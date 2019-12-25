@@ -20,3 +20,9 @@ Yonyou NC5x or U8Cloud Idea devtool Plugin
 找到标签 <component name="PropertiesComponent"> ，
  在标签里加一行  <property name="dynamic.classpath" value="true" /> 
 ```
+
+# 已知BUG
+
+
+# 未来待实现功能
+1. 导出补丁包
