@@ -28,7 +28,7 @@ public class ProjectUtil {
      */
     @Nonnull
     public static Project getDefaultProject(){
-       return getProjectMannager().getDefaultProject();
+       return getProjectMannager().getOpenProjects()[0];
     }
 
     /* *

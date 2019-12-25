@@ -1,8 +1,11 @@
 package com.air.nc5dev.ui;
 
-import javax.swing.*;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
 
-public class NC5HomeConfigDiaLogPanel extends JPanel {
+import javax.swing.*;
+import java.awt.*;
+
+public class NC5HomeConfigDiaLogPanel extends JScrollPane {
     protected JTextField textField_home;
     protected JTextField textField_ip;
     protected JTextField textField_port;
@@ -20,47 +23,52 @@ public class NC5HomeConfigDiaLogPanel extends JPanel {
     protected JLabel label_3;
     protected JComboBox comboBox_datasource;
     protected JComboBox comboBox_dbtype;
-    protected  NC5HomeConfigDialogUIListner nc5HomeConfigDialogUIListner;
+    protected JTextField textField_minConCout;
+    protected JTextField textField_maxConCount;
+    protected NC5HomeConfigDialogUIListner nc5HomeConfigDialogUIListner;
 
     /**
      * Create the dialog.
      */
     public NC5HomeConfigDiaLogPanel() {
-        setBounds(0, 0, 941, 635);
+        setBounds(0, 0, 769, 606);
         setLayout(null);
 
         JPanel contentPanel = new JPanel();
-        contentPanel.setBounds(14, 14, 895, 544);
+        contentPanel.setBounds(14, 14, 738, 543);
         add(contentPanel);
         contentPanel.setLayout(null);
 
         JLabel lblNc = new JLabel("NC 文件夹: ");
-        lblNc.setBounds(14, 14, 107, 19);
+        lblNc.setBounds(14, 29, 107, 19);
         contentPanel.add(lblNc);
 
         textField_home = new JTextField();
-        textField_home.setBounds(114, 11, 620, 32);
+        textField_home.setForeground(new Color(255, 0, 0));
+        textField_home.setToolTipText("可编辑输入框");
+        textField_home.setFont(new Font("宋体", Font.PLAIN, 16));
+        textField_home.setBounds(114, 26, 489, 32);
         contentPanel.add(textField_home);
         textField_home.setColumns(10);
 
         button_choseDir = new JButton("选择");
-        button_choseDir.setBounds(737, -6, 101, 59);
+        button_choseDir.setBounds(617, 9, 101, 59);
         contentPanel.add(button_choseDir);
 
         JLabel label = new JLabel("数据库类型: ");
         label.setBounds(14, 142, 107, 19);
         contentPanel.add(label);
 
-        comboBox_dbtype = new JComboBox(new String[] { "ORACLE11G", "ORACLE10G", "SQLSERVER2008", "DB297" });
+        comboBox_dbtype = new JComboBox(ProjectNCConfigUtil.dsTypes);
         comboBox_dbtype.setBounds(114, 139, 170, 32);
         contentPanel.add(comboBox_dbtype);
 
         button_testdb = new JButton("测试链接");
-        button_testdb.setBounds(559, 111, 120, 42);
+        button_testdb.setBounds(369, 112, 120, 42);
         contentPanel.add(button_testdb);
 
         button_adddesign = new JButton("新增开发源");
-        button_adddesign.setBounds(720, 112, 120, 42);
+        button_adddesign.setBounds(517, 112, 120, 42);
         contentPanel.add(button_adddesign);
 
         JLabel lblIp = new JLabel("IP:");
@@ -68,8 +76,11 @@ public class NC5HomeConfigDiaLogPanel extends JPanel {
         contentPanel.add(lblIp);
 
         textField_ip = new JTextField();
+        textField_ip.setForeground(new Color(255, 0, 0));
+        textField_ip.setToolTipText("可编辑输入框");
+        textField_ip.setFont(new Font("宋体", Font.PLAIN, 16));
         textField_ip.setColumns(10);
-        textField_ip.setBounds(114, 188, 433, 32);
+        textField_ip.setBounds(114, 188, 354, 32);
         contentPanel.add(textField_ip);
 
         JLabel lblOid = new JLabel("Port:");
@@ -77,6 +88,9 @@ public class NC5HomeConfigDiaLogPanel extends JPanel {
         contentPanel.add(lblOid);
 
         textField_port = new JTextField();
+        textField_port.setForeground(new Color(255, 0, 0));
+        textField_port.setToolTipText("可编辑输入框");
+        textField_port.setFont(new Font("宋体", Font.PLAIN, 16));
         textField_port.setColumns(10);
         textField_port.setBounds(114, 224, 113, 32);
         contentPanel.add(textField_port);
@@ -86,8 +100,11 @@ public class NC5HomeConfigDiaLogPanel extends JPanel {
         contentPanel.add(lblOidmark);
 
         textField_oidmark = new JTextField();
+        textField_oidmark.setForeground(new Color(255, 0, 0));
+        textField_oidmark.setToolTipText("可编辑输入框");
+        textField_oidmark.setFont(new Font("宋体", Font.PLAIN, 16));
         textField_oidmark.setColumns(10);
-        textField_oidmark.setBounds(340, 224, 207, 32);
+        textField_oidmark.setBounds(340, 224, 128, 32);
         contentPanel.add(textField_oidmark);
 
         JLabel lblDbnamesid = new JLabel("DBNAME(SID):");
@@ -95,8 +112,11 @@ public class NC5HomeConfigDiaLogPanel extends JPanel {
         contentPanel.add(lblDbnamesid);
 
         textField_sid = new JTextField();
+        textField_sid.setForeground(new Color(255, 0, 0));
+        textField_sid.setToolTipText("可编辑输入框");
+        textField_sid.setFont(new Font("宋体", Font.PLAIN, 16));
         textField_sid.setColumns(10);
-        textField_sid.setBounds(172, 260, 375, 32);
+        textField_sid.setBounds(172, 260, 295, 32);
         contentPanel.add(textField_sid);
 
         JLabel lblUsername = new JLabel("用户名:");
@@ -104,8 +124,11 @@ public class NC5HomeConfigDiaLogPanel extends JPanel {
         contentPanel.add(lblUsername);
 
         textField_user = new JTextField();
+        textField_user.setForeground(new Color(255, 0, 0));
+        textField_user.setToolTipText("可编辑输入框");
+        textField_user.setFont(new Font("宋体", Font.PLAIN, 16));
         textField_user.setColumns(10);
-        textField_user.setBounds(114, 306, 708, 32);
+        textField_user.setBounds(114, 306, 582, 32);
         contentPanel.add(textField_user);
 
         JLabel lblPassword = new JLabel("密  码:");
@@ -113,8 +136,11 @@ public class NC5HomeConfigDiaLogPanel extends JPanel {
         contentPanel.add(lblPassword);
 
         textField_pass = new JTextField();
+        textField_pass.setForeground(new Color(255, 0, 0));
+        textField_pass.setToolTipText("可编辑输入框");
+        textField_pass.setFont(new Font("宋体", Font.PLAIN, 16));
         textField_pass.setColumns(10);
-        textField_pass.setBounds(124, 358, 708, 32);
+        textField_pass.setBounds(114, 358, 572, 32);
         contentPanel.add(textField_pass);
 
         JLabel label_1 = new JLabel("客户端地址:");
@@ -122,7 +148,10 @@ public class NC5HomeConfigDiaLogPanel extends JPanel {
         contentPanel.add(label_1);
 
         textField_clientip = new JTextField();
-        textField_clientip.setBounds(120, 444, 718, 32);
+        textField_clientip.setForeground(new Color(255, 0, 0));
+        textField_clientip.setToolTipText("可编辑输入框");
+        textField_clientip.setFont(new Font("宋体", Font.PLAIN, 16));
+        textField_clientip.setBounds(120, 444, 582, 32);
         contentPanel.add(textField_clientip);
         textField_clientip.setColumns(10);
 
@@ -131,7 +160,10 @@ public class NC5HomeConfigDiaLogPanel extends JPanel {
         contentPanel.add(label_2);
 
         textField_cientport = new JTextField();
-        textField_cientport.setBounds(120, 498, 718, 32);
+        textField_cientport.setForeground(new Color(255, 0, 0));
+        textField_cientport.setToolTipText("可编辑输入框");
+        textField_cientport.setFont(new Font("宋体", Font.PLAIN, 16));
+        textField_cientport.setBounds(120, 498, 582, 32);
         contentPanel.add(textField_cientport);
         textField_cientport.setColumns(10);
 
@@ -143,50 +175,89 @@ public class NC5HomeConfigDiaLogPanel extends JPanel {
         comboBox_datasource.setBounds(114, 79, 170, 32);
         contentPanel.add(comboBox_datasource);
 
+        JLabel label_4 = new JLabel("连接数最小:");
+        label_4.setBounds(482, 206, 101, 26);
+        contentPanel.add(label_4);
+
+        textField_minConCout = new JTextField();
+        textField_minConCout.setForeground(new Color(255, 0, 0));
+        textField_minConCout.setToolTipText("可编辑输入框");
+        textField_minConCout.setFont(new Font("宋体", Font.PLAIN, 16));
+        textField_minConCout.setColumns(10);
+        textField_minConCout.setBounds(589, 204, 113, 32);
+        contentPanel.add(textField_minConCout);
+
+        JLabel label_5 = new JLabel("连接数最大:");
+        label_5.setBounds(487, 256, 96, 26);
+        contentPanel.add(label_5);
+
+        textField_maxConCount = new JTextField();
+        textField_maxConCount.setForeground(new Color(255, 0, 0));
+        textField_maxConCount.setToolTipText("可编辑输入框");
+        textField_maxConCount.setFont(new Font("宋体", Font.PLAIN, 16));
+        textField_maxConCount.setColumns(10);
+        textField_maxConCount.setBounds(589, 250, 119, 32);
+        contentPanel.add(textField_maxConCount);
+
         nc5HomeConfigDialogUIListner = NC5HomeConfigDialogUIListner.build(this);
     }
+
     protected JButton getButton_canel() {
         return button_canel;
     }
+
     public JButton getButton_adddesign() {
         return button_adddesign;
     }
+
     public JButton getButton_testdb() {
         return button_testdb;
     }
+
     public JButton getButton_yes() {
         return button_yes;
     }
+
     public JTextField getTextField_port() {
         return textField_port;
     }
+
     public JTextField getTextField_pass() {
         return textField_pass;
     }
+
     public JTextField getTextField_oidmark() {
         return textField_oidmark;
     }
+
     public JTextField getTextField_home() {
         return textField_home;
     }
+
     public JTextField getTextField_ip() {
         return textField_ip;
     }
+
     public JTextField getTextField_sid() {
         return textField_sid;
     }
+
     public JComboBox getComboBox_datasource() {
         return comboBox_datasource;
     }
+
     public JTextField getTextField_cientport() {
         return textField_cientport;
     }
+
     public JTextField getTextField_clientip() {
         return textField_clientip;
     }
+
     public JTextField getTextField_user() {
         return textField_user;
     }
+
     public JComboBox getComboBox_dbtype() {
         return comboBox_dbtype;
     }

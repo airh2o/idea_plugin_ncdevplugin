@@ -10,11 +10,8 @@ public class NC5HomeConfigDialogUI extends DialogWrapper {
 
     public NC5HomeConfigDialogUI(@Nullable Project project) {
         super(project);
-        setSize(950, 640);
         init();
-        setSize(950, 640);
         setTitle("配置NC5x HOME和数据源");
-        setSize(950, 640);
     }
 
     @Override
@@ -26,7 +23,7 @@ public class NC5HomeConfigDialogUI extends DialogWrapper {
     @Override
     protected JComponent createCenterPanel() {
         centerPanel = new NC5HomeConfigDiaLogPanel();
-        centerPanel.setVisible(true);
+       // centerPanel.setVisible(true);
         return centerPanel;
     }
 

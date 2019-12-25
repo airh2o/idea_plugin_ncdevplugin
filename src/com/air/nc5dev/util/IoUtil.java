@@ -1,9 +1,11 @@
 package com.air.nc5dev.util;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * IO tool
@@ -25,6 +27,7 @@ public final class IoUtil {
             e.printStackTrace();
         }
     }
+
     /**
      * 获得所有NC的Ant jar路径
      *
@@ -36,7 +39,7 @@ public final class IoUtil {
 
         File f = new File(ncHome, File.separatorChar + "ant");
         if (f.exists()) {
-            all.addAll(getAllJarFiles(f));
+            all.addAll(getAllJarFiles(f, true));
         }
 
         return all;
@@ -54,11 +57,12 @@ public final class IoUtil {
         File f = new File(ncHome, "resources");
         if (f.exists()) {
             all.add(f);
+            all.addAll(getAllFiles(f, true));
         }
 
         f = new File(ncHome, "lib");
         if (f.exists()) {
-            all.addAll(getAllJarFilesIncloudChild(f));
+            all.addAll(getAllJarFiles(f, true));
         }
         f = new File(ncHome, "external" + File.separatorChar + "classes");
         if (f.exists()) {
@@ -66,7 +70,7 @@ public final class IoUtil {
         }
         f = new File(ncHome, "external" + File.separatorChar + "lib");
         if (f.exists()) {
-            all.addAll(getAllJarFilesIncloudChild(f));
+            all.addAll(getAllJarFiles(f, true));
         }
 
         return all;
@@ -83,11 +87,12 @@ public final class IoUtil {
 
         File f = new File(ncHome, "middleware");
         if (f.exists()) {
-            all.addAll(getAllJarFilesIncloudChild(f));
+            all.addAll(getAllJarFiles(f, true));
         }
 
         return all;
     }
+
     /**
      * 获得所有NC的公共     Framework_Library  jar路径
      *
@@ -99,7 +104,7 @@ public final class IoUtil {
 
         File f = new File(ncHome, "framework");
         if (f.exists()) {
-            all.addAll(getAllJarFilesIncloudChild(f));
+            all.addAll(getAllJarFiles(f, true));
         }
 
         return all;
@@ -111,20 +116,21 @@ public final class IoUtil {
      * @param ncHome
      * @return
      */
+    @Deprecated
     public static final ArrayList<File> serachAllNcLibsJars(File ncHome) {
         ArrayList<File> all = new ArrayList<File>();
 
         File f = new File(ncHome, "\\lib");
         if (f.exists()) {
-            all.addAll(getAllJarFiles(f));
+            all.addAll(getAllJarFiles(f, false));
         }
         f = new File(ncHome, "\\ejb");
         if (f.exists()) {
-            all.addAll(getAllJarFiles(f));
+            all.addAll(getAllJarFiles(f, false));
         }
         f = new File(ncHome, "\\ejb");
         if (f.exists()) {
-            all.addAll(getAllJarFiles(f));
+            all.addAll(getAllJarFiles(f, false));
         }
         f = new File(ncHome, "\\external\\classes");
         if (f.exists()) {
@@ -132,19 +138,20 @@ public final class IoUtil {
         }
         f = new File(ncHome, "\\external");
         if (f.exists()) {
-            all.addAll(getAllJarFiles(f));
+            all.addAll(getAllJarFiles(f, false));
         }
         f = new File(ncHome, "\\driver");
         if (f.exists()) {
-            all.addAll(getAllJarFiles(f));
+            all.addAll(getAllJarFiles(f, false));
         }
         f = new File(ncHome, "\\middleware");
         if (f.exists()) {
-            all.addAll(getAllJarFiles(f));
+            all.addAll(getAllJarFiles(f, false));
         }
 
         return all;
     }
+
     /**
      * 获取NC的 所有 模块的 所有    NC_Module_Public_Library
      *
@@ -156,6 +163,7 @@ public final class IoUtil {
         all.addAll(serachAllNcPublicJars(ncHome));
         return all;
     }
+
     /**
      * 获取NC的 所有 模块的 所有    Module_Client_Library
      *
@@ -167,6 +175,7 @@ public final class IoUtil {
         all.addAll(serachAllNcClientJars(ncHome));
         return all;
     }
+
     /**
      * 获取NC的 所有 模块的 所有    Module_Private_Library
      *
@@ -178,6 +187,7 @@ public final class IoUtil {
         all.addAll(serachAllNcPrivateJars(ncHome));
         return all;
     }
+
     /**
      * 获取NC的 所有 模块的 所有    Module_Lang_Library
      *
@@ -189,11 +199,12 @@ public final class IoUtil {
 
         File f = new File(ncHome, "langlib");
         if (f.exists()) {
-            all.addAll(getAllJarFilesIncloudChild(f));
+            all.addAll(getAllJarFiles(f, true));
         }
 
         return all;
     }
+
     /**
      * 获取NC的 所有 模块的 所有    Generated_EJB
      *
@@ -205,7 +216,7 @@ public final class IoUtil {
 
         File f = new File(ncHome, "ejb");
         if (f.exists()) {
-            all.addAll(getAllJarFilesIncloudChild(f));
+            all.addAll(getAllJarFiles(f, true));
         }
 
         return all;
@@ -294,7 +305,7 @@ public final class IoUtil {
                 File f = new File(dir, File.separatorChar + dirName);
                 if (f.exists()) {
                     if (isJarDir) {
-                        all.addAll(getAllJarFiles(f));
+                        all.addAll(getAllJarFiles(f, false));
                     } else {
                         all.add(f);
                     }
@@ -304,40 +315,54 @@ public final class IoUtil {
         return all;
     }
 
+
     /**
-     * 所有一个 文件夹类所有的jar文件， 会搜索子目录！
+     * 所有一个 文件夹类所有的jar文件
      *
      * @param dir
+     * @param hasChiled true 会搜索子目录！
      * @return
      */
-    private static Collection<? extends File> getAllJarFilesIncloudChild(File dir) {
-        File[] fs = dir.listFiles();
-
-        ArrayList<File> ar = new ArrayList<File>(null == fs ? 0 : fs.length);
-
-        try {
-            File f;
-            for (int i = 0; i < fs.length; i++) {
-                f = fs[i];
-                if (f.isFile() && f.getName().toLowerCase().endsWith(".jar")) {
-                    ar.add(fs[i]);
-                } else if (f.isDirectory()) {
-                    ar.addAll(getAllJarFilesIncloudChild(f));
-                }
-            }
-        } catch (Exception e) {
-        }
-
-        return ar;
+    public static List<File> getAllJarFiles(File dir, boolean hasChiled) {
+        return getAllFiles(dir, hasChiled, ".jar");
     }
 
     /**
-     * 所有一个 文件夹类所有的jar文件，不会搜索子目录！
+     * 所有一个 文件夹类所有的指定后缀名文件
      *
      * @param dir
+     * @param hasChiled   true 会搜索子目录！
+     * @param fileEndFixs 文件名后缀
      * @return
      */
-    public static List<File> getAllJarFiles(File dir) {
+    public static List<File> getAllFiles(@Nonnull File dir, boolean hasChiled, @Nonnull final String... fileEndFixs) {
+        List<File> ar = getAllFiles(dir, hasChiled);
+        if (null == ar) {
+            return new ArrayList<>();
+        }
+
+        return ar.stream().filter(file
+                -> {
+            boolean mach = file.exists() && file.isFile();
+            boolean endMach = false;
+            for (String fileEndFix : fileEndFixs) {
+                endMach = file.getName().toLowerCase().endsWith(fileEndFix);
+                if (endMach) {
+                    break;
+                }
+            }
+            return mach && endMach;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 所有一个 文件夹类所有的文件
+     *
+     * @param dir
+     * @param hasChiled true 包含子文件夹
+     * @return
+     */
+    public static List<File> getAllFiles(File dir, boolean hasChiled) {
         File[] fs = dir.listFiles();
 
         ArrayList<File> ar = new ArrayList<File>(null == fs ? 0 : fs.length);
@@ -346,10 +371,10 @@ public final class IoUtil {
             File f;
             for (int i = 0; i < fs.length; i++) {
                 f = fs[i];
-                if (f.isFile() && f.getName().toLowerCase().endsWith(".jar")) {
+                if (f.isFile()) {
                     ar.add(fs[i]);
-                } else if (f.isDirectory()) {
-                    ar.addAll(getAllJarFiles(f));
+                } else if (f.isDirectory() && hasChiled) {
+                    ar.addAll(getAllFiles(f, hasChiled));
                 }
             }
         } catch (Exception e) {

@@ -11,6 +11,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import nc.vo.framework.rsa.Encode;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -47,7 +48,7 @@ public class NC5HomeConfigDialogUIListner {
         //final String ora11 = "ORACLE11G", ora10 = "ORACLE10G", sqlserver = "SQLSERVER2008", db297 = "DB297";
         Connection con;
         String user = ui.textField_user.getText();
-        String password = new Encode().decode(ui.textField_pass.getText());
+        String password = new Encode().encode(ui.textField_pass.getText());
         String className = ds.getDriverClassName();
         String url = ui.textField_ip.getText();
         try {
@@ -71,6 +72,9 @@ public class NC5HomeConfigDialogUIListner {
         VirtualFile virtualFile = FileChooser.chooseFile(new FileChooserDescriptor(false, true
                         , false, false, false, false), null
                 , null);
+        if(null == virtualFile){
+            return ;
+        }
         String path = virtualFile.getPath();
         File home = new File(path);
         if (home.exists() && home.isDirectory()) {
@@ -137,28 +141,53 @@ public class NC5HomeConfigDialogUIListner {
      * 数据源选择改变
      */
     private void onDataSourceSelectChange(ItemEvent event) {
-        if (event.getStateChange() != ItemEvent.ITEM_STATE_CHANGED) {
+        if (event.getStateChange() != ItemEvent.DESELECTED) {
             return;
         }
+        //把编辑值 放入到 数据源 配置变量里
+        String old = event.getItem().toString();
+        NCDataSourceVO oldDs = NCPropXmlUtil.get(old);
+        oldDs.setDatabaseUrl(ui.textField_ip.getText());
+        oldDs.setOidMark(ui.textField_oidmark.getText());
+        oldDs.setUser(ui.textField_user.getText());
+        oldDs.setPassword(new Encode().encode(ui.textField_pass.getText()));
+        oldDs.setMinCon(ui.textField_minConCout.getText());
+        oldDs.setMaxCon(ui.textField_maxConCount.getText());
+        oldDs.setDatabaseType(ui.comboBox_dbtype.getSelectedItem().toString());
+        oldDs.setDataSourceClassName(ProjectNCConfigUtil.dsTypeClasss[ui.comboBox_dbtype.getSelectedIndex()]);
 
-        showDataSource2UI(event.getItem().toString());
+
+        //显示最新选择的
+        String now = ui.comboBox_datasource.getSelectedItem().toString();
+        NCDataSourceVO ds = NCPropXmlUtil.get(now);
+        showDataSource2UI(ds);
+    }
+    /***
+      *   TODO  根据下拉框的数据库类型获得jdbc class名字      </br>
+      *           </br>
+      *           </br>
+      *           </br>
+      * @author air Email: 209308343@qq.com
+      * @date 2019/12/25 0025 11:23
+      * @Param [databaseType]
+      * @return java.lang.String
+     */
+    private String getJdbcClassNameByDbType(String databaseType) {
+        return "";
     }
 
     /**
-     * 显示指定的数据源名字到ui界面
+     * 显示指定的数据源 到ui界面
      *
-     * @param dsName
+     * @param ds
      */
-    private void showDataSource2UI(String dsName) {
-        NCDataSourceVO ds =  NCPropXmlUtil.stream().filter(e -> {
-            return e.getDataSourceName().equals(dsName);
-        }).findFirst().get();
-
+    private void showDataSource2UI(@Nonnull  final NCDataSourceVO ds ) {
         ui.textField_ip.setText(ds.getDatabaseUrl());
         ui.textField_oidmark.setText(ds.getOidMark());
         ui.textField_user.setText(ds.getUser());
         ui.textField_pass.setText(new Encode().decode(ds.getPassword()));
-
+        ui.textField_minConCout.setText(ds.getMinCon());
+        ui.textField_maxConCount.setText(ds.getMaxCon());
         ui.comboBox_dbtype.setSelectedItem(ds.getDatabaseType());
     }
 
@@ -176,6 +205,9 @@ public class NC5HomeConfigDialogUIListner {
      */
     private void loadConf() {
         ui.textField_home.setText(ProjectNCConfigUtil.getNCHomePath());
+        ui.textField_clientip.setText(ProjectNCConfigUtil.getNCClientIP());
+        ui.textField_cientport.setText(ProjectNCConfigUtil.getNCClientPort());
+
         List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS();
 
         if (null != dataSourceVOS) {
@@ -195,7 +227,7 @@ public class NC5HomeConfigDialogUIListner {
         final int firstDsIndex = 0;
         ui.comboBox_datasource.setSelectedIndex(firstDsIndex);
         if (dataSourceVOS != null && !dataSourceVOS.isEmpty()) {
-            showDataSource2UI(dataSourceVOS.get(firstDsIndex).getDataSourceName());
+            showDataSource2UI(dataSourceVOS.get(firstDsIndex));
         }
     }
 

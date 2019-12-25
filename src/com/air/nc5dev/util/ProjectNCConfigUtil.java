@@ -21,6 +21,9 @@ import java.util.Properties;
 public class ProjectNCConfigUtil {
     /*** NC配置文件在项目中文件的名字 ***/
     public static final String DEFUAL_NC_CONFIG_PROJECT_FILENAME = "nc.prop";
+    public static final  String[] dsTypes = new String[]{"ORACLE11G", "ORACLE10G", "SQLSERVER2008", "DB297"};
+    public static final  String[] dsTypeClasss = new String[]{"oracle.jdbc.OracleDriver", "oracle.jdbc.OracleDriver", "com.microsoft.sqlserver.jdbc.SQLServerDriver", "com.ibm.db2.jcc.DB2Driver"};
+
     /**** NC项目里配置文件 属性集合 ***/
     private static Properties configPropertis;
     /**** NC项目里配置文件 ***/
@@ -199,23 +202,23 @@ public class ProjectNCConfigUtil {
 
 
     /*****    NC 依赖库： NC ant jars         ****/
-    public static final String LIB_Ant_Library = "Ant_Library";
+    public static final String LIB_Ant_Library = "nc.uap.mde.library.container/Ant_Library";
     /*****    NC 依赖库： NC公共LIB         ****/
-    public static final String LIB_Product_Common_Library = "Product_Common_Library";
+    public static final String LIB_Product_Common_Library = "nc.uap.mde.library.container/Product_Common_Library";
     /*****    NC 依赖库： NC Middleware_Library  ****/
-    public static final String LIB_Middleware_Library = "Middleware_Library";
+    public static final String LIB_Middleware_Library = "nc.uap.mde.library.container/Middleware_Library";
     /*****    NC 依赖库： NC Framework_Library  ****/
-    public static final String LIB_Framework_Library = "Framework_Library";
+    public static final String LIB_Framework_Library = "nc.uap.mde.library.container/Framework_Library";
     /*****    NC 依赖库： NC模块  Module_Public_Library     ****/
-    public static final String LIB_NC_Module_Public_Library = "Module_Public_Library";
+    public static final String LIB_NC_Module_Public_Library = "nc.uap.mde.library.container/Module_Public_Library";
     /*****    NC 依赖库： NC模块  Module_Client_Library     ****/
-    public static final String LIB_Module_Client_Library = "Module_Client_Library";
+    public static final String LIB_Module_Client_Library = "nc.uap.mde.library.container/Module_Client_Library";
     /*****    NC 依赖库： NC模块  Module_Private_Library     ****/
-    public static final String LIB_Module_Private_Library = "Module_Private_Library";
+    public static final String LIB_Module_Private_Library = "nc.uap.mde.library.container/Module_Private_Library";
     /*****    NC 依赖库： NC模块  Module_Lang_Library     ****/
-    public static final String LIB_Module_Lang_Library = "Module_Lang_Library";
+    public static final String LIB_Module_Lang_Library = "nc.uap.mde.library.container/Module_Lang_Library";
     /*****    NC 依赖库： NC模块  Generated_EJB     ****/
-    public static final String LIB_Generated_EJB = "Generated_EJB";
+    public static final String LIB_Generated_EJB = "nc.uap.mde.library.container/Generated_EJB";
 
 
     private ProjectNCConfigUtil() {

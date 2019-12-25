@@ -44,25 +44,35 @@ public class ApplicationLibraryUtil {
         final LibraryTable.ModifiableModel model = LibraryTablesRegistrar.getInstance().getLibraryTable(project).getModifiableModel();
 
         LibraryEx library = (LibraryEx) model.getLibraryByName(libraryName);
-        // 库不存在创建新的
-        if (library == null) {
-            library = (LibraryEx) model.createLibrary(libraryName);
+        // 库存在创建新的
+        if (library != null) {
+            model.removeLibrary(library);
         }
-        // 库中已有的jar删除
+        library = (LibraryEx) model.createLibrary(libraryName);
+
         final LibraryEx.ModifiableModelEx libraryModel = library.getModifiableModel();
+
+        /* // 库中已有的jar删除
         String[] classRootUrls = libraryModel.getUrls(OrderRootType.CLASSES);
         for (String classRootURL : classRootUrls) {
             libraryModel.removeRoot(classRootURL, OrderRootType.CLASSES);
-        }
+        }*/
 
+        //参数转换成路径集合
         List<String> classesRoots = files.stream().map(file -> file.getPath()).collect(Collectors.toList());
-        // 加入新的jar
+
+        // 加入新的依赖路径
         for (String root : classesRoots) {
+            System.out.println(root);
             // 注意jar格式jar:{path_to_jar}.jar!/
-            if (root.endsWith(".jar")) {
+            if (root.toLowerCase().endsWith(".jar")) {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("jar", root + "!/"), OrderRootType.CLASSES);
-            } else {
+            } else if (root.toLowerCase().endsWith(".class") || root.toLowerCase().endsWith("resources")) {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
+                libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);
+            }else{
+                libraryModel.addJarDirectory(VirtualFileManager.constructUrl("file", root), false);
+                libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);
             }
         }
 

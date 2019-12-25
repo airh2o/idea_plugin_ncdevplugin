@@ -73,6 +73,25 @@ public class NCPropXmlUtil {
         return dataSourceVOS.get(index);
     }
     /***
+     *    获取 指定数据源名字的 数据源       </br>
+     *           </br>
+     *           </br>
+     *           </br>
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 9:38
+     * @Param [dataSourceName]
+     * @return com.air.nc5dev.bean.NCDataSourceVO 获取不到返回null
+     */
+    public static final NCDataSourceVO get(final String dataSourceName){
+        if(isDataSourceEmpty()){
+            return null;
+        }
+
+        return stream().filter(e -> {
+            return e.getDataSourceName().equals(dataSourceName);
+        }).findFirst().get();
+    }
+    /***
      *    获得数据源操作流       </br>
      *           </br>
      *           </br>
