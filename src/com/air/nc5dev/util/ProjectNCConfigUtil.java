@@ -3,7 +3,6 @@ package com.air.nc5dev.util;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
