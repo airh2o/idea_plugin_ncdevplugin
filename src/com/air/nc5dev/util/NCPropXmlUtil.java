@@ -7,6 +7,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import javax.annotation.Nullable;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -35,7 +37,7 @@ public class NCPropXmlUtil {
     private static List<NCDataSourceVO> dataSourceVOS;
 
     static{
-        loadConfFromFile();
+        loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
     }
 
     /***
@@ -126,15 +128,27 @@ public class NCPropXmlUtil {
      *
      * @return 没设置NCHOME或者文件不存在返回null
      */
-    public static final  File getPropFile() {
+    public static final  File getPropFile(@Nullable  String ncHome) {
         if (StringUtil.isEmpty(ProjectNCConfigUtil.getNCHomePath())) {
+            return null;
+        }
+        File ncHomeFile = null;
+
+        if(StringUtil.notEmpty(ncHome)){
+            ncHomeFile = new File(ncHome);
+        }else{
+            ncHomeFile = ProjectNCConfigUtil.getNCHome();
+        }
+
+        if(!ncHomeFile.exists() || !ncHomeFile.isDirectory()){
+            Messages.showErrorDialog(ProjectUtil.getDefaultProject(), ncHomeFile.getPath() + " NC Home不存在！", "读取NC数据配置错误");
             return null;
         }
 
         final String propPath = StringUtil.isEmpty(ProjectNCConfigUtil.getConfigValue(ProjectNCConfigUtil.KEY_PROJECT_NC_CONFIG_PROP_PATH))
                 ? DEFUAL_NC_PROP_PATH : ProjectNCConfigUtil.getConfigValue(ProjectNCConfigUtil.KEY_PROJECT_NC_CONFIG_PROP_PATH);
 
-        File prop = new File(ProjectNCConfigUtil.getNCHome()  , propPath);
+        File prop = new File(ncHomeFile  , propPath);
         if (!prop.exists() && !prop.isFile()) {
             Messages.showErrorDialog(ProjectUtil.getDefaultProject(), prop.getPath() + " 配置文件不存在！", "读取NC数据配置错误");
             return null;
@@ -145,9 +159,15 @@ public class NCPropXmlUtil {
     /**
      * 从prop文件中 重新读取数据源信息
      */
-    public static final void loadConfFromFile() {
-        Document document = XmlUtil.xmlFile2Document(getPropFile());
-        ArrayList<NCDataSourceVO> dataSourceVOS = new ArrayList<>();
+    public static final void loadConfFromFile(@Nullable  String ncHome) {
+        NCPropXmlUtil.dataSourceVOS = new ArrayList<>();
+        final File propFile = getPropFile(ncHome);
+
+        if(null == propFile || !propFile.exists()){
+            return ;
+        }
+
+        Document document = XmlUtil.xmlFile2Document(propFile);
         Element root = document.getDocumentElement();
         NodeList dataSources = root.getElementsByTagName("dataSource");
         Element element;
@@ -155,8 +175,6 @@ public class NCPropXmlUtil {
             element = (Element) dataSources.item(i);
             dataSourceVOS.add(new NCDataSourceVO(element));
         }
-
-        NCPropXmlUtil.dataSourceVOS = dataSourceVOS;
     }
 
     /**
@@ -164,7 +182,8 @@ public class NCPropXmlUtil {
      *
      */
     public static final  void saveDataSources() {
-        final Document document = XmlUtil.xmlFile2Document(getPropFile());
+        final  File propFile = getPropFile(ProjectNCConfigUtil.getNCHomePath());
+        final Document document = XmlUtil.xmlFile2Document(propFile);
         final Element root = document.getDocumentElement();
         NodeList dataSources = root.getElementsByTagName("dataSource");
         ArrayList<Node> dataSourceNodes = new ArrayList<>();
@@ -244,7 +263,7 @@ public class NCPropXmlUtil {
             // 文档字符编码
             transformer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
             // 可随意指定文件的后缀,效果一样,但xml比较好解析,比如: E:\\person.txt等
-            transformer.transform(new DOMSource(document), new StreamResult(getPropFile()));
+            transformer.transform(new DOMSource(document), new StreamResult(propFile));
         } catch (TransformerException e) {
             e.printStackTrace();
             Messages.showErrorDialog(ProjectUtil.getDefaultProject(), e.toString(), "更新NC 数据源配置文件错误");

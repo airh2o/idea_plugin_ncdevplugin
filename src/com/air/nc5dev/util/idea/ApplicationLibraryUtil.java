@@ -63,7 +63,6 @@ public class ApplicationLibraryUtil {
 
         // 加入新的依赖路径
         for (String root : classesRoots) {
-            System.out.println(root);
             // 注意jar格式jar:{path_to_jar}.jar!/
             if (root.toLowerCase().endsWith(".jar")) {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("jar", root + "!/"), OrderRootType.CLASSES);

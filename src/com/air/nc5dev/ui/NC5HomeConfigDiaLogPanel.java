@@ -1,31 +1,32 @@
 package com.air.nc5dev.ui;
 
+import com.air.nc5dev.listner.NC5HomeConfigDialogUIListner;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class NC5HomeConfigDiaLogPanel extends JScrollPane {
-    protected JTextField textField_home;
-    protected JTextField textField_ip;
-    protected JTextField textField_port;
-    protected JTextField textField_oidmark;
-    protected JTextField textField_sid;
-    protected JTextField textField_user;
-    protected JTextField textField_pass;
-    protected JTextField textField_clientip;
-    protected JTextField textField_cientport;
-    protected JButton button_testdb;
-    protected JButton button_choseDir;
-    protected JButton button_adddesign;
-    protected JButton button_yes;
-    protected JButton button_canel;
-    protected JLabel label_3;
-    protected JComboBox comboBox_datasource;
-    protected JComboBox comboBox_dbtype;
-    protected JTextField textField_minConCout;
-    protected JTextField textField_maxConCount;
-    protected NC5HomeConfigDialogUIListner nc5HomeConfigDialogUIListner;
+    public JTextField textField_home;
+    public JTextField textField_ip;
+    public JTextField textField_port;
+    public JTextField textField_oidmark;
+    public JTextField textField_sid;
+    public JTextField textField_user;
+    public JTextField textField_pass;
+    public JTextField textField_clientip;
+    public JTextField textField_cientport;
+    public JButton button_testdb;
+    public JButton button_choseDir;
+    public JButton button_adddesign;
+    public JButton button_yes;
+    public JButton button_canel;
+    public JLabel label_3;
+    public JComboBox comboBox_datasource;
+    public JComboBox comboBox_dbtype;
+    public JTextField textField_minConCout;
+    public JTextField textField_maxConCount;
+    public NC5HomeConfigDialogUIListner nc5HomeConfigDialogUIListner;
 
     /**
      * Create the dialog.
@@ -202,7 +203,7 @@ public class NC5HomeConfigDiaLogPanel extends JScrollPane {
         nc5HomeConfigDialogUIListner = NC5HomeConfigDialogUIListner.build(this);
     }
 
-    protected JButton getButton_canel() {
+    public JButton getButton_canel() {
         return button_canel;
     }
 

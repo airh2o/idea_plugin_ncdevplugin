@@ -177,12 +177,12 @@ public class ProjectNCConfigUtil {
             configFile = new File(ideaDir, DEFUAL_NC_CONFIG_PROJECT_FILENAME);
             if (!configFile.exists()) {
                 configFile.createNewFile();
-            } else {
-                //读取
-                Properties ncConf = new Properties();
-                ncConf.load(new FileInputStream(configFile));
-                ProjectNCConfigUtil.configPropertis = ncConf;
             }
+
+            //读取
+            Properties ncConf = new Properties();
+            ncConf.load(new FileInputStream(configFile));
+            ProjectNCConfigUtil.configPropertis = ncConf;
             ProjectNCConfigUtil.configFile = configFile;
         } catch (IOException e) {
             Messages.showErrorDialog(ProjectUtil.getDefaultProject()

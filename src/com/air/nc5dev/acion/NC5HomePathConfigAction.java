@@ -2,19 +2,23 @@ package com.air.nc5dev.acion;
 
 import com.air.nc5dev.ui.NC5HomeConfigDialogUI;
 import com.air.nc5dev.util.IdeaProjectGenerateUtil;
-import com.intellij.execution.ui.RunContentManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.Messages;
 
+/***
+  *  点击  配置NC HOME  的action       </br>
+  *           </br>
+  *           </br>
+  *           </br>
+  * @author air Email: 209308343@qq.com
+  * @date 2019/12/25 0025 14:41
+  * @Param
+  * @return
+ */
 public class NC5HomePathConfigAction extends AnAction {
     public static NC5HomeConfigDialogUI ui = null;
-    static{
-        NCRunManagerListener nCRunManagerListener = new NCRunManagerListener();
-        ProjectManager.getInstance().getDefaultProject().getMessageBus().connect().subscribe(RunContentManager.TOPIC , nCRunManagerListener);
-    }
 
     @Override
     public void actionPerformed(AnActionEvent e) {

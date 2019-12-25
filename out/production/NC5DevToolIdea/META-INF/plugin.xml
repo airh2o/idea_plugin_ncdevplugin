@@ -1,0 +1,66 @@
+<idea-plugin>
+    <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
+    <name>NC5x开发插件</name>
+    <version>1.0</version>
+    <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com</vendor>
+
+    <description><![CDATA[
+      NC5系列 IDEA开发插件 作者:air Email: 209308343@qq.com 欢迎外包私单联系邮件或QQ
+    ]]></description>
+
+    <change-notes><![CDATA[
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>
+    ]]>
+    </change-notes>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="173.0"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <action id="nc5dev.config.nchome" class="com.air.nc5dev.acion.NC5HomePathConfigAction" text="配置NC HOME"
+                description="设置NC5的HOME主路径">
+        </action>
+        <action id="nc5dev.config.updateclasspath" class="com.air.nc5dev.acion.UpdateProjectNCDependencyAction"
+                text="更新NC库依赖" description="理解更新当前设置的NC HOME的所有NC类依赖">
+        </action>
+        <action id="nc5dev.config.addRunConfig" class="com.air.nc5dev.acion.AddProjectNCRunConfig" text="生成默认NC运行配置"
+                description="生成默认的2个NC运行配置，一个服务端，一个客户端(如果已经有了会跳过)">
+        </action>
+        <action id="nc5dev.export.exportncpatcher" class="com.air.nc5dev.acion.ExportNCPatcherAction"
+                text="导出NC补丁包" description="导出项目为NC的补丁包">
+        </action>
+        <action id="nc5dev.info.about" class="com.air.nc5dev.acion.AboutMeAction" text="关于我" description="插件信息">
+        </action>
+
+        <group id="nc5devtool" text="NC 开发插件配置" popup="true" description="配置NC开发插件">
+            <reference ref="nc5dev.config.nchome" />
+            <reference ref="nc5dev.config.updateclasspath" />
+            <reference ref="nc5dev.config.addRunConfig"   />
+            <reference ref="nc5dev.export.exportncpatcher"   />
+            <reference ref="nc5dev.info.about" />
+
+
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </group>
+
+    </actions>
+
+
+    <application-components>
+        <component>
+            <implementation-class>com.air.nc5dev.listner.ProjectNCMeatInfFileEditedListner</implementation-class>
+        </component>
+    </application-components>
+
+</idea-plugin>

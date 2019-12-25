@@ -17,15 +17,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /***
-  *    生成新项目里 NC必须的东西       </br>
+  *    生成新项目里 NC必须的东西  等    </br>
   *     1.NC库依赖      </br>
   *     2.NC 3个源文件夹 和 1个xml     </br>
-  *     3.NC 2个运行选项 服务端+客户端      </br>
+  *     3.NC 2个运行选项 服务端+客户端
+ *     4. 复制项目 ump文件到 NC HOME的工具方法 </br>
   * @author air Email: 209308343@qq.com
   * @date 2019/12/25 0025 9:02
  */
@@ -79,6 +83,7 @@ public class IdeaProjectGenerateUtil {
             }
         }
 
+        copyProjectMetaInfFiles2NCHomeModules();
 
          /*try {
            File readme = new File(projectHome, "插件使用帮助-看完可删除.txt");
@@ -235,8 +240,48 @@ public class IdeaProjectGenerateUtil {
 
 
     }
+    /**
+      *           </br>
+      *    马上把最新的项目里 META-INF 里所有文件复制到
+     *          NC HOME里对应的项目模块文件夹，主要是 ejb部署xml       </br>
+      *           </br>
+      *           </br>
+      * @author air Email: 209308343@qq.com
+      * @date 2019/12/25 0025 15:04
+      * @Param []
+      * @return void
+     */
+    public static final void copyProjectMetaInfFiles2NCHomeModules() {
+        String ncHomePath = ProjectNCConfigUtil.getNCHomePath();
+        if(null == ncHomePath || ncHomePath.trim().isEmpty()){
+            return ;
+        }
+        Project project = ProjectUtil.getDefaultProject();
+        File projectUmpDir = new File(project.getBasePath(), "META-INF");
+        if(!projectUmpDir.exists()){
+            return ;
+        }
 
+        File nchome = new File(ncHomePath);
+        if(!nchome.exists() || !nchome.isDirectory()){
+            return ;
+        }
 
+        File modeluUmpDir = new File(ncHomePath, File.separatorChar + "modules"
+                + File.separatorChar + project.getName() + File.separatorChar + "META-INF");
+        if(!modeluUmpDir.exists() || !modeluUmpDir.isDirectory()){
+            modeluUmpDir.mkdirs();
+        }
+
+        //复制 ump 文件到这里
+        File[] projectFiles = projectUmpDir.listFiles(f -> f.isFile());
+        Stream.of(projectFiles).forEach(f -> {
+            try {
+                Files.copy(f.toPath(), new File(modeluUmpDir,f.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception e) {
+            }
+        });
+    }
 
     private IdeaProjectGenerateUtil() {
     }
