@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
 
 /***
  *    NC 补丁导出 工具类       </br>
- *           </br>
+ *    本类是一个不知名字的大佬写的，只做参考不使用，以后删除       </br>
  *           </br>
  *           </br>
  * @author air Email: 209308343@qq.com

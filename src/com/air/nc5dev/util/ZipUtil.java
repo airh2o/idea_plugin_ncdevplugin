@@ -9,7 +9,16 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
+/***
+  *    zip压缩工具类       </br>
+  *       本类是一个不知名字的大佬写的    </br>
+  *           </br>
+  *           </br>
+  * @author air Email: 209308343@qq.com
+  * @date 2020/1/4 0004 13:03
+  * @Param
+  * @return
+ */
 public class ZipUtil {
 
     public ZipUtil() {
