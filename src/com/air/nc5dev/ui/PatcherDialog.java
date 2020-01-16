@@ -1,19 +1,19 @@
 package com.air.nc5dev.ui;
 
-import com.air.nc5dev.util.ExportPatcherUtil;
+import com.air.nc5dev.util.ExportNCPatcherUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /***
  *   导出NC 补丁包的 弹框UI        </br>
@@ -78,13 +78,17 @@ public class PatcherDialog
                 }
             });
             contentPane.add(button_selectSavePath);
+
+            //设置点默认值
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm");
+            this.textField_saveName.setText("exportpatcher-" + LocalDateTime.now().format(formatter) );
+            this.textField_savePath.setText(ProjectUtil.getDefaultProject().getBasePath() + File.separatorChar + "patchers");
         }
 
         return this.contentPane;
     }
     /***
-      *  TODO  点击了确认，开始导出补丁包        </br>
-      *     导出功能还没实现      </br>
+      *   点击了确认，开始导出补丁包        </br>
       *           </br>
       *           </br>
       * @author air Email: 209308343@qq.com
@@ -102,28 +106,23 @@ public class PatcherDialog
             return;
         }
 
-        File srcFile = new File(ProjectUtil.getDefaultProject().getBasePath()
-                + File.separatorChar + "src");
-        if (!srcFile.exists() || !srcFile.isDirectory()) {
-            Messages.showErrorDialog(event.getProject(), "项目 src 文件夹不存在!", "Error");
-            return;
-        }
-        final VirtualFile srcDir = LocalFileSystem.getInstance().findFileByIoFile(srcFile);
-        String exportPath = this.textField_savePath.getText();
-        ExportPatcherUtil util = new ExportPatcherUtil(this.textField_saveName.getText(), exportPath, this.event);
+        String dirName = this.textField_saveName.getText();
+        dirName = null == dirName || dirName.trim().isEmpty() ? "export" : dirName;
+        String exportPath = this.textField_savePath.getText() + File.separatorChar + dirName;
         try {
-            util.exportPatcher(new VirtualFile[]{srcDir});
-            String zipName = util.getZipName();
-            if (StringUtils.isBlank(zipName)) {
-                zipName = "没有导出任何文件 , 请重新 build 项目 , 或者刷新项目后重试 !";
-            } else {
-                zipName = "输出文件 : " + zipName;
+            ExportNCPatcherUtil.export(exportPath, event.getProject());
+            Messages.showInfoMessage("导出成功!硬盘路径： " + exportPath, "Tips");
+
+
+            try {
+                Desktop desktop = Desktop.getDesktop();
+                File dirToOpen = new File(exportPath);
+                desktop.open(dirToOpen);
+            } catch (IllegalArgumentException iae) {
+                System.out.println("自动打开路径失败");
             }
-            Messages.showInfoMessage("导出成功!\n" + zipName, "Tips");
         } catch (Exception e) {
             Messages.showErrorDialog(e.getMessage(), "错误");
-        } finally {
-            util.delete(new File(util.getExportPath()));
         }
         dispose();
     }

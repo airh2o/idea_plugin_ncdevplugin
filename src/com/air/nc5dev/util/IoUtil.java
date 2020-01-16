@@ -1,11 +1,16 @@
 package com.air.nc5dev.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * IO tool
@@ -355,6 +360,76 @@ public final class IoUtil {
         }).collect(Collectors.toList());
     }
 
+
+    /**
+     * 搜索一个文件夹内 所有的末级子文件夹！
+     *
+     * @param dir
+     * @return
+     */
+    public static List<File> getAllLastDirs(@Nonnull File dir) {
+        List<File> all = new LinkedList<>();
+        File[] files = dir.listFiles();
+        if(null == files){
+            return all;
+        }
+
+        for (File file : files) {
+            if(!file.isDirectory()){
+                continue;
+            }
+
+           if(Stream.of(file.listFiles()).anyMatch(e -> e.isDirectory())){
+                all.addAll(getAllLastDirs(file));
+           }else{
+                all.add(file);
+           }
+        }
+
+        return all;
+    }
+    /**
+      *   把一个文件夹 本目录当前级次内所有文件复制到指定的路径（不会复制下级文件夹！）        </br>
+      *           </br>
+      *           </br>
+      *           </br>
+      * @author air Email: 209308343@qq.com
+      * @date 2020/1/16 0016 20:07
+      * @Param [fromDir, toDir]
+      * @return void
+     */
+    public static final void copyAllFile(@NotNull File fromDir,@NotNull  final File toDir){
+        Stream.of(fromDir.listFiles()).forEach(file -> {
+            if(!file.isFile()){
+                return ;
+            }
+           copyFile(file, toDir);
+        });
+    }
+    /**
+     *   把一个文件 复制到指定的文件夹里 </br>
+     *     会自动创建不存在的文件夹      </br>
+     *           </br>
+     *           </br>
+     * @author air Email: 209308343@qq.com
+     * @date 2020/1/16 0016 20:07
+     * @Param [fromDir, toDir]
+     * @return void
+     */
+    public static final void copyFile(@NotNull File from,@NotNull  final File dir){
+        if(!from.isFile()){
+            return ;
+        }
+        File outFile = new File(dir, from.getName());
+        if(!outFile.getParentFile().exists()){
+            outFile.getParentFile().mkdirs();
+        }
+        try {
+            Files.copy(from.toPath(), outFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * 所有一个 文件夹类所有的文件
      *
