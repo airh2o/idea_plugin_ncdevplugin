@@ -81,20 +81,22 @@ public class PatcherDialog
 
             //设置点默认值
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm");
-            this.textField_saveName.setText("exportpatcher-" + LocalDateTime.now().format(formatter) );
+            this.textField_saveName.setText("exportpatcher-" + LocalDateTime.now().format(formatter));
             this.textField_savePath.setText(ProjectUtil.getDefaultProject().getBasePath() + File.separatorChar + "patchers");
         }
 
+        contentPane.setPreferredSize(new Dimension(300, 180));
         return this.contentPane;
     }
+
     /***
-      *   点击了确认，开始导出补丁包        </br>
-      *           </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com
-      * @date 2019/12/25 0025 16:17
-      * @Param []
-      * @return void
+     *   点击了确认，开始导出补丁包        </br>
+     *           </br>
+     *           </br>
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 16:17
+     * @Param []
+     * @return void
      */
     public void onOK() {
         if ((null == this.textField_saveName.getText()) || ("".equals(this.textField_saveName.getText()))) {
@@ -125,6 +127,12 @@ public class PatcherDialog
             Messages.showErrorDialog(e.getMessage(), "错误");
         }
         dispose();
+    }
+
+    @Nullable
+    @Override
+    protected String getDimensionServiceKey() {
+        return "PatcherDialog";
     }
 
     private void onCancel() {

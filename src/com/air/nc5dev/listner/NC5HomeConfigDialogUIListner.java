@@ -26,7 +26,6 @@ import java.util.List;
  */
 public class NC5HomeConfigDialogUIListner {
     private NC5HomeConfigDiaLogPanel ui;
-
     /**
      * 当点击了  测试数据库链接
      *
@@ -58,7 +57,7 @@ public class NC5HomeConfigDialogUIListner {
             con.close();
         } catch (Exception e) {
             Messages.showErrorDialog(ProjectUtil.getDefaultProject(), e.toString(), "连接失败");
-            return ;
+            return;
         }
 
         Messages.showMessageDialog("连接成功", "提示", null);
@@ -73,8 +72,8 @@ public class NC5HomeConfigDialogUIListner {
         VirtualFile virtualFile = FileChooser.chooseFile(new FileChooserDescriptor(false, true
                         , false, false, false, false), null
                 , null);
-        if(null == virtualFile){
-            return ;
+        if (null == virtualFile) {
+            return;
         }
         String path = virtualFile.getPath();
         File home = new File(path);
@@ -164,17 +163,50 @@ public class NC5HomeConfigDialogUIListner {
         NCDataSourceVO ds = NCPropXmlUtil.get(now);
         showDataSource2UI(ds);
     }
-    /***
-      *   TODO  根据下拉框的数据库类型获得jdbc class名字      </br>
+    /**
+      *  数据库类型 下拉框改变         </br>
       *           </br>
       *           </br>
       *           </br>
       * @author air Email: 209308343@qq.com
-      * @date 2019/12/25 0025 11:23
-      * @Param [databaseType]
-      * @return java.lang.String
+      * @date 2020/1/17 0017 11:25
+      * @Param [event]
+      * @return void
+     */
+    private void onDbTypeSelectChange(ItemEvent event) {
+        if (event.getStateChange() != ItemEvent.DESELECTED) {
+            return;
+        }
+        //显示最新选择的
+        String dataSourceName = ui.comboBox_datasource.getSelectedItem().toString();
+        NCDataSourceVO ds = NCPropXmlUtil.get(dataSourceName);
+        String dataBaseType = ui.comboBox_dbtype.getSelectedItem().toString();
+        ds.setDriverClassName(getJdbcClassNameByDbType(dataBaseType));
+        ds.setDataSourceClassName(ds.getDriverClassName());
+    }
+
+    /**
+     *   根据下拉框的数据库类型获得jdbc class名字      </br>
+     *           </br>
+     *           </br>
+     *           </br>
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 11:23
+     * @Param [databaseType]
+     * @return java.lang.String
      */
     private String getJdbcClassNameByDbType(String databaseType) {
+        int i = 0;
+        for ( ; i < ProjectNCConfigUtil.dsTypes.length; i++) {
+            if(ProjectNCConfigUtil.dsTypes[i].equals(databaseType)){
+                break;
+            }
+        }
+
+        if(i < ProjectNCConfigUtil.dsTypeClasss.length){
+            return ProjectNCConfigUtil.dsTypeClasss[i];
+        }
+
         return "";
     }
 
@@ -183,7 +215,7 @@ public class NC5HomeConfigDialogUIListner {
      *
      * @param ds
      */
-    private void showDataSource2UI(@Nonnull  final NCDataSourceVO ds ) {
+    private void showDataSource2UI(@Nonnull final NCDataSourceVO ds) {
         ui.textField_ip.setText(ds.getDatabaseUrl());
         ui.textField_oidmark.setText(ds.getOidMark());
         ui.textField_user.setText(ds.getUser());
@@ -241,6 +273,7 @@ public class NC5HomeConfigDialogUIListner {
         ui.button_choseDir.addActionListener(this::OnChoseHomeDir);
         ui.button_adddesign.addActionListener(this::OnAddDesgin);
         ui.comboBox_datasource.addItemListener(this::onDataSourceSelectChange);
+        ui.comboBox_dbtype.addItemListener(this::onDbTypeSelectChange);
     }
 
     public static final NC5HomeConfigDialogUIListner build(NC5HomeConfigDiaLogPanel setUI) {

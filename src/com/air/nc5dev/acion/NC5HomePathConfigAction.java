@@ -30,9 +30,14 @@ public class NC5HomePathConfigAction extends AnAction {
         ui = new NC5HomeConfigDialogUI(project);
         ui.setSize(700, 490);
         if (ui.showAndGet()) {
+            int updateClassPath = Messages.showYesNoDialog("你是否确定保存配置?请提前备份好NCHOME/iper/bin/prop.xml文件!", "询问", Messages.getQuestionIcon());
+            if (updateClassPath != Messages.OK) {
+                return ;
+            }
+
             ui.getCenterPanel().getNc5HomeConfigDialogUIListner().OnSave(null);
 
-            int updateClassPath = Messages.showYesNoDialog("是否立即更新项目 Dependencies 中NC包依赖?", "询问", Messages.getQuestionIcon());
+            updateClassPath = Messages.showYesNoDialog("是否立即更新项目 Dependencies 中NC包依赖?", "询问", Messages.getQuestionIcon());
             if (updateClassPath == Messages.OK) {
                 IdeaProjectGenerateUtil.updateApplicationNCLibrarys(e.getProject());
             }

@@ -28,7 +28,8 @@ public class ProjectUtil {
      */
     @Nonnull
     public static Project getDefaultProject(){
-       return getProjectMannager().getOpenProjects()[0];
+        Project[] openProjects = getProjectMannager().getOpenProjects();
+        return null == openProjects || openProjects.length < 1 ? null : openProjects[0];
     }
 
     /* *

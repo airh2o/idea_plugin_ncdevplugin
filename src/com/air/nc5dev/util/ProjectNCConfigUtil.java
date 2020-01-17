@@ -3,6 +3,7 @@ package com.air.nc5dev.util;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,165 +11,200 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
-  *    项目的NC总体配置 读取 维护   工具类       </br>
-  *           </br>
-  *           </br>
-  *           </br>
-  * @author air Email: 209308343@qq.com
-  * @date 2019/12/25 0025 9:05
+ * 项目的NC总体配置 读取 维护   工具类       </br>
+ * </br>
+ * </br>
+ * </br>
+ *
+ * @author air Email: 209308343@qq.com
+ * @date 2019/12/25 0025 9:05
  */
 public class ProjectNCConfigUtil {
     /*** NC配置文件在项目中文件的名字 ***/
     public static final String DEFUAL_NC_CONFIG_PROJECT_FILENAME = "nc.prop";
-    public static final  String[] dsTypes = new String[]{"ORACLE11G", "ORACLE10G", "SQLSERVER2008", "DB297"};
-    public static final  String[] dsTypeClasss = new String[]{"oracle.jdbc.OracleDriver", "oracle.jdbc.OracleDriver", "com.microsoft.sqlserver.jdbc.SQLServerDriver", "com.ibm.db2.jcc.DB2Driver"};
+    public static final String[] dsTypes = new String[]{"ORACLE11G", "ORACLE10G", "SQLSERVER2008", "DB297"};
+    public static final String[] dsTypeClasss = new String[]{"oracle.jdbc.OracleDriver", "oracle.jdbc.OracleDriver", "com.microsoft.sqlserver.jdbc.SQLServerDriver", "com.ibm.db2.jcc.DB2Driver"};
+    private static boolean isInit = false;
 
     /**** NC项目里配置文件 属性集合 ***/
     private static Properties configPropertis;
     /**** NC项目里配置文件 ***/
     private static File configFile;
 
-    static{
+    static {
         //init config
         initConfigFile();
     }
+
     /**
-     *   获取 NC主目录        </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     * 获取 NC主目录        </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return java.lang.String
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 9:11
      * @Param []
-     * @return java.lang.String
      */
-    public static final File getNCHome(){
+    public static final File getNCHome() {
         return new File(getConfigValue(KEY_PROJECT_NC_CONFIG_NCHOME));
     }
+
     /**
-      *   获取 NC主目录        </br>
-      *           </br>
-      *           </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com
-      * @date 2019/12/25 0025 9:11
-      * @Param []
-      * @return java.lang.String
+     * 获取 NC主目录        </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return java.lang.String
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 9:11
+     * @Param []
      */
-    public static final String getNCHomePath(){
+    public static final String getNCHomePath() {
         return getConfigValue(KEY_PROJECT_NC_CONFIG_NCHOME);
     }
+
     /**
-     *    设置NC HOME路径       </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     * 设置NC HOME路径       </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 9:13
      * @Param [path]
-     * @return void
      */
-    public static final void setNCHomePath(String path){
+    public static final void setNCHomePath(String path) {
         setNCConfigPropertice(KEY_PROJECT_NC_CONFIG_NCHOME, path);
     }
+
     /**
-     *   获取 NC客户端要链接的服务器ip       </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     * 获取 NC客户端要链接的服务器ip       </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return java.lang.String
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 9:11
      * @Param []
-     * @return java.lang.String
      */
-    public static final String getNCClientIP(){
+    public static final String getNCClientIP() {
         return getConfigValue(KEY_PROJECT_NC_CONFIG_CLIENT_IP);
     }
+
     /**
-     *    设置NC 客户端要链接的服务器ip      </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     * 设置NC 客户端要链接的服务器ip      </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 9:13
      * @Param [path]
-     * @return void
      */
-    public static final void setNCClientIP(String path){
+    public static final void setNCClientIP(String path) {
         setNCConfigPropertice(KEY_PROJECT_NC_CONFIG_CLIENT_IP, path);
     }
+
     /**
-     *   获取 NC客户端要链接的服务器 端口      </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     * 获取 NC客户端要链接的服务器 端口      </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return java.lang.String
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 9:11
      * @Param []
-     * @return java.lang.String
      */
-    public static final String getNCClientPort(){
+    public static final String getNCClientPort() {
         return getConfigValue(KEY_PROJECT_NC_CONFIG_CLIENT_PORT);
     }
+
     /**
-     *    设置NC 客户端要链接的服务器  端口  </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     * 设置NC 客户端要链接的服务器  端口  </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 9:13
      * @Param [port]
-     * @return void
      */
-    public static final void setNCClientPort(String port){
+    public static final void setNCClientPort(String port) {
         setNCConfigPropertice(KEY_PROJECT_NC_CONFIG_CLIENT_PORT, port);
     }
 
 
-
     /**
-      *  根据key获取NC项目配置值       </br>
-      *           </br>
-      *           </br>
-      *           </br>
-            * @author air Email: 209308343@qq.com
-      * @date 2019/12/25 0025 9:12
-            * @Param [key]
-            * @return java.lang.String
+     * 根据key获取NC项目配置值       </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return java.lang.String
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 9:12
+     * @Param [key]
      */
-    public static final String getConfigValue(@Nonnull String key){
+    public static final String getConfigValue(@Nonnull String key) {
+        if(!isInit){
+            initConfigFile();
+        }
+
         return configPropertis.getProperty(key);
     }
+
     /***
-      *     马上把配置信息更新到配置文件里      </br>
-      *           </br>
-      *           </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com
-      * @date 2019/12/25 0025 9:16
-      * @Param []
-      * @return void
+     *     马上把配置信息更新到配置文件里      </br>
+     *           </br>
+     *           </br>
+     *           </br>
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 9:16
+     * @Param []
+     * @return void
      */
-    public static final void saveConfig2File(){
+    public static final void saveConfig2File() {
+        if(!isInit){
+            initConfigFile();
+        }
+
         IoUtil.wirtePropertis(ProjectNCConfigUtil.configPropertis, ProjectNCConfigUtil.configFile);
     }
+
     /**
-      *    设置NC项目配置       </br>
-      *           </br>
-      *           </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com
-      * @date 2019/12/25 0025 9:13
-      * @Param [key, value]
-      * @return void
+     * 设置NC项目配置       </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 9:13
+     * @Param [key, value]
      */
-    public static final void setNCConfigPropertice(@Nonnull String key, String value){
+    public static final void setNCConfigPropertice(@Nonnull String key, String value) {
+        if(!isInit){
+            initConfigFile();
+        }
+
         configPropertis.setProperty(key, value);
     }
+
     /**
      * 检查项目是否有 NC配置文件，没有就初始化
      */
     public static void initConfigFile() {
+        if (ProjectUtil.getDefaultProject() == null) {
+            return;
+        }
         File configFile = new File("");
         try {
             File projectHome = new File(ProjectUtil.getDefaultProject().getBasePath());
@@ -177,7 +213,7 @@ public class ProjectNCConfigUtil {
             if (!configFile.exists()) {
                 configFile.createNewFile();
             }
-
+            isInit = true;
             //读取
             Properties ncConf = new Properties();
             ncConf.load(new FileInputStream(configFile));

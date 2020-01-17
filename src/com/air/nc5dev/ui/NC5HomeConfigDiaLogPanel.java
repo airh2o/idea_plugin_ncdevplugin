@@ -32,9 +32,7 @@ public class NC5HomeConfigDiaLogPanel extends JScrollPane {
      * Create the dialog.
      */
     public NC5HomeConfigDiaLogPanel() {
-        setBounds(0, 0, 769, 606);
         setLayout(null);
-
         JPanel contentPanel = new JPanel();
         contentPanel.setBounds(14, 14, 738, 543);
         add(contentPanel);
