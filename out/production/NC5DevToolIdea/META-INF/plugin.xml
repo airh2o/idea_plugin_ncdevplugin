@@ -56,6 +56,10 @@
             <add-to-group group-id="MainToolBarSettings" anchor="last"/>
         </group>
 
+        <action id="nc5dev.export.openbmf" class="com.air.nc5dev.acion.EditBmfFileAction"
+                text="编辑元数据" description="打开NC元数据文件">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="before" relative-to-action="CutCopyPasteGroup"/>
+        </action>
 
     </actions>
 
@@ -66,4 +70,13 @@
         </component>
     </application-components>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <fileTypeFactory implementation="com.air.nc5dev.editor.bmf.languageinfo.BmfMDPFileTypeFactory"/>
+    </extensions>
+    <!--
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="bmf file" implementationClass="com.air.nc5dev.editor.bmf.languageinfo.BmfMDPFileTypeFactory" fieldName="INSTANCE"
+                  language="bmf" extensions="bmf"/>
+    </extensions>
+    -->
 </idea-plugin>

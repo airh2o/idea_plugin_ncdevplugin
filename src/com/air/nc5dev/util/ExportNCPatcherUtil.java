@@ -123,8 +123,18 @@ public class ExportNCPatcherUtil {
             }
 
             //复制模块配置文件！
-            IoUtil.copyAllFile(new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "META-INF")
-                    , new File(outPath + File.separatorChar + entry.getValue().getName() + File.separatorChar + "META-INF"));
+            File umpDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "META-INF");
+            if (umpDir.isDirectory()) {
+                IoUtil.copyAllFile(umpDir
+                        , new File(outPath + File.separatorChar + entry.getValue().getName() + File.separatorChar + "META-INF"));
+            }
+
+            File bmfDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "METADATA");
+            //复制模块元数据
+            if (bmfDir.isDirectory()) {
+                IoUtil.copyAllFile(bmfDir
+                        , new File(outPath + File.separatorChar + entry.getValue().getName() + File.separatorChar + "METADATA"));
+            }
         }
     }
 
