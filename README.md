@@ -28,10 +28,11 @@ Yonyou NC5x or U8Cloud Idea devtool Plugin
 修改项目下 .idea\workspace.xml，
 找到标签 <component name="PropertiesComponent"> ，
  在标签里加一行  <property name="dynamic.classpath" value="true" /> 
+ 或者 选 jar方式运行
 ```
 
 # 已知BUG
-
+1. 一个java文件非public类不会导出补丁！请手工操作，一般来讲这样写好么？
 
 # 未来待实现功能
-1. 一个java文件非public类不会导出补丁！请手工操作，一般来讲这样写好么？
+1. 元数据编辑
