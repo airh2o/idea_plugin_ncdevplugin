@@ -388,6 +388,37 @@ public final class IoUtil {
 
         return all;
     }
+
+    /**
+     * 搜索一个文件夹内 所有有源文件的包路径
+     *
+     * @param dir
+     * @return
+     */
+    public static List<File> getAllLastPackges(@Nonnull File dir) {
+        List<File> all = new LinkedList<>();
+        File[] files = dir.listFiles();
+        if(null == files){
+            return all;
+        }
+
+        for (File file : files) {
+            if(!file.isDirectory()){
+                continue;
+            }
+
+            if(Stream.of(file.listFiles()).anyMatch(e -> e.isFile())){
+                all.add(file);
+            }
+
+            if(Stream.of(file.listFiles()).anyMatch(e -> e.isDirectory())){
+                all.addAll(getAllLastPackges(file));
+            }
+        }
+
+        return all;
+    }
+
     /**
       *   把一个文件夹 本目录当前级次内所有文件复制到指定的路径（不会复制下级文件夹！）        </br>
       *           </br>

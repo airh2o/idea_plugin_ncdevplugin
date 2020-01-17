@@ -152,8 +152,9 @@ public class ExportNCPatcherUtil {
             classBaseDirFile = new File(classDir);
         }
 
-        //获取所有的 末级文件夹！
-        List<File> allSourcePackges = IoUtil.getAllLastDirs(sourceBaseDirFile);
+        //获取所有的 有源码的包路径文件夹！
+        List<File> allSourcePackges = IoUtil.getAllLastPackges(sourceBaseDirFile);
+
         for (final File sourcePackge : allSourcePackges) {
             final String packgePath = sourcePackge.getPath().substring(sourceBaseDirFile.getPath().length());
             //class文件位置
