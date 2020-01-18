@@ -153,7 +153,7 @@ public class ExportNCPatcherUtil {
      */
     public static void export(@NotNull String ncType, @NotNull String exportDir
             , @NotNull String moduleName, @NotNull String sourceRoot
-            , @NotNull String classDir, String testClassDir
+            , @NotNull String classDir, @NotNull String testClassDir
             , boolean hasJavaFile, boolean noOutTestClass, @NotNull Properties modulePatcherConfig) {
         File sourceBaseDirFile = new File(sourceRoot);
 
@@ -177,7 +177,7 @@ public class ExportNCPatcherUtil {
                 if (!javaFile.isFile()) {
                     return;
                 }
-                String javaFullName = javaFile.getPath().substring((classBaseDirFile.getPath() + ncType).length() + 1);
+                String javaFullName = javaFile.getPath().substring((sourceBaseDirFile.getPath()).length() + 1);
                 javaFullName = javaFullName.substring(0, javaFullName.length() - ".java".length());
                 if (javaFullName.startsWith(File.separator)) {
                     javaFullName = javaFullName.substring(File.separator.length());
