@@ -10,6 +10,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.impl.VirtualFileImpl;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -153,7 +154,7 @@ public class ExportNCPatcherUtil {
      */
     public static void export(@NotNull String ncType, @NotNull String exportDir
             , @NotNull String moduleName, @NotNull String sourceRoot
-            , @NotNull String classDir, @NotNull String testClassDir
+            , @NotNull String classDir, @Nullable  String testClassDir
             , boolean hasJavaFile, boolean noOutTestClass, @NotNull Properties modulePatcherConfig) {
         File sourceBaseDirFile = new File(sourceRoot);
 
