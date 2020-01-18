@@ -1,12 +1,12 @@
 package com.air.nc5dev.ui;
 
+import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.ExportNCPatcherUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.Nullable;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -123,8 +123,9 @@ public class PatcherDialog
             } catch (IllegalArgumentException iae) {
                 System.out.println("自动打开路径失败");
             }
-        } catch (Exception e) {
-            Messages.showErrorDialog(e.getMessage(), "错误");
+        } catch (Throwable e) {
+            e.printStackTrace();
+            Messages.showErrorDialog(ExceptionUtil.getExcptionDetall(e), "错误");
         }
         dispose();
     }

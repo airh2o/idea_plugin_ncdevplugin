@@ -8,6 +8,7 @@ import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.newvfs.impl.VirtualFileImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -85,7 +86,7 @@ public class ExportNCPatcherUtil {
         //生产class输出文件夹
         VirtualFile classDir;
         //test class 输出文件夹
-        VirtualFile testClassDir;
+        String testClassDirPath;
         while (moduleIterator.hasNext()) {
             entry = moduleIterator.next();
             compilerModuleExtension = CompilerModuleExtension.getInstance(entry.getValue());
@@ -97,26 +98,27 @@ public class ExportNCPatcherUtil {
 
             sourceRoots = ModuleRootManager.getInstance(entry.getValue()).getSourceRoots();
             classDir = compilerModuleExtension.getCompilerOutputPath();
-            testClassDir = compilerModuleExtension.getCompilerOutputPathForTests();
+            testClassDirPath = null == compilerModuleExtension.getCompilerOutputPathForTests() ? null : compilerModuleExtension.getCompilerOutputPathForTests().getPath();
 
             //循环输出 NC 3大文件夹
             for (VirtualFile sourceRoot : sourceRoots) {
                 if (sourceRoot.getName().equals(NC_TYPE_PUBLIC)) {
                     export(NC_TYPE_PUBLIC, outPath, entry.getValue().getName()
-                            , sourceRoot.getPath(), classDir.getPath(), testClassDir.getPath()
+                            , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
                             , hasJavaFile, noOutTestClass, modulePatcherConfig);
                 } else if (sourceRoot.getName().equals(NC_TYPE_PRIVATE)) {
                     export(NC_TYPE_PRIVATE, outPath, entry.getValue().getName()
-                            , sourceRoot.getPath(), classDir.getPath(), testClassDir.getPath()
+                            , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
                             , hasJavaFile, noOutTestClass, modulePatcherConfig);
                 } else if (sourceRoot.getName().equals(NC_TYPE_CLIENT)) {
                     export(NC_TYPE_CLIENT, outPath, entry.getValue().getName()
-                            , sourceRoot.getPath(), classDir.getPath(), testClassDir.getPath()
+                            , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
                             , hasJavaFile, noOutTestClass, modulePatcherConfig);
-                } else if (!noOutTestClass
+                } else if (null != testClassDirPath
+                        && !noOutTestClass
                         && sourceRoot.getName().equals(NC_TYPE_TEST)) {
                     export(NC_TYPE_TEST, outPath, entry.getValue().getName()
-                            , sourceRoot.getPath(), classDir.getPath(), testClassDir.getPath()
+                            , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
                             , hasJavaFile, noOutTestClass, modulePatcherConfig);
                 }
                 //其他无视掉
@@ -151,7 +153,7 @@ public class ExportNCPatcherUtil {
      */
     public static void export(@NotNull String ncType, @NotNull String exportDir
             , @NotNull String moduleName, @NotNull String sourceRoot
-            , @NotNull String classDir, @NotNull String testClassDir
+            , @NotNull String classDir, String testClassDir
             , boolean hasJavaFile, boolean noOutTestClass, @NotNull Properties modulePatcherConfig) {
         File sourceBaseDirFile = new File(sourceRoot);
 
