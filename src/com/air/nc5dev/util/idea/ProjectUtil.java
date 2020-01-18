@@ -16,6 +16,12 @@ import javax.annotation.Nonnull;
  * @project
  */
 public class ProjectUtil {
+    private static Project project;
+
+    public static void setBaseDefaultProject(Project project){
+        ProjectUtil.project = project;
+    }
+
     /* *
       *     获取默认的项目      </br>
       *           </br>
@@ -29,7 +35,7 @@ public class ProjectUtil {
     @Nonnull
     public static Project getDefaultProject(){
         Project[] openProjects = getProjectMannager().getOpenProjects();
-        return null == openProjects || openProjects.length < 1 ? null : openProjects[0];
+        return null == openProjects || openProjects.length < 1 ? project : openProjects[0];
     }
 
     /* *

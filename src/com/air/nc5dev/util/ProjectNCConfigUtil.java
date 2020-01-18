@@ -25,7 +25,6 @@ public class ProjectNCConfigUtil {
     public static final String[] dsTypes = new String[]{"ORACLE11G", "ORACLE10G", "SQLSERVER2008", "DB297"};
     public static final String[] dsTypeClasss = new String[]{"oracle.jdbc.OracleDriver", "oracle.jdbc.OracleDriver", "com.microsoft.sqlserver.jdbc.SQLServerDriver", "com.ibm.db2.jcc.DB2Driver"};
     private static boolean isInit = false;
-
     /**** NC项目里配置文件 属性集合 ***/
     private static Properties configPropertis;
     /**** NC项目里配置文件 ***/
@@ -154,7 +153,7 @@ public class ProjectNCConfigUtil {
      * @Param [key]
      */
     public static final String getConfigValue(@Nonnull String key) {
-        if(!isInit){
+        if (!isInit) {
             initConfigFile();
         }
 
@@ -172,7 +171,7 @@ public class ProjectNCConfigUtil {
      * @return void
      */
     public static final void saveConfig2File() {
-        if(!isInit){
+        if (!isInit) {
             initConfigFile();
         }
 
@@ -191,7 +190,7 @@ public class ProjectNCConfigUtil {
      * @Param [key, value]
      */
     public static final void setNCConfigPropertice(@Nonnull String key, String value) {
-        if(!isInit){
+        if (!isInit) {
             initConfigFile();
         }
 
@@ -203,7 +202,7 @@ public class ProjectNCConfigUtil {
      */
     public static void initConfigFile() {
         if (ProjectUtil.getDefaultProject() == null) {
-            return;
+            throw new RuntimeException("project not finish yet, try restart idea!");
         }
         File configFile = new File("");
         try {

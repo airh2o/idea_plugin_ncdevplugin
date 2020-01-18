@@ -7,6 +7,7 @@ import com.intellij.execution.application.ApplicationConfiguration;
 import com.intellij.execution.application.ApplicationConfigurationType;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.impl.RunManagerImpl;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -35,14 +36,31 @@ import java.util.stream.Stream;
  */
 public class IdeaProjectGenerateUtil {
     /**
-     *  生成NC默认 几个个文件夹 src和META-INF
+     *  生成NC默认 几个个文件夹 src和META-INF 到项目
      *
      * @param project
      */
     public static final void generateSrcDir(@Nullable Project project) {
         Project project1 = project == null ? ProjectUtil.getDefaultProject() : project;
-        File projectHome = new File(project1.getBasePath());
-        File src = new File(projectHome, "src");
+
+        Module[] modules = ModuleManager.getInstance(project1).getModules();
+        for (Module module : modules) {
+            generateSrcDir(module);
+        }
+    }
+    /**
+      *   生成NC默认 几个个文件夹 src和META-INF 到指定模块       </br>
+      *           </br>
+      *           </br>
+      *           </br>
+      * @author air Email: 209308343@qq.com
+      * @date 2020/1/18 0018 12:25
+      * @Param [module]
+      * @return void
+     */
+    public static void generateSrcDir(@NotNull Module module){
+        File homeDir = new File(module.getModuleFilePath()).getParentFile();
+        File src = new File(homeDir, "src");
         File publicf = new File(src, "public");
         if (!publicf.exists()) {
             publicf.mkdirs();
@@ -59,7 +77,7 @@ public class IdeaProjectGenerateUtil {
         if (!testf.exists()) {
             testf.mkdirs();
         }
-        File umpDir = new File(projectHome, "META-INF");
+        File umpDir = new File(homeDir, "META-INF");
         if (!umpDir.exists()) {
             umpDir.mkdirs();
         }
@@ -69,7 +87,7 @@ public class IdeaProjectGenerateUtil {
                 PrintWriter out =new PrintWriter(new FileOutputStream(umpFile));
                 out.print("<?xml version=\"1.0\" encoding=\"gb2312\"?>\n" +
                         "<module name=\""
-                        + project.getName()
+                        + module.getName()
                         + "\">\n" +
                         "\t<public>\n" +
                         "\t</public>\n" +
@@ -85,26 +103,6 @@ public class IdeaProjectGenerateUtil {
 
         copyProjectMetaInfFiles2NCHomeModules();
 
-         /*try {
-           File readme = new File(projectHome, "插件使用帮助-看完可删除.txt");
-            PrintWriter out =new PrintWriter(new FileOutputStream(readme));
-            StringBuilder stringBuilder = new StringBuilder();
-
-            //ConsoleViewContentType.SYSTEM_OUTPUT
-            //ConsoleView out = TextConsoleBuilderFactory.getInstance().createBuilder(project).getConsole();
-            stringBuilder.append("第一次新建项目-必须步骤：\n" );
-            stringBuilder.append("1. Tools -> 配置NC HOME   进行NC HOME配置！ \n" );
-            stringBuilder.append("2. 第一步保存后，如果没有选更新依赖，请在 Tools -> 更新NC 库依赖 执行依赖更新 \n" );
-            stringBuilder.append("3. 第2步后，请在 Tools -> 生成默认NC运行配置 执行Idea的运行配置,注意 执行后请运行时候根据提示手工修改里面的modelu项目名 \n");
-            stringBuilder.append("常见问题：\n " );
-            stringBuilder.append("1. Intellij IDEA运行报Command line is too long解法 ：" )
-                    .append( " 修改项目下 .idea\\workspace.xml，找到标签 <component name=\"PropertiesComponent\"> ， " )
-                    .append(  "在标签里加一行  <property name=\"dynamic.classpath\" value=\"true\" /> " );
-            out.write(stringBuilder.toString());
-            out.flush();
-            out.close();
-        }catch (Exception e){
-        }*/
     }
 
     /**
@@ -242,7 +240,7 @@ public class IdeaProjectGenerateUtil {
     }
     /**
       *           </br>
-      *    马上把最新的项目里 META-INF 里所有文件复制到
+      *    马上把最新的项目里所有模块的 META-INF 里所有文件复制到
      *          NC HOME里对应的项目模块文件夹，主要是 ejb部署xml       </br>
       *           </br>
       *           </br>
@@ -252,13 +250,32 @@ public class IdeaProjectGenerateUtil {
       * @return void
      */
     public static final void copyProjectMetaInfFiles2NCHomeModules() {
+        Project project =  ProjectUtil.getDefaultProject() ;
+        Module[] modules = ModuleManager.getInstance(project).getModules();
+        for (Module module : modules) {
+            copyProjectMetaInfFiles2NCHomeModules(module);
+        }
+    }
+
+    /**
+     *           </br>
+     *    马上把指定模块的 META-INF 里所有文件复制到
+     *          NC HOME里对应的项目模块文件夹，主要是 ejb部署xml       </br>
+     *           </br>
+     *           </br>
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 15:04
+     * @Param []
+     * @return void
+     */
+    public static final void copyProjectMetaInfFiles2NCHomeModules(@NotNull Module module) {
         String ncHomePath = ProjectNCConfigUtil.getNCHomePath();
         if(null == ncHomePath || ncHomePath.trim().isEmpty()){
             return ;
         }
-        Project project = ProjectUtil.getDefaultProject();
-        File projectUmpDir = new File(project.getBasePath(), "META-INF");
-        if(!projectUmpDir.exists()){
+
+        File umpDir = new File(new File(module.getModuleFilePath()).getParentFile(), "META-INF");
+        if(!umpDir.exists()){
             return ;
         }
 
@@ -268,13 +285,13 @@ public class IdeaProjectGenerateUtil {
         }
 
         File modeluUmpDir = new File(ncHomePath, File.separatorChar + "modules"
-                + File.separatorChar + project.getName() + File.separatorChar + "META-INF");
+                + File.separatorChar + module.getName() + File.separatorChar + "META-INF");
         if(!modeluUmpDir.exists() || !modeluUmpDir.isDirectory()){
             modeluUmpDir.mkdirs();
         }
 
         //复制 ump 文件到这里
-        File[] projectFiles = projectUmpDir.listFiles(f -> f.isFile());
+        File[] projectFiles = umpDir.listFiles(f -> f.isFile());
         Stream.of(projectFiles).forEach(f -> {
             try {
                 Files.copy(f.toPath(), new File(modeluUmpDir,f.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);

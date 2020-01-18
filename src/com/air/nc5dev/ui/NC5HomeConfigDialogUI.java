@@ -9,7 +9,6 @@ import java.awt.*;
 
 public class NC5HomeConfigDialogUI extends DialogWrapper {
     private NC5HomeConfigDiaLogPanel centerPanel;
-
     public NC5HomeConfigDialogUI(@Nullable Project project) {
         super(project);
         super.init();

@@ -2,6 +2,7 @@ package com.air.nc5dev.acion;
 
 import com.air.nc5dev.ui.NC5HomeConfigDialogUI;
 import com.air.nc5dev.util.IdeaProjectGenerateUtil;
+import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -23,6 +24,7 @@ public class NC5HomePathConfigAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
+        ProjectUtil.setBaseDefaultProject(project);
         if (null != ui && ui.isShowing()) {
             ui.dispose();
             ui = null;

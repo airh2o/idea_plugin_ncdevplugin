@@ -11,6 +11,7 @@ import com.intellij.openapi.roots.impl.libraries.LibraryEx;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 import com.intellij.openapi.vfs.VirtualFileManager;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
@@ -31,7 +32,6 @@ import java.util.stream.Collectors;
 public class ApplicationLibraryUtil {
 
 
-
     /**
      * 往 IDEA 的项目 jar依赖增加一个 依赖库，如果依赖库已存在 就删除在增加
      *
@@ -39,7 +39,7 @@ public class ApplicationLibraryUtil {
      * @param libraryName
      * @param files
      */
-    public static final void addApplicationLibrary(@Nullable Project theProject, @Nonnull String libraryName,@Nonnull List<File> files) {
+    public static final void addApplicationLibrary(@Nullable Project theProject, @Nonnull String libraryName, @Nonnull List<File> files) {
         Project project = null == theProject ? ProjectUtil.getDefaultProject() : theProject;
         final LibraryTable.ModifiableModel model = LibraryTablesRegistrar.getInstance().getLibraryTable(project).getModifiableModel();
 
@@ -52,25 +52,24 @@ public class ApplicationLibraryUtil {
 
         final LibraryEx.ModifiableModelEx libraryModel = library.getModifiableModel();
 
-        /* // 库中已有的jar删除
-        String[] classRootUrls = libraryModel.getUrls(OrderRootType.CLASSES);
-        for (String classRootURL : classRootUrls) {
-            libraryModel.removeRoot(classRootURL, OrderRootType.CLASSES);
-        }*/
-
         //参数转换成路径集合
         List<String> classesRoots = files.stream().map(file -> file.getPath()).collect(Collectors.toList());
 
         // 加入新的依赖路径
         for (String root : classesRoots) {
-            // 注意jar格式jar:{path_to_jar}.jar!/
             if (root.toLowerCase().endsWith(".jar")) {
+                // 注意jar格式jar:{path_to_jar}.jar!/
                 libraryModel.addRoot(VirtualFileManager.constructUrl("jar", root + "!/"), OrderRootType.CLASSES);
-            } else if (root.toLowerCase().endsWith(".class") || root.toLowerCase().endsWith("resources")) {
+            } else if (root.toLowerCase().endsWith("_src.jar")) {
+                libraryModel.addRoot(VirtualFileManager.constructUrl("jar", root + "!/"), OrderRootType.SOURCES);
+            } else if (root.toLowerCase().endsWith(".class")) {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);
-            }else{
-                libraryModel.addJarDirectory(VirtualFileManager.constructUrl("file", root), false);
+            } else if (root.toLowerCase().endsWith("resources")) {
+                libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
+                libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);
+            } else {
+                libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);
             }
         }
