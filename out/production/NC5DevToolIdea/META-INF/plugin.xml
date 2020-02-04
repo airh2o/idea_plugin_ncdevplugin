@@ -60,7 +60,10 @@
                 text="编辑元数据" description="打开NC元数据文件">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="before" relative-to-action="CutCopyPasteGroup"/>
         </action>
-
+        <action id="nc5dev.export.addwsdl" class="com.air.nc5dev.acion.NewWsdlFilesAction"
+                text="新增WSDL接口" description="新增WSDL接口">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="before" relative-to-action="CutCopyPasteGroup"/>
+        </action>
     </actions>
 
 

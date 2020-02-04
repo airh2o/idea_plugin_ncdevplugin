@@ -18,10 +18,15 @@ Yonyou NC5x or U8Cloud Idea devtool Plugin
     class全限定名=相对路径(也就是NC模块名字)   
     例子(对test无效)：    
     nc.ui.gl.AddVoucherLineAction=gl   
-    特殊参数：
-    config-notest=false ##是否不要test代码，默认true
-    exportsourcefile=true  ##是否导出源代码，默认true
-    
+    特殊参数：   
+    config-notest=false ##是否不要test代码，默认true    
+    exportsourcefile=true  ##是否导出源代码，默认true    
+    类路径配置文件:    
+    ```    
+    比如我要把 nc.bs.arap包里 1.txt和DzTakeF1Impl.wsdl文件输出到 arap模块下的包文件夹里:   
+    nc.bs.arap.1.txt=arap   
+    nc.bs.arap.DzTakeF1Impl.wsdl=arap   
+    ```
 # 常见问题
 ```
 1. Intellij IDEA运行报Command line is too long解法 ： 
@@ -35,4 +40,5 @@ Yonyou NC5x or U8Cloud Idea devtool Plugin
 1. 一个java文件非public类不会导出补丁！请手工操作，一般来讲这样写好么？
 
 # 未来待实现功能
-1. 元数据编辑
+1. 元数据编辑 - 暂不完成
+2. WSDL新增功能  - 暂不完成

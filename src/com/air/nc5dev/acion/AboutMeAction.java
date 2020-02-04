@@ -9,7 +9,7 @@ public class AboutMeAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("作者： air Email 209308343@qq.com 私接NC U8C全系列模块 OA WEB APP等开发.欢迎邮箱或QQ联系. \n");
+        stringBuilder.append("作者： air Email 209308343@qq.com,QQ 209308343 \n");
         stringBuilder.append("使用提示: ");
         stringBuilder.append("第一次新建项目-必须步骤：\n" );
         stringBuilder.append("1. Tools -> 配置NC HOME   进行NC HOME配置！ \n" );

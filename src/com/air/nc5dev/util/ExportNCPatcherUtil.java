@@ -154,7 +154,7 @@ public class ExportNCPatcherUtil {
      */
     public static void export(@NotNull String ncType, @NotNull String exportDir
             , @NotNull String moduleName, @NotNull String sourceRoot
-            , @NotNull String classDir, @Nullable  String testClassDir
+            , @NotNull String classDir, @Nullable String testClassDir
             , boolean hasJavaFile, boolean noOutTestClass, @NotNull Properties modulePatcherConfig) {
         File sourceBaseDirFile = new File(sourceRoot);
 
@@ -169,56 +169,137 @@ public class ExportNCPatcherUtil {
         List<File> allSourcePackges = IoUtil.getAllLastPackges(sourceBaseDirFile);
 
         for (final File sourcePackge : allSourcePackges) {
-            final String packgePath = sourcePackge.getPath().substring(sourceBaseDirFile.getPath().length());
+            String packgePath = sourcePackge.getPath().substring(sourceBaseDirFile.getPath().length());
             //class文件位置
-            final File classFileDir = new File(classBaseDirFile, packgePath);
+            File classFileDir = new File(classBaseDirFile, packgePath);
 
-            //循环复制所有java ,因为idea编译后 没有分NC这3个文件夹！
-            Stream.of(sourcePackge.listFiles()).forEach(javaFile -> {
-                if (!javaFile.isFile()) {
-                    return;
-                }
-                String javaFullName = javaFile.getPath().substring((sourceBaseDirFile.getPath()).length() + 1);
-                javaFullName = javaFullName.substring(0, javaFullName.length() - ".java".length());
-                if (javaFullName.startsWith(File.separator)) {
-                    javaFullName = javaFullName.substring(File.separator.length());
-                } else if (javaFullName.startsWith("\\")) {
-                    javaFullName = javaFullName.substring("\\".length());
-                } else if (javaFullName.startsWith("/")) {
-                    javaFullName = javaFullName.substring("/".length());
-                }
-                String javaFullClassName = StringUtil.replaceAll(javaFullName, File.separator, ".");
-                javaFullClassName = StringUtil.replaceAll(javaFullClassName, "\\", ".");
-                javaFullClassName = StringUtil.replaceAll(javaFullClassName, "/", ".");
-                //检查是否配置了 特殊输出路径
-                String outModuleName = modulePatcherConfig.getProperty(javaFullClassName);
-                final String baseOutDirPath = exportDir + File.separatorChar
-                        + (StringUtil.isEmpty(outModuleName) ? moduleName : outModuleName);
-                File outDir = null;
-                if (NC_TYPE_PUBLIC.equals(ncType)) {
-                    outDir = new File(baseOutDirPath, "classes");
-                } else if (NC_TYPE_PRIVATE.equals(ncType)) {
-                    outDir = new File(baseOutDirPath, "META-INF" + File.separatorChar + "classes");
-                } else if (NC_TYPE_CLIENT.equals(ncType)) {
-                    outDir = new File(baseOutDirPath, "client" + File.separatorChar + "classes");
-                } else if (NC_TYPE_TEST.equals(ncType)) {
-                    outDir = new File(baseOutDirPath, "test");
-                }
+            copyClassAndJavaSourceFiles(sourcePackge, sourceBaseDirFile
+                    , modulePatcherConfig, exportDir, moduleName
+                    , ncType, packgePath, hasJavaFile, classFileDir);
 
-                outDir = new File(outDir, packgePath);
-
-                if (hasJavaFile) {
-                    //复制源码
-                    IoUtil.copyFile(javaFile, outDir);
-                }
-                //复制class 这个麻烦，要正确导出匿名类。 如果是 一个java多个类 反人类写法不考虑让用户手工处理！
-                List<File> classFiles = getJavaClassByClassName(javaFullClassName, classFileDir);
-                for (File classFile : classFiles) {
-                    IoUtil.copyFile(classFile, outDir);
-                }
-
-            });
+            copyClassPathOtherFile(sourcePackge, exportDir, moduleName, ncType, packgePath, modulePatcherConfig);
         }
+    }
+    /**
+      *     把一个包 当前的文件夹内所有 java源代码和类文件 复制到补丁对应位置（不包含下级包）      </br>
+      *           </br>
+      *           </br>
+      *           </br>
+      * @author air Email: 209308343@qq.com
+      * @date 2020/2/4 0004 17:31
+      * @Param [sourcePackge, sourceBaseDirFile, modulePatcherConfig, exportDir, moduleName, ncType, packgePath, hasJavaFile, classFileDir]
+      * @return void
+     */
+    private static final void copyClassAndJavaSourceFiles(File sourcePackge, File sourceBaseDirFile
+            , Properties modulePatcherConfig, String exportDir, String moduleName
+            , String ncType, String packgePath, boolean hasJavaFile, final File classFileDir) {
+        Stream.of(sourcePackge.listFiles()).forEach(javaFile -> {
+            //循环复制所有java文件 ,因为idea编译后 没有分NC这3个文件夹！
+            if (!javaFile.isFile()) {
+                return;
+            }
+
+            if(!javaFile.getName().toLowerCase().endsWith(".java")){
+                return ;
+            }
+
+            String javaFullName = javaFile.getPath().substring((sourceBaseDirFile.getPath()).length() + 1);
+            javaFullName = javaFullName.substring(0, javaFullName.length() - ".java".length());
+            if (javaFullName.startsWith(File.separator)) {
+                javaFullName = javaFullName.substring(File.separator.length());
+            } else if (javaFullName.startsWith("\\")) {
+                javaFullName = javaFullName.substring("\\".length());
+            } else if (javaFullName.startsWith("/")) {
+                javaFullName = javaFullName.substring("/".length());
+            }
+            String javaFullClassName = StringUtil.replaceAll(javaFullName, File.separator, ".");
+            javaFullClassName = StringUtil.replaceAll(javaFullClassName, "\\", ".");
+            javaFullClassName = StringUtil.replaceAll(javaFullClassName, "/", ".");
+            //检查是否配置了 特殊输出路径
+            String outModuleName = modulePatcherConfig.getProperty(javaFullClassName);
+            final String baseOutDirPath = exportDir + File.separatorChar
+                    + (StringUtil.isEmpty(outModuleName) ? moduleName : outModuleName);
+
+            File outDir = null;
+            if (NC_TYPE_PUBLIC.equals(ncType)) {
+                outDir = new File(baseOutDirPath, "classes");
+            } else if (NC_TYPE_PRIVATE.equals(ncType)) {
+                outDir = new File(baseOutDirPath, "META-INF" + File.separatorChar + "classes");
+            } else if (NC_TYPE_CLIENT.equals(ncType)) {
+                outDir = new File(baseOutDirPath, "client" + File.separatorChar + "classes");
+            } else if (NC_TYPE_TEST.equals(ncType)) {
+                outDir = new File(baseOutDirPath, "test");
+            }
+
+            outDir = new File(outDir, packgePath);
+
+            if (hasJavaFile) {
+                //复制源码
+                IoUtil.copyFile(javaFile, outDir);
+            }
+
+            //复制class 这个麻烦，要正确导出匿名类。 如果是 一个java多个类 反人类写法不考虑让用户手工处理！
+            List<File> classFiles = getJavaClassByClassName(javaFullClassName, classFileDir);
+            for (File classFile : classFiles) {
+                IoUtil.copyFile(classFile, outDir);
+            }
+
+        });
+    }
+
+    /**
+     * 把一个包里的 非代码文件 复制到补丁 对应位置里      </br>
+     * 比如 wsdl json 各种类路径配置文件等     </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/2/4 0004 17:28
+     * @Param [sourcePackge, exportDir, moduleName, ncType, packgePath]
+     */
+    private static final void copyClassPathOtherFile(File sourcePackge
+            , String exportDir, String moduleName, String ncType
+            , String packgePath, Properties modulePatcherConfig) {
+        //复制包路径文件夹内所有其他文件，比如 wsdl文件 配置文件等等
+        Stream.of(sourcePackge.listFiles()).forEach(file -> {
+            if (!file.isFile()) {
+                return;
+            }
+            final String fileName = file.getName().toLowerCase();
+            if (fileName.endsWith(".class")
+                    || fileName.endsWith(".java")) {
+                return;
+            }
+
+            //检查是否有特殊模块路径设置
+            String configKey = packgePath + '.' + file.getName();
+            if(configKey.charAt(0) == '/'
+                    || configKey.charAt(0) == '\\'
+                    || configKey.charAt(0) == File.separatorChar){
+                configKey = configKey.substring(1);
+            }
+            configKey = StringUtil.replaceAll(configKey,  "/", ".");
+            configKey = StringUtil.replaceAll(configKey,  "\\", ".");
+            configKey = StringUtil.replaceAll(configKey,  File.separator, ".");
+
+            String outModuleName = modulePatcherConfig.getProperty(configKey);
+            String outClasPathOtherFileDirPath = exportDir + File.separatorChar + (StringUtil.isEmpty(outModuleName) ? moduleName : outModuleName);
+            File outClasPathOtherFileDir = null;
+            if (NC_TYPE_PUBLIC.equals(ncType)) {
+                outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "classes");
+            } else if (NC_TYPE_PRIVATE.equals(ncType)) {
+                outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "META-INF" + File.separatorChar + "classes");
+            } else if (NC_TYPE_CLIENT.equals(ncType)) {
+                outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "client" + File.separatorChar + "classes");
+            } else if (NC_TYPE_TEST.equals(ncType)) {
+                outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "test");
+            }
+
+            File outClasPathOtherFileDirFinal = new File(outClasPathOtherFileDir, packgePath);
+
+            IoUtil.copyFile(file, outClasPathOtherFileDirFinal);
+        });
     }
 
     /**
