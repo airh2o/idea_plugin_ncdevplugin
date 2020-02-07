@@ -19,6 +19,10 @@ public class AboutMeAction extends AnAction {
 
 
         stringBuilder.append("常见问题：\n " );
+
+        stringBuilder.append("开源项目地址,欢迎贡献代码：\n " );
+        stringBuilder.append("github：https://github.com/airh2o/idea_plugin_nc5devplugin (推送地址)\n " );
+        stringBuilder.append("gitee：https://gitee.com/yhlx/idea_plugin_nc5devplugin  (同步github)\n " );
         Messages.showInfoMessage(stringBuilder.toString(), "关于我");
     }
 }
