@@ -19,9 +19,6 @@ public class AboutMeAction extends AnAction {
 
 
         stringBuilder.append("常见问题：\n " );
-        stringBuilder.append("1. Intellij IDEA运行报Command line is too long解法 ：" )
-                .append( " 修改项目下 .idea\\workspace.xml，找到标签 <component name=\"PropertiesComponent\"> ， " )
-                .append(  "在标签里加一行  <property name=\"dynamic.classpath\" value=\"true\" /> " );
         Messages.showInfoMessage(stringBuilder.toString(), "关于我");
     }
 }
