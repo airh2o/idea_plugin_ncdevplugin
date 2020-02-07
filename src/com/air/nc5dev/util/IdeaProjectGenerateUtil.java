@@ -3,6 +3,7 @@ package com.air.nc5dev.util;
 import com.air.nc5dev.util.idea.ApplicationLibraryUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.util.idea.RunConfigurationUtil;
+import com.intellij.execution.ShortenCommandLine;
 import com.intellij.execution.application.ApplicationConfiguration;
 import com.intellij.execution.application.ApplicationConfigurationType;
 import com.intellij.execution.configurations.RunConfiguration;
@@ -170,6 +171,8 @@ public class IdeaProjectGenerateUtil {
             conf.setWorkingDirectory(ncHome.getPath());
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
 
+            conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
+
            RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf);
         }
 
@@ -188,6 +191,8 @@ public class IdeaProjectGenerateUtil {
                     " -Dnc.jstart.port=$FIELD_CLINET_PORT$ -Xmx768m -XX:MaxPermSize=256m -Dnc.fi.autogenfile=N ");
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
             conf.setWorkingDirectory(ncHome.getPath());
+
+            conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
 
             RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf);
         }
