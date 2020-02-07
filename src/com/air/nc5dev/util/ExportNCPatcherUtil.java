@@ -103,6 +103,10 @@ public class ExportNCPatcherUtil {
 
             //循环输出 NC 3大文件夹
             for (VirtualFile sourceRoot : sourceRoots) {
+                if(null == classDir){
+                    continue;
+                }
+
                 if (sourceRoot.getName().equals(NC_TYPE_PUBLIC)) {
                     export(NC_TYPE_PUBLIC, outPath, entry.getValue().getName()
                             , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
