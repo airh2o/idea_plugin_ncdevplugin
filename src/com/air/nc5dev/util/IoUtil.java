@@ -3,14 +3,15 @@ package com.air.nc5dev.util;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.jar.JarOutputStream;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * IO tool
@@ -370,20 +371,20 @@ public final class IoUtil {
     public static List<File> getAllLastDirs(@Nonnull File dir) {
         List<File> all = new LinkedList<>();
         File[] files = dir.listFiles();
-        if(null == files){
+        if (null == files) {
             return all;
         }
 
         for (File file : files) {
-            if(!file.isDirectory()){
+            if (!file.isDirectory()) {
                 continue;
             }
 
-           if(Stream.of(file.listFiles()).anyMatch(e -> e.isDirectory())){
+            if (Stream.of(file.listFiles()).anyMatch(e -> e.isDirectory())) {
                 all.addAll(getAllLastDirs(file));
-           }else{
+            } else {
                 all.add(file);
-           }
+            }
         }
 
         return all;
@@ -398,20 +399,20 @@ public final class IoUtil {
     public static List<File> getAllLastPackges(@Nonnull File dir) {
         List<File> all = new LinkedList<>();
         File[] files = dir.listFiles();
-        if(null == files){
+        if (null == files) {
             return all;
         }
 
         for (File file : files) {
-            if(!file.isDirectory()){
+            if (!file.isDirectory()) {
                 continue;
             }
 
-            if(Stream.of(file.listFiles()).anyMatch(e -> e.isFile())){
+            if (Stream.of(file.listFiles()).anyMatch(e -> e.isFile())) {
                 all.add(file);
             }
 
-            if(Stream.of(file.listFiles()).anyMatch(e -> e.isDirectory())){
+            if (Stream.of(file.listFiles()).anyMatch(e -> e.isDirectory())) {
                 all.addAll(getAllLastPackges(file));
             }
         }
@@ -420,39 +421,42 @@ public final class IoUtil {
     }
 
     /**
-      *   把一个文件夹 本目录当前级次内所有文件复制到指定的路径（不会复制下级文件夹！）        </br>
-      *           </br>
-      *           </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com
-      * @date 2020/1/16 0016 20:07
-      * @Param [fromDir, toDir]
-      * @return void
-     */
-    public static final void copyAllFile(@NotNull File fromDir,@NotNull  final File toDir){
-        Stream.of(fromDir.listFiles()).forEach(file -> {
-            if(!file.isFile()){
-                return ;
-            }
-           copyFile(file, toDir);
-        });
-    }
-    /**
-     *   把一个文件 复制到指定的文件夹里 </br>
-     *     会自动创建不存在的文件夹      </br>
-     *           </br>
-     *           </br>
+     * 把一个文件夹 本目录当前级次内所有文件复制到指定的路径（不会复制下级文件夹！）        </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
      * @author air Email: 209308343@qq.com
      * @date 2020/1/16 0016 20:07
      * @Param [fromDir, toDir]
-     * @return void
      */
-    public static final void copyFile(@NotNull File from,@NotNull  final File dir){
-        if(!from.isFile()){
-            return ;
+    public static final void copyAllFile(@NotNull File fromDir, @NotNull final File toDir) {
+        Stream.of(fromDir.listFiles()).forEach(file -> {
+            if (!file.isFile()) {
+                return;
+            }
+            copyFile(file, toDir);
+        });
+    }
+
+    /**
+     * 把一个文件 复制到指定的文件夹里 </br>
+     * 会自动创建不存在的文件夹      </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/1/16 0016 20:07
+     * @Param [fromDir, toDir]
+     */
+    public static final void copyFile(@NotNull File from, @NotNull final File dir) {
+        if (!from.isFile()) {
+            return;
         }
         File outFile = new File(dir, from.getName());
-        if(!outFile.getParentFile().exists()){
+        if (!outFile.getParentFile().exists()) {
             outFile.getParentFile().mkdirs();
         }
         try {
@@ -461,6 +465,7 @@ public final class IoUtil {
             e.printStackTrace();
         }
     }
+
     /**
      * 所有一个 文件夹类所有的文件
      *
@@ -489,6 +494,171 @@ public final class IoUtil {
         return ar;
     }
 
+    /**
+     * 初始化压缩包信息并开始进行压缩
+     *
+     * @param inputFile   需要压缩的文件或文件夹
+     * @param outputFile  压缩后的文件
+     * @param type        压缩类型
+     * @param skipSuffixs String数组，要跳过的 文件类型后缀： 比如 ["zip","rar"]
+     */
+    public static void zip(File inputFile, File outputFile, CompressType type, String[] skipSuffixs) {
+        ZipOutputStream zos = null;
+        try {
+            if (type == CompressType.ZIP) {
+                zos = new ZipOutputStream(new FileOutputStream(outputFile));
+            } else if (type == CompressType.JAR) {
+                zos = new JarOutputStream(new FileOutputStream(outputFile));
+            } else {
+                zos = new ZipOutputStream(new FileOutputStream(outputFile));
+            }
+            // 设置压缩包注释
+            zos.setComment("From Log");
+            zipFile(zos, inputFile, null, skipSuffixs);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (zos != null) {
+                try {
+                    zos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 如果是单个文件，那么就直接进行压缩。如果是文件夹，那么递归压缩所有文件夹里的文件
+     *
+     * @param zos         压缩输出流
+     * @param inputFile   需要压缩的文件
+     * @param path        需要压缩的文件在压缩包里的路径
+     * @param skipSuffixs String数组，要跳过的 文件类型后缀： 比如 ["zip","rar"]
+     */
+    public static void zipFile(ZipOutputStream zos, File inputFile, String path, String[] skipSuffixs) {
+        if (inputFile.isDirectory()) {
+            // 记录压缩包中文件的全路径
+            String p = null;
+            File[] fileList = inputFile.listFiles();
+            for (int i = 0; i < fileList.length; i++) {
+                File file = fileList[i];
+                // 如果路径为空，说明是根目录
+                if (path == null || path.isEmpty()) {
+                    p = file.getName();
+                } else {
+                    p = path + File.separator + file.getName();
+                }
+                // 如果是目录递归调用，直到遇到文件为止
+                zipFile(zos, file, p, skipSuffixs);
+            }
+        } else if (inputFile.isFile()) {
+            String lowerCaseFileName = inputFile.getName().toLowerCase();
+            if (null != skipSuffixs && skipSuffixs.length > 0) {
+                for (String skipSuffix : skipSuffixs) {
+                    if (lowerCaseFileName.endsWith(skipSuffix)) {
+                        return;
+                    }
+                }
+            }
+            zipSingleFile(zos, inputFile, path);
+        }
+    }
+
+    /**
+     * 压缩单个文件到指定压缩流里
+     *
+     * @param zos       压缩输出流
+     * @param inputFile 需要压缩的文件
+     * @param path      需要压缩的文件在压缩包里的路径
+     * @throws FileNotFoundException
+     */
+    public static void zipSingleFile(ZipOutputStream zos, File inputFile, String path) {
+        try {
+            InputStream in = new FileInputStream(inputFile);
+            zos.putNextEntry(new ZipEntry(path));
+            write(in, zos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 从输入流写入到输出流的方便方法 【注意】这个函数只会关闭输入流，且读写完成后会调用输出流的flush()函数，但不会关闭输出流！
+     *
+     * @param input
+     * @param output
+     */
+    private static void write(InputStream input, OutputStream output) {
+        int len = -1;
+        byte[] buff = new byte[1024];
+        try {
+            while ((len = input.read(buff)) != -1) {
+                output.write(buff, 0, len);
+            }
+            output.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                input.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 把给定的文件夹 里所有文件和文件夹删除！        </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/2/9 0009 15:56
+     * @Param [file]
+     */
+    public static void cleanUpDirFiles(File dir) {
+        if (!dir.exists()) {//判断是否待删除目录是否存在
+            return ;
+        }
+
+        deleteFileAll(dir);
+
+        dir.mkdirs();
+    }
+
+    /**
+     * 删除 文件夹
+     * file：文件名
+     * */
+    public static void deleteFileAll(File dir) {
+        if (dir.exists()) {
+            File files[] = dir.listFiles();
+            int len = files.length;
+            for (int i = 0; i < len; i++) {
+                if (files[i].isDirectory()) {
+                    deleteFileAll(files[i]);
+                } else {
+                    files[i].delete();
+                }
+            }
+            dir.delete();
+        }
+    }
+
     private IoUtil() {
     }
+}
+
+
+/**
+ * 压缩类型枚举
+ *
+ * @author Log
+ */
+enum CompressType {
+    //	GZIP是用于UNIX系统的文件压缩，在Linux中经常会使用到*.gz的文件，就是GZIP格式
+    ZIP, JAR, GZIP
 }

@@ -14,13 +14,16 @@ Yonyou NC5x or U8Cloud Idea devtool Plugin
 
 5. 导出补丁支持 模块写一个配置文件 自定义相对路径：     
   本文件必须放入模块的根目录 文件名： patcherconfig.properties   
-  文件用法：   
+  文件用法(可参考示例文件 patcherconfig.properties)：   
     class全限定名=相对路径(也就是NC模块名字)   
     例子(对test无效)：    
     nc.ui.gl.AddVoucherLineAction=gl   
     特殊参数：   
     config-notest=false ##是否不要test代码，默认true    
-    exportsourcefile=true  ##是否导出源代码，默认true    
+    config-exportsourcefile=true  ##是否导出源代码，默认true    
+    config-compressjar=false ##是否把代码打包成jar文件， 默认false
+    config-compressEndDeleteClass ##如果启用了代码打包成jar文件，是否删除class文件  默认false
+    config-ManifestFilePath=path ##如果打包jar，那么 META-INF.MF 文件模板磁盘全路径(可以不配置 采用默认)    
     类路径配置文件:    
     ```    
     比如我要把 nc.bs.arap包里 1.txt和DzTakeF1Impl.wsdl文件输出到 arap模块下的包文件夹里:   

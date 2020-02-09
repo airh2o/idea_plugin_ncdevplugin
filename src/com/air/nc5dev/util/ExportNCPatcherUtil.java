@@ -1,20 +1,18 @@
 package com.air.nc5dev.util;
 
-import com.air.nc5dev.util.idea.ProjectUtil;
+import com.intellij.debugger.impl.descriptors.data.LocalData;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.newvfs.impl.VirtualFileImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -82,47 +80,54 @@ public class ExportNCPatcherUtil {
         boolean noOutTestClass = true;
         //是否导出 源文件
         boolean hasJavaFile = true;
+        //是否 打包代码到jar
+        boolean compressjar = false;
+        //是否删除打包代码到jar后的 class文件
+        boolean compressEndDeleteClass = false;
         //src 源文件夹 顶级集合
         VirtualFile[] sourceRoots;
         //生产class输出文件夹
         VirtualFile classDir;
         //test class 输出文件夹
         String testClassDirPath;
+
+        String moduleName;
         while (moduleIterator.hasNext()) {
             entry = moduleIterator.next();
             compilerModuleExtension = CompilerModuleExtension.getInstance(entry.getValue());
 
             //读取自定义配置文件
             modulePatcherConfig = readModuleOutConfigFile(entry.getKey());
-            hasJavaFile = !"false".equals(modulePatcherConfig.getProperty("exportsourcefile"));
+            hasJavaFile = !"false".equals(modulePatcherConfig.getProperty("config-exportsourcefile"));
             noOutTestClass = !"false".equals(modulePatcherConfig.getProperty("config-notest"));
-
+            compressjar = "true".equals(modulePatcherConfig.getProperty("config-compressjar"));
+            compressEndDeleteClass = "true".equals(modulePatcherConfig.getProperty("config-compressEndDeleteClass"));
             sourceRoots = ModuleRootManager.getInstance(entry.getValue()).getSourceRoots();
             classDir = compilerModuleExtension.getCompilerOutputPath();
             testClassDirPath = null == compilerModuleExtension.getCompilerOutputPathForTests() ? null : compilerModuleExtension.getCompilerOutputPathForTests().getPath();
-
+            moduleName = entry.getValue().getName();
             //循环输出 NC 3大文件夹
             for (VirtualFile sourceRoot : sourceRoots) {
-                if(null == classDir){
+                if (null == classDir) {
                     continue;
                 }
 
                 if (sourceRoot.getName().equals(NC_TYPE_PUBLIC)) {
-                    export(NC_TYPE_PUBLIC, outPath, entry.getValue().getName()
+                    export(NC_TYPE_PUBLIC, outPath, moduleName
                             , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
                             , hasJavaFile, noOutTestClass, modulePatcherConfig);
                 } else if (sourceRoot.getName().equals(NC_TYPE_PRIVATE)) {
-                    export(NC_TYPE_PRIVATE, outPath, entry.getValue().getName()
+                    export(NC_TYPE_PRIVATE, outPath, moduleName
                             , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
                             , hasJavaFile, noOutTestClass, modulePatcherConfig);
                 } else if (sourceRoot.getName().equals(NC_TYPE_CLIENT)) {
-                    export(NC_TYPE_CLIENT, outPath, entry.getValue().getName()
+                    export(NC_TYPE_CLIENT, outPath, moduleName
                             , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
                             , hasJavaFile, noOutTestClass, modulePatcherConfig);
                 } else if (null != testClassDirPath
                         && !noOutTestClass
                         && sourceRoot.getName().equals(NC_TYPE_TEST)) {
-                    export(NC_TYPE_TEST, outPath, entry.getValue().getName()
+                    export(NC_TYPE_TEST, outPath, moduleName
                             , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
                             , hasJavaFile, noOutTestClass, modulePatcherConfig);
                 }
@@ -133,15 +138,138 @@ public class ExportNCPatcherUtil {
             File umpDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "META-INF");
             if (umpDir.isDirectory()) {
                 IoUtil.copyAllFile(umpDir
-                        , new File(outPath + File.separatorChar + entry.getValue().getName() + File.separatorChar + "META-INF"));
+                        , new File(outPath + File.separatorChar + moduleName + File.separatorChar + "META-INF"));
             }
 
             File bmfDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "METADATA");
             //复制模块元数据
             if (bmfDir.isDirectory()) {
                 IoUtil.copyAllFile(bmfDir
-                        , new File(outPath + File.separatorChar + entry.getValue().getName() + File.separatorChar + "METADATA"));
+                        , new File(outPath + File.separatorChar + moduleName + File.separatorChar + "METADATA"));
             }
+            //检查是否需要把代码打包成 jar文件
+            if (compressjar) {
+                File manifest = null;
+                if(StringUtil.notEmpty(modulePatcherConfig.getProperty("config-ManifestFilePath"))){
+                    manifest = new File(modulePatcherConfig.getProperty("config-ManifestFilePath"));
+                    if(!manifest.isFile()){
+                        manifest = null;
+                    }
+                }
+                compressJar(new File(outPath + File.separatorChar + moduleName), compressEndDeleteClass, manifest);
+            }
+        }
+
+
+    }
+
+    /**
+     * 打包模块class到jar文件       </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/2/9 0009 14:50
+     * @Param [moduleHomeDir, compressEndDeleteClass,modulePatcherConfig]  模块路径， 是否不保留class文件  true删除class文件,模块配置文件
+     */
+    private static void compressJar(File moduleHomeDir, boolean compressEndDeleteClass, File manifest) {
+        File baseDir;
+        //public
+        baseDir= moduleHomeDir;
+        compressJar(new File(baseDir, "classes")
+                , new File(baseDir , "lib")
+                , "pub" + moduleHomeDir.getName()
+                , manifest );
+        //private
+        baseDir = new File(moduleHomeDir, File.separatorChar + "META-INF");
+        compressJar(new File(baseDir, "classes")
+                , new File(baseDir , "lib")
+                , "ui" + moduleHomeDir.getName()
+                , manifest );
+        //client
+        baseDir = new File(moduleHomeDir, File.separatorChar + "client");
+        compressJar(new File(baseDir,  "classes")
+                , new File(baseDir , "lib")
+                , moduleHomeDir.getName()
+                , manifest );
+
+        //删除打包前文件
+        if(compressEndDeleteClass){
+            //public
+            baseDir= moduleHomeDir;
+            IoUtil.cleanUpDirFiles(new File(baseDir, "classes"));
+            //private
+            baseDir = new File(moduleHomeDir, File.separatorChar + "META-INF");
+            IoUtil.cleanUpDirFiles(new File(baseDir, "classes"));
+            //client
+            baseDir = new File(moduleHomeDir, File.separatorChar + "client");
+            IoUtil.cleanUpDirFiles(new File(baseDir, "classes"));
+        }
+    }
+
+    /**
+     *  打包成jar文件   </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return java.io.File
+     * @author air Email: 209308343@qq.com
+     * @date 2020/2/9 0009 14:53
+     * @Param [dir, outDir, jarName,manifest] 要打包的文件，要输出到的文件夹，jar文件名（注意，源码会自动加_src后缀），manifest
+     */
+    private static void compressJar(File dir, File outDir, String jarName, File manifest) {
+        try {
+            if(dir.listFiles() == null
+                || dir.listFiles().length < 1
+                    || (dir.listFiles().length < 2 && dir.listFiles()[0].getName().equals("META-INF"))){
+                return ;
+            }
+            outDir.mkdirs();
+            //创建MANIFEST.MF
+
+            File meteInfoFile = new File(dir, "META-INF" + File.separatorChar + "MANIFEST.MF");
+            meteInfoFile.getParentFile().mkdirs();
+
+            if(null == manifest){
+                HashMap<String,String> manifestMap = new HashMap<>();
+                manifestMap.put("Manifest-Version", "1.0");
+                manifestMap.put("Class-Path", "");
+                manifestMap.put("Main-Class", "");
+                manifestMap.put("Name", "");
+                manifestMap.put("Specification-Title", "");
+                manifestMap.put("Specification-Version", "1.0");
+                manifestMap.put("Specification-Vendor", "");
+                manifestMap.put("Implementation-Title", "");
+                manifestMap.put("Implementation-Version", "");
+                manifestMap.put("Implementation-Vendor", "");
+                manifestMap.put("CreateDate", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                        .format(LocalDateTime.now()));
+                manifestMap.put("Created-By", "");
+                manifestMap.put("Created-ByIde", "IDEA-plugin-nc5devtoolidea by air Email 209308343@qq.com,QQ 209308343 ");
+                manifestMap.put("IDEA-plugin-nc5devtoolidea-github", "https://gitee.com/yhlx/idea_plugin_nc5devplugin");
+                PrintWriter printWriter = new PrintWriter(new FileOutputStream(meteInfoFile));
+                Iterator<Map.Entry<String, String>> infos = manifestMap.entrySet().iterator();
+                Map.Entry<String, String> info;
+                while (infos.hasNext()){
+                    info = infos.next();
+                    printWriter.println(info.getKey() + ':' + info.getValue());
+                }
+                printWriter.flush();
+                printWriter.close();
+            }else{
+                IoUtil.copyFile(manifest, meteInfoFile.getParentFile());
+            }
+
+            File jarFile = new File(outDir, jarName + ".jar");
+            File jarSrcFile = new File(outDir, jarName + "_src.jar");
+            IoUtil.zip(dir, jarFile, CompressType.JAR, new String[]{".java"});
+            IoUtil.zip(dir, jarSrcFile, CompressType.JAR, new String[]{".class"});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
         }
     }
 
@@ -184,15 +312,17 @@ public class ExportNCPatcherUtil {
             copyClassPathOtherFile(sourcePackge, exportDir, moduleName, ncType, packgePath, modulePatcherConfig);
         }
     }
+
     /**
-      *     把一个包 当前的文件夹内所有 java源代码和类文件 复制到补丁对应位置（不包含下级包）      </br>
-      *           </br>
-      *           </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com
-      * @date 2020/2/4 0004 17:31
-      * @Param [sourcePackge, sourceBaseDirFile, modulePatcherConfig, exportDir, moduleName, ncType, packgePath, hasJavaFile, classFileDir]
-      * @return void
+     * 把一个包 当前的文件夹内所有 java源代码和类文件 复制到补丁对应位置（不包含下级包）      </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/2/4 0004 17:31
+     * @Param [sourcePackge, sourceBaseDirFile, modulePatcherConfig, exportDir, moduleName, ncType, packgePath, hasJavaFile, classFileDir]
      */
     private static final void copyClassAndJavaSourceFiles(File sourcePackge, File sourceBaseDirFile
             , Properties modulePatcherConfig, String exportDir, String moduleName
@@ -203,8 +333,8 @@ public class ExportNCPatcherUtil {
                 return;
             }
 
-            if(!javaFile.getName().toLowerCase().endsWith(".java")){
-                return ;
+            if (!javaFile.getName().toLowerCase().endsWith(".java")) {
+                return;
             }
 
             String javaFullName = javaFile.getPath().substring((sourceBaseDirFile.getPath()).length() + 1);
@@ -278,14 +408,14 @@ public class ExportNCPatcherUtil {
 
             //检查是否有特殊模块路径设置
             String configKey = packgePath + '.' + file.getName();
-            if(configKey.charAt(0) == '/'
+            if (configKey.charAt(0) == '/'
                     || configKey.charAt(0) == '\\'
-                    || configKey.charAt(0) == File.separatorChar){
+                    || configKey.charAt(0) == File.separatorChar) {
                 configKey = configKey.substring(1);
             }
-            configKey = StringUtil.replaceAll(configKey,  "/", ".");
-            configKey = StringUtil.replaceAll(configKey,  "\\", ".");
-            configKey = StringUtil.replaceAll(configKey,  File.separator, ".");
+            configKey = StringUtil.replaceAll(configKey, "/", ".");
+            configKey = StringUtil.replaceAll(configKey, "\\", ".");
+            configKey = StringUtil.replaceAll(configKey, File.separator, ".");
 
             String outModuleName = modulePatcherConfig.getProperty(configKey);
             String outClasPathOtherFileDirPath = exportDir + File.separatorChar + (StringUtil.isEmpty(outModuleName) ? moduleName : outModuleName);
