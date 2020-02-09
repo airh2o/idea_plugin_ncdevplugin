@@ -14,7 +14,7 @@ Yonyou NC5x or U8Cloud Idea devtool Plugin
 
 5. 导出补丁支持 模块写一个配置文件 自定义相对路径：     
   本文件必须放入模块的根目录 文件名： patcherconfig.properties   
-  文件用法(可参考示例文件 patcherconfig.properties)：   
+  文件用法(可参考示例文件 patcherconfig.properties 所有参数都可以配或不配置 插件有默认值的哈)：   
     class全限定名=相对路径(也就是NC模块名字)   
     例子(对test无效)：    
     nc.ui.gl.AddVoucherLineAction=gl   
