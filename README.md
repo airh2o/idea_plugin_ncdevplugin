@@ -1,6 +1,6 @@
 # idea_plugin_nc5devplugin
-Yonyou NC5x or U8Cloud Idea devtool Plugin   
-实现了 Idea NC5x+U8Cloud 开发插件，功能比较简单
+Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin   
+实现了 Idea NC5x 6x U8Cloud 开发插件，功能比较简单
 
 # 使用方式
 插件安装后使用方式:
