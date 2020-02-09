@@ -27,17 +27,17 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /***
-  *    生成新项目里 NC必须的东西  等    </br>
-  *     1.NC库依赖      </br>
-  *     2.NC 3个源文件夹 和 1个xml     </br>
-  *     3.NC 2个运行选项 服务端+客户端
+ *    生成新项目里 NC必须的东西  等    </br>
+ *     1.NC库依赖      </br>
+ *     2.NC 3个源文件夹 和 1个xml     </br>
+ *     3.NC 2个运行选项 服务端+客户端
  *     4. 复制项目 ump文件到 NC HOME的工具方法 </br>
-  * @author air Email: 209308343@qq.com
-  * @date 2019/12/25 0025 9:02
+ * @author air Email: 209308343@qq.com
+ * @date 2019/12/25 0025 9:02
  */
 public class IdeaProjectGenerateUtil {
     /**
-     *  生成NC默认 几个个文件夹 src和META-INF 到项目
+     * 生成NC默认 几个个文件夹 src和META-INF 到项目
      *
      * @param project
      */
@@ -49,17 +49,19 @@ public class IdeaProjectGenerateUtil {
             generateSrcDir(module);
         }
     }
+
     /**
-      *   生成NC默认 几个个文件夹 src和META-INF 到指定模块       </br>
-      *           </br>
-      *           </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com
-      * @date 2020/1/18 0018 12:25
-      * @Param [module]
-      * @return void
+     * 生成NC默认 几个个文件夹 src和META-INF 到指定模块       </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/1/18 0018 12:25
+     * @Param [module]
      */
-    public static void generateSrcDir(@NotNull Module module){
+    public static void generateSrcDir(@NotNull Module module) {
         File homeDir = new File(module.getModuleFilePath()).getParentFile();
         File src = new File(homeDir, "src");
         File publicf = new File(src, "public");
@@ -85,7 +87,7 @@ public class IdeaProjectGenerateUtil {
         File umpFile = new File(umpDir, "module.xml");
         if (!umpFile.exists()) {
             try {
-                PrintWriter out =new PrintWriter(new FileOutputStream(umpFile));
+                PrintWriter out = new PrintWriter(new FileOutputStream(umpFile));
                 out.print("<?xml version=\"1.0\" encoding=\"gb2312\"?>\n" +
                         "<module name=\""
                         + module.getName()
@@ -112,8 +114,8 @@ public class IdeaProjectGenerateUtil {
      * @param project
      */
     public static final void generateRunMenu(@NotNull Project project) {
-        if(!checkNCHomeSetPass()){
-            return ;
+        if (!checkNCHomeSetPass()) {
+            return;
         }
 
         File ncHome = ProjectNCConfigUtil.getNCHome();
@@ -163,17 +165,24 @@ public class IdeaProjectGenerateUtil {
             envs.put("FIELD_NC_HOME", ProjectNCConfigUtil.getNCHomePath());
             conf.setEnvs(envs);
 
-            conf.setVMParameters("-Dnc.exclude.modules= " //${FIELD_EX_MODULES}
-                  +  " -Dnc.runMode=develop -Dnc.server.location=$FIELD_NC_HOME$" +
-                    " -DEJBConfigDir=$FIELD_NC_HOME$/ejbXMLs" +
-                    " -DExtServiceConfigDir=$FIELD_NC_HOME$/ejbXMLs" +
-                    " -Xmx768m -XX:MaxPermSize=256m -DEnableSqlDebug=true -XX:+HeapDumpOnOutOfMemoryError ");
+            conf.setVMParameters(
+                    "-Dcom.sun.management.jmxremote "
+                            + "-Dcom.sun.management.jmxremote.port=11241 "
+                            + "-Dcom.sun.management.jmxremote.ssl=false "
+                            + "-Dcom.sun.management.jmxremote.authenticate=false "
+                            + "-Dnc.exclude.modules= " //${FIELD_EX_MODULES}
+                            + " -Dnc.runMode=develop -Dnc.server.location=$FIELD_NC_HOME$"
+                            + " -DEJBConfigDir=$FIELD_NC_HOME$/ejbXMLs"
+                            + " -DExtServiceConfigDir=$FIELD_NC_HOME$/ejbXMLs"
+                            + " -Xmx768m -XX:MaxPermSize=256m -DEnableSqlDebug=true -XX:+HeapDumpOnOutOfMemoryError "
+                            + "-DSqlDebugSkipKey=bd_del_log,pub_alertruntime,pub_alertregistry,bi_schd_host,wfm_task,pub_async,cp_sysinittemp,bi_schd_taskqueue,md_module,ec_muc_affili,ec_muc_member"
+            );
             conf.setWorkingDirectory(ncHome.getPath());
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
 
             conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
 
-           RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf);
+            RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf);
         }
 
         if (0 == hasNc[1]) {
@@ -186,9 +195,14 @@ public class IdeaProjectGenerateUtil {
             envs.put("FIELD_NC_HOME", ProjectNCConfigUtil.getNCHomePath());
             conf.setEnvs(envs);
 
-            conf.setVMParameters("-Dnc.runMode=develop" +
-                    " -Dnc.jstart.server=$FIELD_CLINET_IP$" +
-                    " -Dnc.jstart.port=$FIELD_CLINET_PORT$ -Xmx768m -XX:MaxPermSize=256m -Dnc.fi.autogenfile=N ");
+            conf.setVMParameters(
+                    "-Dcom.sun.management.jmxremote "
+                            + "-Dcom.sun.management.jmxremote.port=11242 "
+                            + "-Dcom.sun.management.jmxremote.ssl=false "
+                            + "-Dcom.sun.management.jmxremote.authenticate=false "
+                            + "-Dnc.runMode=develop"
+                            + " -Dnc.jstart.server=$FIELD_CLINET_IP$"
+                            + " -Dnc.jstart.port=$FIELD_CLINET_PORT$ -Xmx768m -XX:MaxPermSize=256m -Dnc.fi.autogenfile=N ");
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
             conf.setWorkingDirectory(ncHome.getPath());
 
@@ -197,7 +211,8 @@ public class IdeaProjectGenerateUtil {
             RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf);
         }
     }
-    public static final boolean checkNCHomeSetPass(){
+
+    public static final boolean checkNCHomeSetPass() {
         if (StringUtil.isEmpty(ProjectNCConfigUtil.getNCHomePath())) {
             Messages.showInfoMessage("未配置NC HOME，请在 Tools 菜单下 配置NC HOME 菜单进行配置！", "警告");
             return false;
@@ -205,12 +220,13 @@ public class IdeaProjectGenerateUtil {
 
         return true;
     }
+
     /**
      * 更新用户配置的 项目的NC 路径更新 NC的库依赖
      */
     public static final void updateApplicationNCLibrarys(@Nullable Project theProject) {
-        if(!checkNCHomeSetPass()){
-            return ;
+        if (!checkNCHomeSetPass()) {
+            return;
         }
 
         Project project = null == theProject ? ProjectUtil.getDefaultProject() : theProject;
@@ -243,19 +259,21 @@ public class IdeaProjectGenerateUtil {
 
 
     }
+
     /**
-      *           </br>
-      *    马上把最新的项目里所有模块的 META-INF 里所有文件复制到
-     *          NC HOME里对应的项目模块文件夹，主要是 ejb部署xml       </br>
-      *           </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com
-      * @date 2019/12/25 0025 15:04
-      * @Param []
-      * @return void
+     * </br>
+     * 马上把最新的项目里所有模块的 META-INF 里所有文件复制到
+     * NC HOME里对应的项目模块文件夹，主要是 ejb部署xml       </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 15:04
+     * @Param []
      */
     public static final void copyProjectMetaInfFiles2NCHomeModules() {
-        Project project =  ProjectUtil.getDefaultProject() ;
+        Project project = ProjectUtil.getDefaultProject();
         Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules) {
             copyProjectMetaInfFiles2NCHomeModules(module);
@@ -263,35 +281,36 @@ public class IdeaProjectGenerateUtil {
     }
 
     /**
-     *           </br>
-     *    马上把指定模块的 META-INF 里所有文件复制到
-     *          NC HOME里对应的项目模块文件夹，主要是 ejb部署xml       </br>
-     *           </br>
-     *           </br>
+     * </br>
+     * 马上把指定模块的 META-INF 里所有文件复制到
+     * NC HOME里对应的项目模块文件夹，主要是 ejb部署xml       </br>
+     * </br>
+     * </br>
+     *
+     * @return void
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 15:04
      * @Param []
-     * @return void
      */
     public static final void copyProjectMetaInfFiles2NCHomeModules(@NotNull Module module) {
         String ncHomePath = ProjectNCConfigUtil.getNCHomePath();
-        if(null == ncHomePath || ncHomePath.trim().isEmpty()){
-            return ;
+        if (null == ncHomePath || ncHomePath.trim().isEmpty()) {
+            return;
         }
 
         File umpDir = new File(new File(module.getModuleFilePath()).getParentFile(), "META-INF");
-        if(!umpDir.exists()){
-            return ;
+        if (!umpDir.exists()) {
+            return;
         }
 
         File nchome = new File(ncHomePath);
-        if(!nchome.exists() || !nchome.isDirectory()){
-            return ;
+        if (!nchome.exists() || !nchome.isDirectory()) {
+            return;
         }
 
         File modeluUmpDir = new File(ncHomePath, File.separatorChar + "modules"
                 + File.separatorChar + module.getName() + File.separatorChar + "META-INF");
-        if(!modeluUmpDir.exists() || !modeluUmpDir.isDirectory()){
+        if (!modeluUmpDir.exists() || !modeluUmpDir.isDirectory()) {
             modeluUmpDir.mkdirs();
         }
 
@@ -299,7 +318,7 @@ public class IdeaProjectGenerateUtil {
         File[] projectFiles = umpDir.listFiles(f -> f.isFile());
         Stream.of(projectFiles).forEach(f -> {
             try {
-                Files.copy(f.toPath(), new File(modeluUmpDir,f.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(f.toPath(), new File(modeluUmpDir, f.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (Exception e) {
             }
         });
