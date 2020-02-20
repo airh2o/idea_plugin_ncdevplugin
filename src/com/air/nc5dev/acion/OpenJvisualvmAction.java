@@ -26,7 +26,9 @@ public class OpenJvisualvmAction extends AnAction {
                 javaHome = javaHome.getParentFile();
             }
 
-            File javaBin = new File(javaHome.exists() ? javaHome : ufjdkHome, "bin" + File.separatorChar + exe);
+
+            File javaBin = new File(javaHome, "bin" + File.separatorChar + exe);
+            javaBin = javaBin.exists() ? javaBin : new File(ufjdkHome, "bin" + File.separatorChar + exe);
 
             if (!javaBin.exists()) {
                 ProjectUtil.warnNotification("路径不存在: " + javaBin.getPath(), e.getProject());
