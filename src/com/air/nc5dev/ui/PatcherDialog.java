@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.Nullable;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -113,19 +114,18 @@ public class PatcherDialog
         String exportPath = this.textField_savePath.getText() + File.separatorChar + dirName;
         try {
             ExportNCPatcherUtil.export(exportPath, event.getProject());
-            Messages.showInfoMessage("导出成功!硬盘路径： " + exportPath, "Tips");
-
+            ProjectUtil.infoNotification("导出成功!硬盘路径： " + exportPath, event.getProject());
 
             try {
                 Desktop desktop = Desktop.getDesktop();
                 File dirToOpen = new File(exportPath);
                 desktop.open(dirToOpen);
             } catch (IllegalArgumentException iae) {
-                System.out.println("自动打开路径失败");
+                ProjectUtil.errorNotification("自动打开路径失败: " + ExceptionUtil.getExcptionDetall(iae), event.getProject());
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            Messages.showErrorDialog(ExceptionUtil.getExcptionDetall(e), "错误");
+            ProjectUtil.errorNotification(ExceptionUtil.getExcptionDetall(e), event.getProject());
         }
         dispose();
     }

@@ -56,8 +56,8 @@ public  final class ExceptionUtil {
 	 * @param e
 	 * @return
 	 */
-	public static String getMessage3Lines(Throwable e) {
-		return getMessageLines(e, 3);
+	public static String toString3Lines(Throwable e) {
+		return toStringLines(e, 3);
 	}
 	/**
 	 * 获得异常的简短描述+最近1行的代码方法全限定名字和行数
@@ -67,8 +67,8 @@ public  final class ExceptionUtil {
 	 * @param e
 	 * @return
 	 */
-	public static String getMessage1Lines(Throwable e) {
-		return getMessageLines(e, 1);
+	public static String toString1Lines(Throwable e) {
+		return toStringLines(e, 1);
 	}
 	/**
 	 * 获得异常的简短描述+最近2行的代码方法全限定名字和行数
@@ -78,8 +78,8 @@ public  final class ExceptionUtil {
 	 * @param e
 	 * @return
 	 */
-	public static String getMessage2Lines(Throwable e) {
-		return getMessageLines(e, 2);
+	public static String toString2Lines(Throwable e) {
+		return toStringLines(e, 2);
 	}
 	/**
 	 * 获得异常的简短描述+最近 lines 行的代码方法全限定名字和行数
@@ -90,9 +90,9 @@ public  final class ExceptionUtil {
 	 * @param lines 需要获得多少层异常栈信息
 	 * @return
 	 */
-	public static String getMessageLines(Throwable e , int lines) {
+	public static String toStringLines(Throwable e , int lines) {
 		StringBuilder sb = new StringBuilder(3000);
-		sb.append(e.getMessage());
+		sb.append(e.toString());
 		
 		StackTraceElement[] stackTrace = e.getStackTrace();
 		
@@ -103,7 +103,7 @@ public  final class ExceptionUtil {
 				sb.append(" on ")
 					.append(s.getClassName()).append('.')
 					.append(s.getMethodName()).append('(').append(')')
-					.append(" line ").append(s.getLineNumber()).append("!\n");
+					.append(" line ").append(s.getLineNumber()).append("\n");
 			}
 		}
 		
@@ -135,7 +135,7 @@ public  final class ExceptionUtil {
 		if(error instanceof BusinessException){
 			be = (BusinessException) error;
 		}else{
-			be = new BusinessException(error.getMessage());
+			be = new BusinessException(error.toString());
 			be.setStackTrace(error.getStackTrace());
 		}
 		throw be;
