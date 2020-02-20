@@ -23,7 +23,7 @@ public class OpenNCDataConfigFileAction extends AnAction {
             Desktop desktop = Desktop.getDesktop();
             File dirToOpen = new File(ProjectNCConfigUtil.getNCHomePath() + File.separatorChar
                     + "ierp" + File.separatorChar + "bin"
-            + File.separatorChar + "prop.xml.properties");
+            + File.separatorChar + "prop.xml");
             desktop.open(dirToOpen);
         } catch (Exception iae) {
             ProjectUtil.errorNotification(ExceptionUtil.getExcptionDetall(iae), e.getProject());
