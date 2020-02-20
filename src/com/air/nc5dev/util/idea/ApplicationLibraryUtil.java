@@ -57,11 +57,11 @@ public class ApplicationLibraryUtil {
 
         // 加入新的依赖路径
         for (String root : classesRoots) {
-            if (root.toLowerCase().endsWith(".jar")) {
+            if (root.toLowerCase().endsWith("_src.jar")) {
+                libraryModel.addRoot(VirtualFileManager.constructUrl("jar", root + "!/"), OrderRootType.SOURCES);
+            } else if (root.toLowerCase().endsWith(".jar")) {
                 // 注意jar格式jar:{path_to_jar}.jar!/
                 libraryModel.addRoot(VirtualFileManager.constructUrl("jar", root + "!/"), OrderRootType.CLASSES);
-            } else if (root.toLowerCase().endsWith("_src.jar")) {
-                libraryModel.addRoot(VirtualFileManager.constructUrl("jar", root + "!/"), OrderRootType.SOURCES);
             } else if (root.toLowerCase().endsWith(".class")) {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);

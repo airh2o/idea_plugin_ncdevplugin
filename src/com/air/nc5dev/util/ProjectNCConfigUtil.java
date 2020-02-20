@@ -236,23 +236,23 @@ public class ProjectNCConfigUtil {
 
 
     /*****    NC 依赖库： NC ant jars         ****/
-    public static final String LIB_Ant_Library = "nc.uap.mde.library.container/Ant_Library";
+    public static final String LIB_Ant_Library = "NC_LIBS/Ant_Library";
     /*****    NC 依赖库： NC公共LIB         ****/
-    public static final String LIB_Product_Common_Library = "nc.uap.mde.library.container/Product_Common_Library";
+    public static final String LIB_Product_Common_Library = "NC_LIBS/Product_Common_Library";
     /*****    NC 依赖库： NC Middleware_Library  ****/
-    public static final String LIB_Middleware_Library = "nc.uap.mde.library.container/Middleware_Library";
+    public static final String LIB_Middleware_Library = "NC_LIBS/Middleware_Library";
     /*****    NC 依赖库： NC Framework_Library  ****/
-    public static final String LIB_Framework_Library = "nc.uap.mde.library.container/Framework_Library";
+    public static final String LIB_Framework_Library = "NC_LIBS/Framework_Library";
     /*****    NC 依赖库： NC模块  Module_Public_Library     ****/
-    public static final String LIB_NC_Module_Public_Library = "nc.uap.mde.library.container/Module_Public_Library";
+    public static final String LIB_NC_Module_Public_Library = "NC_LIBS/Module_Public_Library";
     /*****    NC 依赖库： NC模块  Module_Client_Library     ****/
-    public static final String LIB_Module_Client_Library = "nc.uap.mde.library.container/Module_Client_Library";
+    public static final String LIB_Module_Client_Library = "NC_LIBS/Module_Client_Library";
     /*****    NC 依赖库： NC模块  Module_Private_Library     ****/
-    public static final String LIB_Module_Private_Library = "nc.uap.mde.library.container/Module_Private_Library";
+    public static final String LIB_Module_Private_Library = "NC_LIBS/Module_Private_Library";
     /*****    NC 依赖库： NC模块  Module_Lang_Library     ****/
-    public static final String LIB_Module_Lang_Library = "nc.uap.mde.library.container/Module_Lang_Library";
+    public static final String LIB_Module_Lang_Library = "NC_LIBS/Module_Lang_Library";
     /*****    NC 依赖库： NC模块  Generated_EJB     ****/
-    public static final String LIB_Generated_EJB = "nc.uap.mde.library.container/Generated_EJB";
+    public static final String LIB_Generated_EJB = "NC_LIBS/Generated_EJB";
 
 
     private ProjectNCConfigUtil() {

@@ -170,16 +170,17 @@ public class IdeaProjectGenerateUtil {
                             + "-Dcom.sun.management.jmxremote.port=11241 "
                             + "-Dcom.sun.management.jmxremote.ssl=false "
                             + "-Dcom.sun.management.jmxremote.authenticate=false "
-                            + "-Dnc.exclude.modules= " //${FIELD_EX_MODULES}
+                            + "-Dnc.exclude.modules=datamig,ecp,egbaseinfo,egdocmg,egitctrl,egriskmg,egrkaudit,gpm,hrbm,hrcm,hrcp,hrdm,hrhi,hrjf,hrjq,hrma,hrp,hrpe,hrrm,hrrpt,hrss,hrta,hrtrn,hrwa,oaar,oaco,oaep,oainf,oakm,oamt,oaod,oapo,oapp,oapub,srm,srmem,srmsm,swcm_pu,webad,webbd,webdbl,webimp,webrt,websm " //${FIELD_EX_MODULES}
                             + " -Dnc.runMode=develop -Dnc.server.location=$FIELD_NC_HOME$"
                             + " -DEJBConfigDir=$FIELD_NC_HOME$/ejbXMLs"
                             + " -DExtServiceConfigDir=$FIELD_NC_HOME$/ejbXMLs"
                             + " -Xmx768m -XX:MaxPermSize=256m -DEnableSqlDebug=true -XX:+HeapDumpOnOutOfMemoryError "
                             + "-DSqlDebugSkipKey=bd_del_log,pub_alertruntime,pub_alertregistry,bi_schd_host,wfm_task,pub_async,cp_sysinittemp,bi_schd_taskqueue,md_module,ec_muc_affili,ec_muc_member"
+                            + "-Duap.hotwebs=lfw,portal,fs "
             );
             conf.setWorkingDirectory(ncHome.getPath());
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
-
+            conf.setShowConsoleOnStdErr(true);
             conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
 
             RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf);
@@ -205,7 +206,7 @@ public class IdeaProjectGenerateUtil {
                             + " -Dnc.jstart.port=$FIELD_CLINET_PORT$ -Xmx768m -XX:MaxPermSize=256m -Dnc.fi.autogenfile=N ");
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
             conf.setWorkingDirectory(ncHome.getPath());
-
+            conf.setShowConsoleOnStdErr(true);
             conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
 
             RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf);
