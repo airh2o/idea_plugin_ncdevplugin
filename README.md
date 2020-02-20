@@ -3,10 +3,12 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 实现了 Idea NC5x 6x U8Cloud 开发插件，功能比较简单
 
 #插件截图
+``` 
 ![快速面板](https://s2.ax1x.com/2020/02/20/3eonRP.jpg "快速操作面板")    
 ![配置NCHOME](https://s2.ax1x.com/2020/02/20/3eolqg.jpg "配置NCHOME")    
 ![补丁导出界面](https://s2.ax1x.com/2020/02/20/3eomGt.jpg "补丁导出界面")    
 ![Tools菜单下位置](https://s2.ax1x.com/2020/02/20/3eoMM8.jpg "Tools菜单下位置")    
+```
 # 使用方式
 插件安装后使用方式:
 ```
