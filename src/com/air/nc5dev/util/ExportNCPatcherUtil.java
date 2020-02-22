@@ -383,8 +383,10 @@ public class ExportNCPatcherUtil {
             String javaFullClassName = StringUtil.replaceAll(pageJava + "/" + javaFullName, File.separator, ".");
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "\\", ".");
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "/", ".");
-            //移除后面的 .java 后缀
-            javaFullClassName = javaFullClassName.substring(0, javaFullClassName.lastIndexOf('.'));
+            if(javaFullClassName.endsWith(".java")){
+                //移除后面的 .java 后缀
+                javaFullClassName = javaFullClassName.substring(0, javaFullClassName.lastIndexOf('.'));
+            }
 
             //检查是否配置了 特殊输出路径
             String outModuleName = modulePatcherConfig.getProperty(javaFullClassName);
@@ -607,24 +609,16 @@ public class ExportNCPatcherUtil {
         if(classFileName.indexOf('$') > 0){
             classFileName = classFileName.substring(0, classFileName.indexOf('$'));
         }
-        classFileName += ".java";
-        if(new File(sourcePackge, classFileName).exists()){
+        if(new File(sourcePackge, classFileName + ".java").exists()){
             return classFileName;
         }
 
         String fileName = readClassFileSourceFileName(path);
-
-        String className = new File(path).getName();
-        className = className.substring(0, className.lastIndexOf('.'));
-        if (fileName == null) {
-            return className;
-        }
-
         if (new File(sourcePackge, fileName).exists()) {
             return fileName;
         }
 
-        return className;
+        return null;
     }
 
     /**
