@@ -406,7 +406,7 @@ public class ExportNCPatcherUtil {
 
             if (hasJavaFile) {
                 //复制源码
-                IoUtil.copyFile(new File(sourcePackge, javaFullName), outDir);
+                IoUtil.copyFile(new File(sourcePackge, javaFullName + ".java"), outDir);
             }
 
             //复制class
@@ -601,6 +601,17 @@ public class ExportNCPatcherUtil {
      * @Param [path, sourcePackge]
      */
     public static String getClassFileSourceFileName(String path, File sourcePackge) {
+        //先看看是否是 源文件的public类或public类里匿名类
+        File classFile = new File(path);
+        String classFileName = classFile.getName().substring(0, classFile.getName().lastIndexOf('.'));
+        if(classFileName.indexOf('$') > 0){
+            classFileName = classFileName.substring(0, classFileName.indexOf('$'));
+        }
+        classFileName += ".java";
+        if(new File(sourcePackge, classFileName).exists()){
+            return classFileName;
+        }
+
         String fileName = readClassFileSourceFileName(path);
 
         String className = new File(path).getName();
