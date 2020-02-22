@@ -208,7 +208,6 @@ public class IdeaProjectGenerateUtil {
             conf.setWorkingDirectory(ncHome.getPath());
             conf.setShowConsoleOnStdErr(true);
             conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
-
             RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf);
         }
     }

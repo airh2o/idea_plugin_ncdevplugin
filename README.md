@@ -52,7 +52,7 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 
 
 # 已知BUG
-1. 一个java文件非public类不会导出补丁！请手工操作.
+1. 注意： 如果你没有设置JAVAHOME或者ufjdk没有javap工具，导出补丁不会导出 同一个源文件内的非public类中匿名且非public的类文件。但如果有javap就会导出 但同时耗时较长！    
 
 # 未来待实现功能
 1. 元数据编辑 - 暂不完成
