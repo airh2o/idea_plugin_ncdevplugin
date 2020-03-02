@@ -257,7 +257,11 @@ public class IdeaProjectGenerateUtil {
         ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Generated_EJB
                 , IoUtil.serachGenerated_EJB(ncHome));
 
-
+        File f = new File(ncHome, "resources");
+        if (f.exists()) {
+            ApplicationLibraryUtil.addApplicationLibrary(project, "NC_LIBS/CLIENT_FILES"
+                    , IoUtil.getAllFiles(f, true));
+        }
     }
 
     /**
