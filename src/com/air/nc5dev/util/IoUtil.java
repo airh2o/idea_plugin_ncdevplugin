@@ -621,7 +621,7 @@ public final class IoUtil {
      */
     public static void cleanUpDirFiles(File dir) {
         if (!dir.exists()) {//判断是否待删除目录是否存在
-            return ;
+            return;
         }
 
         deleteFileAll(dir);
@@ -632,7 +632,7 @@ public final class IoUtil {
     /**
      * 删除 文件夹
      * file：文件名
-     * */
+     */
     public static void deleteFileAll(File dir) {
         if (dir.exists()) {
             File files[] = dir.listFiles();
@@ -646,6 +646,68 @@ public final class IoUtil {
             }
             dir.delete();
         }
+    }
+
+    /**
+     * 获得jdk的基本路径中某个特定文件        </br>
+     * 优先使用nchome的ufjdk 如果没有就查询运行态，如果在没有就查询 JAVA_HOME 然后 JDK_HOME的环境变量配置 最后都没有 返回null       </br>
+     * </br>
+     * </br>
+     *
+     * @param fileRelativePath 相对于 jdk根目录的相对路径
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/3/5 0005 12:05
+     * @Param ncHomePath nchome路径
+     */
+    public static File getJavaHomePathFile(String ncHomePath, String fileRelativePath) {
+        File javaHome = new File(System.getProperty("java.home"));
+        File javaBin = null;
+
+        if(StringUtil.notEmpty(ncHomePath)){
+            File ufjdkHome = new File(ncHomePath + File.separatorChar + "ufjdk");
+            javaBin = new File(ufjdkHome, fileRelativePath);
+            if(javaBin.exists()){
+                return javaBin;
+            }
+        }
+
+        javaBin = new File(javaHome, fileRelativePath);
+        if(javaBin.exists()){
+            return javaBin;
+        }
+
+        //尝试智能匹配路径 like : C:\Program Files\Java\jdk1.8.0_191\jre\bin\jconsole.exe -> to正确路径 (最多往上跳2级)
+        javaHome = javaHome.getParentFile();
+        javaBin = new File(javaHome, fileRelativePath);
+        if(javaBin.exists()){
+            return javaBin;
+        }
+
+        javaHome = javaHome.getParentFile();
+        javaBin = new File(javaHome, fileRelativePath);
+        if(javaBin.exists()){
+            return javaBin;
+        }
+
+        //获取 环境变量
+        String envValue = System.getenv().get("JAVA_HOME");
+        if(StringUtil.notEmpty(envValue)){
+            javaBin = new File(envValue, fileRelativePath);
+            if(javaBin.exists()){
+                return javaBin;
+            }
+        }
+
+        envValue = System.getenv().get("JDK_HOME");
+        if(StringUtil.notEmpty(envValue)){
+            javaBin = new File(envValue, fileRelativePath);
+            if(javaBin.exists()){
+                return javaBin;
+            }
+        }
+
+        return null;
     }
 
     private IoUtil() {

@@ -1,6 +1,7 @@
 package com.air.nc5dev.acion;
 
 import com.air.nc5dev.util.ExceptionUtil;
+import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
@@ -17,21 +18,10 @@ public class ShowLocalNCProcessAction extends AnAction {
     @Override
     public void actionPerformed(final AnActionEvent e) {
         try {
-            final String exe = "jps.exe";
-            File javaHome = new File(System.getProperty("java.home"));
-            File ufjdkHome = new File(ProjectNCConfigUtil.getNCHomePath() + File.separatorChar + "ufjdk");
-
-            //尝试智能匹配路径 like : C:\Program Files\Java\jdk1.8.0_191\jre\bin\jconsole.exe -> to正确路径 (最多往上跳2级)
-            if (!new File(javaHome, "bin" + File.separatorChar + exe).exists()) {
-                javaHome = javaHome.getParentFile();
-            }
-            if (!new File(javaHome, "bin" + File.separatorChar + exe).exists()) {
-                javaHome = javaHome.getParentFile();
-            }
-
-            File javaBin = new File(javaHome, "bin" + File.separatorChar + exe);
-            javaBin = javaBin.exists() ? javaBin : new File(ufjdkHome, "bin" + File.separatorChar + exe);
-            if (!javaBin.exists()) {
+            final String exe = "bin" + File.separatorChar + "jps.exe";
+            File javaBin = IoUtil.getJavaHomePathFile(ProjectNCConfigUtil.getNCHomePath()
+                    , exe);
+            if (null == javaBin) {
                 ProjectUtil.warnNotification("路径不存在: " + javaBin.getPath(), e.getProject());
                 return;
             }

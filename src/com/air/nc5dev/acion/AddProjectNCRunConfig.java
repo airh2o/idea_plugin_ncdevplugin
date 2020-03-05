@@ -1,6 +1,7 @@
 package com.air.nc5dev.acion;
 
 import com.air.nc5dev.util.IdeaProjectGenerateUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -12,6 +13,11 @@ public class AddProjectNCRunConfig extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
+        if(!ProjectNCConfigUtil.getNCHome().exists()){
+            ProjectUtil.warnNotification("未配置NC HOME 无法执行此操作！ ", e.getProject());
+            return ;
+        }
+
         IdeaProjectGenerateUtil.generateSrcDir(e.getProject());
         IdeaProjectGenerateUtil.generateRunMenu(e.getProject());
         ProjectUtil.infoNotification("操作完成", e.getProject());
