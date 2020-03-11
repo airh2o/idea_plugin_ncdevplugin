@@ -614,6 +614,12 @@ public class ExportNCPatcherUtil {
         }
 
         String fileName = readClassFileSourceFileName(path);
+
+        if(StringUtil.isEmpty(fileName)){
+            ProjectUtil.errorNotification(path + " class文件无法找到源码,请关闭JAVAP方式寻求源码!", null);
+            return null;
+        }
+
         if (new File(sourcePackge, fileName).exists()) {
             return fileName;
         }

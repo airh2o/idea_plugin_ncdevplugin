@@ -136,15 +136,16 @@ public class PatcherDialog
                     indicator.setText2("导出成功后会自动打开文件夹： " + exportPath);
                     indicator.setIndeterminate(true);
 
-                    long s = System.currentTimeMillis();
-                    ExportNCPatcherUtil.export(exportPath, event.getProject());
-                    long e = System.currentTimeMillis();
-                    ProjectUtil.infoNotification("导出成功,耗时:" + ((e - s) / 1000.0d) + " (秒s)!硬盘路径： " + exportPath, event.getProject());
                     try {
+                        long s = System.currentTimeMillis();
+                        ExportNCPatcherUtil.export(exportPath, event.getProject());
+                        long e = System.currentTimeMillis();
+                        ProjectUtil.infoNotification("导出成功,耗时:" + ((e - s) / 1000.0d) + " (秒s)!硬盘路径： " + exportPath, event.getProject());
+
                         Desktop desktop = Desktop.getDesktop();
                         File dirToOpen = new File(exportPath);
                         desktop.open(dirToOpen);
-                    } catch (Exception iae) {
+                    } catch (Throwable iae) {
                         ProjectUtil.errorNotification("自动打开路径失败: " + ExceptionUtil.getExcptionDetall(iae), event.getProject());
                     } finally {
                         isRuning = false;
