@@ -7,10 +7,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 
 import java.io.File;
 
-public class OpenJconsoleAction extends AnAction {
-
+public class OpenJconsoleAction extends AbstractIdeaAction {
     @Override
-    public void actionPerformed(final AnActionEvent e) {
+    protected void doHandler(AnActionEvent e) {
         try {
             final String exe = "bin" + File.separatorChar + "jconsole.exe";
             File javaBin = IoUtil.getJavaHomePathFile(ProjectNCConfigUtil.getNCHomePath()
@@ -24,9 +23,5 @@ public class OpenJconsoleAction extends AnAction {
         } catch (Exception iae) {
             ProjectUtil.errorNotification(ExceptionUtil.getExcptionDetall(iae), e.getProject());
         }
-    }
-
-    private boolean isWindows() {
-        return StringUtil.get(System.getProperty("os.name")).toLowerCase().contains("windows");
     }
 }

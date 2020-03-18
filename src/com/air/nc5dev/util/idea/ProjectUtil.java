@@ -72,10 +72,6 @@ public class ProjectUtil {
         Notifications.Bus.notify(notification, project == null ? getDefaultProject() : project);
     }
 
-    public static void setBaseDefaultProject(Project project){
-        ProjectUtil.project = project;
-    }
-
     /* *
       *     获取默认的项目      </br>
       *           </br>
@@ -88,8 +84,13 @@ public class ProjectUtil {
      */
     @Nonnull
     public static Project getDefaultProject(){
+        //因为IDEA可能打开多个项目，所以这里 2个办法 先根据之前按钮触发的最后一次 项目如果不是null 直接返回
+        if (project != null) {
+            return project;
+        }
+        //实在没办法了，直接返回最后一个打开的项目
         Project[] openProjects = getProjectMannager().getOpenProjects();
-        return null == openProjects || openProjects.length < 1 ? project : openProjects[0];
+        return null == openProjects || openProjects.length < 1 ? project : openProjects[openProjects.length - 1];
     }
 
     /* *
@@ -123,5 +124,13 @@ public class ProjectUtil {
     }
     private ProjectUtil() {
         throw new RuntimeException("cannot instance Util Class!");
+    }
+
+    public static void setProject(Project project) {
+        ProjectUtil.project = project;
+    }
+
+    public static Project getProject() {
+        return project;
     }
 }

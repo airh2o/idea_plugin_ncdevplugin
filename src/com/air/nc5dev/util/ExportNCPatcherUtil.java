@@ -675,7 +675,6 @@ public class ExportNCPatcherUtil {
             javaHome = javaHome.getParentFile();
         }
 
-
         File javaBin = new File(javaHome, "bin" + File.separatorChar + exe);
         javaBin = javaBin.exists() ? javaBin : new File(ufjdkHome, "bin" + File.separatorChar + exe);
 

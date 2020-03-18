@@ -238,6 +238,9 @@ public class NC5HomeConfigDialogUIListner {
      * 载入NC配置到界面
      */
     private void loadConf() {
+        //每次弹出窗口 自动重新加载一次 插件配置文件
+        ProjectNCConfigUtil.initConfigFile();
+
         ui.textField_home.setText(ProjectNCConfigUtil.getNCHomePath());
         ui.textField_clientip.setText(ProjectNCConfigUtil.getNCClientIP());
         ui.textField_cientport.setText(ProjectNCConfigUtil.getNCClientPort());

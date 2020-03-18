@@ -20,6 +20,8 @@ import java.util.Properties;
  * @date 2019/12/25 0025 9:05
  */
 public class ProjectNCConfigUtil {
+    //这是插件实例的唯一标识
+    private static final int PLUGIN_RUNTIME_MARK = new Object().hashCode();
     /*** NC配置文件在项目中文件的名字 ***/
     public static final String DEFUAL_NC_CONFIG_PROJECT_FILENAME = "nc.prop";
     public static final String[] dsTypes = new String[]{"ORACLE11G", "ORACLE10G", "SQLSERVER2008", "DB297"};
@@ -257,5 +259,19 @@ public class ProjectNCConfigUtil {
 
     private ProjectNCConfigUtil() {
         throw new RuntimeException("cannot instance Util Class!");
+    }
+
+    /**
+      *   获取这个插件的运行实例的唯一标识int        </br>
+      *           </br>
+      *           </br>
+      *           </br>
+      * @author air Email: 209308343@qq.com
+      * @date 2020/3/18 0018 9:28
+      * @Param []
+      * @return int
+     */
+    public static int getPluginRuntimeMark() {
+        return PLUGIN_RUNTIME_MARK;
     }
 }

@@ -1,7 +1,10 @@
 package com.air.nc5dev.acion;
 
 import com.air.nc5dev.editor.bmf.languageinfo.BmfMDPFileType;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -17,11 +20,10 @@ import com.intellij.openapi.vfs.VirtualFile;
  * @Param
  * @return
  */
-public class EditBmfFileAction extends AnAction {
+public class EditBmfFileAction extends AbstractIdeaAction {
     private Project mProject;
-
     @Override
-    public void actionPerformed(AnActionEvent event) {
+    protected void doHandler(AnActionEvent event) {
         mProject = event.getData(PlatformDataKeys.PROJECT);
         DataContext dataContext = event.getDataContext();
         if (BmfMDPFileType.INSTANCE.getDefaultExtension().equals(getFileExtension(dataContext))) {
@@ -32,10 +34,7 @@ public class EditBmfFileAction extends AnAction {
                 Messages.showErrorDialog(event.getProject(), "请选中要编辑的元数据bmf文件后右键编辑元数据!", "Error");
                 return ;
             }
-
-
         }
-
     }
 
     public void aaa(AnActionEvent event) {

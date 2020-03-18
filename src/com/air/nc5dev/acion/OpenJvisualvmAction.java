@@ -7,13 +7,11 @@ import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-
 import java.io.File;
 
-public class OpenJvisualvmAction extends AnAction {
-
+public class OpenJvisualvmAction extends AbstractIdeaAction {
     @Override
-    public void actionPerformed(final AnActionEvent e) {
+    protected void doHandler(AnActionEvent e) {
         try {
             final String exe = "bin" + File.separatorChar + "jvisualvm.exe";
             File javaBin = IoUtil.getJavaHomePathFile(ProjectNCConfigUtil.getNCHomePath()
@@ -27,9 +25,5 @@ public class OpenJvisualvmAction extends AnAction {
         } catch (Exception iae) {
             ProjectUtil.errorNotification(ExceptionUtil.getExcptionDetall(iae), e.getProject());
         }
-    }
-
-    private boolean isWindows(){
-        return StringUtil.get(System.getProperty("os.name")).toLowerCase().contains("windows");
     }
 }

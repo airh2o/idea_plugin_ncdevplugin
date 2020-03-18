@@ -513,8 +513,12 @@ public final class IoUtil {
                 zos = new ZipOutputStream(new FileOutputStream(outputFile));
             }
             // 设置压缩包注释
-            zos.setComment("From Log");
+            zos.setComment("create by idea plugin , power by air 209308343@qq.com");
             zipFile(zos, inputFile, null, skipSuffixs);
+
+            //2次调用 保证字节完全写入磁盘。
+            zos.flush();
+            zos.finish();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

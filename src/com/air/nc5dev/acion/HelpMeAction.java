@@ -2,7 +2,6 @@ package com.air.nc5dev.acion;
 
 import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 
 import java.awt.*;
@@ -20,10 +19,9 @@ import java.net.URI;
  * @Param
  * @return
  */
-public class HelpMeAction extends AnAction {
-
+public class HelpMeAction extends AbstractIdeaAction {
     @Override
-    public void actionPerformed(AnActionEvent e) {
+    protected void doHandler(AnActionEvent e) {
         final String url = "https://gitee.com/yhlx/idea_plugin_nc5devplugin";
         try {
             Desktop.getDesktop().browse(URI.create(url));

@@ -5,15 +5,13 @@ import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 
 import java.io.File;
 
-public class DeleteNCLogsAction extends AnAction {
-
+public class DeleteNCLogsAction extends AbstractIdeaAction {
     @Override
-    public void actionPerformed(AnActionEvent e) {
+    protected void doHandler(AnActionEvent e) {
         try {
             if (StringUtil.isEmpty(ProjectNCConfigUtil.getNCHomePath())) {
                 ProjectUtil.warnNotification("未配置NC HOME", e.getProject());

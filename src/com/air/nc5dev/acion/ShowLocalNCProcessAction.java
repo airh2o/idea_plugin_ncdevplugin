@@ -13,10 +13,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ShowLocalNCProcessAction extends AnAction {
-
+public class ShowLocalNCProcessAction extends AbstractIdeaAction {
     @Override
-    public void actionPerformed(final AnActionEvent e) {
+    protected void doHandler(AnActionEvent e) {
         try {
             final String exe = "bin" + File.separatorChar + "jps.exe";
             File javaBin = IoUtil.getJavaHomePathFile(ProjectNCConfigUtil.getNCHomePath()
@@ -73,9 +72,5 @@ public class ShowLocalNCProcessAction extends AnAction {
         } catch (Exception iae) {
             ProjectUtil.errorNotification(ExceptionUtil.getExcptionDetall(iae), e.getProject());
         }
-    }
-
-    private boolean isWindows() {
-        return StringUtil.get(System.getProperty("os.name")).toLowerCase().contains("windows");
     }
 }
