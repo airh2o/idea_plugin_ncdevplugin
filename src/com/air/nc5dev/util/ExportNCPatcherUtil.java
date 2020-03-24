@@ -400,10 +400,13 @@ public class ExportNCPatcherUtil {
             //检查是否配置了 特殊输出路径
             String outModuleName = modulePatcherConfig.getProperty(javaFullClassName);
 
-            if (gaussModuleByPackge && StringUtil.isEmpty(outModuleName)) {
+            if (gaussModuleByPackge
+                    && StringUtil.isEmpty(outModuleName)
+                    && !classFile.getName().startsWith("CHG")
+                    && !classFile.getName().startsWith("N_")) {
                 //猜测模块
                 String packgeThreeName = javaFullClassName.substring(javaFullClassName.indexOf('.') + 1);
-                packgeThreeName = javaFullClassName.substring(javaFullClassName.indexOf('.') + 1);
+                packgeThreeName = packgeThreeName.substring(packgeThreeName.indexOf('.') + 1);
                 packgeThreeName = packgeThreeName.substring(0, packgeThreeName.indexOf('.'));
                 outModuleName = packgeThreeName;
             }
