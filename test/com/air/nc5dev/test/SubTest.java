@@ -6,6 +6,8 @@ import com.air.nc5dev.util.subscribe.itf.ISubscriber;
 import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.intellij.ide.b.q.t3;
+
 /**
  * </br>
  * </br>
@@ -19,21 +21,28 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SubTest {
     public static void main(String[] args) throws Exception {
-        t2();
-
+        t4();
     }
 
-    private static void t2() throws Exception{
+    private static void t4() {
+        String a = "nc.ui.arap.pf.DzTakeF1BillSourceDLG";
+
+        a = a.substring(a.indexOf('.') + 1 );
+        a = a.substring(a.indexOf('.') + 1 );
+        System.out.println(a.substring(0, a.indexOf('.')));
+    }
+
+    private static void t2() throws Exception {
         File classFile = new File("F:\\temp\\temps\\1\\c1$cc1.class");
         File sourcePackge = new File("F:\\temp\\temps\\1");
         String classFileName = classFile.getName().substring(0, classFile.getName().lastIndexOf('.'));
-        if(classFileName.indexOf('$') > 0){
+        if (classFileName.indexOf('$') > 0) {
             classFileName = classFileName.substring(0, classFileName.indexOf('$'));
         }
         classFileName += ".java";
-        if(new File(sourcePackge, classFileName).exists()){
+        if (new File(sourcePackge, classFileName).exists()) {
             System.out.println(classFileName);
-        }else{
+        } else {
             System.out.println("没找到");
         }
     }

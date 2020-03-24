@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>NC5x开发插件</name>
-    <version>v1.1.bate</version>
+    <version>v2.0.0</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com</vendor>
 
     <description><![CDATA[
@@ -10,7 +10,12 @@
 
     <change-notes><![CDATA[
       Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+      <em>2.0版本重大更新:</em> <br>
+      <ul>
+          <li>1. 优化大量代码</li>
+          <li>2. 支持IDEA同时打开多个项目 区分当前按钮点击所在项目。</li>
+          <li>3. 修复IDEA同时打开多个项目 ,每次配置文件打开自动加载新的项目插件配置文件。</li>
+      </ul>
     ]]>
     </change-notes>
 

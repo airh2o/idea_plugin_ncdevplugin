@@ -90,6 +90,9 @@ public class ExportNCPatcherUtil {
         boolean compressjar = false;
         //是否删除打包代码到jar后的 class文件
         boolean compressEndDeleteClass = false;
+        //是否猜测模块
+        boolean gaussModuleByPackge = true;
+
         //src 源文件夹 顶级集合
         VirtualFile[] sourceRoots;
         //生产class输出文件夹
@@ -108,6 +111,8 @@ public class ExportNCPatcherUtil {
             noOutTestClass = !"false".equals(modulePatcherConfig.getProperty("config-notest"));
             compressjar = "true".equals(modulePatcherConfig.getProperty("config-compressjar"));
             compressEndDeleteClass = "true".equals(modulePatcherConfig.getProperty("config-compressEndDeleteClass"));
+            gaussModuleByPackge = !"false".equals(modulePatcherConfig.getProperty("config-guessModule"));
+
             sourceRoots = ModuleRootManager.getInstance(entry.getValue()).getSourceRoots();
             classDir = compilerModuleExtension.getCompilerOutputPath();
             testClassDirPath = null == compilerModuleExtension.getCompilerOutputPathForTests() ? null : compilerModuleExtension.getCompilerOutputPathForTests().getPath();
@@ -121,21 +126,21 @@ public class ExportNCPatcherUtil {
                 if (sourceRoot.getName().equals(NC_TYPE_PUBLIC)) {
                     export(NC_TYPE_PUBLIC, outPath, moduleName
                             , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
-                            , hasJavaFile, noOutTestClass, modulePatcherConfig);
+                            , hasJavaFile, noOutTestClass, modulePatcherConfig, gaussModuleByPackge);
                 } else if (sourceRoot.getName().equals(NC_TYPE_PRIVATE)) {
                     export(NC_TYPE_PRIVATE, outPath, moduleName
                             , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
-                            , hasJavaFile, noOutTestClass, modulePatcherConfig);
+                            , hasJavaFile, noOutTestClass, modulePatcherConfig, gaussModuleByPackge);
                 } else if (sourceRoot.getName().equals(NC_TYPE_CLIENT)) {
                     export(NC_TYPE_CLIENT, outPath, moduleName
                             , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
-                            , hasJavaFile, noOutTestClass, modulePatcherConfig);
+                            , hasJavaFile, noOutTestClass, modulePatcherConfig, gaussModuleByPackge);
                 } else if (null != testClassDirPath
                         && !noOutTestClass
                         && sourceRoot.getName().equals(NC_TYPE_TEST)) {
                     export(NC_TYPE_TEST, outPath, moduleName
                             , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
-                            , hasJavaFile, noOutTestClass, modulePatcherConfig);
+                            , hasJavaFile, noOutTestClass, modulePatcherConfig, gaussModuleByPackge);
                 }
                 //其他无视掉
             }
@@ -293,7 +298,8 @@ public class ExportNCPatcherUtil {
     public static void export(@NotNull String ncType, @NotNull String exportDir
             , @NotNull String moduleName, @NotNull String sourceRoot
             , @NotNull String classDir, @Nullable String testClassDir
-            , boolean hasJavaFile, boolean noOutTestClass, @NotNull Properties modulePatcherConfig) {
+            , boolean hasJavaFile, boolean noOutTestClass, @NotNull Properties modulePatcherConfig
+            , boolean gaussModuleByPackge) {
         File sourceBaseDirFile = new File(sourceRoot);
 
         File classBaseDirFile;
@@ -313,9 +319,10 @@ public class ExportNCPatcherUtil {
 
             copyClassAndJavaSourceFiles(sourcePackge, sourceBaseDirFile
                     , modulePatcherConfig, exportDir, moduleName
-                    , ncType, packgePath, hasJavaFile, classFileDir);
+                    , ncType, packgePath, hasJavaFile, classFileDir, gaussModuleByPackge);
 
-            copyClassPathOtherFile(sourcePackge, exportDir, moduleName, ncType, packgePath, modulePatcherConfig);
+            copyClassPathOtherFile(sourcePackge, exportDir, moduleName
+                    , ncType, packgePath, modulePatcherConfig);
         }
     }
 
@@ -332,15 +339,16 @@ public class ExportNCPatcherUtil {
      */
     private static final void copyClassAndJavaSourceFiles(File sourcePackge, File sourceBaseDirFile
             , Properties modulePatcherConfig, String exportDir, String moduleName
-            , String ncType, String packgePath, boolean hasJavaFile, final File classFileDir) {
+            , String ncType, String packgePath, boolean hasJavaFile, final File classFileDir
+            , boolean gaussModuleByPackge) {
         if (null == javapCommandPath) {
             copyClassAndJavaSourceFilesBySource(sourcePackge, sourceBaseDirFile
                     , modulePatcherConfig, exportDir, moduleName
-                    , ncType, packgePath, hasJavaFile, classFileDir);
+                    , ncType, packgePath, hasJavaFile, classFileDir, gaussModuleByPackge);
         } else {
             copyClassAndJavaSourceFilesByClass(sourcePackge, sourceBaseDirFile
                     , modulePatcherConfig, exportDir, moduleName
-                    , ncType, packgePath, hasJavaFile, classFileDir);
+                    , ncType, packgePath, hasJavaFile, classFileDir, gaussModuleByPackge);
         }
     }
 
@@ -357,7 +365,8 @@ public class ExportNCPatcherUtil {
      */
     private static final void copyClassAndJavaSourceFilesByClass(File sourcePackge, File sourceBaseDirFile
             , Properties modulePatcherConfig, String exportDir, String moduleName
-            , String ncType, String packgePath, boolean hasJavaFile, final File classFileDir) {
+            , String ncType, String packgePath, boolean hasJavaFile
+            , final File classFileDir, boolean gaussModuleByPackge) {
 
         Stream.of(classFileDir.listFiles()).forEach(classFile -> {
             //循环复制所有java文件 ,因为idea编译后 没有分NC这3个文件夹！
@@ -383,13 +392,22 @@ public class ExportNCPatcherUtil {
             String javaFullClassName = StringUtil.replaceAll(pageJava + "/" + javaFullName, File.separator, ".");
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "\\", ".");
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "/", ".");
-            if(javaFullClassName.endsWith(".java")){
+            if (javaFullClassName.endsWith(".java")) {
                 //移除后面的 .java 后缀
                 javaFullClassName = javaFullClassName.substring(0, javaFullClassName.lastIndexOf('.'));
             }
 
             //检查是否配置了 特殊输出路径
             String outModuleName = modulePatcherConfig.getProperty(javaFullClassName);
+
+            if (gaussModuleByPackge && StringUtil.isEmpty(outModuleName)) {
+                //猜测模块
+                String packgeThreeName = javaFullClassName.substring(javaFullClassName.indexOf('.') + 1);
+                packgeThreeName = javaFullClassName.substring(javaFullClassName.indexOf('.') + 1);
+                packgeThreeName = packgeThreeName.substring(0, packgeThreeName.indexOf('.'));
+                outModuleName = packgeThreeName;
+            }
+
             final String baseOutDirPath = exportDir + File.separatorChar
                     + (StringUtil.isEmpty(outModuleName) ? moduleName : outModuleName);
 
@@ -429,7 +447,8 @@ public class ExportNCPatcherUtil {
      */
     private static final void copyClassAndJavaSourceFilesBySource(File sourcePackge, File sourceBaseDirFile
             , Properties modulePatcherConfig, String exportDir, String moduleName
-            , String ncType, String packgePath, boolean hasJavaFile, final File classFileDir) {
+            , String ncType, String packgePath, boolean hasJavaFile
+            , final File classFileDir, boolean gaussModuleByPackge) {
 
         Stream.of(sourcePackge.listFiles()).forEach(javaFile -> {
             //循环复制所有java文件 ,因为idea编译后 没有分NC这3个文件夹！
@@ -455,6 +474,15 @@ public class ExportNCPatcherUtil {
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "/", ".");
             //检查是否配置了 特殊输出路径
             String outModuleName = modulePatcherConfig.getProperty(javaFullClassName);
+
+            if (gaussModuleByPackge && StringUtil.isEmpty(outModuleName)) {
+                //猜测模块
+                String packgeThreeName = javaFullClassName.substring(javaFullClassName.indexOf('.') + 1);
+                packgeThreeName = javaFullClassName.substring(javaFullClassName.indexOf('.') + 1);
+                packgeThreeName = packgeThreeName.substring(0, packgeThreeName.indexOf('.'));
+                outModuleName = packgeThreeName;
+            }
+
             final String baseOutDirPath = exportDir + File.separatorChar
                     + (StringUtil.isEmpty(outModuleName) ? moduleName : outModuleName);
 
@@ -606,16 +634,16 @@ public class ExportNCPatcherUtil {
         //先看看是否是 源文件的public类或public类里匿名类
         File classFile = new File(path);
         String classFileName = classFile.getName().substring(0, classFile.getName().lastIndexOf('.'));
-        if(classFileName.indexOf('$') > 0){
+        if (classFileName.indexOf('$') > 0) {
             classFileName = classFileName.substring(0, classFileName.indexOf('$'));
         }
-        if(new File(sourcePackge, classFileName + ".java").exists()){
+        if (new File(sourcePackge, classFileName + ".java").exists()) {
             return classFileName;
         }
 
         String fileName = readClassFileSourceFileName(path);
 
-        if(StringUtil.isEmpty(fileName)){
+        if (StringUtil.isEmpty(fileName)) {
             ProjectUtil.errorNotification(path + " class文件无法找到源码,请关闭JAVAP方式寻求源码!", null);
             return null;
         }
@@ -628,14 +656,15 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-      *   从Class文件 javap 读取 源文件名        </br>
-      *   FIXME 有效率问题，如果用二进制读取会更好        </br>
-      *           </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com
-      * @date 2020/2/22 0022 13:04
-      * @Param [classFilePath]
-      * @return java.lang.String
+     * 从Class文件 javap 读取 源文件名        </br>
+     * FIXME 有效率问题，如果用二进制读取会更好        </br>
+     * </br>
+     * </br>
+     *
+     * @return java.lang.String
+     * @author air Email: 209308343@qq.com
+     * @date 2020/2/22 0022 13:04
+     * @Param [classFilePath]
      */
     public static String readClassFileSourceFileName(String classFilePath) {
         try {

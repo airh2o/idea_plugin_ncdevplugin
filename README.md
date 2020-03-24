@@ -33,15 +33,22 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
     nc.ui.gl.AddVoucherLineAction=gl   
     
     特殊参数：   
-    config-notest=false    ##是否不要test代码，默认true     
-    config-exportsourcefile=true     ##是否导出源代码，默认true        
-    config-compressjar=false    ##是否把代码打包成jar文件， 默认false    
-    config-compressEndDeleteClass    ##如果启用了代码打包成jar文件，是否删除class文件  默认false    
-    config-ManifestFilePath=path    ##如果打包jar，那么 META-INF.MF 文件模板磁盘全路径(可以不配置 采用默认)        
-    
+    ##是否不要test代码，默认true
+    config-notest=false         
+    ##是否导出源代码，默认true
+    config-exportsourcefile=true         
+    ##是否把代码打包成jar文件， 默认false    
+    config-compressjar=false        
+    ##如果启用了代码打包成jar文件，是否删除class文件  默认false
+    config-compressEndDeleteClass      
+    ##如果打包jar，那么 META-INF.MF 文件模板磁盘全路径(可以不配置 采用默认)  
+    config-ManifestFilePath=path             
+    #是否猜测模块，默认true，开启后 如果配置文件没有指明的类会根据包名第三个判断模块       
+    # （比如 nc.ui.pub.ButtonBar 第三个是pub 所以认为模块是 pub）     
+    config-guessModule=true     
     类路径配置文件:     
         比如我要把 nc.bs.arap包里 1.txt和DzTakeF1Impl.wsdl文件输出到 arap模块下的包文件夹里:   
-        nc.bs.arap.1.txt=arap   
+                                        nc.bs.arap.1.txt=arap   
         nc.bs.arap.DzTakeF1Impl.wsdl=arap    
  ```
 # 常见问题
