@@ -1,12 +1,17 @@
 package test.com.air.nc5dev.test;
 
+import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.subscribe.PubSubUtil;
 import com.air.nc5dev.util.subscribe.itf.ISubscriber;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.intellij.ide.b.q.t3;
+import java.util.jar.Manifest;
 
 /**
  * </br>
@@ -21,14 +26,48 @@ import static com.intellij.ide.b.q.t3;
  */
 public class SubTest {
     public static void main(String[] args) throws Exception {
-        t4();
+        tjar();
+    }
+
+    private static void tjar() throws Exception {
+        String p = "C:\\Users\\air\\IdeaProjects\\aaa\\patchers\\exportpatcher-2020-03-24-14-07\\aaa\\classes";
+        File dir = new File(p);
+        Manifest minf = null;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        PrintWriter printWriter = new PrintWriter(byteArrayOutputStream);
+        printWriter.println("Manifest-Version" + ": " + "1.0");
+        printWriter.println("Class-Path" + ": " + "");
+        printWriter.println("Main-Class" + ": " + "");
+        printWriter.println("Name" + ": " + dir.getName());
+        printWriter.println("Specification-Title" + ": " + "");
+        printWriter.println("Specification-Version" + ": " + "1.0");
+        printWriter.println("Specification-Vendor" + ": " + "");
+        printWriter.println("Implementation-Title" + ": " + "");
+        printWriter.println("Implementation-Version" + ": " + "");
+        printWriter.println("Implementation-Vendor" + ": " + "");
+        printWriter.println("CreateDate" + ": " + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .format(LocalDateTime.now()));
+        printWriter.println("Created-By" + ": " + "");
+        printWriter.println("Created-ByIde" + ": " + "IDEA-plugin-nc5devtoolidea");
+        printWriter.println("  by air Email 209308343@qq.com,QQ 209308343");
+        printWriter.println("IDEA-plugin-nc5devtoolidea-github" + ": " + "https://");
+        printWriter.println(" gitee.com/yhlx/idea_plugin_nc5devplugin");
+        printWriter.println("");
+        printWriter.flush();
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        minf = new Manifest(byteArrayInputStream);
+        printWriter.close();
+
+
+        File jarFile = new File(dir.getParentFile(), "1.jar");
+        IoUtil.makeJar(dir, jarFile, minf, new String[]{".java"});
     }
 
     private static void t4() {
         String a = "nc.ui.arap.pf.DzTakeF1BillSourceDLG";
 
-        a = a.substring(a.indexOf('.') + 1 );
-        a = a.substring(a.indexOf('.') + 1 );
+        a = a.substring(a.indexOf('.') + 1);
+        a = a.substring(a.indexOf('.') + 1);
         System.out.println(a.substring(0, a.indexOf('.')));
     }
 

@@ -7,10 +7,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -495,6 +496,77 @@ public final class IoUtil {
     }
 
     /**
+     * 输出Jar文件
+     *  @param dir   root 文件夹or文件
+     * @param outputFile  压缩后的文件
+     * @param minf
+     * @param skipSuffixs String数组，要跳过的 文件类型后缀： 比如 ["zip","rar"]
+     */
+    public static void makeJar(File dir, File outputFile, Manifest minf, String[] skipSuffixs) {
+        JarOutputStream jos = null;
+        try {
+            jos = new JarOutputStream(new FileOutputStream(outputFile), minf);
+            // 设置压缩包注释
+            jos.setComment("create by idea plugin , power by air 209308343@qq.com");
+
+            List<File> allFiles = getAllFiles(dir, true);
+            if (skipSuffixs == null) {
+                skipSuffixs = new String[0];
+            }
+            if (allFiles == null) {
+                allFiles = Collections.emptyList();
+            }
+            int count = -1;
+            BufferedInputStream bis = null;
+            byte[] cache = new byte[1024];
+            boolean skip = false;
+            for (File f : allFiles) {
+                skip = false;
+                for (String skipSuffix : skipSuffixs) {
+                    if (f.getName().toLowerCase().endsWith(skipSuffix)) {
+                        skip = true;
+                        break;
+                    }
+                }
+
+                if(skip){
+                    continue;
+                }
+
+                bis = new BufferedInputStream(new FileInputStream(f), 1024);
+                jos.putNextEntry(new JarEntry(
+                        StringUtil.replaceAll(f.getPath(),File.separator,  "/").substring(dir.getPath().length())
+                ));
+                while ((count = bis.read(cache, 0, 1024)) != -1) {
+                    jos.write(cache, 0, count);
+                }
+                jos.closeEntry();
+                bis.close();
+            }
+
+            //2次调用 保证字节完全写入磁盘。
+            jos.flush();
+            jos.finish();
+        } catch (
+                IOException e)
+
+        {
+            e.printStackTrace();
+        } finally
+
+        {
+            if (jos != null) {
+                try {
+                    jos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    /**
      * 初始化压缩包信息并开始进行压缩
      *
      * @param inputFile   需要压缩的文件或文件夹
@@ -580,7 +652,7 @@ public final class IoUtil {
     public static void zipSingleFile(ZipOutputStream zos, File inputFile, String path) {
         try {
             InputStream in = new FileInputStream(inputFile);
-            zos.putNextEntry(new ZipEntry(path));
+            zos.putNextEntry(new JarEntry(path));
             write(in, zos);
         } catch (IOException e) {
             e.printStackTrace();
@@ -668,45 +740,45 @@ public final class IoUtil {
         File javaHome = new File(System.getProperty("java.home"));
         File javaBin = null;
 
-        if(StringUtil.notEmpty(ncHomePath)){
+        if (StringUtil.notEmpty(ncHomePath)) {
             File ufjdkHome = new File(ncHomePath + File.separatorChar + "ufjdk");
             javaBin = new File(ufjdkHome, fileRelativePath);
-            if(javaBin.exists()){
+            if (javaBin.exists()) {
                 return javaBin;
             }
         }
 
         javaBin = new File(javaHome, fileRelativePath);
-        if(javaBin.exists()){
+        if (javaBin.exists()) {
             return javaBin;
         }
 
         //尝试智能匹配路径 like : C:\Program Files\Java\jdk1.8.0_191\jre\bin\jconsole.exe -> to正确路径 (最多往上跳2级)
         javaHome = javaHome.getParentFile();
         javaBin = new File(javaHome, fileRelativePath);
-        if(javaBin.exists()){
+        if (javaBin.exists()) {
             return javaBin;
         }
 
         javaHome = javaHome.getParentFile();
         javaBin = new File(javaHome, fileRelativePath);
-        if(javaBin.exists()){
+        if (javaBin.exists()) {
             return javaBin;
         }
 
         //获取 环境变量
         String envValue = System.getenv().get("JAVA_HOME");
-        if(StringUtil.notEmpty(envValue)){
+        if (StringUtil.notEmpty(envValue)) {
             javaBin = new File(envValue, fileRelativePath);
-            if(javaBin.exists()){
+            if (javaBin.exists()) {
                 return javaBin;
             }
         }
 
         envValue = System.getenv().get("JDK_HOME");
-        if(StringUtil.notEmpty(envValue)){
+        if (StringUtil.notEmpty(envValue)) {
             javaBin = new File(envValue, fileRelativePath);
-            if(javaBin.exists()){
+            if (javaBin.exists()) {
                 return javaBin;
             }
         }

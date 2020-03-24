@@ -145,6 +145,11 @@ public class NC5HomeConfigDialogUIListner {
         if (event.getStateChange() != ItemEvent.DESELECTED) {
             return;
         }
+
+        if(event.getItem() == null){
+            return ;
+        }
+
         //把编辑值 放入到 数据源 配置变量里
         String old = event.getItem().toString();
         NCDataSourceVO oldDs = NCPropXmlUtil.get(old);
@@ -238,9 +243,6 @@ public class NC5HomeConfigDialogUIListner {
      * 载入NC配置到界面
      */
     private void loadConf() {
-        //每次弹出窗口 自动重新加载一次 插件配置文件
-        ProjectNCConfigUtil.initConfigFile();
-
         ui.textField_home.setText(ProjectNCConfigUtil.getNCHomePath());
         ui.textField_clientip.setText(ProjectNCConfigUtil.getNCClientIP());
         ui.textField_cientport.setText(ProjectNCConfigUtil.getNCClientPort());
@@ -280,6 +282,9 @@ public class NC5HomeConfigDialogUIListner {
     }
 
     public static final NC5HomeConfigDialogUIListner build(NC5HomeConfigDiaLogPanel setUI) {
+        //每次弹出窗口 自动重新加载一次 插件配置文件
+        ProjectNCConfigUtil.initConfigFile();
+
         NC5HomeConfigDialogUIListner nC5HomeConfigDialogUIListner = new NC5HomeConfigDialogUIListner(setUI);
 
         nC5HomeConfigDialogUIListner.initEventListeners();

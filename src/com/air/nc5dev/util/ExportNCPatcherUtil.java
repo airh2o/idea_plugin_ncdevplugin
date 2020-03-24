@@ -14,6 +14,7 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -115,11 +116,14 @@ public class ExportNCPatcherUtil {
 
             sourceRoots = ModuleRootManager.getInstance(entry.getValue()).getSourceRoots();
             classDir = compilerModuleExtension.getCompilerOutputPath();
-            testClassDirPath = null == compilerModuleExtension.getCompilerOutputPathForTests() ? null : compilerModuleExtension.getCompilerOutputPathForTests().getPath();
+            testClassDirPath = null == compilerModuleExtension.getCompilerOutputPathForTests()
+                    ? null : compilerModuleExtension.getCompilerOutputPathForTests().getPath();
             moduleName = entry.getValue().getName();
             //循环输出 NC 3大文件夹
             for (VirtualFile sourceRoot : sourceRoots) {
                 if (null == classDir) {
+                    ProjectUtil.warnNotification("编译输出路径不存在!请重新build或者" +
+                            "模块配置Paths-Compiler output选项必须要勾选的 Use module cpmpile output path！", null);
                     continue;
                 }
 
@@ -241,43 +245,40 @@ public class ExportNCPatcherUtil {
             outDir.mkdirs();
             //创建MANIFEST.MF
 
-            File meteInfoFile = new File(dir, "META-INF" + File.separatorChar + "MANIFEST.MF");
-            meteInfoFile.getParentFile().mkdirs();
-
+            Manifest minf = null;
             if (null == manifest) {
-                HashMap<String, String> manifestMap = new HashMap<>();
-                manifestMap.put("Manifest-Version", "1.0");
-                manifestMap.put("Class-Path", "");
-                manifestMap.put("Main-Class", "");
-                manifestMap.put("Name", "");
-                manifestMap.put("Specification-Title", "");
-                manifestMap.put("Specification-Version", "1.0");
-                manifestMap.put("Specification-Vendor", "");
-                manifestMap.put("Implementation-Title", "");
-                manifestMap.put("Implementation-Version", "");
-                manifestMap.put("Implementation-Vendor", "");
-                manifestMap.put("CreateDate", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                PrintWriter printWriter = new PrintWriter(byteArrayOutputStream);
+                printWriter.println("Manifest-Version" + ": " + "1.0");
+                printWriter.println("Class-Path" + ": " + "");
+                printWriter.println("Main-Class" + ": " + "");
+                printWriter.println("Name" + ": " + dir.getName());
+                printWriter.println("Specification-Title" + ": " + "");
+                printWriter.println("Specification-Version" + ": " + "1.0");
+                printWriter.println("Specification-Vendor" + ": " + "");
+                printWriter.println("Implementation-Title" + ": " + "");
+                printWriter.println("Implementation-Version" + ": " + "");
+                printWriter.println("Implementation-Vendor" + ": " + "");
+                printWriter.println("CreateDate" + ": " + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
                         .format(LocalDateTime.now()));
-                manifestMap.put("Created-By", "");
-                manifestMap.put("Created-ByIde", "IDEA-plugin-nc5devtoolidea by air Email 209308343@qq.com,QQ 209308343 ");
-                manifestMap.put("IDEA-plugin-nc5devtoolidea-github", "https://gitee.com/yhlx/idea_plugin_nc5devplugin");
-                PrintWriter printWriter = new PrintWriter(new FileOutputStream(meteInfoFile));
-                Iterator<Map.Entry<String, String>> infos = manifestMap.entrySet().iterator();
-                Map.Entry<String, String> info;
-                while (infos.hasNext()) {
-                    info = infos.next();
-                    printWriter.println(info.getKey() + ':' + info.getValue());
-                }
+                printWriter.println("Created-By" + ": " + "");
+                printWriter.println("Created-ByIde" + ": " + "IDEA-plugin-nc5devtoolidea");
+                printWriter.println("  by air Email 209308343@qq.com,QQ 209308343");
+                printWriter.println("IDEA-plugin-nc5devtoolidea-github" + ": " + "https://");
+                printWriter.println(" gitee.com/yhlx/idea_plugin_nc5devplugin");
+                printWriter.println("");
                 printWriter.flush();
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                minf = new Manifest(byteArrayInputStream);
                 printWriter.close();
             } else {
-                IoUtil.copyFile(manifest, meteInfoFile.getParentFile());
+                minf = new Manifest(new FileInputStream(manifest));
             }
 
             File jarFile = new File(outDir, jarName + ".jar");
             File jarSrcFile = new File(outDir, jarName + "_src.jar");
-            IoUtil.zip(dir, jarFile, CompressType.JAR, new String[]{".java"});
-            IoUtil.zip(dir, jarSrcFile, CompressType.JAR, new String[]{".class"});
+            IoUtil.makeJar(dir, jarFile, minf, new String[]{".java"});
+            IoUtil.makeJar(dir, jarSrcFile, minf, new String[]{".class"});
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -341,7 +342,8 @@ public class ExportNCPatcherUtil {
             , Properties modulePatcherConfig, String exportDir, String moduleName
             , String ncType, String packgePath, boolean hasJavaFile, final File classFileDir
             , boolean gaussModuleByPackge) {
-        if (null == javapCommandPath) {
+        if (null == javapCommandPath
+                || "true".endsWith(StringUtil.get(modulePatcherConfig.getProperty("config-closeJavaP")))) {
             copyClassAndJavaSourceFilesBySource(sourcePackge, sourceBaseDirFile
                     , modulePatcherConfig, exportDir, moduleName
                     , ncType, packgePath, hasJavaFile, classFileDir, gaussModuleByPackge);
@@ -405,10 +407,7 @@ public class ExportNCPatcherUtil {
                     && !classFile.getName().startsWith("CHG")
                     && !classFile.getName().startsWith("N_")) {
                 //猜测模块
-                String packgeThreeName = javaFullClassName.substring(javaFullClassName.indexOf('.') + 1);
-                packgeThreeName = packgeThreeName.substring(packgeThreeName.indexOf('.') + 1);
-                packgeThreeName = packgeThreeName.substring(0, packgeThreeName.indexOf('.'));
-                outModuleName = packgeThreeName;
+                outModuleName = getPackgeName(javaFullClassName, 3, ".");
             }
 
             final String baseOutDirPath = exportDir + File.separatorChar
@@ -435,6 +434,27 @@ public class ExportNCPatcherUtil {
             //复制class
             IoUtil.copyFile(classFile, outDir);
         });
+    }
+
+    /**
+     * 获得第几个包名字       </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return java.lang.String
+     * @author air Email: 209308343@qq.com
+     * @date 2020/3/24 0024 13:23
+     * @Param [p, packgeIndex, split]
+     */
+    private static String getPackgeName(String p, int packgeIndex, String split) {
+        String packgeThreeName = p;
+
+        for (int i = 1; i < packgeIndex; i++) {
+            packgeThreeName = packgeThreeName.substring(packgeThreeName.indexOf(split) + 1);
+        }
+
+        return packgeThreeName.substring(0, packgeThreeName.indexOf(split));
     }
 
     /**
@@ -480,10 +500,7 @@ public class ExportNCPatcherUtil {
 
             if (gaussModuleByPackge && StringUtil.isEmpty(outModuleName)) {
                 //猜测模块
-                String packgeThreeName = javaFullClassName.substring(javaFullClassName.indexOf('.') + 1);
-                packgeThreeName = javaFullClassName.substring(javaFullClassName.indexOf('.') + 1);
-                packgeThreeName = packgeThreeName.substring(0, packgeThreeName.indexOf('.'));
-                outModuleName = packgeThreeName;
+                outModuleName = getPackgeName(javaFullClassName, 3, ".");
             }
 
             final String baseOutDirPath = exportDir + File.separatorChar
@@ -647,7 +664,7 @@ public class ExportNCPatcherUtil {
         String fileName = readClassFileSourceFileName(path);
 
         if (StringUtil.isEmpty(fileName)) {
-            ProjectUtil.errorNotification(path + " class文件无法找到源码,请关闭JAVAP方式寻求源码!", null);
+            ProjectUtil.warnNotification(path + " class文件JAVAP方式无法找到源码,可以在配置文件关闭此方式!", null);
             return null;
         }
 
@@ -695,26 +712,12 @@ public class ExportNCPatcherUtil {
     }
 
     public static void initJavap() {
-        final String exe = "javap.exe";
-        File javaHome = new File(System.getProperty("java.home"));
-        File ufjdkHome = new File(ProjectNCConfigUtil.getNCHomePath() + File.separatorChar + "ufjdk");
+        final String exe = "bin" + File.separatorChar + "javap.exe";
 
-        //尝试智能匹配路径 like : C:\Program Files\Java\jdk1.8.0_191\jre\bin\jconsole.exe -> to正确路径 (最多往上跳2级)
-        if (!new File(javaHome, "bin" + File.separatorChar + exe).exists()) {
-            javaHome = javaHome.getParentFile();
+        File javaHomePathFile = IoUtil.getJavaHomePathFile(ProjectNCConfigUtil.getNCHomePath()
+                , exe);
+        if (javaHomePathFile != null) {
+            javapCommandPath = javaHomePathFile.getPath();
         }
-        if (!new File(javaHome, "bin" + File.separatorChar + exe).exists()) {
-            javaHome = javaHome.getParentFile();
-        }
-
-        File javaBin = new File(javaHome, "bin" + File.separatorChar + exe);
-        javaBin = javaBin.exists() ? javaBin : new File(ufjdkHome, "bin" + File.separatorChar + exe);
-
-        if (!javaBin.exists()) {
-            ProjectUtil.infoNotification("javap路径不存在: " + javaBin.getPath() + " .将使用源码分析方式导出补丁，同一个java源文件内class中非匿名非public类将不会导出到补丁!", ProjectUtil.getDefaultProject());
-            return;
-        }
-
-        javapCommandPath = javaBin.getPath();
     }
 }
