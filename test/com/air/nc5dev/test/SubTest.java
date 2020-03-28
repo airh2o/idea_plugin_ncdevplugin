@@ -4,13 +4,15 @@ import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.subscribe.PubSubUtil;
 import com.air.nc5dev.util.subscribe.itf.ISubscriber;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.PrintWriter;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
 /**
@@ -26,7 +28,26 @@ import java.util.jar.Manifest;
  */
 public class SubTest {
     public static void main(String[] args) throws Exception {
-        tjar();
+        t05();
+    }
+
+    private static void t05() throws Exception {
+        File f =  new File("E:\\temp\\home20200204\\modules\\u8cwebapi\\lib\\public_u8cwebapi.jar");
+
+
+        JarInputStream in = new JarInputStream(new FileInputStream(f));
+
+        JarFile jarFile = new JarFile(f);
+        System.out.println( jarFile.getEntry("nc/bs/u8cwebapi/utils/Assrt.class") );
+
+
+
+        URLClassLoader classLoader = new URLClassLoader(new URL[]{
+               f.toURL()
+        });
+
+        Class<?> aClass = classLoader.loadClass("nc.bs.u8cwebapi.utils.Assrt");
+        System.out.println(aClass.getName());
     }
 
     private static void tjar() throws Exception {

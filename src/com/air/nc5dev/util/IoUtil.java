@@ -497,7 +497,8 @@ public final class IoUtil {
 
     /**
      * 输出Jar文件
-     *  @param dir   root 文件夹or文件
+     *
+     * @param dir         root 文件夹or文件
      * @param outputFile  压缩后的文件
      * @param minf
      * @param skipSuffixs String数组，要跳过的 文件类型后缀： 比如 ["zip","rar"]
@@ -529,14 +530,21 @@ public final class IoUtil {
                     }
                 }
 
-                if(skip){
+                if (skip) {
                     continue;
                 }
 
                 bis = new BufferedInputStream(new FileInputStream(f), 1024);
-                jos.putNextEntry(new JarEntry(
-                        StringUtil.replaceAll(f.getPath(),File.separator,  "/").substring(dir.getPath().length())
-                ));
+                String entityPath = StringUtil.replaceAll(f.getPath(), File.separator, "/")
+                        .substring(dir.getPath().length());
+
+                if (entityPath.charAt(0) == '/'
+                        || entityPath.charAt(0) == File.separatorChar) {
+                    //我TM也很无语，这里为啥可能多个 / 导致类加载器不识别
+                    entityPath = entityPath.substring(1);
+                }
+
+                jos.putNextEntry(new JarEntry(entityPath));
                 while ((count = bis.read(cache, 0, 1024)) != -1) {
                     jos.write(cache, 0, count);
                 }
