@@ -195,19 +195,19 @@ public class ExportNCPatcherUtil {
         baseDir = moduleHomeDir;
         compressJar(new File(baseDir, "classes")
                 , new File(baseDir, "lib")
-                , "pub" + moduleHomeDir.getName()
+                , "public_" + moduleHomeDir.getName()
                 , manifest);
         //private
         baseDir = new File(moduleHomeDir, File.separatorChar + "META-INF");
         compressJar(new File(baseDir, "classes")
                 , new File(baseDir, "lib")
-                , "ui" + moduleHomeDir.getName()
+                , "private_" + moduleHomeDir.getName()
                 , manifest);
         //client
         baseDir = new File(moduleHomeDir, File.separatorChar + "client");
         compressJar(new File(baseDir, "classes")
                 , new File(baseDir, "lib")
-                , moduleHomeDir.getName()
+                , "ui_" + moduleHomeDir.getName()
                 , manifest);
 
         //删除打包前文件
