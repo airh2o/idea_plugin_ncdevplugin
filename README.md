@@ -4,7 +4,10 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 
 
 # 插件截图
-    
+ 
+buy me a coffee:     
+![buy me a coffee](https://s1.ax1x.com/2020/03/30/GeyQJK.png "buy me a coffee")        
+
 ![快速面板](https://s2.ax1x.com/2020/02/20/3eonRP.jpg "快速操作面板")    
 
 ![配置NCHOME](https://s2.ax1x.com/2020/02/20/3eolqg.jpg "配置NCHOME")    
@@ -21,6 +24,7 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 2. Tools -> 更新NC 库依赖 执行依赖更新! 
 3. Tools -> 生成默认NC运行配置!(如果重启IDEA后丢失了运行配置 可以再次执行这个)    
 4. 第一次执行上面步骤以后，会生成项目默认的client public private test 几个源文件夹 请手工在 项目结构修改几个文件夹的IDEA属性为正确值
+5. 请注意 模块的编译输出路径要选 use module path 分别设置test和非test class输出路径。
 ```
 
  导出补丁支持 模块写一个配置文件 自定义相对路径：     
