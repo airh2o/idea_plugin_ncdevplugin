@@ -399,19 +399,11 @@ public class ExportNCPatcherUtil {
                 javaFullClassName = javaFullClassName.substring(0, javaFullClassName.lastIndexOf('.'));
             }
 
-            //检查是否配置了 特殊输出路径
-            String outModuleName = modulePatcherConfig.getProperty(javaFullClassName);
+            //获得类对于的模块名字
+            String outModuleName = getOutModuleName(modulePatcherConfig
+                    , javaFullClassName, classFile, gaussModuleByPackge, moduleName);
 
-            if (gaussModuleByPackge
-                    && StringUtil.isEmpty(outModuleName)
-                    && !classFile.getName().startsWith("CHG")
-                    && !classFile.getName().startsWith("N_")) {
-                //猜测模块
-                outModuleName = getPackgeName(javaFullClassName, 3, ".");
-            }
-
-            final String baseOutDirPath = exportDir + File.separatorChar
-                    + (StringUtil.isEmpty(outModuleName) ? moduleName : outModuleName);
+            final String baseOutDirPath = exportDir + File.separatorChar + outModuleName;
 
             File outDir = null;
             if (NC_TYPE_PUBLIC.equals(ncType)) {
@@ -434,6 +426,54 @@ public class ExportNCPatcherUtil {
             //复制class
             IoUtil.copyFile(classFile, outDir);
         });
+    }
+
+    /**
+     * 根据 补丁模块配置文件 获得模块名        </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return java.lang.String
+     * @author air Email: 209308343@qq.com
+     * @date 2020/3/30 0030 16:56
+     * @Param [modulePatcherConfig, javaFullClassName,guass]
+     */
+    private static String getOutModuleName(Properties modulePatcherConfig, String javaFullClassName
+            , File classFile, boolean guass, String defalut) {
+        //最优先 使用类全路径
+        String outModuleName = modulePatcherConfig.getProperty(javaFullClassName);
+        if (StringUtil.notEmpty(outModuleName)) {
+            return outModuleName;
+        }
+
+        //其实优先通配符
+        String cn = javaFullClassName;
+        int left = 0;
+        while ((left = cn.lastIndexOf('.')) > 0) {
+            cn = cn.substring(0, cn.lastIndexOf('.'));
+            outModuleName = modulePatcherConfig.getProperty(cn);
+
+            if (StringUtil.notEmpty(outModuleName)) {
+                return outModuleName;
+            }
+        }
+
+        //最后如果没有，就看看是否启用了 模块名猜测
+        if (guass
+                && StringUtil.isEmpty(outModuleName)
+                && !classFile.getName().startsWith("CHG")
+                && !classFile.getName().startsWith("N_")) {
+            //猜测模块
+            outModuleName = getPackgeName(javaFullClassName, 3, ".");
+
+            if (StringUtil.notEmpty(outModuleName)) {
+                return outModuleName;
+            }
+        }
+
+        //都没有，返回默认
+        return defalut;
     }
 
     /**

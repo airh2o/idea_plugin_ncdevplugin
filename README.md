@@ -36,6 +36,11 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
     例子(对test无效)：    
     nc.ui.gl.AddVoucherLineAction=gl   
     
+    支持包路径比如:    
+    nc.ui.gl=gl2       
+    nc.ui=gl3       
+    会根据 包路径判断模块名字，优先级是 全路径》包路径(包路径从最末级逐个向上匹配)》模块猜测       
+    
     特殊参数：   
     ##是否不要test代码，默认true
     config-notest=false         

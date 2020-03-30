@@ -1,6 +1,7 @@
 package test.com.air.nc5dev.test;
 
 import com.air.nc5dev.util.IoUtil;
+import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.subscribe.PubSubUtil;
 import com.air.nc5dev.util.subscribe.itf.ISubscriber;
 
@@ -28,22 +29,31 @@ import java.util.jar.Manifest;
  */
 public class SubTest {
     public static void main(String[] args) throws Exception {
-        t05();
+        t06();
+    }
+
+    private static void t06() {
+        String s = "com.air.nc5dev.util.ExportNCPatcherUtil";
+        String cn = s ;
+        int left = cn.lastIndexOf('.');
+        while ( (left = cn.lastIndexOf('.')) > 0) {
+            cn =  cn.substring(0, cn.lastIndexOf('.'));
+            System.out.println(cn);
+        }
     }
 
     private static void t05() throws Exception {
-        File f =  new File("E:\\temp\\home20200204\\modules\\u8cwebapi\\lib\\public_u8cwebapi.jar");
+        File f = new File("E:\\temp\\home20200204\\modules\\u8cwebapi\\lib\\public_u8cwebapi.jar");
 
 
         JarInputStream in = new JarInputStream(new FileInputStream(f));
 
         JarFile jarFile = new JarFile(f);
-        System.out.println( jarFile.getEntry("nc/bs/u8cwebapi/utils/Assrt.class") );
-
+        System.out.println(jarFile.getEntry("nc/bs/u8cwebapi/utils/Assrt.class"));
 
 
         URLClassLoader classLoader = new URLClassLoader(new URL[]{
-               f.toURL()
+                f.toURL()
         });
 
         Class<?> aClass = classLoader.loadClass("nc.bs.u8cwebapi.utils.Assrt");
