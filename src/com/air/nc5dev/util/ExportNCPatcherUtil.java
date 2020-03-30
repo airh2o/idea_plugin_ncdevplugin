@@ -441,26 +441,33 @@ public class ExportNCPatcherUtil {
      */
     private static String getOutModuleName(Properties modulePatcherConfig, String javaFullClassName
             , File classFile, boolean guass, String defalut) {
-        //最优先 使用类全路径
-        String outModuleName = modulePatcherConfig.getProperty(javaFullClassName);
-        if (StringUtil.notEmpty(outModuleName)) {
-            return outModuleName;
+        if (StringUtil.isEmpty(javaFullClassName)) {
+            return defalut;
         }
-
-        //其实优先通配符
-        String cn = javaFullClassName;
-        int left = 0;
-        while ((left = cn.lastIndexOf('.')) > 0) {
-            cn = cn.substring(0, cn.lastIndexOf('.'));
-            outModuleName = modulePatcherConfig.getProperty(cn);
-
+        String outModuleName = null;
+        if (null != modulePatcherConfig) {
+            //最优先 使用类全路径
+            outModuleName = modulePatcherConfig.getProperty(javaFullClassName);
             if (StringUtil.notEmpty(outModuleName)) {
                 return outModuleName;
+            }
+
+            //其实优先通配符
+            String cn = javaFullClassName;
+            int left = 0;
+            while ((left = cn.lastIndexOf('.')) > 0) {
+                cn = cn.substring(0, cn.lastIndexOf('.'));
+                outModuleName = modulePatcherConfig.getProperty(cn);
+
+                if (StringUtil.notEmpty(outModuleName)) {
+                    return outModuleName;
+                }
             }
         }
 
         //最后如果没有，就看看是否启用了 模块名猜测
-        if (guass
+        if (null != classFile
+                && guass
                 && StringUtil.isEmpty(outModuleName)
                 && !classFile.getName().startsWith("CHG")
                 && !classFile.getName().startsWith("N_")) {
@@ -536,12 +543,8 @@ public class ExportNCPatcherUtil {
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "\\", ".");
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "/", ".");
             //检查是否配置了 特殊输出路径
-            String outModuleName = modulePatcherConfig.getProperty(javaFullClassName);
-
-            if (gaussModuleByPackge && StringUtil.isEmpty(outModuleName)) {
-                //猜测模块
-                outModuleName = getPackgeName(javaFullClassName, 3, ".");
-            }
+            String outModuleName = getOutModuleName(modulePatcherConfig
+                    , javaFullClassName, javaFile, gaussModuleByPackge, moduleName);
 
             final String baseOutDirPath = exportDir + File.separatorChar
                     + (StringUtil.isEmpty(outModuleName) ? moduleName : outModuleName);
@@ -609,7 +612,8 @@ public class ExportNCPatcherUtil {
             configKey = StringUtil.replaceAll(configKey, "\\", ".");
             configKey = StringUtil.replaceAll(configKey, File.separator, ".");
 
-            String outModuleName = modulePatcherConfig.getProperty(configKey);
+            String outModuleName = getOutModuleName(modulePatcherConfig
+                    , configKey, null, false, moduleName);;
             String outClasPathOtherFileDirPath = exportDir + File.separatorChar + (StringUtil.isEmpty(outModuleName) ? moduleName : outModuleName);
             File outClasPathOtherFileDir = null;
             if (NC_TYPE_PUBLIC.equals(ncType)) {

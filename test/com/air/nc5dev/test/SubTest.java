@@ -11,6 +11,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
@@ -32,13 +33,16 @@ public class SubTest {
         t06();
     }
 
-    private static void t06() {
-        String s = "com.air.nc5dev.util.ExportNCPatcherUtil";
-        String cn = s ;
-        int left = cn.lastIndexOf('.');
-        while ( (left = cn.lastIndexOf('.')) > 0) {
-            cn =  cn.substring(0, cn.lastIndexOf('.'));
-            System.out.println(cn);
+    private static void t06() throws Exception {
+        Properties properties = new Properties();
+        properties.load(new FileInputStream("C:\\Users\\air\\IdeaProjects\\NC5DevToolIdea\\test\\com\\air\\nc5dev\\test\\1.prop"));
+        String s = "nc.bs.uap.srm.wsdlutils.calbodydoc.CalbodyDoc_portType";
+        String cn = s;
+        int left = 0;
+        while ((left = cn.lastIndexOf('.')) > 0) {
+            cn = cn.substring(0, cn.lastIndexOf('.'));
+            System.out.println(cn + " : " + properties.getProperty(cn));
+
         }
     }
 
