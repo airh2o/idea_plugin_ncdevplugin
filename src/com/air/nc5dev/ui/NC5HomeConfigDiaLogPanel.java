@@ -201,6 +201,18 @@ public class NC5HomeConfigDiaLogPanel extends JScrollPane {
         contentPanel.add(textField_maxConCount);
 
         nc5HomeConfigDialogUIListner = NC5HomeConfigDialogUIListner.build(this);
+
+        //不允许编辑 数据源信息
+        textField_maxConCount.setEditable(false);
+        textField_ip.setEditable(false);
+        textField_minConCout.setEditable(false);
+        textField_user.setEditable(false);
+        textField_pass.setEditable(false);
+        textField_oidmark.setEditable(false);
+        textField_sid.setEditable(false);
+        button_adddesign.setVisible(false);
+
+
     }
 
     public JButton getButton_canel() {

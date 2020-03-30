@@ -48,7 +48,7 @@ public class NC5HomeConfigDialogUIListner {
         //final String ora11 = "ORACLE11G", ora10 = "ORACLE10G", sqlserver = "SQLSERVER2008", db297 = "DB297";
         Connection con;
         String user = ui.textField_user.getText();
-        String password = new Encode().encode(ui.textField_pass.getText());
+        String password = ui.textField_pass.getText();
         String className = ds.getDriverClassName();
         String url = ui.textField_ip.getText();
         try {
@@ -135,7 +135,7 @@ public class NC5HomeConfigDialogUIListner {
         ProjectNCConfigUtil.setNCClientPort(ui.textField_cientport.getText());
 
         ProjectNCConfigUtil.saveConfig2File();
-        NCPropXmlUtil.saveDataSources();
+        //NCPropXmlUtil.saveDataSources();
     }
 
     /**
