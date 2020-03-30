@@ -6,7 +6,7 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 # 插件截图
  
 buy me a coffee:     
-<img style="width:250px;height:200px" src="https://s1.ax1x.com/2020/03/30/GeyNdI.md.png"  alt="buy me a coffee" align=center />    
+<img width="200px" height="200px" src="https://s1.ax1x.com/2020/03/30/GeyNdI.md.png"  alt="buy me a coffee"  />           
 
 ![快速面板](https://s2.ax1x.com/2020/02/20/3eonRP.jpg "快速操作面板")    
 
