@@ -5,9 +5,6 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 
 # 插件截图
  
-buy me a coffee:     
-<img width="200px" height="200px" src="https://s1.ax1x.com/2020/03/30/GeyNdI.md.png"  alt="buy me a coffee"  />           
-
 ![快速面板](https://s2.ax1x.com/2020/02/20/3eonRP.jpg "快速操作面板")    
 
 ![配置NCHOME](https://s2.ax1x.com/2020/02/20/3eolqg.jpg "配置NCHOME")    
@@ -16,6 +13,9 @@ buy me a coffee:
 
 ![Tools菜单下位置](https://s2.ax1x.com/2020/02/20/3eoMM8.jpg "Tools菜单下位置")    
      
+# buy me a coffee:     
+<img width="200px" height="200px" src="https://s1.ax1x.com/2020/03/30/GeyNdI.md.png"  alt="buy me a coffee"  />     
+
 # 使用方式
 插件安装后使用方式:
 ```
