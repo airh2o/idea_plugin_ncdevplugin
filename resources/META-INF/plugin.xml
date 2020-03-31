@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>NC5x开发插件</name>
-    <version>v2.0.0</version>
+    <version>v2.1.0</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com</vendor>
 
     <description><![CDATA[
@@ -10,6 +10,16 @@
 
     <change-notes><![CDATA[
       Add change notes here.<br>
+
+      <em>2.1.0版本 更新:</em> <br>
+      <ul>
+          <li>1. 不修改NC本身数据源配置文件prop.xml</li>
+          <li>2. 生成运行配置会生成模块的补丁导出配置文件。</li>
+          <li>3. 修复打包成Jar Jar文件异常 无法识别。</li>
+          <li>4. 增加部分导出补丁的配置参数。</li>
+          <li>5. 导出补丁的支持包路径配置。</li>
+      </ul>
+
       <em>2.0版本重大更新:</em> <br>
       <ul>
           <li>1. 优化大量代码</li>
