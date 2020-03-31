@@ -52,7 +52,7 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
     config-compressEndDeleteClass      
     ##如果打包jar，那么 META-INF.MF 文件模板磁盘全路径(可以不配置 采用默认)  
     config-ManifestFilePath=path             
-    #是否猜测模块，默认true，开启后 如果配置文件没有指明的类会根据包名第三个判断模块       
+    #是否猜测模块，默认false，开启后 如果配置文件没有指明的类会根据包名第三个判断模块       
     # （比如 nc.ui.pub.ButtonBar 第三个是pub 所以认为模块是 pub）     
     config-guessModule=true     
     类路径配置文件:     

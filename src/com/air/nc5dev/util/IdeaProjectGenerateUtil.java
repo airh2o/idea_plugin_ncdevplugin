@@ -47,6 +47,7 @@ public class IdeaProjectGenerateUtil {
         Module[] modules = ModuleManager.getInstance(project1).getModules();
         for (Module module : modules) {
             generateSrcDir(module);
+            generatePatherConfigFile(module);
         }
     }
 
@@ -106,6 +107,57 @@ public class IdeaProjectGenerateUtil {
 
         copyProjectMetaInfFiles2NCHomeModules();
 
+    }
+
+    /**
+     * 生成 插件补丁 标准导出配置文件 到 到指定模块       </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/1/18 0018 12:25
+     * @Param [module]
+     */
+    public static void generatePatherConfigFile(@NotNull Module module) {
+        File homeDir = new File(module.getModuleFilePath()).getParentFile();
+        File outFile = new File(homeDir, "patcherconfig.properties");
+        if (!outFile.exists()) {
+            try {
+                PrintWriter out = new PrintWriter(new FileOutputStream(outFile));
+                out.print(
+                        "#模块 " + module.getName() + "("+ homeDir.getPath() + ")" + "导出补丁的配置文件\n" +
+                        "#导出补丁选项参数\n" +
+                        "config-notest=true\n" +
+                        "#是否导出源码\n" +
+                        "config-exportsourcefile=true\n" +
+                        "#是否打包成jar(所有idea项目和模块 才打包，其他非模块和项目名字的不打包)\n" +
+                        "config-compressjar=true\n" +
+                        "#打包成jar的是否保留classess里的文件\n" +
+                        "config-compressEndDeleteClass=true\n" +
+                        "#如果打包jar，那么 META-INF.MF 文件模板磁盘全路径\n" +
+                        "config-ManifestFilePath=\n" +
+                        "#是否猜测模块，默认true，开启后 如果配置文件没有指明的类会根据包名第三个判断模块\n" +
+                        "# （比如 nc.ui.pub.ButtonBar 第三个是pub 所以认为模块是 pub）\n" +
+                        "config-guessModule=false\n" +
+                        "#关闭使用JAVAP方式判断 源码文件对应,默认false\n" +
+                        "config-closeJavaP=false\n" +
+                        "\n" +
+                        "#全类名匹配的输出模块\n" +
+                        "nc.ui.glpub.UiManager=gl\n" +
+                        "nc.bs.arap.DzTakeF1Impl=arap\n" +
+                        "nc.impl.gl.voucher.ImpVoucher=gl\n" +
+                        "#非源码的文件输出模块\n" +
+                        "nc.bs.arap.1.txt=arap  \n" +
+                        "#支持包路径匹配（优先级低于 全类名匹配， 包路径优先匹配最精确的包）\n" +
+                        "nc.bs.po=pu");
+                out.flush();
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**

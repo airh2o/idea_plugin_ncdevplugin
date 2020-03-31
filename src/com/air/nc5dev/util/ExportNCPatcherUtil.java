@@ -103,6 +103,7 @@ public class ExportNCPatcherUtil {
 
         String moduleName;
         while (moduleIterator.hasNext()) {
+            //循环所有的模块
             entry = moduleIterator.next();
             compilerModuleExtension = CompilerModuleExtension.getInstance(entry.getValue());
 
@@ -112,15 +113,15 @@ public class ExportNCPatcherUtil {
             noOutTestClass = !"false".equals(modulePatcherConfig.getProperty("config-notest"));
             compressjar = "true".equals(modulePatcherConfig.getProperty("config-compressjar"));
             compressEndDeleteClass = "true".equals(modulePatcherConfig.getProperty("config-compressEndDeleteClass"));
-            gaussModuleByPackge = !"false".equals(modulePatcherConfig.getProperty("config-guessModule"));
+            gaussModuleByPackge = !"true".equals(modulePatcherConfig.getProperty("config-guessModule"));
 
             sourceRoots = ModuleRootManager.getInstance(entry.getValue()).getSourceRoots();
             classDir = compilerModuleExtension.getCompilerOutputPath();
             testClassDirPath = null == compilerModuleExtension.getCompilerOutputPathForTests()
                     ? null : compilerModuleExtension.getCompilerOutputPathForTests().getPath();
             moduleName = entry.getValue().getName();
-            //循环输出 NC 3大文件夹
             for (VirtualFile sourceRoot : sourceRoots) {
+                //循环输出 NC 3大文件夹
                 if (null == classDir) {
                     ProjectUtil.warnNotification("编译输出路径不存在!请重新build或者" +
                             "模块配置Paths-Compiler output选项必须要勾选的 Use module cpmpile output path！", null);
@@ -157,11 +158,13 @@ public class ExportNCPatcherUtil {
             }
 
             File bmfDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "METADATA");
+
             //复制模块元数据
             if (bmfDir.isDirectory()) {
                 IoUtil.copyAllFile(bmfDir
                         , new File(outPath + File.separatorChar + moduleName + File.separatorChar + "METADATA"));
             }
+
             //检查是否需要把代码打包成 jar文件
             if (compressjar) {
                 File manifest = null;
@@ -173,6 +176,8 @@ public class ExportNCPatcherUtil {
                 }
                 compressJar(new File(outPath + File.separatorChar + moduleName), compressEndDeleteClass, manifest);
             }
+
+            //模块循环结束
         }
 
 
