@@ -64,7 +64,6 @@ public final class IoUtil {
         File f = new File(ncHome, "resources");
         if (f.exists()) {
             all.add(f);
-            //all.addAll(getAllFiles(f, true));
         }
 
         f = new File(ncHome, "lib");

@@ -291,29 +291,30 @@ public class IdeaProjectGenerateUtil {
 
         ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Ant_Library
                 , IoUtil.serachAllNcAntJars(ncHome));
+
         ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Product_Common_Library
                 , IoUtil.serachProduct_Common_LibraryJars(ncHome));
+
         ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Middleware_Library
                 , IoUtil.serachMiddleware_LibraryJars(ncHome));
+
         ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Framework_Library
                 , IoUtil.serachFramework_LibraryJars(ncHome));
+
         ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NC_Module_Public_Library
                 , IoUtil.serachNC_Module_Public_Library(ncHome));
+
         ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Client_Library
                 , IoUtil.serachModule_Client_Library(ncHome));
+
         ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Private_Library
                 , IoUtil.serachModule_Private_Library(ncHome));
+
         ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Lang_Library
                 , IoUtil.serachModule_Lang_Library(ncHome));
 
         ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Generated_EJB
                 , IoUtil.serachGenerated_EJB(ncHome));
-
-        File f = new File(ncHome, "resources");
-        if (f.exists()) {
-            ApplicationLibraryUtil.addApplicationLibrary(project, "NC_LIBS/CLIENT_FILES"
-                    , IoUtil.getAllFiles(f, true));
-        }
     }
 
     /**

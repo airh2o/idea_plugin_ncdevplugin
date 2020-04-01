@@ -65,10 +65,7 @@ public class ApplicationLibraryUtil {
             } else if (root.toLowerCase().endsWith(".class")) {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);
-            } else if (root.toLowerCase().endsWith("resources")) {
-                libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
-                libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);
-            } else {
+            }  else {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);
             }
