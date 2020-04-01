@@ -52,37 +52,56 @@ public class MakeNcModuleJarAction extends AbstractIdeaAction {
 
         Manifest maniFest = ExportNCPatcherUtil.getManiFest(manifest, dir.getName());
 
-
         //public
         File srcDir = new File(dir, "classes");
-        IoUtil.makeJar(srcDir, new File(dir
-                , "lib" + File.separatorChar + "public_"
-                        + dir.getName() + ".jar")
-                , maniFest, new String[]{".java"});
-        IoUtil.makeJar(srcDir, new File(dir
-                        , "lib" + File.separatorChar + "public_"
-                        + dir.getName() + "_src.jar")
-                , maniFest, new String[]{".class"});
+        File outFile;
+        if (srcDir.isDirectory()) {
+            outFile = new File(dir
+                    , "lib" + File.separatorChar + "public_"
+                    + dir.getName() + ".jar");
+            if (!outFile.getParentFile().exists()) {
+                outFile.getParentFile().mkdirs();
+            }
+            IoUtil.makeJar(srcDir
+                    , outFile
+                    , maniFest, new String[]{".java"});
+            IoUtil.makeJar(srcDir, new File(outFile.getParentFile()
+                            , "public_" + dir.getName() + "_src.jar")
+                    , maniFest, new String[]{".class"});
+        }
+
         //private
-        srcDir = new File(dir, "META-INF");
-        IoUtil.makeJar(srcDir, new File(dir
-                        , "lib" + File.separatorChar + "private_"
-                        + dir.getName() + ".jar")
-                , maniFest, new String[]{".java"});
-        IoUtil.makeJar(srcDir, new File(dir
-                        , "META-INF" + File.separatorChar +"lib" + File.separatorChar + "private_"
-                        + dir.getName() + "_src.jar")
-                , maniFest, new String[]{".class"});
+        srcDir = new File(dir, "META-INF" + File.separatorChar + "classes");
+        if (srcDir.isDirectory()) {
+            outFile = new File(srcDir.getParentFile()
+                    , "lib" + File.separatorChar + "private_"
+                    + dir.getName() + ".jar");
+            if (!outFile.getParentFile().exists()) {
+                outFile.getParentFile().mkdirs();
+            }
+            IoUtil.makeJar(srcDir, outFile
+                    , maniFest, new String[]{".java"});
+            IoUtil.makeJar(srcDir, new File(outFile.getParentFile()
+                            , "private_" + dir.getName() + "_src.jar")
+                    , maniFest, new String[]{".class"});
+        }
+
         //client
-        srcDir = new File(dir, "client");
-        IoUtil.makeJar(srcDir, new File(dir
-                        , "lib" + File.separatorChar + "ui_"
-                        + dir.getName() + ".jar")
-                , maniFest, new String[]{".java"});
-        IoUtil.makeJar(srcDir, new File(dir
-                        , "client" + File.separatorChar +"lib" + File.separatorChar + "ui_"
-                        + dir.getName() + "_src.jar")
-                , maniFest, new String[]{".class"});
+        srcDir = new File(dir, "client" + File.separatorChar + "classes");
+        if (srcDir.isDirectory()) {
+            outFile = new File(srcDir.getParentFile()
+                    , "lib" + File.separatorChar + "ui_"
+                    + dir.getName() + ".jar");
+            if (!outFile.getParentFile().exists()) {
+                outFile.getParentFile().mkdirs();
+            }
+            IoUtil.makeJar(srcDir, outFile
+                    , maniFest, new String[]{".java"});
+            IoUtil.makeJar(srcDir, new File(outFile.getParentFile()
+                            , "ui_" + dir.getName() + "_src.jar")
+                    , maniFest, new String[]{".class"});
+        }
+
 
         Messages.showInfoMessage("生成成功： " + dir.getPath(), "转换完成");
 
