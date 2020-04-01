@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>NC5x开发插件</name>
-    <version>v2.1.0</version>
+    <version>v2.1.1</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com</vendor>
 
     <description><![CDATA[
@@ -10,6 +10,12 @@
 
     <change-notes><![CDATA[
       Add change notes here.<br>
+
+    <em>2.1.1版本 更新:</em> <br>
+      <ul>
+          <li>1. 新增 文件夹转jar功能</li>
+          <li>2. 新增 NC补丁class模块转jar功能</li>
+      </ul>
 
       <em>2.1.0版本 更新:</em> <br>
       <ul>
@@ -87,6 +93,12 @@
         <action id="nc5dev.info.showlocalncjavaexe" class="com.air.nc5dev.acion.ShowLocalNCProcessAction"
                 text="显示 本机NC进程列表" description="显示 本机NC后端和Swing端进程列表">
         </action>
+        <action id="nc5dev.info.makejarfile" class="com.air.nc5dev.acion.MakeJarAction"
+                text="文件夹转Jar文件" description="把一个文件夹 比如class文件夹 转换成Jar包">
+        </action>
+        <action id="nc5dev.info.makeNcModulejarfile" class="com.air.nc5dev.acion.MakeNcModuleJarAction"
+                text="NC补丁模块转Jar文件" description="把一个NC补丁的模块文件夹  转换成Jar包">
+        </action>
 
         <group id="nc5devtool" text="NC 开发插件配置" popup="true" description="配置NC开发插件"
                icon="/META-INF/nc-logo.png">
@@ -107,6 +119,8 @@
             <reference ref="nc5dev.info.openjconsole"/>
             <reference ref="nc5dev.info.openjvisualvm"/>
             <reference ref="nc5dev.info.showlocalncjavaexe"/>
+            <reference ref="nc5dev.info.makejarfile"/>
+            <reference ref="nc5dev.info.makeNcModulejarfile"/>
 
             <add-to-group group-id="ToolsMenu" anchor="last"/>
             <add-to-group group-id="MainToolBarSettings" anchor="last"/>

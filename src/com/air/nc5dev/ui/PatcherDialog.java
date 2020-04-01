@@ -81,9 +81,9 @@ public class PatcherDialog
                 public void actionPerformed(ActionEvent e) {
                     String userDir = System.getProperty("user.home");
                     JFileChooser fileChooser = new JFileChooser(userDir);
-                    fileChooser.setFileSelectionMode(1);
+                    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     int flag = fileChooser.showOpenDialog(null);
-                    if (flag == 0) {
+                    if (flag == JFileChooser.APPROVE_OPTION) {
                         textField_savePath.setText(fileChooser.getSelectedFile().getAbsolutePath());
                     }
                 }

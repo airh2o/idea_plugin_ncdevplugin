@@ -250,14 +250,37 @@ public class ExportNCPatcherUtil {
             outDir.mkdirs();
             //创建MANIFEST.MF
 
-            Manifest minf = null;
+            Manifest maniFest = getManiFest(manifest, dir.getName());
+
+            File jarFile = new File(outDir, jarName + ".jar");
+            File jarSrcFile = new File(outDir, jarName + "_src.jar");
+            IoUtil.makeJar(dir, jarFile, maniFest, new String[]{".java"});
+            IoUtil.makeJar(dir, jarSrcFile, maniFest, new String[]{".class"});
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+    }
+    /**
+      *     获得jar的manifest文件，如果穿的file是null 就够就默认的格式      </br>
+      *           </br>
+      *           </br>
+      *           </br>
+      * @author air Email: 209308343@qq.com 
+      * @date 2020/4/1 0001 22:31
+      * @Param [manifest]
+      * @return void
+     */ 
+    public static Manifest getManiFest(File manifest, String name) {
+        Manifest minf = null;
+        try {
             if (null == manifest) {
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 PrintWriter printWriter = new PrintWriter(byteArrayOutputStream);
                 printWriter.println("Manifest-Version" + ": " + "1.0");
                 printWriter.println("Class-Path" + ": " + "");
                 printWriter.println("Main-Class" + ": " + "");
-                printWriter.println("Name" + ": " + dir.getName());
+                printWriter.println("Name" + ": " + name);
                 printWriter.println("Specification-Title" + ": " + "");
                 printWriter.println("Specification-Version" + ": " + "1.0");
                 printWriter.println("Specification-Vendor" + ": " + "");
@@ -279,15 +302,10 @@ public class ExportNCPatcherUtil {
             } else {
                 minf = new Manifest(new FileInputStream(manifest));
             }
-
-            File jarFile = new File(outDir, jarName + ".jar");
-            File jarSrcFile = new File(outDir, jarName + "_src.jar");
-            IoUtil.makeJar(dir, jarFile, minf, new String[]{".java"});
-            IoUtil.makeJar(dir, jarSrcFile, minf, new String[]{".class"});
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+        } catch (IOException e) {
         }
+
+        return minf;
     }
 
     /**

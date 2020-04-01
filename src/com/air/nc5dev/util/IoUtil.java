@@ -521,6 +521,10 @@ public final class IoUtil {
             byte[] cache = new byte[1024];
             boolean skip = false;
             for (File f : allFiles) {
+                if(f.equals(outputFile)){
+                    continue;
+                }
+
                 skip = false;
                 for (String skipSuffix : skipSuffixs) {
                     if (f.getName().toLowerCase().endsWith(skipSuffix)) {
