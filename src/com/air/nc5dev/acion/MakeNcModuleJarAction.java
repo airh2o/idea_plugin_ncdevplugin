@@ -1,11 +1,11 @@
 package com.air.nc5dev.acion;
 
-import com.air.nc5dev.util.ExceptionUtil;
+import com.air.nc5dev.acion.base.AbstractIdeaAction;
 import com.air.nc5dev.util.ExportNCPatcherUtil;
 import com.air.nc5dev.util.IoUtil;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.ui.Messages;
 
 import javax.swing.*;
 import java.awt.*;
@@ -103,13 +103,13 @@ public class MakeNcModuleJarAction extends AbstractIdeaAction {
         }
 
 
-        Messages.showInfoMessage("生成成功： " + dir.getPath(), "转换完成");
+        LogUtil.info("生成成功： " + dir.getPath());
 
         try {
             Desktop desktop = Desktop.getDesktop();
             desktop.open(dir);
         } catch (Throwable iae) {
-            ProjectUtil.errorNotification("自动打开路径失败: " + ExceptionUtil.getExcptionDetall(iae), null);
+            LogUtil.error("自动打开路径失败: " + dir.getPath(), iae);
         }
     }
 }

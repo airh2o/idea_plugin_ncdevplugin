@@ -89,3 +89,38 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
            3. 修复IDEA同时打开多个项目 ,每次配置文件打开自动加载新的项目插件配置文件。        
         
 ```
+
+
+# 感谢
+部分代码 参考或使用了 部分插件开源项目的代码。
+涉及到的有(列表可能不全，请谅解，实际已源码和项目为准)：
+IDEA plugin 官方示例项目 或 开源插件：
+比如 https://github.com/SonarSource/sonarlint-intellij , https://github.com/gejun123456/intellij-generateAllSetMethod  等
+框架比如 guava hutool 等等
+再次感谢开源项目参与者们的无私奉献！
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -12,7 +12,7 @@ public class NC5HomeConfigDialogUI extends DialogWrapper {
     public NC5HomeConfigDialogUI(@Nullable Project project) {
         super(project);
         super.init();
-        setTitle("配置NC HOME和数据源(不需要测试数据库连接,不需要这里修改数据库连接信息!你这需要保证HOME位置对和客户端配置ok)");
+        setTitle("配置NC HOME(只需要保证HOME位置对和客户端IP端口配置正确)");
         super.getPeer().setSize(centerPanel.getWidth() + 10, centerPanel.getHeight() + 10);
     }
 

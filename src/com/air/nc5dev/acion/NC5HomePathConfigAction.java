@@ -1,5 +1,6 @@
 package com.air.nc5dev.acion;
 
+import com.air.nc5dev.acion.base.AbstractIdeaAction;
 import com.air.nc5dev.ui.NC5HomeConfigDialogUI;
 import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -29,12 +30,6 @@ public class NC5HomePathConfigAction extends AbstractIdeaAction {
         ui = new NC5HomeConfigDialogUI(project);
         ui.setSize(700, 490);
         if (ui.showAndGet()) {
-          /*  int updateClassPath = Messages.showYesNoDialog("你是否确定保存配置?"
-                +"请提前备份好NCHOME/ierp/bin/prop.xml文件!", "询问", Messages.getQuestionIcon());
-            if (updateClassPath != Messages.OK) {
-                return ;
-            }
-*/
             ui.getCenterPanel().getNc5HomeConfigDialogUIListner().OnSave(null);
 
             int updateClassPath = Messages.showYesNoDialog("是否立即更新项目 Dependencies 中NC包依赖?"

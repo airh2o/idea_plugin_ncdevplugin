@@ -1,8 +1,10 @@
 package com.air.nc5dev.acion;
 
-import com.air.nc5dev.util.*;
-import com.air.nc5dev.util.idea.ProjectUtil;
-import com.intellij.openapi.actionSystem.AnAction;
+import com.air.nc5dev.acion.base.AbstractIdeaAction;
+import com.air.nc5dev.util.ExceptionUtil;
+import com.air.nc5dev.util.IoUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 
 import java.io.File;
@@ -15,13 +17,13 @@ public class OpenJconsoleAction extends AbstractIdeaAction {
             File javaBin = IoUtil.getJavaHomePathFile(ProjectNCConfigUtil.getNCHomePath()
                     , exe);
             if (null == javaBin) {
-                ProjectUtil.warnNotification("路径不存在: " + javaBin.getPath(), e.getProject());
+                LogUtil.error("路径不存在: " + javaBin.getPath());
                 return;
             }
 
             Runtime.getRuntime().exec(javaBin.getPath());
         } catch (Exception iae) {
-            ProjectUtil.errorNotification(ExceptionUtil.getExcptionDetall(iae), e.getProject());
+            LogUtil.error(ExceptionUtil.getExcptionDetall(iae), iae);
         }
     }
 }

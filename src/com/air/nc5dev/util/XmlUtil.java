@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * XML tool
  */
-public final class XmlUtil {
+public final class XmlUtil extends cn.hutool.core.util.XmlUtil{
     /**
      * XML 文件 解析成 Document
      * @param xml

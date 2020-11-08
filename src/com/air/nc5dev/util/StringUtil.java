@@ -1,5 +1,7 @@
 package com.air.nc5dev.util;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
@@ -15,7 +17,7 @@ import java.util.regex.Pattern;
  * @version 505
  * @date 2019年8月9日 下午9:14:26
  */
-public  final class StringUtil {
+public  final class StringUtil extends StringUtils{
     /**
      * 字符串 == null 或者 trim后是空 <br>
      * <br>

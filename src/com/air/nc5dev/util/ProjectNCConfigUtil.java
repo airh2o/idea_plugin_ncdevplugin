@@ -1,13 +1,18 @@
 package com.air.nc5dev.util;
 
 import com.air.nc5dev.util.idea.ProjectUtil;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import org.apache.commons.lang.StringUtils;
+import org.fest.util.Arrays;
 
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Properties;
 
 /**
@@ -220,6 +225,13 @@ public class ProjectNCConfigUtil {
             ncConf.load(new FileInputStream(configFile));
             ProjectNCConfigUtil.configPropertis = ncConf;
             ProjectNCConfigUtil.configFile = configFile;
+
+            if (StringUtils.isBlank(getNCClientIP())) {
+                setNCClientIP("127.0.0.1");
+            }
+            if (StringUtils.isBlank(getNCClientPort())) {
+                setNCClientPort("80");
+            }
         } catch (IOException e) {
             Messages.showErrorDialog(ProjectUtil.getDefaultProject()
                     , "文件路径: " + configFile.getPath() + " ,异常: " + e.toString()
@@ -273,5 +285,36 @@ public class ProjectNCConfigUtil {
      */
     public static int getPluginRuntimeMark() {
         return PLUGIN_RUNTIME_MARK;
+    }
+
+    /**
+     * 获取NC的 hotwebs里面的文件夹名字列表 ,隔开
+     * @return
+     */
+    public static String getNcHotWebsList() {
+        String s = "lfw,portal,fs ";
+        File ncHome = getNCHome();
+        if (ncHome == null) {
+            return s;
+        }
+
+        File hw = new File(ncHome, "hotwebs");
+        if (!hw.isDirectory()) {
+            return s;
+        }
+
+        File[] fs = hw.listFiles();
+        if (Arrays.isNullOrEmpty(fs)) {
+            return s;
+        }
+
+        ArrayList<String> ns = Lists.newArrayListWithCapacity(fs.length);
+        for (File f : fs) {
+            if (f.isDirectory()) {
+                ns.add(f.getName());
+            }
+        }
+
+        return Joiner.on(',').skipNulls().join(ns);
     }
 }

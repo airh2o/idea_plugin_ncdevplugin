@@ -1,7 +1,7 @@
 package com.air.nc5dev.acion;
 
-import com.air.nc5dev.util.ExceptionUtil;
-import com.air.nc5dev.util.idea.ProjectUtil;
+import com.air.nc5dev.acion.base.AbstractIdeaAction;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 
 import java.awt.*;
@@ -26,8 +26,7 @@ public class HelpMeAction extends AbstractIdeaAction {
         try {
             Desktop.getDesktop().browse(URI.create(url));
         } catch (IOException e1) {
-            ProjectUtil.errorNotification("无法自动打开浏览器，请手工打开网址：" + url
-                    + "  ,ERROR=" + ExceptionUtil.getExcptionDetall(e1), e.getProject());
+            LogUtil.error("无法自动打开浏览器，请手工打开网址：" + url, e1);
         }
     }
 }

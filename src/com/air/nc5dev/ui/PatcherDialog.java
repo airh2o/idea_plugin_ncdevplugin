@@ -1,7 +1,9 @@
 package com.air.nc5dev.ui;
 
+import com.air.nc5dev.bean.ExportContentVO;
 import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.ExportNCPatcherUtil;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -9,8 +11,6 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,10 +19,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Random;
 
 /***
  *   导出NC 补丁包的 弹框UI        </br>
@@ -93,7 +91,8 @@ public class PatcherDialog
             //设置点默认值
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm");
             this.textField_saveName.setText("exportpatcher-" + LocalDateTime.now().format(formatter));
-            this.textField_savePath.setText(ProjectUtil.getDefaultProject().getBasePath() + File.separatorChar + "patchers");
+            this.textField_savePath.setText(ProjectUtil.getDefaultProject().getBasePath() + File.separatorChar +
+                    "patchers" + File.separatorChar + "modules");
         }
 
         contentPane.setPreferredSize(new Dimension(300, 180));
@@ -110,55 +109,55 @@ public class PatcherDialog
      * @return void
      */
     public void onOK() {
-        if(isRuning){
-            Messages.showErrorDialog(event.getProject(), "上一次导出任务还未处理完，请稍后再试!", "Error");
-            return ;
+        if (isRuning) {
+            LogUtil.error("上一次导出任务还未处理完，请稍后再试!");
+            return;
         }
 
         if ((null == this.textField_saveName.getText()) || ("".equals(this.textField_saveName.getText()))) {
-            Messages.showErrorDialog(event.getProject(), "请输入补丁包名字!", "Error");
+            LogUtil.error("请输入补丁包名字!");
             return;
         }
         if ((null == this.textField_savePath.getText()) || ("".equals(this.textField_savePath.getText()))) {
-            Messages.showErrorDialog(event.getProject(), "请选择补丁要导出到的路径!", "Error");
+            LogUtil.error("请选择补丁要导出到的路径!");
             return;
         }
 
         String dirName = this.textField_saveName.getText();
         dirName = null == dirName || dirName.trim().isEmpty() ? "export" : dirName;
         String exportPath = this.textField_savePath.getText() + File.separatorChar + dirName;
-        try {
-            Task.Backgroundable backgroundable = new Task.Backgroundable(event.getProject(), "导出中...请等待...") {
-                @Override
-                public void run(@NotNull ProgressIndicator indicator) {
-                    isRuning = true;
-                    indicator.setText("正在玩命导出NC补丁包中...");
-                    indicator.setText2("导出成功后会自动打开文件夹： " + exportPath);
-                    indicator.setIndeterminate(true);
+        Task.Backgroundable backgroundable = new Task.Backgroundable(event.getProject(), "导出中...请等待...") {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                isRuning = true;
+                indicator.setText("正在玩命导出NC补丁包中...");
+                indicator.setText2("导出成功后会自动打开文件夹： " + exportPath);
+                indicator.setIndeterminate(true);
 
-                    try {
-                        long s = System.currentTimeMillis();
-                        ExportNCPatcherUtil.export(exportPath, event.getProject());
-                        long e = System.currentTimeMillis();
-                        ProjectUtil.infoNotification("导出成功,耗时:" + ((e - s) / 1000.0d) + " (秒s)!硬盘路径： " + exportPath, event.getProject());
+                try {
+                    long s = System.currentTimeMillis();
+                    ExportContentVO contentVO = new ExportContentVO();
+                    contentVO.outPath = exportPath;
+                    contentVO.project = event.getProject();
+                    contentVO.event = event;
+                    ExportNCPatcherUtil.export(contentVO);
+                    long e = System.currentTimeMillis();
+                    LogUtil.info("导出成功,耗时:" + ((e - s) / 1000.0d) + " (秒s)!硬盘路径： " + exportPath);
 
-                        Desktop desktop = Desktop.getDesktop();
-                        File dirToOpen = new File(exportPath);
-                        desktop.open(dirToOpen);
-                    } catch (Throwable iae) {
-                        ProjectUtil.errorNotification("自动打开路径失败: " + ExceptionUtil.getExcptionDetall(iae), event.getProject());
-                    } finally {
-                        isRuning = false;
-                    }
+                    Desktop desktop = Desktop.getDesktop();
+                    File dirToOpen = new File(exportPath);
+                    desktop.open(dirToOpen);
+                } catch (Throwable iae) {
+                    LogUtil.error("自动打开路径失败: " + ExceptionUtil.getExcptionDetall(iae));
+                } finally {
+                    isRuning = false;
                 }
-            };
-            backgroundable.setCancelText("放弃吧,没有卵用的按钮");
-            backgroundable.setCancelTooltipText("这是一个没有卵用的按钮");
-            ProgressManager.getInstance().run(backgroundable);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            ProjectUtil.errorNotification(ExceptionUtil.getExcptionDetall(e), event.getProject());
-        }
+            }
+        };
+        backgroundable.setCancelText("放弃吧,没有卵用的按钮");
+        backgroundable.setCancelTooltipText("这是一个没有卵用的按钮");
+        ProgressManager.getInstance().run(backgroundable);
+
         dispose();
     }
 

@@ -1,12 +1,17 @@
 package com.air.nc5dev.util;
 
+import cn.hutool.core.collection.CollUtil;
+import com.air.nc5dev.bean.ExportConfigVO;
+import com.air.nc5dev.bean.ExportContentVO;
 import com.air.nc5dev.util.idea.ProjectUtil;
+import com.google.common.base.Splitter;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,36 +69,35 @@ public class ExportNCPatcherUtil {
      * @date 2020/1/16 0016 18:32
      * @Param [outPath, project] 输出文件夹，项目对象
      */
-    public static final void export(@NotNull String outPath, @NotNull Project project) {
+    public static final void export(@NotNull ExportContentVO contentVO) {
         if (null == javapCommandPath) {
             initJavap();
         }
 
         //获得所有的 模块
-        Module[] modules = ModuleManager.getInstance(project).getModules();
+        Module[] modules = ModuleManager.getInstance(contentVO.project).getModules();
+        contentVO.modules = CollUtil.toList(modules);
         //模块文件夹根路径 ： 模块对象
-        HashMap<String, Module> moduleHomeDir2ModuleMap = new HashMap<>();
         for (Module module : modules) {
-            moduleHomeDir2ModuleMap.put(new File(module.getModuleFilePath()).getParent(), module);
+            contentVO.moduleHomeDir2ModuleMap.put(new File(module.getModuleFilePath()).getParent(), module);
         }
+
+        //排除配置文件里设置的 不需要的模块
+        contentVO.moduleHomeDir2ModuleMap.forEach((path, module) -> {
+            ExportConfigVO configVO = loadExportConfig(path, module);
+            contentVO.module2ExportConfigVoMap.put(module, configVO);
+
+            if (configVO.ignoreModule) {
+                contentVO.ignoreModules.add(module);
+            }
+        });
 
         //循环模块，根据编译对象情况，输出补丁
         CompilerModuleExtension compilerModuleExtension;
-        Iterator<Map.Entry<String, Module>> moduleIterator = moduleHomeDir2ModuleMap.entrySet().iterator();
+        Iterator<Map.Entry<String, Module>> moduleIterator = contentVO.moduleHomeDir2ModuleMap.entrySet().iterator();
         Map.Entry<String, Module> entry;
         //模块 自定义输出配置信息
-        Properties modulePatcherConfig;
-        //不输出 test
-        boolean noOutTestClass = true;
-        //是否导出 源文件
-        boolean hasJavaFile = true;
-        //是否 打包代码到jar
-        boolean compressjar = false;
-        //是否删除打包代码到jar后的 class文件
-        boolean compressEndDeleteClass = false;
-        //是否猜测模块
-        boolean gaussModuleByPackge = true;
-
+        ExportConfigVO configVO;
         //src 源文件夹 顶级集合
         VirtualFile[] sourceRoots;
         //生产class输出文件夹
@@ -105,21 +109,21 @@ public class ExportNCPatcherUtil {
         while (moduleIterator.hasNext()) {
             //循环所有的模块
             entry = moduleIterator.next();
+
+            if (contentVO.ignoreModules.contains(entry.getValue())) {
+                //需要跳过的模块
+                continue;
+            }
+
             compilerModuleExtension = CompilerModuleExtension.getInstance(entry.getValue());
 
             //读取自定义配置文件
-            modulePatcherConfig = readModuleOutConfigFile(entry.getKey());
-            hasJavaFile = !"false".equals(modulePatcherConfig.getProperty("config-exportsourcefile"));
-            noOutTestClass = !"false".equals(modulePatcherConfig.getProperty("config-notest"));
-            compressjar = "true".equals(modulePatcherConfig.getProperty("config-compressjar"));
-            compressEndDeleteClass = "true".equals(modulePatcherConfig.getProperty("config-compressEndDeleteClass"));
-            gaussModuleByPackge = !"true".equals(modulePatcherConfig.getProperty("config-guessModule"));
+            configVO = contentVO.module2ExportConfigVoMap.get(entry.getValue());
 
             sourceRoots = ModuleRootManager.getInstance(entry.getValue()).getSourceRoots();
             classDir = compilerModuleExtension.getCompilerOutputPath();
             testClassDirPath = null == compilerModuleExtension.getCompilerOutputPathForTests()
                     ? null : compilerModuleExtension.getCompilerOutputPathForTests().getPath();
-            moduleName = entry.getValue().getName();
             for (VirtualFile sourceRoot : sourceRoots) {
                 //循环输出 NC 3大文件夹
                 if (null == classDir) {
@@ -129,23 +133,19 @@ public class ExportNCPatcherUtil {
                 }
 
                 if (sourceRoot.getName().equals(NC_TYPE_PUBLIC)) {
-                    export(NC_TYPE_PUBLIC, outPath, moduleName
-                            , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
-                            , hasJavaFile, noOutTestClass, modulePatcherConfig, gaussModuleByPackge);
+                    export(NC_TYPE_PUBLIC, contentVO.outPath, entry.getValue()
+                            , sourceRoot.getPath(), classDir.getPath(), testClassDirPath, contentVO);
                 } else if (sourceRoot.getName().equals(NC_TYPE_PRIVATE)) {
-                    export(NC_TYPE_PRIVATE, outPath, moduleName
-                            , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
-                            , hasJavaFile, noOutTestClass, modulePatcherConfig, gaussModuleByPackge);
+                    export(NC_TYPE_PRIVATE, contentVO.outPath, entry.getValue()
+                            , sourceRoot.getPath(), classDir.getPath(), testClassDirPath, contentVO);
                 } else if (sourceRoot.getName().equals(NC_TYPE_CLIENT)) {
-                    export(NC_TYPE_CLIENT, outPath, moduleName
-                            , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
-                            , hasJavaFile, noOutTestClass, modulePatcherConfig, gaussModuleByPackge);
+                    export(NC_TYPE_CLIENT, contentVO.outPath, entry.getValue()
+                            , sourceRoot.getPath(), classDir.getPath(), testClassDirPath, contentVO);
                 } else if (null != testClassDirPath
-                        && !noOutTestClass
+                        && !configVO.noTest
                         && sourceRoot.getName().equals(NC_TYPE_TEST)) {
-                    export(NC_TYPE_TEST, outPath, moduleName
-                            , sourceRoot.getPath(), classDir.getPath(), testClassDirPath
-                            , hasJavaFile, noOutTestClass, modulePatcherConfig, gaussModuleByPackge);
+                    export(NC_TYPE_TEST, contentVO.outPath, entry.getValue()
+                            , sourceRoot.getPath(), classDir.getPath(), testClassDirPath, contentVO);
                 }
                 //其他无视掉
             }
@@ -154,7 +154,9 @@ public class ExportNCPatcherUtil {
             File umpDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "META-INF");
             if (umpDir.isDirectory()) {
                 IoUtil.copyAllFile(umpDir
-                        , new File(outPath + File.separatorChar + moduleName + File.separatorChar + "META-INF"));
+                        , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
+                                .separatorChar +
+                                "META-INF"));
             }
 
             File bmfDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "METADATA");
@@ -162,25 +164,57 @@ public class ExportNCPatcherUtil {
             //复制模块元数据
             if (bmfDir.isDirectory()) {
                 IoUtil.copyAllFile(bmfDir
-                        , new File(outPath + File.separatorChar + moduleName + File.separatorChar + "METADATA"));
+                        , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
+                                .separatorChar +
+                                "METADATA"));
             }
 
             //检查是否需要把代码打包成 jar文件
-            if (compressjar) {
+            if (configVO.toJar) {
                 File manifest = null;
-                if (StringUtil.notEmpty(modulePatcherConfig.getProperty("config-ManifestFilePath"))) {
-                    manifest = new File(modulePatcherConfig.getProperty("config-ManifestFilePath"));
+                if (StringUtil.notEmpty(configVO.manifestFilePath)) {
+                    manifest = new File(configVO.manifestFilePath);
                     if (!manifest.isFile()) {
                         manifest = null;
                     }
                 }
-                compressJar(new File(outPath + File.separatorChar + moduleName), compressEndDeleteClass, manifest);
+                compressJar(new File(contentVO.outPath + File.separatorChar + entry.getValue().getName()),
+                        configVO.toJarThenDelClass, manifest);
             }
 
             //模块循环结束
         }
 
 
+    }
+
+    /**
+     * 根据 配置文件的路径(所在文件夹) 载入配置信息， module 不重要！
+     *
+     * @param path
+     * @param module
+     * @return
+     */
+    public static ExportConfigVO loadExportConfig(String path, Module module) {
+        ExportConfigVO cf = new ExportConfigVO();
+        Properties prop = readModuleOutConfigFile(path);
+        cf.prop = prop;
+
+        cf.hasSource = !"false".equals(cf.getProperty("config-exportsourcefile"));
+        cf.noTest = !"true".equals(cf.getProperty("config-notest"));
+        cf.toJar = !"false".equals(cf.getProperty("config-compressjar"));
+        cf.toJarThenDelClass = "true".equals(cf.getProperty("config-compressEndDeleteClass"));
+        cf.guessModule = "true".equals(cf.getProperty("config-guessModule"));
+        cf.ignoreModule = "true".equals(cf.getProperty("config-ignoreModule"));
+        cf.manifestFilePath = cf.getProperty("config-ManifestFilePath");
+        cf.closeJavaP = "true".equals(cf.getProperty("config-closeJavaP"));
+
+        String s = cf.getProperty("config-ignoreFiles");
+        if (StringUtils.isNotBlank(s)) {
+            cf.ignoreFiles.addAll(Splitter.on(',').omitEmptyStrings().trimResults().splitToList(s));
+        }
+
+        return cf;
     }
 
     /**
@@ -192,7 +226,7 @@ public class ExportNCPatcherUtil {
      * @return void
      * @author air Email: 209308343@qq.com
      * @date 2020/2/9 0009 14:50
-     * @Param [moduleHomeDir, compressEndDeleteClass,modulePatcherConfig]  模块路径， 是否不保留class文件  true删除class文件,模块配置文件
+     * @Param [moduleHomeDir, compressEndDeleteClass, contentVO]  模块路径， 是否不保留class文件  true删除class文件,模块配置文件
      */
     private static void compressJar(File moduleHomeDir, boolean compressEndDeleteClass, File manifest) {
         File baseDir;
@@ -261,16 +295,18 @@ public class ExportNCPatcherUtil {
         } finally {
         }
     }
+
     /**
-      *     获得jar的manifest文件，如果穿的file是null 就够就默认的格式      </br>
-      *           </br>
-      *           </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com 
-      * @date 2020/4/1 0001 22:31
-      * @Param [manifest]
-      * @return void
-     */ 
+     * 获得jar的manifest文件，如果穿的file是null 就够就默认的格式      </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/4/1 0001 22:31
+     * @Param [manifest]
+     */
     public static Manifest getManiFest(File manifest, String name) {
         Manifest minf = null;
         try {
@@ -296,7 +332,8 @@ public class ExportNCPatcherUtil {
                 printWriter.println(" gitee.com/yhlx/idea_plugin_nc5devplugin");
                 printWriter.println("");
                 printWriter.flush();
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream
+                        .toByteArray());
                 minf = new Manifest(byteArrayInputStream);
                 printWriter.close();
             } else {
@@ -317,13 +354,12 @@ public class ExportNCPatcherUtil {
      * @return void
      * @author air Email: 209308343@qq.com
      * @date 2020/1/16 0016 19:34
-     * @Param [ncType, exportDir, moduleName, sourceRoot, classDir , testClassDir, hasJavaFile, noOutTestClass , modulePatcherConfig]    NC3大文件夹，导出文件夹路径，模块名字, java源码路径，生产代码路径，test代码路径，是否导出源码，是否不输出test代码
+     * @Param [ncType, exportDir, Module, sourceRoot, classDir , testClassDir, hasJavaFile, noOutTestClass ,
+     * contentVO]    NC3大文件夹，导出文件夹路径，模块, java源码路径，生产代码路径，test代码路径，
      */
     public static void export(@NotNull String ncType, @NotNull String exportDir
-            , @NotNull String moduleName, @NotNull String sourceRoot
-            , @NotNull String classDir, @Nullable String testClassDir
-            , boolean hasJavaFile, boolean noOutTestClass, @NotNull Properties modulePatcherConfig
-            , boolean gaussModuleByPackge) {
+            , @NotNull Module module, @NotNull String sourceRoot
+            , @NotNull String classDir, @Nullable String testClassDir, @NotNull ExportContentVO contentVO) {
         File sourceBaseDirFile = new File(sourceRoot);
 
         File classBaseDirFile;
@@ -342,11 +378,11 @@ public class ExportNCPatcherUtil {
             File classFileDir = new File(classBaseDirFile, packgePath);
 
             copyClassAndJavaSourceFiles(sourcePackge, sourceBaseDirFile
-                    , modulePatcherConfig, exportDir, moduleName
-                    , ncType, packgePath, hasJavaFile, classFileDir, gaussModuleByPackge);
+                    , contentVO, exportDir, module
+                    , ncType, packgePath, classFileDir);
 
-            copyClassPathOtherFile(sourcePackge, exportDir, moduleName
-                    , ncType, packgePath, modulePatcherConfig);
+            copyClassPathOtherFile(sourcePackge, exportDir, module
+                    , ncType, packgePath, contentVO);
         }
     }
 
@@ -359,21 +395,23 @@ public class ExportNCPatcherUtil {
      * @return void
      * @author air Email: 209308343@qq.com
      * @date 2020/2/4 0004 17:31
-     * @Param [sourcePackge, sourceBaseDirFile, modulePatcherConfig, exportDir, moduleName, ncType, packgePath, hasJavaFile, classFileDir]
+     * @Param [sourcePackge, sourceBaseDirFile,  contentVO, exportDir, moduleName, ncType, packgePath,
+     * classFileDir]
      */
     private static final void copyClassAndJavaSourceFiles(File sourcePackge, File sourceBaseDirFile
-            , Properties modulePatcherConfig, String exportDir, String moduleName
-            , String ncType, String packgePath, boolean hasJavaFile, final File classFileDir
-            , boolean gaussModuleByPackge) {
+            , ExportContentVO contentVO, String exportDir, Module module
+            , String ncType, String packgePath, final File classFileDir) {
+        ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(module);
+
         if (null == javapCommandPath
-                || "true".endsWith(StringUtil.get(modulePatcherConfig.getProperty("config-closeJavaP")))) {
+                || configVO.closeJavaP) {
             copyClassAndJavaSourceFilesBySource(sourcePackge, sourceBaseDirFile
-                    , modulePatcherConfig, exportDir, moduleName
-                    , ncType, packgePath, hasJavaFile, classFileDir, gaussModuleByPackge);
+                    , contentVO, exportDir, module
+                    , ncType, packgePath, classFileDir);
         } else {
             copyClassAndJavaSourceFilesByClass(sourcePackge, sourceBaseDirFile
-                    , modulePatcherConfig, exportDir, moduleName
-                    , ncType, packgePath, hasJavaFile, classFileDir, gaussModuleByPackge);
+                    , contentVO, exportDir, module
+                    , ncType, packgePath, classFileDir);
         }
     }
 
@@ -386,13 +424,13 @@ public class ExportNCPatcherUtil {
      * @return void
      * @author air Email: 209308343@qq.com
      * @date 2020/2/22 0022 12:14
-     * @Param [sourcePackge, sourceBaseDirFile, modulePatcherConfig, exportDir, moduleName, ncType, packgePath, hasJavaFile, classFileDir]
+     * @Param [sourcePackge, sourceBaseDirFile,  contentVO, exportDir, moduleName, ncType, packgePath,
+     * hasJavaFile, classFileDir]
      */
     private static final void copyClassAndJavaSourceFilesByClass(File sourcePackge, File sourceBaseDirFile
-            , Properties modulePatcherConfig, String exportDir, String moduleName
-            , String ncType, String packgePath, boolean hasJavaFile
-            , final File classFileDir, boolean gaussModuleByPackge) {
-
+            , ExportContentVO contentVO, String exportDir, Module module
+            , String ncType, String packgePath, final File classFileDir) {
+        ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(module);
         Stream.of(classFileDir.listFiles()).forEach(classFile -> {
             //循环复制所有java文件 ,因为idea编译后 没有分NC这3个文件夹！
             if (!classFile.isFile()) {
@@ -423,8 +461,8 @@ public class ExportNCPatcherUtil {
             }
 
             //获得类对于的模块名字
-            String outModuleName = getOutModuleName(modulePatcherConfig
-                    , javaFullClassName, classFile, gaussModuleByPackge, moduleName);
+            String outModuleName = getOutModuleName(contentVO
+                    , javaFullClassName, classFile, module, module.getName());
 
             final String baseOutDirPath = exportDir + File.separatorChar + outModuleName;
 
@@ -441,14 +479,39 @@ public class ExportNCPatcherUtil {
 
             outDir = new File(outDir, packgePath);
 
-            if (hasJavaFile) {
+            if (configVO.hasSource) {
                 //复制源码
-                IoUtil.copyFile(new File(sourcePackge, javaFullName + ".java"), outDir);
+                copyFile(new File(sourcePackge, javaFullName + ".java"), outDir, contentVO, module);
             }
 
             //复制class
-            IoUtil.copyFile(classFile, outDir);
+            copyFile(classFile, outDir, contentVO, module);
         });
+    }
+
+    /**
+     * 把一个文件 复制到指定的文件夹里 </br>
+     * 会自动创建不存在的文件夹      </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/1/16 0016 20:07
+     * @Param [from, toDir]
+     */
+    private static final void copyFile(@NotNull File from, @NotNull final File dir
+            , ExportContentVO contentVO, Module module) {
+        if (Objects.nonNull(contentVO) && Objects.nonNull(module)) {
+            //检查是否配置了 文件不复制！
+            ExportConfigVO cf = contentVO.module2ExportConfigVoMap.get(module);
+            final String path = from.getPath();
+            if (cf.ignoreFiles.stream().anyMatch(reg -> isMatch(path, reg))) {
+                return;
+            }
+        }
+
+        IoUtil.copyFile(from, dir);
     }
 
     /**
@@ -460,37 +523,38 @@ public class ExportNCPatcherUtil {
      * @return java.lang.String
      * @author air Email: 209308343@qq.com
      * @date 2020/3/30 0030 16:56
-     * @Param [modulePatcherConfig, javaFullClassName,guass]
+     * @Param [ contentVO, javaFullClassName,guass]
      */
-    private static String getOutModuleName(Properties modulePatcherConfig, String javaFullClassName
-            , File classFile, boolean guass, String defalut) {
+    private static String getOutModuleName(ExportContentVO contentVO, String javaFullClassName
+            , File classFile, Module module, String defalut) {
         if (StringUtil.isEmpty(javaFullClassName)) {
             return defalut;
         }
+
+        ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(module);
+
         String outModuleName = null;
-        if (null != modulePatcherConfig) {
-            //最优先 使用类全路径
-            outModuleName = modulePatcherConfig.getProperty(javaFullClassName);
+        //最优先 使用类全路径
+        outModuleName = configVO.getProperty(javaFullClassName);
+        if (StringUtil.notEmpty(outModuleName)) {
+            return outModuleName;
+        }
+
+        //其实优先通配符
+        String cn = javaFullClassName;
+        int left = 0;
+        while ((left = cn.lastIndexOf('.')) > 0) {
+            cn = cn.substring(0, cn.lastIndexOf('.'));
+            outModuleName = configVO.getProperty(cn);
+
             if (StringUtil.notEmpty(outModuleName)) {
                 return outModuleName;
-            }
-
-            //其实优先通配符
-            String cn = javaFullClassName;
-            int left = 0;
-            while ((left = cn.lastIndexOf('.')) > 0) {
-                cn = cn.substring(0, cn.lastIndexOf('.'));
-                outModuleName = modulePatcherConfig.getProperty(cn);
-
-                if (StringUtil.notEmpty(outModuleName)) {
-                    return outModuleName;
-                }
             }
         }
 
         //最后如果没有，就看看是否启用了 模块名猜测
         if (null != classFile
-                && guass
+                && configVO.guessModule
                 && StringUtil.isEmpty(outModuleName)
                 && !classFile.getName().startsWith("CHG")
                 && !classFile.getName().startsWith("N_")) {
@@ -504,6 +568,29 @@ public class ExportNCPatcherUtil {
 
         //都没有，返回默认
         return defalut;
+    }
+
+    /**
+     * 判断一个 全路径的文件，他 是否 符合 配置文件里 配置的 包或精确路径
+     *
+     * @param path
+     * @param regx
+     * @return
+     */
+    public static boolean isMatch(String file, String regx) {
+        File f = new File(file);
+        if (!f.exists()) {
+            return false;
+        }
+
+        if (f.isFile()) {
+
+        }
+
+        String s = StringUtil.replaceAll(f.getPath(), "\\", ".");
+        s = StringUtil.replaceAll(s, "/", ".");
+
+        return s.contains(regx);
     }
 
     /**
@@ -536,13 +623,13 @@ public class ExportNCPatcherUtil {
      * @return void
      * @author air Email: 209308343@qq.com
      * @date 2020/2/22 0022 12:14
-     * @Param [sourcePackge, sourceBaseDirFile, modulePatcherConfig, exportDir, moduleName, ncType, packgePath, hasJavaFile, classFileDir]
+     * @Param [sourcePackge, sourceBaseDirFile,  contentVO, exportDir, moduleName, ncType, packgePath,
+     * hasJavaFile, classFileDir]
      */
     private static final void copyClassAndJavaSourceFilesBySource(File sourcePackge, File sourceBaseDirFile
-            , Properties modulePatcherConfig, String exportDir, String moduleName
-            , String ncType, String packgePath, boolean hasJavaFile
-            , final File classFileDir, boolean gaussModuleByPackge) {
-
+            , ExportContentVO contentVO, String exportDir, Module module
+            , String ncType, String packgePath, final File classFileDir) {
+        ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(module);
         Stream.of(sourcePackge.listFiles()).forEach(javaFile -> {
             //循环复制所有java文件 ,因为idea编译后 没有分NC这3个文件夹！
             if (!javaFile.isFile()) {
@@ -566,11 +653,11 @@ public class ExportNCPatcherUtil {
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "\\", ".");
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "/", ".");
             //检查是否配置了 特殊输出路径
-            String outModuleName = getOutModuleName(modulePatcherConfig
-                    , javaFullClassName, javaFile, gaussModuleByPackge, moduleName);
+            String outModuleName = getOutModuleName(contentVO
+                    , javaFullClassName, javaFile, module, module.getName());
 
             final String baseOutDirPath = exportDir + File.separatorChar
-                    + (StringUtil.isEmpty(outModuleName) ? moduleName : outModuleName);
+                    + (StringUtil.isEmpty(outModuleName) ? module.getName() : outModuleName);
 
             File outDir = null;
             if (NC_TYPE_PUBLIC.equals(ncType)) {
@@ -585,15 +672,15 @@ public class ExportNCPatcherUtil {
 
             outDir = new File(outDir, packgePath);
 
-            if (hasJavaFile) {
+            if (configVO.hasSource) {
                 //复制源码
-                IoUtil.copyFile(javaFile, outDir);
+                copyFile(javaFile, outDir, contentVO, module);
             }
 
             //复制class 这个麻烦，要正确导出匿名类。 如果是 一个java多个类 反人类写法不考虑让用户手工处理！
             List<File> classFiles = getJavaClassByClassName(javaFullClassName, classFileDir);
             for (File classFile : classFiles) {
-                IoUtil.copyFile(classFile, outDir);
+                copyFile(classFile, outDir, contentVO, module);
             }
 
         });
@@ -611,8 +698,8 @@ public class ExportNCPatcherUtil {
      * @Param [sourcePackge, exportDir, moduleName, ncType, packgePath]
      */
     private static final void copyClassPathOtherFile(File sourcePackge
-            , String exportDir, String moduleName, String ncType
-            , String packgePath, Properties modulePatcherConfig) {
+            , String exportDir, Module module, String ncType
+            , String packgePath, ExportContentVO contentVO) {
         //复制包路径文件夹内所有其他文件，比如 wsdl文件 配置文件等等
         Stream.of(sourcePackge.listFiles()).forEach(file -> {
             if (!file.isFile()) {
@@ -635,23 +722,25 @@ public class ExportNCPatcherUtil {
             configKey = StringUtil.replaceAll(configKey, "\\", ".");
             configKey = StringUtil.replaceAll(configKey, File.separator, ".");
 
-            String outModuleName = getOutModuleName(modulePatcherConfig
-                    , configKey, null, false, moduleName);;
-            String outClasPathOtherFileDirPath = exportDir + File.separatorChar + (StringUtil.isEmpty(outModuleName) ? moduleName : outModuleName);
+            String outModuleName = getOutModuleName(contentVO, configKey, null, module, module.getName());
+            String outClasPathOtherFileDirPath = exportDir + File.separatorChar + (StringUtil.isEmpty(outModuleName)
+                    ? module.getName() : outModuleName);
             File outClasPathOtherFileDir = null;
             if (NC_TYPE_PUBLIC.equals(ncType)) {
                 outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "classes");
             } else if (NC_TYPE_PRIVATE.equals(ncType)) {
-                outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "META-INF" + File.separatorChar + "classes");
+                outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "META-INF" + File.separatorChar +
+                        "classes");
             } else if (NC_TYPE_CLIENT.equals(ncType)) {
-                outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "client" + File.separatorChar + "classes");
+                outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "client" + File.separatorChar +
+                        "classes");
             } else if (NC_TYPE_TEST.equals(ncType)) {
                 outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "test");
             }
 
             File outClasPathOtherFileDirFinal = new File(outClasPathOtherFileDir, packgePath);
 
-            IoUtil.copyFile(file, outClasPathOtherFileDirFinal);
+            copyFile(file, outClasPathOtherFileDirFinal, contentVO, module);
         });
     }
 
@@ -673,7 +762,8 @@ public class ExportNCPatcherUtil {
                 return false;
             }
 
-            String classFullPath = file.getPath().substring(file.getPath().lastIndexOf(classPath), file.getPath().lastIndexOf('.'));
+            String classFullPath = file.getPath().substring(file.getPath().lastIndexOf(classPath), file.getPath()
+                    .lastIndexOf('.'));
             return classFullPath.equals(classPath) || classFullPath.startsWith(classPath + '$');
         }).collect(Collectors.toList());
     }

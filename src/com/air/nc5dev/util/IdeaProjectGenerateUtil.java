@@ -127,31 +127,37 @@ public class IdeaProjectGenerateUtil {
             try {
                 PrintWriter out = new PrintWriter(new FileOutputStream(outFile));
                 out.print(
-                        "#模块 " + module.getName() + "("+ homeDir.getPath() + ")" + "导出补丁的配置文件\n" +
-                        "#导出补丁选项参数\n" +
-                        "config-notest=true\n" +
-                        "#是否导出源码\n" +
-                        "config-exportsourcefile=true\n" +
-                        "#是否打包成jar(所有idea项目和模块 才打包，其他非模块和项目名字的不打包)\n" +
-                        "config-compressjar=true\n" +
-                        "#打包成jar的是否保留classess里的文件\n" +
-                        "config-compressEndDeleteClass=true\n" +
-                        "#如果打包jar，那么 META-INF.MF 文件模板磁盘全路径\n" +
-                        "config-ManifestFilePath=\n" +
-                        "#是否猜测模块，默认true，开启后 如果配置文件没有指明的类会根据包名第三个判断模块\n" +
-                        "# （比如 nc.ui.pub.ButtonBar 第三个是pub 所以认为模块是 pub）\n" +
-                        "config-guessModule=false\n" +
-                        "#关闭使用JAVAP方式判断 源码文件对应,默认false\n" +
-                        "config-closeJavaP=false\n" +
-                        "\n" +
-                        "#全类名匹配的输出模块\n" +
-                        "nc.ui.glpub.UiManager=gl\n" +
-                        "nc.bs.arap.DzTakeF1Impl=arap\n" +
-                        "nc.impl.gl.voucher.ImpVoucher=gl\n" +
-                        "#非源码的文件输出模块\n" +
-                        "nc.bs.arap.1.txt=arap  \n" +
-                        "#支持包路径匹配（优先级低于 全类名匹配， 包路径优先匹配最精确的包）\n" +
-                        "nc.bs.po=pu");
+                        "#模块 " + module.getName() + "(" + homeDir.getPath() + ")" + "导出补丁的配置文件\n" +
+                                "#导出补丁选项参数\n" +
+                                "config-notest=true\n" +
+                                "#是否导出源码\n" +
+                                "config-exportsourcefile=true\n" +
+                                "#是否打包成jar(所有idea项目和模块 才打包，其他非模块和项目名字的不打包)\n" +
+                                "config-compressjar=true\n" +
+                                "#打包成jar的是否保留classess里的文件\n" +
+                                "config-compressEndDeleteClass=true\n" +
+                                "#如果打包jar，那么 META-INF.MF 文件模板磁盘全路径\n" +
+                                "config-ManifestFilePath=\n" +
+                                "#是否猜测模块，默认true，开启后 如果配置文件没有指明的类会根据包名第三个判断模块\n" +
+                                "# （比如 nc.ui.pub.ButtonBar 第三个是pub 所以认为模块是 pub）\n" +
+                                "config-guessModule=false\n" +
+                                "#关闭使用JAVAP方式判断 源码文件对应,默认false\n" +
+                                "config-closeJavaP=false\n" +
+                                "\n" +
+                                "#全类名匹配的输出模块\n" +
+                                "nc.ui.glpub.UiManager=gl\n" +
+                                "nc.bs.arap.DzTakeF1Impl=arap\n" +
+                                "nc.impl.gl.voucher.ImpVoucher=gl\n" +
+                                "#非源码的文件输出模块\n" +
+                                "nc.bs.arap.1.txt=arap  \n" +
+                                "#支持包路径匹配（优先级低于 全类名匹配， 包路径优先匹配最精确的包）\n" +
+                                "nc.bs.po=pu  \n "
+                                + "# 是否跳过此配置文件所在模块，不导出这个模块\n" +
+                                "config-ignoreModule=false \n"
+                                + "# 不导出的文件列表 多个 用 英文,隔开\n" +
+                                "# 第一个 根据class定位精确不导出， 第二个 根据包名和里面的文件名精确定位不导出， 第三个 根据包名路径下的 所有 都不导出\n" +
+                                "config-ignoreFiles=nc.bs.some.Save2Impl, nc.bs.arap.2.txt, nc.bs.some.impl2 \n"
+                );
                 out.flush();
                 out.close();
             } catch (FileNotFoundException e) {
@@ -173,7 +179,8 @@ public class IdeaProjectGenerateUtil {
         File ncHome = ProjectNCConfigUtil.getNCHome();
 
         RunManagerImpl runManager = RunConfigurationUtil.getRunManagerImpl(ProjectUtil.getDefaultProject());
-        List<RunConfiguration> configurationsList = runManager.getConfigurationsList(ApplicationConfigurationType.getInstance());
+        List<RunConfiguration> configurationsList = runManager.getConfigurationsList(ApplicationConfigurationType
+                .getInstance());
 
         final byte[] hasNc = new byte[2];
         final String serverClass = "ufmiddle.start.tomcat.StartDirectServer";
@@ -210,7 +217,8 @@ public class IdeaProjectGenerateUtil {
 
         if (0 == hasNc[0]) {
             //新增服务端
-            ApplicationConfiguration conf = new ApplicationConfiguration("NC服务端", project, ApplicationConfigurationType.getInstance());
+            ApplicationConfiguration conf = new ApplicationConfiguration("NC服务端", project,
+                    ApplicationConfigurationType.getInstance());
             conf.setMainClassName(serverClass);
 
             HashMap<String, String> envs = new HashMap<>();
@@ -218,29 +226,35 @@ public class IdeaProjectGenerateUtil {
             conf.setEnvs(envs);
 
             conf.setVMParameters(
-                    "-Dcom.sun.management.jmxremote "
-                            + "-Dcom.sun.management.jmxremote.port=11241 "
+                    " -Dnc.http.port=" + ProjectNCConfigUtil.getNCClientPort()
+                            + " -Dcom.sun.management.jmxremote "
+                            //+ "-Dcom.sun.management.jmxremote.port=11241 "
                             + "-Dcom.sun.management.jmxremote.ssl=false "
                             + "-Dcom.sun.management.jmxremote.authenticate=false "
-                            + "-Dnc.exclude.modules=datamig,ecp,egbaseinfo,egdocmg,egitctrl,egriskmg,egrkaudit,gpm,hrbm,hrcm,hrcp,hrdm,hrhi,hrjf,hrjq,hrma,hrp,hrpe,hrrm,hrrpt,hrss,hrta,hrtrn,hrwa,oaar,oaco,oaep,oainf,oakm,oamt,oaod,oapo,oapp,oapub,srm,srmem,srmsm,swcm_pu,webad,webbd,webdbl,webimp,webrt,websm " //${FIELD_EX_MODULES}
+                            + "-Dnc.exclude.modules=datamig,ecp,egbaseinfo,egdocmg,egitctrl,egriskmg,egrkaudit,gpm," +
+                            "hrbm,hrcm,hrcp,hrdm,hrhi,hrjf,hrjq,hrma,hrp,hrpe,hrrm,hrrpt,hrss,hrta,hrtrn,hrwa,oaar," +
+                            "oaco,oaep,oainf,oakm,oamt,oaod,oapo,oapp,oapub,srm,srmem,srmsm,swcm_pu,webad,webbd," +
+                            "webdbl,webimp,webrt,websm " //${FIELD_EX_MODULES}
                             + " -Dnc.runMode=develop -Dnc.server.location=$FIELD_NC_HOME$"
                             + " -DEJBConfigDir=$FIELD_NC_HOME$/ejbXMLs"
                             + " -DExtServiceConfigDir=$FIELD_NC_HOME$/ejbXMLs"
                             + " -Xmx768m -XX:MaxPermSize=256m -DEnableSqlDebug=true -XX:+HeapDumpOnOutOfMemoryError "
-                            + "-DSqlDebugSkipKey=bd_del_log,pub_alertruntime,pub_alertregistry,bi_schd_host,wfm_task,pub_async,cp_sysinittemp,bi_schd_taskqueue,md_module,ec_muc_affili,ec_muc_member"
-                            + "-Duap.hotwebs=lfw,portal,fs "
+                            + "-DSqlDebugSkipKey=bd_del_log,pub_alertruntime,pub_alertregistry,bi_schd_host,wfm_task," +
+                            "pub_async,cp_sysinittemp,bi_schd_taskqueue,md_module,ec_muc_affili,ec_muc_member"
+                            + "-Duap.hotwebs=" + ProjectNCConfigUtil.getNcHotWebsList()
             );
             conf.setWorkingDirectory(ncHome.getPath());
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
             conf.setShowConsoleOnStdErr(true);
             conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
 
-            RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf);
+            RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf, true, true);
         }
 
         if (0 == hasNc[1]) {
             //新增客户端
-            ApplicationConfiguration conf = new ApplicationConfiguration("NC客户端", project, ApplicationConfigurationType.getInstance());
+            ApplicationConfiguration conf = new ApplicationConfiguration("NC客户端", project,
+                    ApplicationConfigurationType.getInstance());
             conf.setMainClassName(clientClass);
             HashMap<String, String> envs = new HashMap<>();
             envs.put("FIELD_CLINET_IP", ProjectNCConfigUtil.getNCClientIP());
@@ -249,18 +263,20 @@ public class IdeaProjectGenerateUtil {
             conf.setEnvs(envs);
 
             conf.setVMParameters(
-                    "-Dcom.sun.management.jmxremote "
-                            + "-Dcom.sun.management.jmxremote.port=11242 "
+                    " -Dcom.sun.management.jmxremote "
+                            //  + "-Dcom.sun.management.jmxremote.port=11242 "
                             + "-Dcom.sun.management.jmxremote.ssl=false "
                             + "-Dcom.sun.management.jmxremote.authenticate=false "
                             + "-Dnc.runMode=develop"
                             + " -Dnc.jstart.server=$FIELD_CLINET_IP$"
-                            + " -Dnc.jstart.port=$FIELD_CLINET_PORT$ -Xmx768m -XX:MaxPermSize=256m -Dnc.fi.autogenfile=N ");
+                            + " -Dnc.jstart.port=$FIELD_CLINET_PORT$ -Xmx768m -XX:MaxPermSize=256m -Dnc.fi" +
+                            ".autogenfile=N "
+            );
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
             conf.setWorkingDirectory(ncHome.getPath());
             conf.setShowConsoleOnStdErr(true);
             conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
-            RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf);
+            RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf, false, true);
         }
     }
 
@@ -375,7 +391,8 @@ public class IdeaProjectGenerateUtil {
         File[] projectFiles = umpDir.listFiles(f -> f.isFile());
         Stream.of(projectFiles).forEach(f -> {
             try {
-                Files.copy(f.toPath(), new File(modeluUmpDir, f.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(f.toPath(), new File(modeluUmpDir, f.getName()).toPath(), StandardCopyOption
+                        .REPLACE_EXISTING);
             } catch (Exception e) {
             }
         });

@@ -10,7 +10,7 @@ import nc.vo.pub.BusinessException;
  * @version NC505+,JDK1.5
  * @date 2019-9-9 下午9:54:53
  */
-public  final class ExceptionUtil {
+public  final class ExceptionUtil extends cn.hutool.core.exceptions.ExceptionUtil{
 	/**
 	 * 获取所有错误栈代码方法全限定名字和行数
 	 * 

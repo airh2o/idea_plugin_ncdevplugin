@@ -17,7 +17,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * IO tool
  */
-public final class IoUtil {
+public final class IoUtil extends cn.hutool.core.io.IoUtil{
     /**
      * 把一个 java的 Properties 输出成文件
      *

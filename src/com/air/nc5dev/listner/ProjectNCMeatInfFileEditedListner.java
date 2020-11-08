@@ -50,15 +50,20 @@ public class ProjectNCMeatInfFileEditedListner implements ApplicationComponent, 
 
     @Override
     public void after(@Nonnull List<? extends VFileEvent> events) {
-        boolean isMeta = false;
-        for (VFileEvent event : events) {
-            if (isMetaInfoDir(event)) {
-                isMeta = true;
-                break;
+        try {
+            boolean isMeta = false;
+            for (VFileEvent event : events) {
+                if (isMetaInfoDir(event)) {
+                    isMeta = true;
+                    break;
+                }
             }
-        }
 
-        IdeaProjectGenerateUtil.copyProjectMetaInfFiles2NCHomeModules();
+            IdeaProjectGenerateUtil.copyProjectMetaInfFiles2NCHomeModules();
+        } catch (Exception e) {
+            //is ok
+            e.printStackTrace();
+        }
     }
 
     private boolean isMetaInfoDir(VFileEvent event) {
