@@ -1,3 +1,7 @@
+# 注意，因为本人懒等原因，最新的插件是 项目根目录的 zip文件哦，不是发行版里的哦！！！！
+
+# 因本人目前在微服务公司，所以本人业余接开发私单，有私单才能继续参与NC 继续更新插件啊，人懒又要养家
+
 # idea_plugin_nc5devplugin
 Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin   
 实现了 Idea NC5x 6x U8Cloud 开发插件，功能比较简单
