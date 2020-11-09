@@ -26,7 +26,7 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 4. 第一次执行上面步骤以后，会生成项目默认的client public private test 几个源文件夹 请手工在 项目结构修改几个文件夹的IDEA属性为正确值
 5. 请注意 模块的编译输出路径要选 use module path 分别设置test和非test class输出路径。
 ```
-
+![注意简单使用方式,数据库配置不管他 没用处的,就是个显示功能](https://s1.ax1x.com/2020/11/09/B7FcOH.jpg "注意简单使用方式,数据库配置不管他 没用处的,就是个显示功能")  
  导出补丁支持 模块写一个配置文件 自定义相对路径：     
  ```
   本文件必须放入模块的根目录 文件名： patcherconfig.properties   

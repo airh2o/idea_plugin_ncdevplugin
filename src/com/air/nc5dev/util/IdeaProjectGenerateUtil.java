@@ -240,8 +240,8 @@ public class IdeaProjectGenerateUtil {
                             + " -DExtServiceConfigDir=$FIELD_NC_HOME$/ejbXMLs"
                             + " -Xmx768m -XX:MaxPermSize=256m -DEnableSqlDebug=true -XX:+HeapDumpOnOutOfMemoryError "
                             + "-DSqlDebugSkipKey=bd_del_log,pub_alertruntime,pub_alertregistry,bi_schd_host,wfm_task," +
-                            "pub_async,cp_sysinittemp,bi_schd_taskqueue,md_module,ec_muc_affili,ec_muc_member"
-                            + "-Duap.hotwebs=" + ProjectNCConfigUtil.getNcHotWebsList()
+                            "pub_async,cp_sysinittemp,bi_schd_taskqueue,md_module,ec_muc_affili,ec_muc_member "
+                            + " -Duap.hotwebs=" + ProjectNCConfigUtil.getNcHotWebsList()
             );
             conf.setWorkingDirectory(ncHome.getPath());
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
@@ -269,8 +269,8 @@ public class IdeaProjectGenerateUtil {
                             + "-Dcom.sun.management.jmxremote.authenticate=false "
                             + "-Dnc.runMode=develop"
                             + " -Dnc.jstart.server=$FIELD_CLINET_IP$"
-                            + " -Dnc.jstart.port=$FIELD_CLINET_PORT$ -Xmx768m -XX:MaxPermSize=256m -Dnc.fi" +
-                            ".autogenfile=N "
+                            + " -Dnc.jstart.port=$FIELD_CLINET_PORT$" +
+                            " -Xmx768m -XX:MaxPermSize=256m -Dnc.fi.autogenfile=N "
             );
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
             conf.setWorkingDirectory(ncHome.getPath());

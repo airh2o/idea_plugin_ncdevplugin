@@ -21,22 +21,19 @@ public class OpenNCConfigWindowAction extends AbstractIdeaAction {
         File binDir = new File(ProjectNCConfigUtil.getNCHomePath() + File.separatorChar + "bin");
         File bat = new File(binDir, isWindows() ? "sysConfig.bat" : "sysConfig.sh");
 
-        if (bat.isFile()) {
+        if (!bat.isFile()) {
             bat = new File(binDir, isWindows() ? "u8cSysConfig.bat" : "u8cSysConfig.sh");
         }
 
-        if (bat.isFile()) {
+        if (!bat.isFile()) {
             bat = new File(binDir, isWindows() ? "ncSysConfig.bat" : "ncSysConfig.sh");
         }
 
-
-
-        if (bat == null) {
+        if (!bat.isFile()) {
             LogUtil.error("脚本路径不存在!请把配置窗口启动脚本命名成: ncSysConfig.bat 和 ncSysConfig.sh");
             return;
         }
 
         Runtime.getRuntime().exec(bat.getPath());
-
     }
 }

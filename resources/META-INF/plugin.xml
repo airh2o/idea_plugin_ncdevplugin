@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
-    <name>NC5x开发插件</name>
-    <version>v2.1.1</version>
+    <name>NC系列开发插件</name>
+    <version>v2.2.1</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com</vendor>
 
     <description><![CDATA[
@@ -9,6 +9,13 @@
     ]]></description>
 
     <change-notes><![CDATA[
+     <em>2.2.1 版本 更新:</em> <br>
+      <ul>
+          <li>1. 优化部分代码,减少插件直接爆出错误信息</li>
+          <li>2. 修复部分小错误</li>
+          <li>3. 修复 U8Cloud部分功能无法使用</li>
+      </ul>
+
     <em>2.2.0 版本 更新:</em> <br>
       <ul>
           <li>1. 优化部分代码,减少插件直接爆出错误信息</li>

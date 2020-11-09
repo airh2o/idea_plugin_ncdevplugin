@@ -89,13 +89,13 @@ public class PatcherDialog
             contentPane.add(button_selectSavePath);
 
             //设置点默认值
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm");
-            this.textField_saveName.setText("exportpatcher-" + LocalDateTime.now().format(formatter));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
+            this.textField_saveName.setText("modules");
             this.textField_savePath.setText(ProjectUtil.getDefaultProject().getBasePath() + File.separatorChar +
-                    "patchers" + File.separatorChar + "modules");
+                    "patchers" + File.separatorChar + "exportpatcher-" + LocalDateTime.now().format(formatter));
         }
 
-        contentPane.setPreferredSize(new Dimension(300, 180));
+        contentPane.setPreferredSize(new Dimension(765, 210));
         return this.contentPane;
     }
 

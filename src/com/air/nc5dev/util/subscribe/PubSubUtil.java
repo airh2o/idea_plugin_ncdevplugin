@@ -1,5 +1,6 @@
 package com.air.nc5dev.util.subscribe;
 
+import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.subscribe.itf.ISubscriber;
 import org.jetbrains.annotations.NotNull;
 
@@ -78,7 +79,11 @@ public final class PubSubUtil {
             return ;
         }
         subscriberCopyOnWriteArrayList.stream().forEach(sub -> {
-            sub.accept(msg);
+            try {
+                sub.accept(msg);
+            } catch (Exception e) {
+                LogUtil.error(e.toString(), e);
+            }
         });
     }
 

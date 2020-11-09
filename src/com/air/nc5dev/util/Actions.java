@@ -23,6 +23,7 @@ import com.air.nc5dev.acion.LogCleanConsoleAction;
 import com.air.nc5dev.acion.LogErrAutoShowAction;
 import com.air.nc5dev.acion.LogMoveDownAction;
 import com.air.nc5dev.acion.LogMoveUpAction;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -65,7 +66,12 @@ public class Actions {
     }
 
     public static Actions getInstance() {
-        return ProjectUtil.getService(Actions.class);
+        try {
+            return ProjectUtil.getService(Actions.class);
+        } catch (Exception e) {
+            LogUtil.error(e.toString(), e);
+        }
+        return null;
     }
 
     public AnAction cleanConsole() {
