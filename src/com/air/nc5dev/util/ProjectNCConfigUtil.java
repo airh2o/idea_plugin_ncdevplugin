@@ -1,13 +1,12 @@
 package com.air.nc5dev.util;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import org.apache.commons.lang.StringUtils;
-import org.fest.util.Arrays;
-
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
@@ -304,7 +303,7 @@ public class ProjectNCConfigUtil {
         }
 
         File[] fs = hw.listFiles();
-        if (Arrays.isNullOrEmpty(fs)) {
+        if (ArrayUtil.isEmpty(fs)) {
             return s;
         }
 
