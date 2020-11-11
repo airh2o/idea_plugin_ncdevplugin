@@ -2,8 +2,6 @@ package com.air.nc5dev.ui;
 
 import com.air.nc5dev.listner.NC5HomeConfigDialogUIListner;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
-import com.intellij.openapi.project.Project;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

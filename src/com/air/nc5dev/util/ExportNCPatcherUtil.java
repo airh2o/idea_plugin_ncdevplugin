@@ -1,13 +1,12 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.collection.CollUtil;
-import com.air.nc5dev.bean.ExportConfigVO;
-import com.air.nc5dev.bean.ExportContentVO;
+import com.air.nc5dev.vo.ExportConfigVO;
+import com.air.nc5dev.vo.ExportContentVO;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.google.common.base.Splitter;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;

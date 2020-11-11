@@ -1,5 +1,6 @@
-package com.air.nc5dev.bean;
+package com.air.nc5dev.vo;
 
+import com.air.nc5dev.util.ncutils.nc5x.NC5xEncode;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -37,6 +38,7 @@ public class NCDataSourceVO {
         databaseUrl = getSonElementTextContent(element,"databaseUrl", 0);
         user = getSonElementTextContent(element,"user", 0);
         password = getSonElementTextContent(element,"password", 0);
+        password = new NC5xEncode().decode(password);
         driverClassName = getSonElementTextContent(element,"driverClassName", 0);
         databaseType = getSonElementTextContent(element,"databaseType", 0);
         maxCon = getSonElementTextContent(element,"maxCon", 0);
@@ -195,24 +197,7 @@ public class NCDataSourceVO {
 
     @Override
     public String toString() {
-        return "NCDataSourceVO{" +
-                "element=" + element +
-                ", dataSourceName='" + dataSourceName + '\'' +
-                ", oidMark='" + oidMark + '\'' +
-                ", databaseUrl='" + databaseUrl + '\'' +
-                ", user='" + user + '\'' +
-                ", password='" + password + '\'' +
-                ", driverClassName='" + driverClassName + '\'' +
-                ", databaseType='" + databaseType + '\'' +
-                ", maxCon='" + maxCon + '\'' +
-                ", minCon='" + minCon + '\'' +
-                ", dataSourceClassName='" + dataSourceClassName + '\'' +
-                ", xaDataSourceClassName='" + xaDataSourceClassName + '\'' +
-                ", conIncrement='" + conIncrement + '\'' +
-                ", conInUse='" + conInUse + '\'' +
-                ", conIdle='" + conIdle + '\'' +
-                ", isBase='" + isBase + '\'' +
-                '}';
+        return dataSourceName;
     }
 
     @Override

@@ -1,13 +1,28 @@
 package com.air.nc5dev.util.idea;
 
+import cn.hutool.core.lang.UUID;
+import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.IoUtil;
+import com.air.nc5dev.util.NCPropXmlUtil;
+import com.air.nc5dev.util.XmlUtil;
+import com.air.nc5dev.vo.NCDataSourceVO;
+import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import com.intellij.notification.*;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.XMLWriter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
+import java.awt.*;
+import java.io.*;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 项目 工具类</br>
@@ -155,5 +170,117 @@ public class ProjectUtil {
 
     public static <T> T getService(Class<T> clazz) {
         return getService(getDefaultProject(), clazz);
+    }
+
+    public static File getResourceTemplates(String name) {
+        return new File(getResource().getPath()
+                + File.separatorChar + "templates", name);
+    }
+
+    public static File getResource() {
+        return new File(ProjectUtil.class.getResource("/").getPath());
+    }
+
+    /**
+     * 往IDEA的数据库database管理工具 新增数据连接
+     *
+     * @param basePath      项目ROOT文件夹路径
+     * @param dataSourceVOS 数据源们
+     * @throws IOException
+     */
+    public static void addDatabaseToolLinks(String basePath, List<NCDataSourceVO> dataSourceVOS) throws IOException  {
+        File dsxml = new File(basePath + File.separatorChar + ".idea", "dataSources.xml");
+        File dslxml = new File(basePath + File.separatorChar + ".idea", "dataSources.local.xml");
+
+        if (!dsxml.isFile()) {
+            IoUtil.copyFile(ProjectUtil.getResourceTemplates("dataSources.xml")
+                    , dsxml.getParentFile());
+        }
+        if (!dslxml.isFile()) {
+            IoUtil.copyFile(ProjectUtil.getResourceTemplates("dataSources.local.xml")
+                    , dslxml.getParentFile());
+        }
+
+        Document document = XmlUtil.xmlFile2DocumentSax(dsxml);
+        Element rootElement = document.getRootElement();
+        Element component = rootElement.element("component");
+
+        Document documentLocal = XmlUtil.xmlFile2DocumentSax(dslxml);
+        Element rootElementLocal = documentLocal.getRootElement();
+        Element componentLocal = rootElementLocal.element("component");
+
+        final String dataSourceElementName = "data-source";
+        List<Element> elementDs = component.elements(dataSourceElementName);
+
+        if (CollUtil.isEmpty(elementDs)) {
+            elementDs = Lists.newArrayListWithCapacity(dataSourceVOS.size());
+        }
+
+        List<NCDataSourceVO> newDs = Lists.newArrayListWithCapacity(dataSourceVOS.size());
+        for (NCDataSourceVO dataSourceVO : dataSourceVOS) {
+            if (elementDs.stream().noneMatch(element ->
+                    getDsName(dataSourceVO).equals(element.attributeValue("name")))) {
+                newDs.add(dataSourceVO);
+            }
+        }
+
+        if (newDs.isEmpty()) {
+            LogUtil.info("过滤掉已有同名数据源的连接,没有可以新增的连接!");
+            return;
+        }
+
+        LogUtil.info("新增连接: " + newDs.toString());
+        Element dele;
+        Element deleLocal;
+        String id;
+        String name;
+        for (NCDataSourceVO d : newDs) {
+            dele = component.addElement(dataSourceElementName);
+            dele.addAttribute("source", "LOCAL");
+            id = UUID.fastUUID().toString();
+            dele.addAttribute("uuid", id);
+            name = getDsName(d);
+            dele.addAttribute("name", name);
+            dele.addElement("driver-ref").setText(d.getDatabaseType().toLowerCase());
+            dele.addElement("synchronize").setText("true");
+            dele.addElement("remarks").setText(d.getUser() + '@' + d.getPassword());
+            dele.addElement("auto-commit").setText("false");
+            dele.addElement("jdbc-driver").setText(d.getDriverClassName());
+            dele.addElement("jdbc-url").setText(d.getDatabaseUrl());
+            dele.addElement("driver-properties")
+                    .addElement("property")
+                    .addAttribute("name", "v$session.program")
+                    .addAttribute("value", "DataGrip");
+
+
+            deleLocal = componentLocal.addElement("data-source")
+                    .addAttribute("name", name)
+                    .addAttribute("uuid", id);
+            deleLocal.addElement("database-info")
+                    .addAttribute("product", "")
+                    .addAttribute("version", "")
+                    .addAttribute("jdbc-version", "")
+                    .addAttribute("driver-name", "")
+                    .addAttribute("driver-version", "");
+            deleLocal.addElement("secret-storage").setText("master_key");
+            deleLocal.addElement("first-sync").setText("true");
+            deleLocal.addElement("user-name").setText(d.getUser());
+            deleLocal.addElement("introspection-schemas").setText("*:");
+        }
+
+        //保存
+        XMLWriter writer = new XMLWriter(new FileOutputStream(dsxml));
+        writer.write(document);
+        writer.close();
+
+        writer = new XMLWriter(new FileOutputStream(dslxml));
+        writer.write(documentLocal);
+        writer.close();
+
+        LogUtil.info("生成数据库连接成功");
+    }
+
+    private static String getDsName(NCDataSourceVO d) {
+        return d.getDataSourceName() + '_' + d.getDatabaseUrl();
     }
 }

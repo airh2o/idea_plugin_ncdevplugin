@@ -1,6 +1,6 @@
 package com.air.nc5dev.util;
 
-import nc.vo.pub.BusinessException;
+import com.air.nc5dev.exception.BusinessException;
 
 /**
  * 异常工具类

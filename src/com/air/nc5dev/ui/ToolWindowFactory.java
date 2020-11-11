@@ -33,7 +33,7 @@ import com.intellij.ui.content.Content;
  * Nothing can be injected as it runs in the root pico container.
  */
 public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFactory {
-    public static final String TOOL_WINDOW_ID = "ToolWindowFactory";
+    public static final String TOOL_WINDOW_ID = "NC插件日志";
     public static final String TAB_LOGS = "Log";
     public static LogPanel logPanel;
 
@@ -41,10 +41,10 @@ public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFact
     public void createToolWindowContent(Project project, final ToolWindow toolWindow) {
         addLogTab(project, toolWindow);
         toolWindow.setType(ToolWindowType.DOCKED, null);
-        toolWindow.setTitle("NC系列开发插件 日志窗口(QQ 209308343 有业务可联系 感谢支持)");
+        toolWindow.setTitle("(QQ 209308343 有业务可联系 感谢支持)");
         toolWindow.setIcon(AllIcons.Ide.Info_notifications);
         toolWindow.setToHideOnEmptyContent(true);
-        toolWindow.setStripeTitle("NC插件日志");
+        toolWindow.setStripeTitle(TOOL_WINDOW_ID);
 
         PubSubUtil.subscribe(MeassgeConsoleImpl.KEY, new LogWinAutoShowWhenErr(toolWindow));
     }

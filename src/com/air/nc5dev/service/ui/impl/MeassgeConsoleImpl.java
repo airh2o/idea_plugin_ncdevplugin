@@ -2,7 +2,6 @@ package com.air.nc5dev.service.ui.impl;
 
 import com.air.nc5dev.service.ui.IMeassgeConsole;
 import com.air.nc5dev.util.subscribe.PubSubUtil;
-import com.air.nc5dev.util.subscribe.impl.LogWinAutoShowWhenErr;
 import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;

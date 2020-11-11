@@ -1,7 +1,6 @@
 package com.air.nc5dev.util.subscribe.impl;
 
 import com.air.nc5dev.acion.LogErrAutoShowAction;
-import com.air.nc5dev.ui.ToolWindowFactory;
 import com.air.nc5dev.util.subscribe.itf.ISubscriber;
 import com.intellij.openapi.wm.ToolWindow;
 

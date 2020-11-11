@@ -1,6 +1,5 @@
 package com.air.nc5dev.util.subscribe.impl;
 
-import com.air.nc5dev.acion.LogErrAutoShowAction;
 import com.air.nc5dev.acion.LogMoveDownAction;
 import com.air.nc5dev.service.ui.IMeassgeConsole;
 import com.air.nc5dev.util.idea.ProjectUtil;

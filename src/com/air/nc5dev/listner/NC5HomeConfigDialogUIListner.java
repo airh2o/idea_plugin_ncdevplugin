@@ -1,8 +1,10 @@
 package com.air.nc5dev.listner;
 
 import com.air.nc5dev.acion.NC5HomePathConfigAction;
-import com.air.nc5dev.bean.NCDataSourceVO;
+import com.air.nc5dev.util.idea.LogUtil;
+import com.air.nc5dev.vo.NCDataSourceVO;
 import com.air.nc5dev.ui.NC5HomeConfigDiaLogPanel;
+import com.air.nc5dev.util.NCPassWordUtil;
 import com.air.nc5dev.util.NCPropXmlUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
@@ -10,7 +12,8 @@ import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
-import nc.vo.framework.rsa.Encode;
+import org.apache.commons.lang3.StringUtils;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.event.ActionEvent;
@@ -25,6 +28,7 @@ import java.util.List;
  */
 public class NC5HomeConfigDialogUIListner {
     private NC5HomeConfigDiaLogPanel ui;
+
     /**
      * 当点击了  测试数据库链接
      *
@@ -51,10 +55,13 @@ public class NC5HomeConfigDialogUIListner {
         String className = ds.getDriverClassName();
         String url = ui.textField_ip.getText();
         try {
-            Class.forName(className);
+            if (StringUtils.isNotBlank(className)) {
+                Class.forName(className);
+            }
             con = DriverManager.getConnection(url, user, password);
             con.close();
         } catch (Exception e) {
+            LogUtil.error(e.toString(), e);
             Messages.showErrorDialog(ProjectUtil.getDefaultProject(), e.toString(), "连接失败");
             return;
         }
@@ -103,7 +110,8 @@ public class NC5HomeConfigDialogUIListner {
             return;
         }
         final String designName = "design";
-        boolean hasDesign = NCPropXmlUtil.stream().anyMatch(ncDataSourceVO -> designName.equals(ncDataSourceVO.getDataSourceName()));
+        boolean hasDesign = NCPropXmlUtil.stream().anyMatch(ncDataSourceVO -> designName.equals(ncDataSourceVO
+                .getDataSourceName()));
         if (hasDesign) {
             return;
         }
@@ -145,8 +153,8 @@ public class NC5HomeConfigDialogUIListner {
             return;
         }
 
-        if(event.getItem() == null){
-            return ;
+        if (event.getItem() == null) {
+            return;
         }
 
         //把编辑值 放入到 数据源 配置变量里
@@ -155,7 +163,7 @@ public class NC5HomeConfigDialogUIListner {
         oldDs.setDatabaseUrl(ui.textField_ip.getText());
         oldDs.setOidMark(ui.textField_oidmark.getText());
         oldDs.setUser(ui.textField_user.getText());
-        oldDs.setPassword(new Encode().encode(ui.textField_pass.getText()));
+        oldDs.setPassword(NCPassWordUtil.encode(ui.textField_pass.getText()));
         oldDs.setMinCon(ui.textField_minConCout.getText());
         oldDs.setMaxCon(ui.textField_maxConCount.getText());
         oldDs.setDatabaseType(ui.comboBox_dbtype.getSelectedItem().toString());
@@ -167,15 +175,17 @@ public class NC5HomeConfigDialogUIListner {
         NCDataSourceVO ds = NCPropXmlUtil.get(now);
         showDataSource2UI(ds);
     }
+
     /**
-      *  数据库类型 下拉框改变         </br>
-      *           </br>
-      *           </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com
-      * @date 2020/1/17 0017 11:25
-      * @Param [event]
-      * @return void
+     * 数据库类型 下拉框改变         </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/1/17 0017 11:25
+     * @Param [event]
      */
     private void onDbTypeSelectChange(ItemEvent event) {
         if (event.getStateChange() != ItemEvent.DESELECTED) {
@@ -190,24 +200,25 @@ public class NC5HomeConfigDialogUIListner {
     }
 
     /**
-     *   根据下拉框的数据库类型获得jdbc class名字      </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     * 根据下拉框的数据库类型获得jdbc class名字      </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return java.lang.String
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 11:23
      * @Param [databaseType]
-     * @return java.lang.String
      */
     private String getJdbcClassNameByDbType(String databaseType) {
         int i = 0;
-        for ( ; i < ProjectNCConfigUtil.dsTypes.length; i++) {
-            if(ProjectNCConfigUtil.dsTypes[i].equals(databaseType)){
+        for (; i < ProjectNCConfigUtil.dsTypes.length; i++) {
+            if (ProjectNCConfigUtil.dsTypes[i].equals(databaseType)) {
                 break;
             }
         }
 
-        if(i < ProjectNCConfigUtil.dsTypeClasss.length){
+        if (i < ProjectNCConfigUtil.dsTypeClasss.length) {
             return ProjectNCConfigUtil.dsTypeClasss[i];
         }
 
@@ -223,7 +234,7 @@ public class NC5HomeConfigDialogUIListner {
         ui.textField_ip.setText(ds.getDatabaseUrl());
         ui.textField_oidmark.setText(ds.getOidMark());
         ui.textField_user.setText(ds.getUser());
-        ui.textField_pass.setText(new Encode().decode(ds.getPassword()));
+        ui.textField_pass.setText(ds.getPassword());
         ui.textField_minConCout.setText(ds.getMinCon());
         ui.textField_maxConCount.setText(ds.getMaxCon());
         ui.comboBox_dbtype.setSelectedItem(ds.getDatabaseType());

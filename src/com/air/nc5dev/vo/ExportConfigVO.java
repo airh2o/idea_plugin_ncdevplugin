@@ -1,4 +1,4 @@
-package com.air.nc5dev.bean;
+package com.air.nc5dev.vo;
 
 import com.air.nc5dev.util.StringUtil;
 import com.google.common.collect.Lists;

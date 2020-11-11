@@ -1,6 +1,6 @@
 package com.air.nc5dev.ui;
 
-import com.air.nc5dev.bean.ExportContentVO;
+import com.air.nc5dev.vo.ExportContentVO;
 import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.ExportNCPatcherUtil;
 import com.air.nc5dev.util.idea.LogUtil;
@@ -10,7 +10,6 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,4 +1,4 @@
-package com.air.nc5dev.bean;
+package com.air.nc5dev.vo;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

@@ -1,12 +1,14 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.util.ArrayUtil;
+import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import org.apache.commons.lang.StringUtils;
+
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
@@ -316,4 +318,24 @@ public class ProjectNCConfigUtil {
 
         return Joiner.on(',').skipNulls().join(ns);
     }
+
+    /**
+     * 获取NC的版本
+     * @return
+     */
+    public static NcVersionEnum getNCVerSIon(){
+        File f = new File(getNCHome(), "\\webapps\\u8c_web\\Client\\appletjar\\U8C_Login.jar");
+        if (f.isFile()) {
+            return NcVersionEnum.U8Cloud;
+        }
+
+        f = new File(getNCHome(), "webapps\\nc_web\\Client\\appletjar\\NC_Login_v507.jar");
+        if (f.isFile()) {
+            return NcVersionEnum.NC5;
+        }
+
+
+        return NcVersionEnum.NC6;
+    }
+
 }

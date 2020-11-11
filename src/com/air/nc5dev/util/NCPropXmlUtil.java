@@ -1,6 +1,6 @@
 package com.air.nc5dev.util;
 
-import com.air.nc5dev.bean.NCDataSourceVO;
+import com.air.nc5dev.vo.NCDataSourceVO;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.ui.Messages;
 import org.w3c.dom.Document;
@@ -61,7 +61,7 @@ public class NCPropXmlUtil {
       * @author air Email: 209308343@qq.com
       * @date 2019/12/25 0025 9:38
       * @Param [index]
-      * @return com.air.nc5dev.bean.NCDataSourceVO 获取不到返回null
+      * @return com.air.nc5dev.vo.NCDataSourceVO 获取不到返回null
      */
     public static final NCDataSourceVO get(final int index){
         if(isDataSourceEmpty()){
@@ -82,7 +82,7 @@ public class NCPropXmlUtil {
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 9:38
      * @Param [dataSourceName]
-     * @return com.air.nc5dev.bean.NCDataSourceVO 获取不到返回null
+     * @return com.air.nc5dev.vo.NCDataSourceVO 获取不到返回null
      */
     public static final NCDataSourceVO get(final String dataSourceName){
         if(isDataSourceEmpty()){
@@ -167,7 +167,7 @@ public class NCPropXmlUtil {
             return ;
         }
 
-        Document document = XmlUtil.xmlFile2Document(propFile);
+        Document document = XmlUtil.xmlFile2Document2(propFile);
         Element root = document.getDocumentElement();
         NodeList dataSources = root.getElementsByTagName("dataSource");
         Element element;
@@ -183,7 +183,7 @@ public class NCPropXmlUtil {
      */
     public static final  void saveDataSources() {
         final  File propFile = getPropFile(ProjectNCConfigUtil.getNCHomePath());
-        final Document document = XmlUtil.xmlFile2Document(propFile);
+        final Document document = XmlUtil.xmlFile2Document2(propFile);
         final Element root = document.getDocumentElement();
         NodeList dataSources = root.getElementsByTagName("dataSource");
         ArrayList<Node> dataSourceNodes = new ArrayList<>();
