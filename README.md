@@ -9,13 +9,17 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 
 # 插件截图
  
-![快速面板](https://s2.ax1x.com/2020/02/20/3eonRP.jpg "快速操作面板")    
+![快速面板](https://s1.ax1x.com/2020/11/11/BjAfbV.png "快速操作面板")    
 
-![配置NCHOME](https://s2.ax1x.com/2020/02/20/3eolqg.jpg "配置NCHOME")    
+![配置NCHOME](https://s1.ax1x.com/2020/11/11/BjARuq.png "配置NCHOME")    
 
-![补丁导出界面](https://s2.ax1x.com/2020/02/20/3eomGt.jpg "补丁导出界面")    
+![补丁导出界面](https://s1.ax1x.com/2020/11/11/BjA5UU.png "补丁导出界面")    
 
-![Tools菜单下位置](https://s2.ax1x.com/2020/02/20/3eoMM8.jpg "Tools菜单下位置")    
+![日志窗口](https://s1.ax1x.com/2020/11/11/BjAgvn.png "日志窗口")  
+  
+![重置密码](https://s1.ax1x.com/2020/11/11/BjAWD0.png "重置密码")  
+    
+![数据库连接生成](https://s1.ax1x.com/2020/11/11/BjA4ET.png "数据库连接生成")   
      
 # buy me a coffee:     
 <img width="200px" height="200px" src="https://s1.ax1x.com/2020/03/30/GeyNdI.md.png"  alt="buy me a coffee"  />     
