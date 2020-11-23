@@ -151,7 +151,7 @@
 
     <application-components>
         <component>
-            <implementation-class>com.air.nc5dev.listner.ProjectNCMeatInfFileEditedListner</implementation-class>
+            <implementation-class>com.air.nc5dev.ui.listener.ProjectNCMeatInfFileEditedListener</implementation-class>
         </component>
     </application-components>
 

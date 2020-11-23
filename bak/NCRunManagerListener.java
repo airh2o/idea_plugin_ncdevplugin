@@ -1,4 +1,4 @@
-package com.air.nc5dev.listner;
+package com.air.nc5dev.listener;
 
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.intellij.execution.Executor;

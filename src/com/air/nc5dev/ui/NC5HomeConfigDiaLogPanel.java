@@ -1,6 +1,6 @@
 package com.air.nc5dev.ui;
 
-import com.air.nc5dev.listner.NC5HomeConfigDialogUIListner;
+import com.air.nc5dev.ui.listener.NC5HomeConfigDialogUIListener;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 
 import javax.swing.*;
@@ -26,7 +26,7 @@ public class NC5HomeConfigDiaLogPanel extends JScrollPane {
     public JComboBox comboBox_dbtype;
     public JTextField textField_minConCout;
     public JTextField textField_maxConCount;
-    public NC5HomeConfigDialogUIListner nc5HomeConfigDialogUIListner;
+    public NC5HomeConfigDialogUIListener nc5HomeConfigDialogUIListner;
 
     /**
      * Create the dialog.
@@ -198,7 +198,7 @@ public class NC5HomeConfigDiaLogPanel extends JScrollPane {
         textField_maxConCount.setBounds(589, 250, 119, 32);
         contentPanel.add(textField_maxConCount);
 
-        nc5HomeConfigDialogUIListner = NC5HomeConfigDialogUIListner.build(this);
+        nc5HomeConfigDialogUIListner = NC5HomeConfigDialogUIListener.build(this);
 
         //不允许编辑 数据源信息
         textField_maxConCount.setEditable(false);
@@ -349,11 +349,11 @@ public class NC5HomeConfigDiaLogPanel extends JScrollPane {
         this.comboBox_dbtype = comboBox_dbtype;
     }
 
-    public NC5HomeConfigDialogUIListner getNc5HomeConfigDialogUIListner() {
+    public NC5HomeConfigDialogUIListener getNc5HomeConfigDialogUIListner() {
         return nc5HomeConfigDialogUIListner;
     }
 
-    public void setNc5HomeConfigDialogUIListner(NC5HomeConfigDialogUIListner nc5HomeConfigDialogUIListner) {
+    public void setNc5HomeConfigDialogUIListner(NC5HomeConfigDialogUIListener nc5HomeConfigDialogUIListner) {
         this.nc5HomeConfigDialogUIListner = nc5HomeConfigDialogUIListner;
     }
 }
