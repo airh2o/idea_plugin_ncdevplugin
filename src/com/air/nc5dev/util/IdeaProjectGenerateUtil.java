@@ -133,7 +133,7 @@ public class IdeaProjectGenerateUtil {
                                 "#是否导出源码\n" +
                                 "config-exportsourcefile=true\n" +
                                 "#是否打包成jar(所有idea项目和模块 才打包，其他非模块和项目名字的不打包)\n" +
-                                "config-compressjar=true\n" +
+                                "config-compressjar=false\n" +
                                 "#打包成jar的是否保留classess里的文件\n" +
                                 "config-compressEndDeleteClass=true\n" +
                                 "#如果打包jar，那么 META-INF.MF 文件模板磁盘全路径\n" +
@@ -146,8 +146,6 @@ public class IdeaProjectGenerateUtil {
                                 "\n" +
                                 "#全类名匹配的输出模块\n" +
                                 "nc.ui.glpub.UiManager=gl\n" +
-                                "nc.bs.arap.DzTakeF1Impl=arap\n" +
-                                "nc.impl.gl.voucher.ImpVoucher=gl\n" +
                                 "#非源码的文件输出模块\n" +
                                 "nc.bs.arap.1.txt=arap  \n" +
                                 "#支持包路径匹配（优先级低于 全类名匹配， 包路径优先匹配最精确的包）\n" +

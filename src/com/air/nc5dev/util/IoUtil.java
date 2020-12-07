@@ -17,7 +17,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * IO tool
  */
-public final class IoUtil extends cn.hutool.core.io.IoUtil{
+public final class IoUtil extends cn.hutool.core.io.IoUtil {
     /**
      * 把一个 java的 Properties 输出成文件
      *
@@ -179,6 +179,12 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil{
     public static final ArrayList<File> serachModule_Client_Library(File ncHome) {
         ArrayList<File> all = serachAllNcClientClass(ncHome);
         all.addAll(serachAllNcClientJars(ncHome));
+        //增加数据交换支持 eg:
+        //D:\runtimes\U8Cloud_HEXIN\modules\dm\client\extension\classes\
+        all.addAll(serachAllNcClass(new File(ncHome, "modules")
+                , "client" + File.separatorChar + "extension"
+                        + File.separatorChar +"classes"
+                , false));
         return all;
     }
 
@@ -191,6 +197,14 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil{
     public static final ArrayList<File> serachModule_Private_Library(File ncHome) {
         ArrayList<File> all = serachAllNcPrivateClass(ncHome);
         all.addAll(serachAllNcPrivateJars(ncHome));
+
+        //增加数据交换支持 eg:
+        // D:\runtimes\U8Cloud_HEXIN\modules\dm\META-INF\var\classes\nc\bs\pf\changedir\CHG45TOP4.class
+        all.addAll(serachAllNcClass(new File(ncHome, "modules")
+                , "META-INF" + File.separatorChar + "var"
+                        + File.separatorChar +"classes"
+                , false));
+
         return all;
     }
 
@@ -305,7 +319,17 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil{
      */
     public static final ArrayList<File> serachAllNcClass(File ncModules, String dirName, boolean isJarDir) {
         ArrayList<File> all = new ArrayList<>();
+
+        if (!ncModules.isDirectory()) {
+            return all;
+        }
+
         File[] listFiles = ncModules.listFiles();
+
+        if (CollUtil.isEmpty(listFiles)) {
+            return all;
+        }
+
         Arrays.stream(listFiles).forEach(dir -> {
             if (dir.isDirectory()) {
                 File f = new File(dir, File.separatorChar + dirName);
@@ -521,7 +545,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil{
             byte[] cache = new byte[1024];
             boolean skip = false;
             for (File f : allFiles) {
-                if(f.equals(outputFile)){
+                if (f.equals(outputFile)) {
                     continue;
                 }
 
