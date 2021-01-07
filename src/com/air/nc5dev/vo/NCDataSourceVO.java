@@ -1,6 +1,6 @@
 package com.air.nc5dev.vo;
 
-import com.air.nc5dev.util.ncutils.nc5x.NC5xEncode;
+import com.air.nc5dev.util.ncutils.NC5xEncode;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

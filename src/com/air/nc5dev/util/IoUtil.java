@@ -183,7 +183,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         //D:\runtimes\U8Cloud_HEXIN\modules\dm\client\extension\classes\
         all.addAll(serachAllNcClass(new File(ncHome, "modules")
                 , "client" + File.separatorChar + "extension"
-                        + File.separatorChar +"classes"
+                        + File.separatorChar + "classes"
                 , false));
         return all;
     }
@@ -199,10 +199,10 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         all.addAll(serachAllNcPrivateJars(ncHome));
 
         //增加数据交换支持 eg:
-        // D:\runtimes\U8Cloud_HEXIN\modules\dm\META-INF\var\classes\nc\bs\pf\changedir\CHG45TOP4.class
+        // D:\runtimes\U8Cloud_HEXIN\modules\dm\META-INF\var\classes\
         all.addAll(serachAllNcClass(new File(ncHome, "modules")
                 , "META-INF" + File.separatorChar + "var"
-                        + File.separatorChar +"classes"
+                        + File.separatorChar + "classes"
                 , false));
 
         return all;
@@ -822,6 +822,20 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
     }
 
     private IoUtil() {
+    }
+
+    /**
+     * 复制NC元数据文件
+     *
+     * @param old
+     * @param newFile
+     */
+    public static void copyNCMateFile(File old, File newFile) throws IOException {
+        org.dom4j.Document document = XmlUtil.resetMeateIds(old);
+        OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(newFile), "UTF-8");
+        document.write(out);
+        out.flush();
+        out.close();
     }
 }
 

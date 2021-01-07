@@ -2,7 +2,7 @@ package com.air.nc5dev.ui.listener;
 
 import com.air.nc5dev.ui.ResetNCUserPassWordPanel;
 import com.air.nc5dev.util.idea.LogUtil;
-import com.air.nc5dev.util.ncutils.nc5x.NC5xEncode;
+import com.air.nc5dev.util.ncutils.NC5xEncode;
 import com.intellij.openapi.ui.Messages;
 import nc.bcmanage.vo.SuperAdminVO;
 import nc.vo.pub.lang.UFBoolean;

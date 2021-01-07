@@ -1,7 +1,5 @@
 package com.air.nc5dev.util.jdbc;
 
-import com.air.nc5dev.util.NCPassWordUtil;
-import com.air.nc5dev.util.ncutils.nc5x.NC5xEncode;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import org.apache.commons.lang3.StringUtils;
 

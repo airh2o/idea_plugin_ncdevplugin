@@ -1,8 +1,8 @@
 package com.air.nc5dev.util;
 
 import com.air.nc5dev.enums.NcVersionEnum;
-import com.air.nc5dev.util.ncutils.nc5x.NC5xEncode;
-import com.air.nc5dev.util.ncutils.nc5x.NC6xEncode;
+import com.air.nc5dev.util.ncutils.NC5xEncode;
+import com.air.nc5dev.util.ncutils.NC6xEncode;
 
 /**
  * <br/>

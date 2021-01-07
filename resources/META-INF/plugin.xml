@@ -9,6 +9,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    <em>2.4.0 版本 更新:</em> <br>
+      <ul>
+          <li>1. 新增NC6x导出单据脚本功能(整合一个大佬的工具) </li>
+          <li>2. 新增元数据文件复制功能(整合一个大佬的工具) </li>
+      </ul>
+
     <em>2.3.0 版本 更新:</em> <br>
       <ul>
           <li>1. 新增数据源 一键添加到Database工具连接列表功能 </li>
@@ -134,6 +140,12 @@
         <action id="nc5dev.info.makeNcModulejarfile" class="com.air.nc5dev.acion.MakeNcModuleJarAction"
                 text="NC补丁模块转Jar文件" description="把一个NC补丁的模块文件夹  转换成Jar包">
         </action>
+        <action id="nc5dev.info.exportBillAll" class="com.air.nc5dev.acion.ExportBillAllAction"
+                text="导出NC6X单据所有脚本" description="导出NC6X单据所有SQL脚本">
+        </action>
+        <action id="nc5dev.info.copyMateFile2NewFile" class="com.air.nc5dev.acion.CopyMateFile2NewFileAction"
+                text="复制元数据文件" description="把一个NC元数据文件复制成新的文件且重置里面的各种id等">
+        </action>
 
         <group id="nc5devtool" text="NC 开发插件配置" popup="true" description="配置NC开发插件"
                icon="/META-INF/nc-logo.png">
@@ -148,6 +160,11 @@
             <separator/>
             <!-- 方便使用的小功能 -->
             <reference ref="nc5dev.info.deletenclogs"/>
+            <reference ref="nc5dev.info.copyMateFile2NewFile"/>
+            <group id="nc5devtoolExportBillAll" text="导出已有节点单据SQL脚本"
+                   popup="true" description="导出已有节点单据SQL脚本">
+                <reference ref="nc5dev.info.exportBillAll"/>
+            </group>
             <separator/>
 
             <reference ref="nc5dev.info.opennchome"/>

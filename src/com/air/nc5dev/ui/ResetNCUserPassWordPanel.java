@@ -3,7 +3,7 @@ package com.air.nc5dev.ui;
 import com.air.nc5dev.ui.listener.*;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.idea.LogUtil;
-import com.air.nc5dev.util.ncutils.nc5x.NC5xEncode;
+import com.air.nc5dev.util.ncutils.NC5xEncode;
 import nc.bcmanage.vo.SuperAdminVO;
 import nc.hb.account.AccountXMLUtil;
 import nc.vo.sm.config.Account;

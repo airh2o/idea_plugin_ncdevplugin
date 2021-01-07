@@ -5,6 +5,7 @@ import com.air.nc5dev.util.subscribe.itf.ISubscriber;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -21,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class PubSubUtil {
     /** 消息订阅者，key 消息主题key， value 订阅者集合 **/
-    private final ConcurrentHashMap<String, ArrayList<ISubscriber>> subscribers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, List<ISubscriber>> subscribers = new ConcurrentHashMap<>();
     private final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 100
             , 1, TimeUnit.MILLISECONDS
             , new ArrayBlockingQueue<>(10)
@@ -50,10 +51,10 @@ public final class PubSubUtil {
      */
     public static final boolean subscribe(@NotNull final String key, ISubscriber sub){
         PubSubUtil me = getInstance();
-        ArrayList<ISubscriber> subscriberArrayList = me.subscribers.get(key);
+        List<ISubscriber> subscriberArrayList = me.subscribers.get(key);
         if (subscriberArrayList == null) {
             synchronized (lock){
-                subscriberArrayList = new ArrayList<>();
+                subscriberArrayList = new CopyOnWriteArrayList<>();
                 me.subscribers.put(key, subscriberArrayList);
             }
         }
@@ -74,7 +75,7 @@ public final class PubSubUtil {
      */
     public static final void publish(@NotNull final String key,Object msg){
         PubSubUtil me = getInstance();
-        ArrayList<ISubscriber> subscriberCopyOnWriteArrayList = me.subscribers.get(key);
+        List<ISubscriber> subscriberCopyOnWriteArrayList = me.subscribers.get(key);
         if (subscriberCopyOnWriteArrayList == null) {
             return ;
         }
@@ -117,7 +118,7 @@ public final class PubSubUtil {
         return INSTANCE;
     }
 
-    public ConcurrentHashMap<String, ArrayList<ISubscriber>> getSubscribers() {
+    public ConcurrentHashMap<String, List<ISubscriber>> getSubscribers() {
         return subscribers;
     }
 

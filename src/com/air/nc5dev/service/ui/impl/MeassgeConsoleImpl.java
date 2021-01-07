@@ -1,6 +1,7 @@
 package com.air.nc5dev.service.ui.impl;
 
 import com.air.nc5dev.service.ui.IMeassgeConsole;
+import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.util.subscribe.PubSubUtil;
 import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.ui.ConsoleView;
@@ -35,6 +36,7 @@ public class MeassgeConsoleImpl implements IMeassgeConsole, Disposable {
     public void debug(String msg) {
         if (debugEnabled()) {
             getConsoleView().print(msg + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
+            ProjectUtil.infoNotification(msg, ProjectUtil.getProject());
         }
     }
 
@@ -46,12 +48,14 @@ public class MeassgeConsoleImpl implements IMeassgeConsole, Disposable {
     @Override
     public void info(String msg) {
         getConsoleView().print(msg + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
+        ProjectUtil.infoNotification(msg, ProjectUtil.getProject());
     }
 
     @Override
     public void error(String msg) {
         getConsoleView().print(msg + "\n", ConsoleViewContentType.ERROR_OUTPUT);
         PubSubUtil.publishAsync(KEY, new RuntimeException());
+        ProjectUtil.errorNotification(msg, ProjectUtil.getProject());
     }
 
     @Override

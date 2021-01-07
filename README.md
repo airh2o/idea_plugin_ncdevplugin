@@ -84,6 +84,12 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 
 # 版本更新
 ``` 
+ <em>2.4.0 版本 更新:</em> <br>
+      <ul>
+          <li>1. 新增NC6x导出单据脚本功能(整合一个大佬的工具) </li>
+          <li>2. 新增元数据文件复制功能(整合一个大佬的工具) </li>
+      </ul>
+      
     <em>2.3.0 版本 更新:</em> <br>
           <ul>
               <li>1. 新增数据源 一键添加到Database工具连接列表功能 </li>
