@@ -2,10 +2,9 @@ package com.air.nc5dev.acion;
 
 import cn.hutool.core.collection.CollUtil;
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
-import com.air.nc5dev.vo.NCDataSourceVO;
-import com.air.nc5dev.util.NCPassWordUtil;
 import com.air.nc5dev.util.NCPropXmlUtil;
 import com.air.nc5dev.util.idea.LogUtil;
+import com.air.nc5dev.vo.NCDataSourceVO;
 import com.google.common.base.Joiner;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ui.Messages;

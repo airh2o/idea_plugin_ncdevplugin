@@ -7,7 +7,6 @@ import nc.hb.account.AccountXMLUtil;
 import nc.vo.pub.lang.UFBoolean;
 import nc.vo.sm.config.SysAdm;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;

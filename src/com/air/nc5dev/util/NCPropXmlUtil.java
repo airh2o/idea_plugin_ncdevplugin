@@ -1,7 +1,7 @@
 package com.air.nc5dev.util;
 
-import com.air.nc5dev.vo.NCDataSourceVO;
 import com.air.nc5dev.util.idea.ProjectUtil;
+import com.air.nc5dev.vo.NCDataSourceVO;
 import com.intellij.openapi.ui.Messages;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
