@@ -16,7 +16,8 @@ import org.dom4j.Element;
 import org.dom4j.io.XMLWriter;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -139,7 +140,7 @@ public class ProjectUtil {
      * @Param []
      * @return com.intellij.openapi.project.ProjectManager
      */
-    @Nonnull
+    @NotNull
     public static ProjectManager getProjectMannager() {
         return ProjectManager.getInstance();
     }
@@ -156,11 +157,17 @@ public class ProjectUtil {
         return project;
     }
 
-    public static <T> T getService(@NotNull Project project, Class<T> clazz) {
-        T t = ServiceManager.getService(project, clazz);
+    public static <T> T getService(Project project, Class<T> clazz) {
+        T t = null;
+        try {
+            t = ServiceManager.getService(project, clazz);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return null;
+        }
         if (t == null) {
             LOG.error("Could not find service: " + clazz.getName());
-            throw new IllegalArgumentException("Class not found: " + clazz.getName());
+            return null;
         }
 
         return t;
@@ -186,7 +193,7 @@ public class ProjectUtil {
      * @param dataSourceVOS 数据源们
      * @throws IOException
      */
-    public static void addDatabaseToolLinks(String basePath, List<NCDataSourceVO> dataSourceVOS) throws IOException  {
+    public static void addDatabaseToolLinks(String basePath, List<NCDataSourceVO> dataSourceVOS) throws IOException {
         File dsxml = new File(basePath + File.separatorChar + ".idea", "dataSources.xml");
         File dslxml = new File(basePath + File.separatorChar + ".idea", "dataSources.local.xml");
 

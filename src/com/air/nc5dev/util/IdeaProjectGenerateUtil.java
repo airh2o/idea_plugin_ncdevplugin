@@ -1,5 +1,7 @@
 package com.air.nc5dev.util;
 
+import cn.hutool.core.util.RandomUtil;
+import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.ApplicationLibraryUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.util.idea.RunConfigurationUtil;
@@ -14,7 +16,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -89,15 +92,16 @@ public class IdeaProjectGenerateUtil {
         if (!umpFile.exists()) {
             try {
                 PrintWriter out = new PrintWriter(new FileOutputStream(umpFile));
-                out.print("<?xml version=\"1.0\" encoding=\"gb2312\"?>\n" +
-                        "<module name=\""
-                        + module.getName()
-                        + "\">\n" +
-                        "\t<public>\n" +
-                        "\t</public>\n" +
-                        "\t<private>\n" +
-                        "\t</private>\n" +
-                        "</module>");
+                out.print(
+                        String.format("<?xml version=\"1.0\" encoding=\"gb2312\"?>\n"
+                                        + "<module name=\"%s\">\n"
+                                        + "\t<public>\n"
+                                        + "\t</public>\n"
+                                        + "\t<private>\n"
+                                        + "\t</private>\n"
+                                        + "</module>"
+                                , module.getName())
+                );
                 out.flush();
                 out.close();
             } catch (FileNotFoundException e) {
@@ -147,14 +151,14 @@ public class IdeaProjectGenerateUtil {
                                 "#全类名匹配的输出模块\n" +
                                 "nc.ui.glpub.UiManager=gl\n" +
                                 "#非源码的文件输出模块\n" +
-                                "nc.bs.arap.1.txt=arap  \n" +
-                                "#支持包路径匹配（优先级低于 全类名匹配， 包路径优先匹配最精确的包）\n" +
-                                "nc.bs.po=pu  \n "
-                                + "# 是否跳过此配置文件所在模块，不导出这个模块\n" +
-                                "config-ignoreModule=false \n"
-                                + "# 不导出的文件列表 多个 用 英文,隔开\n" +
-                                "# 第一个 根据class定位精确不导出， 第二个 根据包名和里面的文件名精确定位不导出， 第三个 根据包名路径下的 所有 都不导出\n" +
-                                "config-ignoreFiles=nc.bs.some.Save2Impl, nc.bs.arap.2.txt, nc.bs.some.impl2 \n"
+                                "nc.bs.arap.1.txt=arap  \n"
+                                + "#支持包路径匹配（优先级低于 全类名匹配， 包路径优先匹配最精确的包）\n"
+                                + "nc.bs.po=pu  \n "
+                                + "# 是否跳过此配置文件所在模块，不导出这个模块\n"
+                                + "config-ignoreModule=false \n"
+                                + "# 不导出的文件列表 多个 用 英文,隔开\n"
+                                + "# 第一个 根据class定位精确不导出， 第二个 根据包名和里面的文件名精确定位不导出， 第三个 根据包名路径下的 所有 都不导出\n"
+                                + "config-ignoreFiles=nc.bs.some.Save2Impl, nc.bs.arap.2.txt, nc.bs.some.impl2 \n"
                 );
                 out.flush();
                 out.close();
@@ -226,20 +230,20 @@ public class IdeaProjectGenerateUtil {
             conf.setVMParameters(
                     " -Dnc.http.port=" + ProjectNCConfigUtil.getNCClientPort()
                             + " -Dcom.sun.management.jmxremote "
-                            //+ "-Dcom.sun.management.jmxremote.port=11241 "
-                            + "-Dcom.sun.management.jmxremote.ssl=false "
+                            + "-Dcom.sun.management.jmxremote.port=" + RandomUtil.randomInt(25000, 55000)
+                            + " -Dcom.sun.management.jmxremote.ssl=false "
                             + "-Dcom.sun.management.jmxremote.authenticate=false "
-                            + "-Dnc.exclude.modules=datamig,ecp,egbaseinfo,egdocmg,egitctrl,egriskmg,egrkaudit,gpm," +
-                            "hrbm,hrcm,hrcp,hrdm,hrhi,hrjf,hrjq,hrma,hrp,hrpe,hrrm,hrrpt,hrss,hrta,hrtrn,hrwa,oaar," +
-                            "oaco,oaep,oainf,oakm,oamt,oaod,oapo,oapp,oapub,srm,srmem,srmsm,swcm_pu,webad,webbd," +
-                            "webdbl,webimp,webrt,websm " //${FIELD_EX_MODULES}
-                            + " -Dnc.runMode=develop -Dnc.server.location=$FIELD_NC_HOME$"
+                            + "-Dnc.exclude.modules1=可以配置你需要排除的模块" //${FIELD_EX_MODULES}
+                            + " -Dnc.runMode=develop -Dnc.server.location=$FIELD_NC_HOME$ -Dorg.owasp.esapi.resources=$FIELD_NC_HOME$/ierp/bin/esapi "
                             + " -DEJBConfigDir=$FIELD_NC_HOME$/ejbXMLs"
                             + " -DExtServiceConfigDir=$FIELD_NC_HOME$/ejbXMLs"
-                            + " -Xmx768m -XX:MaxPermSize=256m -DEnableSqlDebug=true -XX:+HeapDumpOnOutOfMemoryError "
-                            + "-DSqlDebugSkipKey=bd_del_log,pub_alertruntime,pub_alertregistry,bi_schd_host,wfm_task," +
-                            "pub_async,cp_sysinittemp,bi_schd_taskqueue,md_module,ec_muc_affili,ec_muc_member "
+                            + " -XX:+HeapDumpOnOutOfMemoryError "
                             + " -Duap.hotwebs=" + ProjectNCConfigUtil.getNcHotWebsList()
+                            + " -Djava.awt.headless=true -Dlog4j.ignoreTCL=true -Duser.timezone=GMT+8 "
+                            + (
+                            NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon()) ?
+                                    " -Dfile.encoding=UTF-8 " : " -Xmx768m -XX:MaxPermSize=256m "
+                    )
             );
             conf.setWorkingDirectory(ncHome.getPath());
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
@@ -262,13 +266,13 @@ public class IdeaProjectGenerateUtil {
 
             conf.setVMParameters(
                     " -Dcom.sun.management.jmxremote "
-                            //  + "-Dcom.sun.management.jmxremote.port=11242 "
-                            + "-Dcom.sun.management.jmxremote.ssl=false "
+                            //    + "-Dcom.sun.management.jmxremote.port=" + RandomUtil.randomInt(25000, 55000)
+                            + " -Dcom.sun.management.jmxremote.ssl=false "
                             + "-Dcom.sun.management.jmxremote.authenticate=false "
                             + "-Dnc.runMode=develop"
                             + " -Dnc.jstart.server=$FIELD_CLINET_IP$"
-                            + " -Dnc.jstart.port=$FIELD_CLINET_PORT$" +
-                            " -Xmx768m -XX:MaxPermSize=256m -Dnc.fi.autogenfile=N "
+                            + " -Dnc.jstart.port=$FIELD_CLINET_PORT$"
+                            + " -Dnc.fi.autogenfile=N "
             );
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
             conf.setWorkingDirectory(ncHome.getPath());
@@ -329,11 +333,19 @@ public class IdeaProjectGenerateUtil {
 
         ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Generated_EJB
                 , IoUtil.serachGenerated_EJB(ncHome));
+
+        ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Generated_EJB
+                , IoUtil.serachGenerated_EJB(ncHome));
+
+        if (new File(ProjectNCConfigUtil.getNCHome(), "hotwebs" + File.separatorChar + "nccloud").isDirectory()) {
+            ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NCCloud_Library
+                    , IoUtil.serachNCCloud_Library(ncHome));
+        }
     }
 
     /**
      * </br>
-     * 马上把最新的项目里所有模块的 META-INF 里所有文件复制到
+     * 马上把最新的项目里所有模块的 META-INF 里所有文件复制到(包括ncc项目的hotwebs的文件)
      * NC HOME里对应的项目模块文件夹，主要是 ejb部署xml       </br>
      * </br>
      * </br>
@@ -364,6 +376,11 @@ public class IdeaProjectGenerateUtil {
      * @Param []
      */
     public static final void copyProjectMetaInfFiles2NCHomeModules(@NotNull Module module) {
+        copyModuleMetainfoDir2NChome(module);
+        copyModuleNccConfigDir2NChome(module);
+    }
+
+    private static void copyModuleMetainfoDir2NChome(@NotNull Module module) {
         String ncHomePath = ProjectNCConfigUtil.getNCHomePath();
         if (null == ncHomePath || ncHomePath.trim().isEmpty()) {
             return;
@@ -395,6 +412,56 @@ public class IdeaProjectGenerateUtil {
             }
         });
     }
+
+    private static void copyModuleNccConfigDir2NChome(@NotNull Module module) {
+        String ncHomePath = ProjectNCConfigUtil.getNCHomePath();
+        if (null == ncHomePath || ncHomePath.trim().isEmpty()) {
+            return;
+        }
+
+        File clientDir = new File(new File(module.getModuleFilePath()).getParentFile(), "src"
+                + File.separatorChar + "client");
+        if (!clientDir.exists()) {
+            return;
+        }
+
+        File yyconfigDir = new File(clientDir, "yyconfig");
+        if (!yyconfigDir.exists()) {
+            return;
+        }
+
+        File nchome = new File(ncHomePath);
+        if (!nchome.exists() || !nchome.isDirectory()) {
+            return;
+        }
+
+        // hotwebs\nccloud\WEB-INF\extend\yyconfig\modules\recr
+        File ncHomeyyconfigDir = new File(ncHomePath, "hotwebs"
+                + File.separatorChar + "nccloud"
+                + File.separatorChar + "WEB-INF"
+                + File.separatorChar + "extend"
+                + File.separatorChar + "yyconfig"
+        );
+        if (!ncHomeyyconfigDir.exists() || !ncHomeyyconfigDir.isDirectory()) {
+            ncHomeyyconfigDir.mkdirs();
+        }
+
+        //复制 ump 文件到这里
+        List<File> fs = IoUtil.getAllFiles(yyconfigDir, true);
+        for (File f : fs) {
+            try {
+                File tof = IoUtil.replaceDir(f, yyconfigDir, ncHomeyyconfigDir);
+                if (!tof.getParentFile().isDirectory()) {
+                    tof.getParentFile().mkdirs();
+                }
+                Files.copy(f.toPath()
+                        , tof.toPath()
+                        , StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception e) {
+            }
+        }
+    }
+
 
     private IdeaProjectGenerateUtil() {
     }

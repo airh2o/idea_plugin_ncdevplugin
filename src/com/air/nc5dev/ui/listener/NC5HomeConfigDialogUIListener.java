@@ -14,8 +14,8 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.io.File;
@@ -230,7 +230,7 @@ public class NC5HomeConfigDialogUIListener {
      *
      * @param ds
      */
-    private void showDataSource2UI(@Nonnull final NCDataSourceVO ds) {
+    private void showDataSource2UI(@NotNull final NCDataSourceVO ds) {
         ui.textField_ip.setText(ds.getDatabaseUrl());
         ui.textField_oidmark.setText(ds.getOidMark());
         ui.textField_user.setText(ds.getUser());

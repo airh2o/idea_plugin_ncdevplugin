@@ -1,6 +1,7 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.collection.CollUtil;
+import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.ExportConfigVO;
 import com.air.nc5dev.vo.ExportContentVO;
@@ -177,6 +178,7 @@ public class ExportNCPatcherUtil {
                         manifest = null;
                     }
                 }
+
                 compressJar(new File(contentVO.outPath + File.separatorChar + entry.getValue().getName()),
                         configVO.toJarThenDelClass, manifest);
             }
@@ -185,6 +187,62 @@ public class ExportNCPatcherUtil {
         }
 
 
+    }
+
+    /**
+     * 当NCC补丁导出后，马上处理 补丁结构 符合NCC要求
+     *
+     * @param sourceRoot
+     * @param contentVO
+     * @param entry
+     * @param classDir
+     * @param testClassDirPath
+     */
+    private static void processNCCPatchersWhenFinash(@NotNull String ncType, @NotNull String exportDir
+            , @NotNull Module module, @NotNull String sourceRoot
+            , @NotNull String classDir, @Nullable String testClassDir, @NotNull ExportContentVO contentVO) {
+        //目前只有client包位置特殊
+        if (!NC_TYPE_CLIENT.equals(ncType)) {
+            return;
+        }
+
+        File exportDirF = new File(exportDir);
+        File[] fs = exportDirF.listFiles();
+        File outBaseDir = new File(exportDirF.getParent(), "hotwebs"
+                + File.separatorChar + "nccloud"
+                + File.separatorChar + "WEB-INF"
+        );
+        for (File f : fs) {
+            if (f.isDirectory()) {
+                File clientDir = new File(f, "client");
+
+                File[] clientFs = clientDir.listFiles();
+                for (File cf : clientFs) {
+                    if (cf.getName().equals("classes")) {
+                        //如果是classes 要特殊点，有配置文件！
+                        File yyconfig = new File(cf, "yyconfig");
+                        if (yyconfig.isDirectory()) {
+                            File outf = new File(outBaseDir, "extend"
+                            );
+                            if (!outf.isDirectory()) {
+                                outf.mkdirs();
+                            }
+                            IoUtil.copyFile(yyconfig, outf);
+                            IoUtil.deleteFileAll(yyconfig);
+                        }
+                    }
+
+                    File outf = outBaseDir;
+                    if (!outf.isDirectory()) {
+                        outf.mkdirs();
+                    }
+                    IoUtil.copyFile(cf, outf);
+                    IoUtil.deleteFileAll(cf);
+                }
+
+                clientDir.deleteOnExit();
+            }
+        }
     }
 
     /**
@@ -199,14 +257,14 @@ public class ExportNCPatcherUtil {
         Properties prop = readModuleOutConfigFile(path);
         cf.prop = prop;
 
-        cf.hasSource = !"false".equals(cf.getProperty("config-exportsourcefile"));
-        cf.noTest = !"true".equals(cf.getProperty("config-notest"));
-        cf.toJar = !"false".equals(cf.getProperty("config-compressjar"));
-        cf.toJarThenDelClass = "true".equals(cf.getProperty("config-compressEndDeleteClass"));
-        cf.guessModule = "true".equals(cf.getProperty("config-guessModule"));
-        cf.ignoreModule = "true".equals(cf.getProperty("config-ignoreModule"));
+        cf.hasSource = toBoolean(cf.getProperty("config-exportsourcefile"), true);
+        cf.noTest = toBoolean(cf.getProperty("config-notest"), true);
+        cf.toJar = toBoolean(cf.getProperty("config-compressjar"), true);
+        cf.toJarThenDelClass = toBoolean(cf.getProperty("config-compressEndDeleteClass"), false);
+        cf.guessModule = toBoolean(cf.getProperty("config-guessModule"), false);
+        cf.ignoreModule = toBoolean(cf.getProperty("config-ignoreModule"), false);
         cf.manifestFilePath = cf.getProperty("config-ManifestFilePath");
-        cf.closeJavaP = "true".equals(cf.getProperty("config-closeJavaP"));
+        cf.closeJavaP = toBoolean(cf.getProperty("config-closeJavaP"), false);
 
         String s = cf.getProperty("config-ignoreFiles");
         if (StringUtils.isNotBlank(s)) {
@@ -214,6 +272,40 @@ public class ExportNCPatcherUtil {
         }
 
         return cf;
+    }
+
+    private static boolean toBoolean(String s, boolean defual) {
+        if (StringUtil.isEmpty(s)) {
+            return defual;
+        }
+
+        s = s.trim().toLowerCase();
+
+        if (s.equals("true")) {
+            return true;
+        }
+
+        if (s.equals("y")) {
+            return true;
+        }
+
+        if (s.equals("1")) {
+            return true;
+        }
+
+        if (s.equals("false")) {
+            return false;
+        }
+
+        if (s.equals("n")) {
+            return false;
+        }
+
+        if (s.equals("0")) {
+            return false;
+        }
+
+        return defual;
     }
 
     /**
@@ -382,6 +474,12 @@ public class ExportNCPatcherUtil {
 
             copyClassPathOtherFile(sourcePackge, exportDir, module
                     , ncType, packgePath, contentVO);
+        }
+
+        //处理NCC特殊的模块补丁结构
+        if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+            processNCCPatchersWhenFinash(ncType, exportDir, module
+                    , sourceRoot, classDir, testClassDir, contentVO);
         }
     }
 

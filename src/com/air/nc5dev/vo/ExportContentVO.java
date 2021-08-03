@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import lombok.Data;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
  * @project
  * @Version
  */
+@Data
 public class ExportContentVO {
     /**
      * 触发操作的事件， 可能null

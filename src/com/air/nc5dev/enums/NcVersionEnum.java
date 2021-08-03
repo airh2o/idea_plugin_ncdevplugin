@@ -14,6 +14,6 @@ public enum NcVersionEnum {
     NC5,
     NC6,
     NCC,
-    U8Cloud
+    U8Cloud,
     ;
 }

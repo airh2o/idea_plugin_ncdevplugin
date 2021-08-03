@@ -1,8 +1,10 @@
 package com.air.nc5dev.util;
 
+import cn.hutool.core.io.FileUtil;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -33,6 +35,21 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 替换f的根路径base 为dir的
+     *
+     * @param f
+     * @param dir
+     * @return
+     */
+    public static final File replaceDir(File f, File base, File dir) {
+        String p = f.getPath();
+        String bp = base.getPath();
+        String np = dir.getPath();
+
+        return new File(StringUtil.replace(p, bp, np));
     }
 
     /**
@@ -195,6 +212,42 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @return
      */
     public static final ArrayList<File> serachModule_Private_Library(File ncHome) {
+        ArrayList<File> all = serachAllNCCClass(ncHome);
+        all.addAll(serachAllNCCJars(ncHome));
+        return all;
+    }
+
+    /**
+     * 获取NC的 所有 模块的 所有  NCC class文件夹
+     *
+     * @param ncHome
+     * @return
+     */
+    public static final ArrayList<File> serachAllNCCClass(File ncHome) {
+        return serachAllNcClass(new File(ncHome
+                        , "hotwebs" + File.separatorChar + "nccloud" + File.separatorChar + "WEB-INF")
+                , "classes", false);
+    }
+
+    /**
+     * 获取NC的 所有 模块的 所有 NCC jar文件
+     *
+     * @param ncHome
+     * @return
+     */
+    public static final ArrayList<File> serachAllNCCJars(File ncHome) {
+        return serachAllNcClass(new File(ncHome
+                        , "hotwebs" + File.separatorChar + "nccloud" + File.separatorChar + "WEB-INF")
+                , "lib", true);
+    }
+
+    /**
+     * 获取NC的 所有 模块的 所有    NCCloud_Library
+     *
+     * @param ncHome
+     * @return
+     */
+    public static final ArrayList<File> serachNCCloud_Library(File ncHome) {
         ArrayList<File> all = serachAllNcPrivateClass(ncHome);
         all.addAll(serachAllNcPrivateJars(ncHome));
 
@@ -365,7 +418,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param fileEndFixs 文件名后缀
      * @return
      */
-    public static List<File> getAllFiles(@Nonnull File dir, boolean hasChiled, @Nonnull final String... fileEndFixs) {
+    public static List<File> getAllFiles(@NotNull File dir, boolean hasChiled, @NotNull final String... fileEndFixs) {
         List<File> ar = getAllFiles(dir, hasChiled);
         if (null == ar) {
             return new ArrayList<>();
@@ -392,7 +445,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param dir
      * @return
      */
-    public static List<File> getAllLastDirs(@Nonnull File dir) {
+    public static List<File> getAllLastDirs(@NotNull File dir) {
         List<File> all = new LinkedList<>();
         File[] files = dir.listFiles();
         if (null == files) {
@@ -420,7 +473,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param dir
      * @return
      */
-    public static List<File> getAllLastPackges(@Nonnull File dir) {
+    public static List<File> getAllLastPackges(@NotNull File dir) {
         List<File> all = new LinkedList<>();
         File[] files = dir.listFiles();
         if (null == files) {
@@ -475,8 +528,8 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @date 2020/1/16 0016 20:07
      * @Param [fromDir, toDir]
      */
-    public static final void copyFile(@NotNull File from, @NotNull final File dir) {
-        if (!from.isFile()) {
+    public static final void copyFile(@NotNull File from, @NotNull final File to) {
+        /*if (!from.isFile()) {
             return;
         }
         File outFile = new File(dir, from.getName());
@@ -487,7 +540,11 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
             Files.copy(from.toPath(), outFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
+
+        to.mkdirs();
+
+        FileUtil.copy(from, to, true);
     }
 
     /**
@@ -583,13 +640,9 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
             jos.flush();
             jos.finish();
         } catch (
-                IOException e)
-
-        {
+                IOException e) {
             e.printStackTrace();
-        } finally
-
-        {
+        } finally {
             if (jos != null) {
                 try {
                     jos.close();

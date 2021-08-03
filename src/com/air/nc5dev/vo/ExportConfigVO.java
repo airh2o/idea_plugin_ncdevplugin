@@ -2,6 +2,7 @@ package com.air.nc5dev.vo;
 
 import com.air.nc5dev.util.StringUtil;
 import com.google.common.collect.Lists;
+import lombok.Data;
 
 import java.util.List;
 import java.util.Properties;
@@ -16,6 +17,7 @@ import java.util.Properties;
  * @project
  * @Version
  */
+@Data
 public class ExportConfigVO {
     /**
      * 是否导出源文件

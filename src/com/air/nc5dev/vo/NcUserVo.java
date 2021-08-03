@@ -1,6 +1,7 @@
 package com.air.nc5dev.vo;
 
 import com.air.nc5dev.util.NCPassWordUtil;
+import lombok.Data;
 
 /**
  * NC的操作员vo <br/>
@@ -12,6 +13,7 @@ import com.air.nc5dev.util.NCPassWordUtil;
  * @project
  * @Version
  */
+@Data
 public class NcUserVo {
     /**
      * id
@@ -37,46 +39,11 @@ public class NcUserVo {
 
     @Override
     public String toString() {
-        return name + " | " + NCPassWordUtil.decode(getPass(), this);
+        return String.format("%s | %s | %s"
+                , code
+                , name
+                , NCPassWordUtil.decode(getPass(), this)
+        );
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getPass() {
-        return pass;
-    }
-
-    public void setPass(String pass) {
-        this.pass = pass;
-    }
-
-    public String getLocked() {
-        return locked;
-    }
-
-    public void setLocked(String locked) {
-        this.locked = locked;
-    }
 }

@@ -8,7 +8,7 @@ import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.util.messages.MessageBusConnection;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +24,7 @@ import java.util.List;
  * @date 2019/12/25 0025 15:07
  * @project
  */
+@Deprecated //暂时关闭使用 @see com.air.nc5dev.component.Component
 public class ProjectNCMeatInfFileEditedListener implements ApplicationComponent, BulkFileListener {
     @SuppressWarnings("WeakerAccess")
     public static HashSet<String> dirtyProjects = new HashSet<>();
@@ -45,12 +46,12 @@ public class ProjectNCMeatInfFileEditedListener implements ApplicationComponent,
     }
 
     @Override
-    public void before(@Nonnull List<? extends VFileEvent> events) {
+    public void before(@NotNull List<? extends VFileEvent> events) {
 
     }
 
     @Override
-    public void after(@Nonnull List<? extends VFileEvent> events) {
+    public void after(@NotNull List<? extends VFileEvent> events) {
         try {
             boolean isMeta = false;
             for (VFileEvent event : events) {

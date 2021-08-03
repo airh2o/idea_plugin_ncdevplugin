@@ -6,8 +6,9 @@ import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl;
 import com.intellij.openapi.project.Project;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Idea - 运行配置的工具类</br>
@@ -34,7 +35,7 @@ public class RunConfigurationUtil {
      * @return void
      */
     public static void addRunJavaApplicationMenu(@Nullable Project project
-            , @Nonnull ApplicationConfiguration conf,boolean singleton,boolean share) {
+            , @NotNull ApplicationConfiguration conf, boolean singleton, boolean share) {
         RunManagerImpl runManagerImpl = getRunManagerImpl(project);
         RunnerAndConfigurationSettingsImpl runnerAndConfigurationSettings = new RunnerAndConfigurationSettingsImpl
                 (runManagerImpl, conf);

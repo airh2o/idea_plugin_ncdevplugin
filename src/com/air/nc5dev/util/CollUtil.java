@@ -211,7 +211,7 @@ public class CollUtil extends cn.hutool.core.collection.CollUtil {
     }
 
     /**
-     * 把一个 map的key里 所有的中间的 下划线 _ 转换成驼峰方式 {@link StrUtil#toCamelCase(java.lang.CharSequence)}， 返回去除后的 新的map
+     * 把一个 map的key里 所有的中间的 下划线 _ 转换成驼峰方式 {@link StrUtil#toCamelCase(CharSequence)}， 返回去除后的 新的map
      *
      * @param map
      * @param lower 是否key转换驼峰后再转成全小写
@@ -236,7 +236,7 @@ public class CollUtil extends cn.hutool.core.collection.CollUtil {
     }
 
     /**
-     * 把一个 map的key里 所有的中间的 下划线 _ 转换成驼峰方式 {@link StrUtil#toCamelCase(java.lang.CharSequence)}， 返回去除后的 新的map
+     * 把一个 map的key里 所有的中间的 下划线 _ 转换成驼峰方式 {@link StrUtil#toCamelCase(CharSequence)}， 返回去除后的 新的map
      *
      * @param map
      * @return
@@ -246,7 +246,7 @@ public class CollUtil extends cn.hutool.core.collection.CollUtil {
     }
 
     /**
-     * 把多个 map的key里 所有的中间的 下划线 _ 转换成驼峰方式 {@link StrUtil#toCamelCase(java.lang.CharSequence)}， 返回去除后的 新的map
+     * 把多个 map的key里 所有的中间的 下划线 _ 转换成驼峰方式 {@link StrUtil#toCamelCase(CharSequence)}， 返回去除后的 新的map
      *
      * @param maps
      * @return
@@ -260,7 +260,7 @@ public class CollUtil extends cn.hutool.core.collection.CollUtil {
     }
 
     /**
-     * 把一个 map的key里 所有的中间的 下划线 _ 转换成驼峰方式且全小写 {@link StrUtil#toCamelCase(java.lang.CharSequence)}
+     * 把一个 map的key里 所有的中间的 下划线 _ 转换成驼峰方式且全小写 {@link StrUtil#toCamelCase(CharSequence)}
      * ， 返回去除后的 新的map
      *
      * @param map
@@ -271,7 +271,7 @@ public class CollUtil extends cn.hutool.core.collection.CollUtil {
     }
 
     /**
-     * 把多个 map的key里 所有的中间的 下划线 _ 转换成驼峰方式且全小写 {@link StrUtil#toCamelCase(java.lang.CharSequence)}， 返回去除后的 新的map
+     * 把多个 map的key里 所有的中间的 下划线 _ 转换成驼峰方式且全小写 {@link StrUtil#toCamelCase(CharSequence)}， 返回去除后的 新的map
      *
      * @param maps
      * @return

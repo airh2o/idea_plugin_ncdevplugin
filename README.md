@@ -84,6 +84,17 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 
 # 版本更新
 ``` 
+  <em>2.5.0 版本 更新:</em> <br>
+      <ul>
+          <li>1. 新增强行指定NC版本: <br>
+                在.idea文件夹的nc.prop文件配置 nc.version参数为 NC5, NC6,  NCC,  U8Cloud 几种即可。
+           </li>
+          <li>2. 增加对NCC的特殊支持(特殊的hotwebs路径和配置文件路径和补丁结构)</li>
+          <li>3. 优化运行等配置的生成参数</li>
+          <li>4. 定时提醒和元数据复制无法正常使用，暂不修复，用处不大</li>
+          <li>5. 修复部分情况下插件报错的问题</li>
+      </ul>
+
  <em>2.4.0 版本 更新:</em> <br>
       <ul>
           <li>1. 新增NC6x导出单据脚本功能(整合一个大佬的工具) </li>
@@ -145,8 +156,35 @@ IDEA plugin 官方示例项目 或 开源插件：
 框架比如 guava hutool 等等
 再次感谢开源项目参与者们的无私奉献！
 
+#### 备注
+IDEA常见事件: 事件分发 com.intellij.util.messages.impl.MessageBusImpl.invokeListener                    
+```text
+   Build Manager   com.intellij.compiler.server.BuildManagerListener                                         
+   compilation status        com.intellij.openapi.compiler.CompilationStatusListener                  
+Run Content      com.intellij.execution.ui.RunContentWithExecutorListener                       
 
-
+```
+事件断点一些不需要的:
+```text
+!"IdePerformanceListener".equals(message.getTopic().getDisplayName()) 
+&& !"Application activation notifications".equals(message.getTopic().getDisplayName())
+&& !"FrameStateListener".equals(message.getTopic().getDisplayName())
+&& !"action changes".equals(message.getTopic().getDisplayName())
+        && !"Document load, save and reload events".equals(message.getTopic().getDisplayName())   
+        && !"tool window events".equals(message.getTopic().getDisplayName())
+        && !"services topic".equals(message.getTopic().getDisplayName()) 
+        && !"configuration executed".equals(message.getTopic().getDisplayName())  
+        && !"IdeStatusBar.Text".equals(message.getTopic().getDisplayName())
+        && !"compilation status".equals(message.getTopic().getDisplayName())
+        && !"custom builder message".equals(message.getTopic().getDisplayName())
+&& !"Build Manager".equals(message.getTopic().getDisplayName())
+&& !"LOG_MODEL_CHANGED".equals(message.getTopic().getDisplayName())
+&& !"Notifications".equals(message.getTopic().getDisplayName())
+&& !"NewVirtualFileSystem changes".equals(message.getTopic().getDisplayName())
+&& !"Run Content".equals(message.getTopic().getDisplayName())
+&& !"".equals(message.getTopic().getDisplayName())
+&& !"".equals(message.getTopic().getDisplayName())
+```
 
 
 

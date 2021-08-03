@@ -7,9 +7,11 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -25,13 +27,15 @@ import java.util.Properties;
  * @author air Email: 209308343@qq.com
  * @date 2019/12/25 0025 9:05
  */
+@Getter
 public class ProjectNCConfigUtil {
     //这是插件实例的唯一标识
     private static final int PLUGIN_RUNTIME_MARK = new Object().hashCode();
     /*** NC配置文件在项目中文件的名字 ***/
     public static final String DEFUAL_NC_CONFIG_PROJECT_FILENAME = "nc.prop";
     public static final String[] dsTypes = new String[]{"ORACLE11G", "ORACLE10G", "SQLSERVER2008", "DB297"};
-    public static final String[] dsTypeClasss = new String[]{"oracle.jdbc.OracleDriver", "oracle.jdbc.OracleDriver", "com.microsoft.sqlserver.jdbc.SQLServerDriver", "com.ibm.db2.jcc.DB2Driver"};
+    public static final String[] dsTypeClasss = new String[]{"oracle.jdbc.OracleDriver", "oracle.jdbc.OracleDriver"
+            , "com.microsoft.sqlserver.jdbc.SQLServerDriver", "com.ibm.db2.jcc.DB2Driver"};
     private static boolean isInit = false;
     /**** NC项目里配置文件 属性集合 ***/
     private static Properties configPropertis;
@@ -160,7 +164,7 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:12
      * @Param [key]
      */
-    public static final String getConfigValue(@Nonnull String key) {
+    public static final String getConfigValue(@NotNull String key) {
         if (!isInit) {
             initConfigFile();
         }
@@ -197,7 +201,7 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:13
      * @Param [key, value]
      */
-    public static final void setNCConfigPropertice(@Nonnull String key, String value) {
+    public static final void setNCConfigPropertice(@NotNull String key, String value) {
         if (!isInit) {
             initConfigFile();
         }
@@ -268,21 +272,23 @@ public class ProjectNCConfigUtil {
     public static final String LIB_Module_Lang_Library = "NC_LIBS/Module_Lang_Library";
     /*****    NC 依赖库： NC模块  Generated_EJB     ****/
     public static final String LIB_Generated_EJB = "NC_LIBS/Generated_EJB";
-
+    /*****    NC 依赖库： NC模块  NCC     ****/
+    public static final String LIB_NCCloud_Library = "NC_LIBS/Module_NCCloud_Library";
 
     private ProjectNCConfigUtil() {
         throw new RuntimeException("cannot instance Util Class!");
     }
 
     /**
-      *   获取这个插件的运行实例的唯一标识int        </br>
-      *           </br>
-      *           </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com
-      * @date 2020/3/18 0018 9:28
-      * @Param []
-      * @return int
+     * 获取这个插件的运行实例的唯一标识int        </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return int
+     * @author air Email: 209308343@qq.com
+     * @date 2020/3/18 0018 9:28
+     * @Param []
      */
     public static int getPluginRuntimeMark() {
         return PLUGIN_RUNTIME_MARK;
@@ -290,6 +296,7 @@ public class ProjectNCConfigUtil {
 
     /**
      * 获取NC的 hotwebs里面的文件夹名字列表 ,隔开
+     *
      * @return
      */
     public static String getNcHotWebsList() {
@@ -321,19 +328,44 @@ public class ProjectNCConfigUtil {
 
     /**
      * 获取NC的版本
+     *
      * @return
      */
-    public static NcVersionEnum getNCVerSIon(){
-        File f = new File(getNCHome(), "\\webapps\\u8c_web\\Client\\appletjar\\U8C_Login.jar");
+    public static NcVersionEnum getNCVerSIon() {
+        //先看看是否配置文件强行指定了NC版本！
+        String version = getConfigValue("nc.version");
+        if (StringUtil.isNotEmpty(version)) {
+            return NcVersionEnum.valueOf(version);
+        }
+
+        File f = new File(getNCHome(), "webapps"
+                + File.separatorChar + "u8c_web"
+                + File.separatorChar + "webapps"
+                + File.separatorChar + "Client"
+                + File.separatorChar + "appletjar"
+                + File.separatorChar + "U8C_Login.jar"
+        );
         if (f.isFile()) {
             return NcVersionEnum.U8Cloud;
         }
 
-        f = new File(getNCHome(), "webapps\\nc_web\\Client\\appletjar\\NC_Login_v507.jar");
+        f = new File(getNCHome(), "webapps"
+                + File.separatorChar + "nc_web"
+                + File.separatorChar + "Client"
+                + File.separatorChar + "appletjar"
+                + File.separatorChar + "NC_Login_v507.jar"
+        );
         if (f.isFile()) {
             return NcVersionEnum.NC5;
         }
 
+        f = new File(getNCHome(), "hotwebs"
+                + File.separatorChar + "nccloud"
+        );
+
+        if (f.isDirectory()) {
+            return NcVersionEnum.NCC;
+        }
 
         return NcVersionEnum.NC6;
     }

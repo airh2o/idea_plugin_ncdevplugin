@@ -3,12 +3,12 @@ package com.air.nc5dev.util;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.intellij.openapi.ui.Messages;
+import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.annotation.Nullable;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -128,7 +128,7 @@ public class NCPropXmlUtil {
      *
      * @return 没设置NCHOME或者文件不存在返回null
      */
-    public static final  File getPropFile(@Nullable  String ncHome) {
+    public static final  File getPropFile(@Nullable String ncHome) {
         if (StringUtil.isEmpty(ProjectNCConfigUtil.getNCHomePath())) {
             return null;
         }

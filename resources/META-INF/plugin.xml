@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>NC系列开发插件</name>
-    <version>v2.4.0</version>
+    <version>v2.5.0</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com</vendor>
 
     <description><![CDATA[
@@ -9,6 +9,17 @@
     ]]></description>
 
     <change-notes><![CDATA[
+  <em>2.5.0 版本 更新:</em> <br>
+      <ul>
+          <li>1. 新增强行指定NC版本: <br>
+                在.idea文件夹的nc.prop文件配置 nc.version参数为 NC5, NC6,  NCC,  U8Cloud 几种即可。
+           </li>
+          <li>2. 增加对NCC的特殊支持(特殊的hotwebs路径和配置文件路径和补丁结构)</li>
+          <li>3. 优化运行等配置的生成参数</li>
+          <li>4. 定时提醒和元数据复制无法正常使用，暂不修复，用处不大</li>
+          <li>5. 修复部分情况下插件报错的问题</li>
+      </ul>
+
     <em>2.4.0 版本 更新:</em> <br>
       <ul>
           <li>1. 新增NC6x导出单据脚本功能(整合一个大佬的工具) </li>
@@ -85,7 +96,7 @@
         </action>
         <action id="nc5dev.config.addRunConfig" class="com.air.nc5dev.acion.AddProjectNCRunConfig" text="生成默认NC运行配置"
                 description="生成默认的2个NC运行配置，一个服务端，一个客户端(如果已经有了会跳过)">
-            <keyboard-shortcut keymap="$default" />
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift r"/>
         </action>
         <action id="nc5dev.export.exportncpatcher" class="com.air.nc5dev.acion.ExportNCPatcherAction"
                 text="导出NC补丁包" description="导出项目为NC的补丁包">
@@ -227,7 +238,7 @@
 
     <application-components>
         <component>
-            <implementation-class>com.air.nc5dev.ui.listener.ProjectNCMeatInfFileEditedListener</implementation-class>
+            <implementation-class>com.air.nc5dev.component.Component</implementation-class>
         </component>
     </application-components>
 

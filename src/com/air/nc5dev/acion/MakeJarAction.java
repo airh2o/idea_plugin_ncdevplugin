@@ -45,7 +45,7 @@ public class MakeJarAction extends AbstractIdeaAction {
         //选择jar保存位置
         File outJarFile = new File(dir.getParentFile(), jarName);
         fileChooser = new JFileChooser();
-        fileChooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
+        fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         fileChooser.setCurrentDirectory(dir.getParentFile());
         fileChooser.setSelectedFile(outJarFile);
         fileChooser.setDialogTitle("选择jar保存名字:");
