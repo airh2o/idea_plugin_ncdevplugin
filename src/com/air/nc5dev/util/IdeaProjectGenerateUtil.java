@@ -334,9 +334,6 @@ public class IdeaProjectGenerateUtil {
         ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Generated_EJB
                 , IoUtil.serachGenerated_EJB(ncHome));
 
-        ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Generated_EJB
-                , IoUtil.serachGenerated_EJB(ncHome));
-
         if (new File(ProjectNCConfigUtil.getNCHome(), "hotwebs" + File.separatorChar + "nccloud").isDirectory()) {
             ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NCCloud_Library
                     , IoUtil.serachNCCloud_Library(ncHome));
