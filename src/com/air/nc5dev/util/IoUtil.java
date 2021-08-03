@@ -212,8 +212,8 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @return
      */
     public static final ArrayList<File> serachModule_Private_Library(File ncHome) {
-        ArrayList<File> all = serachAllNCCClass(ncHome);
-        all.addAll(serachAllNCCJars(ncHome));
+        ArrayList<File> all = serachAllNcPrivateClass(ncHome);
+        all.addAll(serachAllNcPrivateJars(ncHome));
         return all;
     }
 
@@ -236,9 +236,12 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @return
      */
     public static final ArrayList<File> serachAllNCCJars(File ncHome) {
-        return serachAllNcClass(new File(ncHome
-                        , "hotwebs" + File.separatorChar + "nccloud" + File.separatorChar + "WEB-INF")
-                , "lib", true);
+        return new ArrayList<>(getAllJarFiles(new File(ncHome
+                , "hotwebs"
+                + File.separatorChar + "nccloud"
+                + File.separatorChar + "WEB-INF"
+                + File.separatorChar + "lib"
+        ), true));
     }
 
     /**
@@ -248,15 +251,13 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @return
      */
     public static final ArrayList<File> serachNCCloud_Library(File ncHome) {
-        ArrayList<File> all = serachAllNcPrivateClass(ncHome);
-        all.addAll(serachAllNcPrivateJars(ncHome));
-
-        //增加数据交换支持 eg:
-        // D:\runtimes\U8Cloud_HEXIN\modules\dm\META-INF\var\classes\
-        all.addAll(serachAllNcClass(new File(ncHome, "modules")
-                , "META-INF" + File.separatorChar + "var"
-                        + File.separatorChar + "classes"
-                , false));
+        //I:\runtime\NCCHOME202005_DONGGUANZHENGJUAN\hotwebs\nccloud\WEB-INF
+        ArrayList<File> all = serachAllNCCJars(ncHome);
+        all.add(new File(ncHome, "hotwebs"
+                + File.separatorChar + "nccloud"
+                + File.separatorChar + "WEB-INF"
+                + File.separatorChar + "classes"
+        ));
 
         return all;
     }
