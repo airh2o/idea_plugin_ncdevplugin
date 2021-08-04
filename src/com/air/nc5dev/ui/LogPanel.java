@@ -33,7 +33,11 @@ public class LogPanel extends SimpleToolWindowPanel {
     this.project = project;
 
     addLogActions();
-    addToolbar();
+    try {
+      addToolbar();
+    } catch (Throwable e) {
+      e.printStackTrace();
+    }
     addConsole();
 
   }
