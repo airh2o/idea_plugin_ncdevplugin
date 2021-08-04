@@ -398,7 +398,7 @@ public class ResetNCUserPassWordPanel extends JPanel {
         this.textInput_newPass = new JTextField();
         this.textInput_newPass.setForeground(Color.RED);
         this.textInput_newPass.setFont(new Font("宋体", Font.BOLD, 28));
-        this.textInput_newPass.setText("123");
+        this.textInput_newPass.setText("1");
         this.textInput_newPass.setBounds(100, 407, 835, 51);
         this.panel_smUser.add(this.textInput_newPass);
         this.textInput_newPass.setColumns(10);

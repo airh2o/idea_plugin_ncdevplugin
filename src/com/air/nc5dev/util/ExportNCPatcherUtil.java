@@ -578,7 +578,8 @@ public class ExportNCPatcherUtil {
 
             if (configVO.hasSource) {
                 //复制源码
-                copyFile(new File(sourcePackge, javaFullName + ".java"), outDir, contentVO, module);
+                copyFile(new File(sourcePackge, javaFullName.endsWith(".java") ? javaFullName : javaFullName + ".java")
+                        , outDir, contentVO, module);
             }
 
             //复制class
