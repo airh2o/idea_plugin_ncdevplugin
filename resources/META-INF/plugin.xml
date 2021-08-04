@@ -96,7 +96,7 @@
         </action>
         <action id="nc5dev.config.addRunConfig" class="com.air.nc5dev.acion.AddProjectNCRunConfig" text="生成默认NC运行配置"
                 description="生成默认的2个NC运行配置，一个服务端，一个客户端(如果已经有了会跳过)">
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift r"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift r"/>
         </action>
         <action id="nc5dev.export.exportncpatcher" class="com.air.nc5dev.acion.ExportNCPatcherAction"
                 text="导出NC补丁包" description="导出项目为NC的补丁包">

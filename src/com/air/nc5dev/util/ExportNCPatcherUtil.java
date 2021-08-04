@@ -495,7 +495,7 @@ public class ExportNCPatcherUtil {
      * @Param [sourcePackge, sourceBaseDirFile,  contentVO, exportDir, moduleName, ncType, packgePath,
      * classFileDir]
      */
-    private static final void copyClassAndJavaSourceFiles(File sourcePackge, File sourceBaseDirFile
+    public static final void copyClassAndJavaSourceFiles(File sourcePackge, File sourceBaseDirFile
             , ExportContentVO contentVO, String exportDir, Module module
             , String ncType, String packgePath, final File classFileDir) {
         ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(module);
@@ -794,7 +794,7 @@ public class ExportNCPatcherUtil {
      * @date 2020/2/4 0004 17:28
      * @Param [sourcePackge, exportDir, moduleName, ncType, packgePath]
      */
-    private static final void copyClassPathOtherFile(File sourcePackge
+    public static final void copyClassPathOtherFile(File sourcePackge
             , String exportDir, Module module, String ncType
             , String packgePath, ExportContentVO contentVO) {
         //复制包路径文件夹内所有其他文件，比如 wsdl文件 配置文件等等

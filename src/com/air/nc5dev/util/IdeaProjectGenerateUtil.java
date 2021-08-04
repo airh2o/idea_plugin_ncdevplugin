@@ -1,10 +1,13 @@
 package com.air.nc5dev.util;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.ApplicationLibraryUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.util.idea.RunConfigurationUtil;
+import com.air.nc5dev.vo.ExportConfigVO;
+import com.air.nc5dev.vo.ExportContentVO;
 import com.intellij.execution.ShortenCommandLine;
 import com.intellij.execution.application.ApplicationConfiguration;
 import com.intellij.execution.application.ApplicationConfigurationType;
@@ -13,7 +16,10 @@ import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.CompilerModuleExtension;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 import org.jetbrains.annotations.Nullable;
@@ -24,9 +30,7 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 /***
@@ -375,6 +379,7 @@ public class IdeaProjectGenerateUtil {
     public static final void copyProjectMetaInfFiles2NCHomeModules(@NotNull Module module) {
         copyModuleMetainfoDir2NChome(module);
         copyModuleNccConfigDir2NChome(module);
+        copyModuleNccActionDir2NChome(module);
     }
 
     private static void copyModuleMetainfoDir2NChome(@NotNull Module module) {
@@ -410,6 +415,11 @@ public class IdeaProjectGenerateUtil {
         });
     }
 
+    /**
+     * 复制NCC的配置文件：client
+     *
+     * @param module
+     */
     private static void copyModuleNccConfigDir2NChome(@NotNull Module module) {
         String ncHomePath = ProjectNCConfigUtil.getNCHomePath();
         if (null == ncHomePath || ncHomePath.trim().isEmpty()) {
@@ -459,6 +469,83 @@ public class IdeaProjectGenerateUtil {
         }
     }
 
+    /**
+     * 复制NCC的client action代码到hotwebs
+     *
+     * @param module
+     */
+    private static void copyModuleNccActionDir2NChome(@NotNull Module module) {
+        String ncHomePath = ProjectNCConfigUtil.getNCHomePath();
+        if (null == ncHomePath || ncHomePath.trim().isEmpty()) {
+            return;
+        }
+
+        File clientDir = new File(new File(module.getModuleFilePath()).getParentFile(), "src"
+                + File.separatorChar + "client"
+                //  + File.separatorChar + "nccloud"
+        );
+        if (!clientDir.exists()) {
+            return;
+        }
+
+
+        File nchome = new File(ncHomePath);
+        if (!nchome.exists() || !nchome.isDirectory()) {
+            return;
+        }
+
+        // hotwebs\nccloud\WEB-INF\extend\yyconfig\modules\recr
+        File nccClientClassDir = new File(ncHomePath, "hotwebs"
+                + File.separatorChar + "nccloud"
+                + File.separatorChar + "WEB-INF"
+                + File.separatorChar + "classes"
+        );
+        if (!nccClientClassDir.exists() || !nccClientClassDir.isDirectory()) {
+            nccClientClassDir.mkdirs();
+        }
+
+        //复制
+        VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
+        File classBaseDirFile = new File(CompilerModuleExtension.getInstance(module).getCompilerOutputPath().getPath());
+        //获取所有的 有源码的包路径文件夹！
+        List<File> allSourcePackges = IoUtil.getAllLastPackges(clientDir);
+        ExportContentVO contentVO = new ExportContentVO();
+        contentVO.setIgnoreModules(new ArrayList<>());
+        contentVO.setModule2ExportConfigVoMap(new HashMap<>());
+        ExportConfigVO exportConfigVO = new ExportConfigVO();
+        exportConfigVO.setProp(new Properties());
+        contentVO.getModule2ExportConfigVoMap().put(module, exportConfigVO);
+        contentVO.setModuleHomeDir2ModuleMap(new HashMap<>());
+        contentVO.getModuleHomeDir2ModuleMap().put(module.getModuleFilePath(), module);
+        for (final File sourcePackge : allSourcePackges) {
+            String packgePath = sourcePackge.getPath().substring(clientDir.getPath().length());
+            //class文件位置
+            File classFileDir = new File(classBaseDirFile, packgePath);
+
+            ExportNCPatcherUtil.copyClassAndJavaSourceFiles(sourcePackge, clientDir
+                    , contentVO, nccClientClassDir.getPath(), module
+                    , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, classFileDir);
+
+            ExportNCPatcherUtil.copyClassPathOtherFile(sourcePackge, clientDir.getPath(), module
+                    , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, contentVO);
+        }
+
+        //移动文件到正确的文件夹结构
+        File[] fs1 = nccClientClassDir.listFiles();
+        if (CollUtil.isEmpty(fs1)) {
+            return;
+        }
+        File f2;
+        for (File f1 : fs1) {
+            f2 = new File(f1, "client" + File.separatorChar + "classes");
+            if (!f2.isDirectory()) {
+                continue;
+            }
+
+            IoUtil.copyFile(f2, nccClientClassDir.getParentFile());
+            FileUtil.del(f1);
+        }
+    }
 
     private IdeaProjectGenerateUtil() {
     }
