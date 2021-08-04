@@ -379,7 +379,9 @@ public class IdeaProjectGenerateUtil {
     public static final void copyProjectMetaInfFiles2NCHomeModules(@NotNull Module module) {
         copyModuleMetainfoDir2NChome(module);
         copyModuleNccConfigDir2NChome(module);
-        copyModuleNccActionDir2NChome(module);
+        if (!"true".equals(ProjectNCConfigUtil.getConfigValue("close_client_copy"))) {
+            copyModuleNccActionDir2NChome(module);
+        }
     }
 
     private static void copyModuleMetainfoDir2NChome(@NotNull Module module) {
