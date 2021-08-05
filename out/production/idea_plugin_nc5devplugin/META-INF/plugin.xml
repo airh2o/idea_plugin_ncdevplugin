@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>Yonyou NC Idea Dev Plugin</name>
-    <version>v2.5.1</version>
+    <version>v2.5.2</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com</vendor>
 
     <description><![CDATA[
@@ -14,7 +14,7 @@
             <li>First time opening project - Required steps:</li>
                 <li>1. Tools -> Configure NC HOME.</li>
                 <li>2. Tools -> update NC library dependencies execute dependency update!</li>
-                <li>3.tools -> generate default NC run configuration!</li>
+                <li>3. Tools -> generate default NC run configuration!</li>
                 <li>4. After you perform the preceding steps for the first time, the project will generate the default client public Private test several source folders. Manually modify the IDEA attribute of several folders in the project structure to correct values</li>
                 <li>5. Select Use Module path to set the output path of test class and non-test class respectively.</li>
         </ul>
