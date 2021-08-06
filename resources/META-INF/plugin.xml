@@ -1,11 +1,11 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
-    <name>Yonyou NC Idea Dev Plugin</name>
-    <version>v2.5.2</version>
+    <name>Yonyou NC Dev Tool</name>
+    <version>v2.5.4</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com</vendor>
 
     <description><![CDATA[
-      <p><strong>U8Cloud, NC5 NC6 NCCloud 系列 IDEA开发插件 作者:air Email: 209308343@qq.com 欢迎外包私单联系邮件或QQ.</strong> </p>
+      <p><strong>IDEA dev suport plugin for yonyou U8Cloud, NC5 NC6 NCCloud softs</strong> </p>
 
         <p>English: </p>
         If you do not need to edit metadata and new document development can directly create idea ordinary projects.
