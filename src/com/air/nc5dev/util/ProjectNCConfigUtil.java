@@ -187,6 +187,13 @@ public class ProjectNCConfigUtil {
             initConfigFile();
         }
 
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("close_client_copy")) {
+            ProjectNCConfigUtil.configPropertis.put("close_client_copy", "false");
+        }
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("nc.version")) {
+            ProjectNCConfigUtil.configPropertis.put("nc.version", "");
+        }
+
         IoUtil.wirtePropertis(ProjectNCConfigUtil.configPropertis, ProjectNCConfigUtil.configFile);
     }
 

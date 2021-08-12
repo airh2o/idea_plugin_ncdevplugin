@@ -42,7 +42,10 @@ public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFact
         addLogTab(project, toolWindow);
         toolWindow.setType(ToolWindowType.DOCKED, null);
         toolWindow.setTitle("(QQ 209308343 有业务可联系 感谢支持)");
-        toolWindow.setIcon(AllIcons.Ide.Info_notifications);
+        try {
+            toolWindow.setIcon(AllIcons.Ide.Info_notifications);
+        } catch (Throwable e) {
+        }
         toolWindow.setToHideOnEmptyContent(true);
         toolWindow.setStripeTitle(TOOL_WINDOW_ID);
 

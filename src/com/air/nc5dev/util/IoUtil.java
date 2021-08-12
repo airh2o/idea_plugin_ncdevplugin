@@ -253,11 +253,25 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
     public static final ArrayList<File> serachNCCloud_Library(File ncHome) {
         //I:\runtime\NCCHOME202005_DONGGUANZHENGJUAN\hotwebs\nccloud\WEB-INF
         ArrayList<File> all = serachAllNCCJars(ncHome);
-        all.add(new File(ncHome, "hotwebs"
+
+        File f = new File(ncHome, "hotwebs"
                 + File.separatorChar + "nccloud"
                 + File.separatorChar + "WEB-INF"
                 + File.separatorChar + "classes"
-        ));
+        );
+        if (f.isDirectory()) {
+            all.add(f);
+        }
+
+        f = new File(ncHome, "hotwebs"
+                + File.separatorChar + "nccloud"
+                + File.separatorChar + "WEB-INF"
+                + File.separatorChar + "extend"
+        );
+
+        if (f.isDirectory()) {
+            all.add(f);
+        }
 
         return all;
     }

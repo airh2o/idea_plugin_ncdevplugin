@@ -1,12 +1,11 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>Yonyou NC Dev Tool</name>
-    <version>v2.5.4</version>
+    <version>v2.5.6</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com</vendor>
 
     <description><![CDATA[
-      <p><strong>IDEA dev suport plugin for yonyou U8Cloud, NC5 NC6 NCCloud softs</strong> </p>
-
+      <p>Yonyou U8Cloud, NC5 NC6 NCCloud and other series of software development tools</p>
         <p>English: </p>
         If you do not need to edit metadata and new document development can directly create idea ordinary projects.
         You can change the name of the old project folder and create a new folder with the same path, and then copy the files in the folder.
@@ -34,67 +33,27 @@
     ]]></description>
 
     <change-notes><![CDATA[
-  <em>2.5.0 版本 更新:</em> <br>
+     <em>version 2.5.0 updated:</em> <br>
       <ul>
-          <li>1. 新增强行指定NC版本: <br>
-                在.idea文件夹的nc.prop文件配置 nc.version参数为 NC5, NC6,  NCC,  U8Cloud 几种即可。
+          <li>english:</li>
+          <li>1. Add the mandatory NC version:<br>
+                In the nc.prop file in the. Idea folder, set the Nc. version parameter to NC5, NC6, NCC, U8Cloud.
            </li>
-          <li>2. 增加对NCC的特殊支持(特殊的hotwebs路径和配置文件路径和补丁结构)</li>
-          <li>3. 优化运行等配置的生成参数</li>
-          <li>4. 定时提醒和元数据复制无法正常使用，暂不修复，用处不大</li>
-          <li>5. 修复部分情况下插件报错的问题</li>
+          <li>2. Added special support for NCC (special Hotwebs path and profile path and patch structure)</li>
+          <li>3. Optimize the generation parameters of the operation configuration</li>
+          <li>4. Periodic reminders and metadata replication cannot be used normally and are not useful until repaired</li>
+          <li>5. Fixed the plug-in error in some cases</li>
+
+          <li>中文:</li>
+          <li>1. 新增强行指定NC版本: <br>
+                    在.idea文件夹的nc.prop文件配置 nc.version参数为 NC5, NC6,  NCC,  U8Cloud 几种即可。
+               </li>
+              <li>2. 增加对NCC的特殊支持(特殊的hotwebs路径和配置文件路径和补丁结构)</li>
+              <li>3. 优化运行等配置的生成参数</li>
+              <li>4. 定时提醒和元数据复制无法正常使用，暂不修复，用处不大</li>
+              <li>5. 修复部分情况下插件报错的问题</li>
       </ul>
 
-    <em>2.4.0 版本 更新:</em> <br>
-      <ul>
-          <li>1. 新增NC6x导出单据脚本功能(整合一个大佬的工具) </li>
-          <li>2. 新增元数据文件复制功能(整合一个大佬的工具) </li>
-      </ul>
-
-    <em>2.3.0 版本 更新:</em> <br>
-      <ul>
-          <li>1. 新增数据源 一键添加到Database工具连接列表功能 </li>
-          <li>2. 新增重置NC操作员密码功能 </li>
-          <li>3. 新增一键查看数据源列表和密码功能</li>
-      </ul>
-
-     <em>2.2.1 版本 更新:</em> <br>
-      <ul>
-          <li>1. 优化部分代码,减少插件直接爆出错误信息</li>
-          <li>2. 修复部分小错误</li>
-          <li>3. 修复 U8Cloud部分功能无法使用</li>
-      </ul>
-
-    <em>2.2.0 版本 更新:</em> <br>
-      <ul>
-          <li>1. 优化部分代码,减少插件直接爆出错误信息</li>
-          <li>2. 新增 统一日志窗口，部分界面 不在使用右下角弹框</li>
-          <li>3. 修复 U8Cloud部分功能无法使用</li>
-          <li>4. 新增意见生成VO的set方法用</li>
-          <li>5. 修复 U8Cloud部分功能无法使用</li>
-      </ul>
-
-    <em>2.1.1 版本 更新:</em> <br>
-      <ul>
-          <li>1. 新增 文件夹转jar功能</li>
-          <li>2. 新增 NC补丁class模块转jar功能</li>
-      </ul>
-
-      <em>2.1.0 版本 更新:</em> <br>
-      <ul>
-          <li>1. 不修改NC本身数据源配置文件prop.xml</li>
-          <li>2. 生成运行配置会生成模块的补丁导出配置文件。</li>
-          <li>3. 修复打包成Jar Jar文件异常 无法识别。</li>
-          <li>4. 增加部分导出补丁的配置参数。</li>
-          <li>5. 导出补丁的支持包路径配置。</li>
-      </ul>
-
-      <em>2.0 版本重大更新:</em> <br>
-      <ul>
-          <li>1. 优化大量代码</li>
-          <li>2. 支持IDEA同时打开多个项目 区分当前按钮点击所在项目。</li>
-          <li>3. 修复IDEA同时打开多个项目 ,每次配置文件打开自动加载新的项目插件配置文件。</li>
-      </ul>
     ]]>
     </change-notes>
 

@@ -217,6 +217,10 @@ public class ExportNCPatcherUtil {
                 File clientDir = new File(f, "client");
 
                 File[] clientFs = clientDir.listFiles();
+                if (com.air.nc5dev.util.CollUtil.isEmpty(clientFs)) {
+                    clientDir.deleteOnExit();
+                    continue;
+                }
                 for (File cf : clientFs) {
                     if (cf.getName().equals("classes")) {
                         //如果是classes 要特殊点，有配置文件！
@@ -540,7 +544,7 @@ public class ExportNCPatcherUtil {
 
             //获得源文件名字
 
-            String javaFullName = getClassFileSourceFileName(classFile.getPath(), sourcePackge);
+            String javaFullName = StringUtil.get(getClassFileSourceFileName(classFile.getPath(), sourcePackge),"");
             String pageJava = packgePath;
             if (pageJava.startsWith(File.separator)) {
                 pageJava = pageJava.substring(File.separator.length());
@@ -576,7 +580,7 @@ public class ExportNCPatcherUtil {
 
             outDir = new File(outDir, packgePath);
 
-            if (configVO.hasSource) {
+            if (configVO.hasSource && StringUtil.notEmpty(javaFullName)) {
                 //复制源码
                 copyFile(new File(sourcePackge, javaFullName.endsWith(".java") ? javaFullName : javaFullName + ".java")
                         , outDir, contentVO, module);
