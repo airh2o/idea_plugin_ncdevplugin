@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.ApplicationLibraryUtil;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.util.idea.RunConfigurationUtil;
 import com.air.nc5dev.vo.ExportConfigVO;
@@ -377,13 +378,17 @@ public class IdeaProjectGenerateUtil {
      * @Param []
      */
     public static final void copyProjectMetaInfFiles2NCHomeModules(@NotNull Module module) {
-        copyModuleMetainfoDir2NChome(module);
-
-        if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
-            copyModuleNccConfigDir2NChome(module);
-            if (!"true".equals(ProjectNCConfigUtil.getConfigValue("close_client_copy"))) {
-                copyModuleNccActionDir2NChome(module);
+        try {
+            copyModuleMetainfoDir2NChome(module);
+            if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+                copyModuleNccConfigDir2NChome(module);
+                if (!"true".equals(ProjectNCConfigUtil.getConfigValue("close_client_copy"))) {
+                    copyModuleNccActionDir2NChome(module);
+                }
             }
+        } catch (Exception e) {
+            LogUtil.error(e.toString(), e);
+            e.printStackTrace();
         }
     }
 

@@ -859,6 +859,10 @@ public class ExportNCPatcherUtil {
      */
     private static List<File> getJavaClassByClassName(@NotNull String classFullName, @NotNull File classFileDir) {
         final String classPath = StringUtil.replaceAll(classFullName, ".", File.separator);
+        if (com.air.nc5dev.util.CollUtil.isEmpty(classFileDir.listFiles())) {
+            return com.air.nc5dev.util.CollUtil.emptyList();
+        }
+        
         return Stream.of(classFileDir.listFiles()).filter(file -> {
             if (file.getPath().lastIndexOf(classPath) < 0) {
                 return false;
