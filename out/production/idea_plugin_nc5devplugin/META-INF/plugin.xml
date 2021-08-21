@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>Yonyou NC Dev Tool</name>
-    <version>v2.5.6</version>
+    <version>v2.5.7</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com</vendor>
 
     <description><![CDATA[
@@ -33,6 +33,21 @@
     ]]></description>
 
     <change-notes><![CDATA[
+     <em>version 2.5.7 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+          <li>1. Add the mandatory NC version:<br>
+                In the nc.prop file in the. Idea folder, set the Nc. version parameter to NC5, NC6, NCC, U8Cloud.
+           </li>
+          <li>2. Added special support for NCC (special Hotwebs path and profile path and patch structure)</li>
+          <li>3. Optimize the generation parameters of the operation configuration</li>
+          <li>4. Periodic reminders and metadata replication cannot be used normally and are not useful until repaired</li>
+          <li>5. Fixed the plug-in error in some cases</li>
+
+          <li>中文:</li>
+          <li>1. 修复部分NCC的支持性问题.
+      </ul>
+
      <em>version 2.5.0 updated:</em> <br>
       <ul>
           <li>english:</li>
@@ -226,7 +241,7 @@
     </application-components>
 
     <extensions defaultExtensionNs="com.intellij">
-        <fileTypeFactory implementation="com.air.nc5dev.editor.bmf.languageinfo.BmfMDPFileTypeFactory"/>
+        <!--     <fileTypeFactory implementation="com.air.nc5dev.editor.bmf.languageinfo.BmfMDPFileTypeFactory"/>-->
 
         <!-- 日志输出窗口服务注册 -->
         <projectService serviceInterface="com.air.nc5dev.service.ui.IMeassgeConsole"

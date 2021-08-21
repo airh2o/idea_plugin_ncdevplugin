@@ -1,6 +1,7 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.io.FileUtil;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.jetbrains.annotations.NotNull;
 
 import org.jetbrains.annotations.NotNull;
@@ -904,6 +905,42 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         document.write(out);
         out.flush();
         out.close();
+    }
+
+    /**
+     * 判断2个文件是否是 没有任何差异(大小 修改时间)
+     *
+     * @param f
+     * @param tof
+     * @return
+     */
+    public static boolean isNoChange(File f, File tof) {
+        try {
+            if (f.isFile() && tof.isFile()) {
+                return f.length() == tof.length() && f.lastModified() == tof.lastModified();
+                // return DigestUtils.md5Hex(new FileInputStream(f)).equals(DigestUtils.md5Hex(new FileInputStream(tof)));
+            }
+
+           /* if (f.isDirectory() && tof.isDirectory()) {
+                List<File> afs = getAllFiles(f, true);
+                HashSet<Object> aSet = new HashSet<>();
+                for (File af : afs) {
+                    aSet.add(DigestUtils.md5Hex(new FileInputStream(af)));
+                }
+
+                List<File> bfs = getAllFiles(tof, true);
+                HashSet<Object> bSet = new HashSet<>();
+                for (File bf : bfs) {
+                    bSet.add(DigestUtils.md5Hex(new FileInputStream(bf)));
+                }
+
+                return aSet.equals(bSet);
+            }*/
+        } catch (Throwable e) {
+            return false;
+        }
+
+        return false;
     }
 }
 

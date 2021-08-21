@@ -182,7 +182,7 @@ Run Content      com.intellij.execution.ui.RunContentWithExecutorListener
 && !"Notifications".equals(message.getTopic().getDisplayName())
 && !"NewVirtualFileSystem changes".equals(message.getTopic().getDisplayName())
 && !"Run Content".equals(message.getTopic().getDisplayName())
-&& !"".equals(message.getTopic().getDisplayName())
+&& !"DebuggerManagerListener".equals(message.getTopic().getDisplayName())
 && !"".equals(message.getTopic().getDisplayName())
 ```
 

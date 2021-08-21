@@ -1,6 +1,8 @@
 package com.air.nc5dev.util.idea;
 
 import com.air.nc5dev.service.ui.IMeassgeConsole;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.diagnostic.Logger;
 
 /**
@@ -75,5 +77,18 @@ public class LogUtil {
         }
 
         service.clear();
+    }
+
+    /**
+     * 尝试发个提醒到 自定义的日志console里面，如果出错直接忽略
+     *
+     * @param info
+     */
+    public static void tryInfo(String info) {
+        try {
+            IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class);
+            service.getConsoleView().print(info + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
+        } catch (Throwable e) {
+        }
     }
 }

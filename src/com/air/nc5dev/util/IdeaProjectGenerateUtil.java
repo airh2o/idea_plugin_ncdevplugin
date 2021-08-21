@@ -30,6 +30,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Stream;
@@ -361,6 +362,9 @@ public class IdeaProjectGenerateUtil {
         Project project = ProjectUtil.getDefaultProject();
         Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules) {
+            LogUtil.tryInfo(module.getModuleFilePath()
+                    + " 模块执行：NC 各种配置文件 复制到NCHOME:"
+                    + ProjectNCConfigUtil.getNCHomePath());
             copyProjectMetaInfFiles2NCHomeModules(module);
         }
     }
@@ -380,10 +384,14 @@ public class IdeaProjectGenerateUtil {
     public static final void copyProjectMetaInfFiles2NCHomeModules(@NotNull Module module) {
         try {
             copyModuleMetainfoDir2NChome(module);
+
             if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
                 copyModuleNccConfigDir2NChome(module);
                 if (!"true".equals(ProjectNCConfigUtil.getConfigValue("close_client_copy"))) {
                     copyModuleNccActionDir2NChome(module);
+                } else {
+                    LogUtil.tryInfo(module.getModuleFilePath()
+                            + " 模块执行：NCC-hotwebs文件复制到NCHOME. 配置了跳过。执行跳过。");
                 }
             }
         } catch (Exception e) {
@@ -418,7 +426,12 @@ public class IdeaProjectGenerateUtil {
         File[] projectFiles = umpDir.listFiles(f -> f.isFile());
         Stream.of(projectFiles).forEach(f -> {
             try {
-                Files.copy(f.toPath(), new File(modeluUmpDir, f.getName()).toPath(), StandardCopyOption
+                //判断文件是否改变， 不改变的跳过复制
+                File tof = new File(modeluUmpDir, f.getName());
+                if (IoUtil.isNoChange(f, tof)) {
+                    return;
+                }
+                Files.copy(f.toPath(), tof.toPath(), StandardCopyOption
                         .REPLACE_EXISTING);
             } catch (Exception e) {
             }
@@ -464,6 +477,7 @@ public class IdeaProjectGenerateUtil {
         }
 
         //复制 ump 文件到这里
+        LogUtil.tryInfo("开始复制：NCC-hotwebs yyconfig文件复制到NCHOME: " + yyconfigDir.getPath());
         List<File> fs = IoUtil.getAllFiles(yyconfigDir, true);
         for (File f : fs) {
             try {
@@ -471,6 +485,11 @@ public class IdeaProjectGenerateUtil {
                 if (!tof.getParentFile().isDirectory()) {
                     tof.getParentFile().mkdirs();
                 }
+
+                LogUtil.tryInfo(module.getModuleFilePath()
+                        + " 模块执行：NCC-hotwebs yyconfig文件复制到NCHOME: "
+                        + f.getPath() + "   ->  " + tof.getPath());
+
                 Files.copy(f.toPath()
                         , tof.toPath()
                         , StandardCopyOption.REPLACE_EXISTING);
@@ -501,6 +520,7 @@ public class IdeaProjectGenerateUtil {
 
         File nchome = new File(ncHomePath);
         if (!nchome.exists() || !nchome.isDirectory()) {
+            LogUtil.tryInfo("NCHOME无法找到，跳过NCC配置文件复制.");
             return;
         }
 
@@ -516,28 +536,37 @@ public class IdeaProjectGenerateUtil {
 
         //复制
         VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
-        File classBaseDirFile = new File(CompilerModuleExtension.getInstance(module).getCompilerOutputPath().getPath());
-        //获取所有的 有源码的包路径文件夹！
-        List<File> allSourcePackges = IoUtil.getAllLastPackges(clientDir);
-        ExportContentVO contentVO = new ExportContentVO();
-        contentVO.setIgnoreModules(new ArrayList<>());
-        contentVO.setModule2ExportConfigVoMap(new HashMap<>());
-        ExportConfigVO exportConfigVO = new ExportConfigVO();
-        exportConfigVO.setProp(new Properties());
-        contentVO.getModule2ExportConfigVoMap().put(module, exportConfigVO);
-        contentVO.setModuleHomeDir2ModuleMap(new HashMap<>());
-        contentVO.getModuleHomeDir2ModuleMap().put(module.getModuleFilePath(), module);
-        for (final File sourcePackge : allSourcePackges) {
-            String packgePath = sourcePackge.getPath().substring(clientDir.getPath().length());
-            //class文件位置
-            File classFileDir = new File(classBaseDirFile, packgePath);
+        File classBaseDirFile = null;
+        try {
+            classBaseDirFile = new File(CompilerModuleExtension.getInstance(module).getCompilerOutputPath().getPath());
+        } catch (Exception e) {
+        }
 
-            ExportNCPatcherUtil.copyClassAndJavaSourceFiles(sourcePackge, clientDir
-                    , contentVO, nccClientClassDir.getPath(), module
-                    , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, classFileDir);
+        if (classBaseDirFile != null) {
+            //获取所有的 有源码的包路径文件夹！
+            List<File> allSourcePackges = IoUtil.getAllLastPackges(clientDir);
+            ExportContentVO contentVO = new ExportContentVO();
+            contentVO.setIgnoreModules(new ArrayList<>());
+            contentVO.setModule2ExportConfigVoMap(new HashMap<>());
+            ExportConfigVO exportConfigVO = new ExportConfigVO();
+            exportConfigVO.setProp(new Properties());
+            contentVO.getModule2ExportConfigVoMap().put(module, exportConfigVO);
+            contentVO.setModuleHomeDir2ModuleMap(new HashMap<>());
+            contentVO.getModuleHomeDir2ModuleMap().put(module.getModuleFilePath(), module);
+            for (final File sourcePackge : allSourcePackges) {
+                String packgePath = sourcePackge.getPath().substring(clientDir.getPath().length());
+                //class文件位置
+                File classFileDir = new File(classBaseDirFile, packgePath);
 
-            ExportNCPatcherUtil.copyClassPathOtherFile(sourcePackge, clientDir.getPath(), module
-                    , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, contentVO);
+                LogUtil.tryInfo("复制NCC Action代码文件夹: " + nccClientClassDir.getPath());
+
+                ExportNCPatcherUtil.copyClassAndJavaSourceFiles(sourcePackge, clientDir
+                        , contentVO, nccClientClassDir.getPath(), module
+                        , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, classFileDir);
+
+                ExportNCPatcherUtil.copyClassPathOtherFile(sourcePackge, clientDir.getPath(), module
+                        , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, contentVO);
+            }
         }
 
         //移动文件到正确的文件夹结构

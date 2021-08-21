@@ -3,11 +3,15 @@ package com.air.nc5dev.component;
 import com.air.nc5dev.util.ReflectUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.compiler.server.BuildManagerListener;
+import com.intellij.debugger.impl.DebuggerManagerListener;
+import com.intellij.execution.ui.RunContentManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ApplicationComponent;
+import com.intellij.profiler.api.configurations.ProfilerRunConfigurationsManagerListener;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.messages.Topic;
+import com.intellij.xdebugger.impl.XDebuggerManagerImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -29,11 +33,20 @@ public class Component implements ApplicationComponent {
     public void initComponent() {
         LogUtil.info("Starting component: " + COMPONENT_NAME);
 
+
         BuildManagerListenerImpl manager = BuildManagerListenerImpl.getInstance();
 
         MessageBus bus = ApplicationManager.getApplication().getMessageBus();
         MessageBusConnection connection = bus.connect();
+
+        //监听编译动作
         connection.subscribe(BuildManagerListener.TOPIC, manager);
+        //监听debug run动作
+        connection.subscribe(DebuggerManagerListener.TOPIC, manager);
+        //监听其他 运行
+        connection.subscribe(RunContentManager.TOPIC, manager);
+        connection.subscribe(XDebuggerManagerImpl.TOPIC, manager);
+
     }
 
     @Override
