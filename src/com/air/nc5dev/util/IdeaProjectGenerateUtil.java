@@ -542,6 +542,8 @@ public class IdeaProjectGenerateUtil {
         } catch (Exception e) {
         }
 
+        File outPathRoot = nccClientClassDir;
+
         if (classBaseDirFile != null) {
             //获取所有的 有源码的包路径文件夹！
             List<File> allSourcePackges = IoUtil.getAllLastPackges(clientDir);
@@ -561,11 +563,13 @@ public class IdeaProjectGenerateUtil {
                 LogUtil.tryInfo("复制NCC Action代码文件夹: " + nccClientClassDir.getPath());
 
                 ExportNCPatcherUtil.copyClassAndJavaSourceFiles(sourcePackge, clientDir
-                        , contentVO, nccClientClassDir.getPath(), module
+                        , contentVO, outPathRoot.getPath(), module
                         , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, classFileDir);
 
-                ExportNCPatcherUtil.copyClassPathOtherFile(sourcePackge, clientDir.getPath(), module
-                        , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, contentVO);
+                if(!StringUtil.replaceAll(StringUtil.replaceAll(sourcePackge.getPath(), File.separator, "/"), "\\", "/").contains("client/yyconfig/")){
+                    ExportNCPatcherUtil.copyClassPathOtherFile(sourcePackge, outPathRoot.getPath(), module
+                            , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, contentVO);
+                }
             }
         }
 

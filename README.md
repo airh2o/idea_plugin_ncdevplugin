@@ -84,6 +84,11 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 
 # 版本更新
 ``` 
+    <em>2.5.7 版本 更新:</em> <br>
+      <ul>
+          <li>1. 修复部分NCC的支持性问题.</li>
+      </ul>
+
   <em>2.5.0 版本 更新:</em> <br>
       <ul>
           <li>1. 新增强行指定NC版本: <br>
