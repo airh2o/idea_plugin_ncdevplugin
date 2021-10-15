@@ -945,6 +945,10 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
 
         return false;
     }
+
+    public static boolean isFile(File f, String endName) {
+        return f.isFile() && f.getName().toLowerCase().endsWith(endName.toLowerCase());
+    }
 }
 
 

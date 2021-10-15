@@ -1,6 +1,7 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.sql.SQLData;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -187,7 +189,142 @@ public class ExportNCPatcherUtil {
             //模块循环结束
         }
 
+        //处理NCC特殊的模块补丁结构
+        //if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+            buildNCCSqlAndFrontFiles(contentVO);
+        //}
+    }
 
+    /**
+     * 构建 NCC特殊的 前端js文件和SQL文件
+     *
+     * @param contentVO
+     */
+    public static void buildNCCSqlAndFrontFiles(ExportContentVO contentVO) {
+        buildNCCHotwebs(new File(contentVO.getProject().getBasePath(), "hotwebs"), contentVO);
+
+        HashMap<String, Module> moduleHomeDir2ModuleMap = contentVO.getModuleHomeDir2ModuleMap();
+        File sqldir = new File(new File(contentVO.getOutPath()).getParentFile(), "SQL脚本");
+        ArrayList<File> moduleOneSqls = new ArrayList<>();
+        for (String modulePath : moduleHomeDir2ModuleMap.keySet()) {
+            if (contentVO.ignoreModules.contains(moduleHomeDir2ModuleMap.get(modulePath))) {
+                //需要跳过的模块
+                continue;
+            }
+
+            File script = new File(modulePath, "script");
+            if (!script.isDirectory() || script.listFiles().length < 1) {
+                continue;
+            }
+
+            File moduleSqlDir = new File(sqldir, moduleHomeDir2ModuleMap.get(modulePath).getName());
+            //根据模块 复制sql文件们
+            IoUtil.copyFile(script, moduleSqlDir);
+
+            //根据模块 合并SQL文件们
+            File moduleSqlOne = new File(moduleSqlDir, moduleHomeDir2ModuleMap.get(modulePath).getName() + "_模块汇总.sql");
+            File[] fs = moduleSqlDir.listFiles();
+            if (fs == null) {
+                continue;
+            }
+
+            moduleSqlOne.deleteOnExit();
+            moduleOneSqls.add(moduleSqlOne);
+            StringBuilder txt = new StringBuilder(80_0000);
+            for (File f : fs) {
+                if (f.isDirectory() && (
+                        f.getName().equals("dbcreate")
+                                || f.getName().equals("conf")
+                                || f.getName().equals("dbml")
+                )) {
+                    continue;
+                }
+
+                if (isSqlFile(f)) {
+                    apendToSql(f, txt);
+                }
+
+                meargSqlFiles(f, txt);
+            }
+
+            FileUtil.writeUtf8String(txt.toString(), moduleSqlOne);
+        }
+
+        //合并成完全一个文件
+        File sqlOne = new File(sqldir, "全量汇总.sql");
+        sqlOne.deleteOnExit();
+        for (File moduleOneSql : moduleOneSqls) {
+            FileUtil.appendUtf8String("\n-- 模块SQL:  " + moduleOneSql.getPath() + "\n"
+                    + FileUtil.readUtf8String(moduleOneSql)
+                    + "\n\n\n\n\n", sqlOne);
+        }
+    }
+
+    private static void meargSqlFiles(File dir, StringBuilder txt) {
+        File[] fs = dir.listFiles();
+        if (fs == null) {
+            return;
+        }
+
+        for (File f : fs) {
+            if (isSqlFile(f)) {
+                apendToSql(f, txt);
+            }
+
+            meargSqlFiles(f, txt);
+        }
+    }
+
+    public static boolean isSqlFile(File f) {
+        return IoUtil.isFile(f, ".sql");
+    }
+
+    private static void apendToSql(File f, StringBuilder txt) {
+        List<String> lines = FileUtil.readUtf8Lines(f);
+        txt.append("\n\n-- SQL文件: ").append(f.getPath()).append("\n");
+        for (int i = 0; i < lines.size(); i++) {
+            if (lines.get(i).trim().toLowerCase().equals("go")) {
+                txt.append(";\n");
+                continue;
+            }
+
+            txt.append(lines.get(i)).append("\n");
+        }
+    }
+
+    /**
+     * 导出 hotwebs的前端 dist补丁
+     *
+     * @param hotwebs
+     * @param contentVO
+     */
+    public static void buildNCCHotwebs(File hotwebs, ExportContentVO contentVO) {
+        File dist = new File(hotwebs, "dist");
+        if (!dist.isDirectory()) {
+            return;
+        }
+
+        if (dist.listFiles() == null || dist.listFiles().length < 1) {
+            return;
+        }
+
+        File p_hotwebs = new File(new File(contentVO.getOutPath()).getParentFile(), "hotwebs");
+        File nccloud = new File(p_hotwebs, "nccloud");
+        File resources = new File(nccloud, "resources");
+
+        if (!resources.exists()) {
+            try {
+                resources.mkdirs();
+            } catch (Exception e) {
+                LogUtil.error(e.getMessage(), e);
+                e.printStackTrace();
+            }
+        }
+
+        File[] fs = dist.listFiles();
+        for (File f : fs) {
+            IoUtil.copyFile(f, resources);
+        }
     }
 
     /**
