@@ -2,6 +2,7 @@ package com.air.nc5dev.util;
 
 import cn.hutool.core.collection.CollUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.ExportConfigVO;
 import com.air.nc5dev.vo.ExportContentVO;
@@ -208,6 +209,11 @@ public class ExportNCPatcherUtil {
 
         File exportDirF = new File(exportDir);
         File[] fs = exportDirF.listFiles();
+        if (fs == null) {
+            LogUtil.info(exportDir + " 文件夹为空，不执行 processNCCPatchersWhenFinash !");
+            fs = new File[0];
+        }
+
         File outBaseDir = new File(exportDirF.getParent(), "hotwebs"
                 + File.separatorChar + "nccloud"
                 + File.separatorChar + "WEB-INF"
@@ -544,7 +550,7 @@ public class ExportNCPatcherUtil {
 
             //获得源文件名字
 
-            String javaFullName = StringUtil.get(getClassFileSourceFileName(classFile.getPath(), sourcePackge),"");
+            String javaFullName = StringUtil.get(getClassFileSourceFileName(classFile.getPath(), sourcePackge), "");
             String pageJava = packgePath;
             if (pageJava.startsWith(File.separator)) {
                 pageJava = pageJava.substring(File.separator.length());
@@ -862,7 +868,7 @@ public class ExportNCPatcherUtil {
         if (com.air.nc5dev.util.CollUtil.isEmpty(classFileDir.listFiles())) {
             return com.air.nc5dev.util.CollUtil.emptyList();
         }
-        
+
         return Stream.of(classFileDir.listFiles()).filter(file -> {
             if (file.getPath().lastIndexOf(classPath) < 0) {
                 return false;

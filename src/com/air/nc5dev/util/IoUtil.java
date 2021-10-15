@@ -573,7 +573,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
     public static List<File> getAllFiles(File dir, boolean hasChiled) {
         File[] fs = dir.listFiles();
 
-        ArrayList<File> ar = new ArrayList<File>(null == fs ? 0 : fs.length);
+        ArrayList<File> ar = new ArrayList<File>(null == fs ? 1 : fs.length);
 
         try {
             File f;
@@ -816,6 +816,9 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
     public static void deleteFileAll(File dir) {
         if (dir.exists()) {
             File files[] = dir.listFiles();
+            if (files == null) {
+                files = new File[0];
+            }
             int len = files.length;
             for (int i = 0; i < len; i++) {
                 if (files[i].isDirectory()) {
