@@ -191,7 +191,7 @@ public class ExportNCPatcherUtil {
 
         //处理NCC特殊的模块补丁结构
         //if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
-            buildNCCSqlAndFrontFiles(contentVO);
+        buildNCCSqlAndFrontFiles(contentVO);
         //}
     }
 
@@ -206,6 +206,12 @@ public class ExportNCPatcherUtil {
         HashMap<String, Module> moduleHomeDir2ModuleMap = contentVO.getModuleHomeDir2ModuleMap();
         File sqldir = new File(new File(contentVO.getOutPath()).getParentFile(), "SQL脚本");
         ArrayList<File> moduleOneSqls = new ArrayList<>();
+        //已存在的sql
+        Set exsitSqlSet = null;
+        if (!"false".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("filtersql"))) {
+            exsitSqlSet = new HashSet<>(60000);
+        }
+
         for (String modulePath : moduleHomeDir2ModuleMap.keySet()) {
             if (contentVO.ignoreModules.contains(moduleHomeDir2ModuleMap.get(modulePath))) {
                 //需要跳过的模块
@@ -241,10 +247,10 @@ public class ExportNCPatcherUtil {
                 }
 
                 if (isSqlFile(f)) {
-                    apendToSql(f, txt);
+                    apendToSql(f, txt, exsitSqlSet);
                 }
 
-                meargSqlFiles(f, txt);
+                meargSqlFiles(f, txt, exsitSqlSet);
             }
 
             FileUtil.writeUtf8String(txt.toString(), moduleSqlOne);
@@ -260,7 +266,7 @@ public class ExportNCPatcherUtil {
         }
     }
 
-    private static void meargSqlFiles(File dir, StringBuilder txt) {
+    private static void meargSqlFiles(File dir, StringBuilder txt, Set exsitSqlSet) {
         File[] fs = dir.listFiles();
         if (fs == null) {
             return;
@@ -268,10 +274,10 @@ public class ExportNCPatcherUtil {
 
         for (File f : fs) {
             if (isSqlFile(f)) {
-                apendToSql(f, txt);
+                apendToSql(f, txt, exsitSqlSet);
             }
 
-            meargSqlFiles(f, txt);
+            meargSqlFiles(f, txt, exsitSqlSet);
         }
     }
 
@@ -279,16 +285,32 @@ public class ExportNCPatcherUtil {
         return IoUtil.isFile(f, ".sql");
     }
 
-    private static void apendToSql(File f, StringBuilder txt) {
+    private static void apendToSql(File f, StringBuilder txt, Set exsitSqlSet) {
         List<String> lines = FileUtil.readUtf8Lines(f);
         txt.append("\n\n-- SQL文件: ").append(f.getPath()).append("\n");
+        String sqlfull = "";
+        String sql;
         for (int i = 0; i < lines.size(); i++) {
-            if (lines.get(i).trim().toLowerCase().equals("go")) {
-                txt.append(";\n");
+            if (lines.get(i) == null) {
                 continue;
             }
 
-            txt.append(lines.get(i)).append("\n");
+            sql = lines.get(i).trim();
+
+            if (sql.toLowerCase().equals("go")) {
+                if (exsitSqlSet != null && exsitSqlSet.contains(sqlfull)) {
+                    txt.append(" -- 重复SQL发现(" + exsitSqlSet.size() + "):" + sqlfull).append(" ;\n ");
+                    sqlfull = "";
+                    continue;
+                }
+
+                txt.append(sqlfull).append(" ;\n");
+                exsitSqlSet.add(sqlfull);
+                sqlfull = "";
+                continue;
+            } else {
+                sqlfull += ' ' + sql;
+            }
         }
     }
 
