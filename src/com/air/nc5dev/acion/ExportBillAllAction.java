@@ -3,6 +3,7 @@ package com.air.nc5dev.acion;
 import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
 import com.air.nc5dev.util.NCPropXmlUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.XmlUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.vo.NCDataSourceVO;
@@ -39,6 +40,7 @@ public class ExportBillAllAction extends AbstractIdeaAction {
         File outdir = new File(e.getProject().getBasePath() + File.separator
                 + "patchers" + File.separator + "单据脚本导出");
         outdir.mkdirs();
+        NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
         NCDataSourceVO dataConf = NCPropXmlUtil.getDataSourceVOS().get(0);
         String dbType = dataConf.getDatabaseType().toUpperCase()
                 .startsWith

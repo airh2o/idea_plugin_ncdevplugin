@@ -5,8 +5,11 @@ import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
+import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.vo.ExportConfigVO;
 import com.air.nc5dev.vo.ExportContentVO;
+import com.air.nc5dev.vo.ItemsItemVO;
+import com.air.nc5dev.vo.NCDataSourceVO;
 import com.google.common.base.Splitter;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -18,7 +21,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.sql.Connection;
 import java.sql.SQLData;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -136,17 +141,21 @@ public class ExportNCPatcherUtil {
                 }
 
                 if (sourceRoot.getName().equals(NC_TYPE_PUBLIC)) {
+                    contentVO.indicator.setText("public:" + sourceRoot.getPath());
                     export(NC_TYPE_PUBLIC, contentVO.outPath, entry.getValue()
                             , sourceRoot.getPath(), classDir.getPath(), testClassDirPath, contentVO);
                 } else if (sourceRoot.getName().equals(NC_TYPE_PRIVATE)) {
+                    contentVO.indicator.setText("private:" + sourceRoot.getPath());
                     export(NC_TYPE_PRIVATE, contentVO.outPath, entry.getValue()
                             , sourceRoot.getPath(), classDir.getPath(), testClassDirPath, contentVO);
                 } else if (sourceRoot.getName().equals(NC_TYPE_CLIENT)) {
+                    contentVO.indicator.setText("client:" + sourceRoot.getPath());
                     export(NC_TYPE_CLIENT, contentVO.outPath, entry.getValue()
                             , sourceRoot.getPath(), classDir.getPath(), testClassDirPath, contentVO);
                 } else if (null != testClassDirPath
                         && !configVO.noTest
                         && sourceRoot.getName().equals(NC_TYPE_TEST)) {
+                    contentVO.indicator.setText("test:" + sourceRoot.getPath());
                     export(NC_TYPE_TEST, contentVO.outPath, entry.getValue()
                             , sourceRoot.getPath(), classDir.getPath(), testClassDirPath, contentVO);
                 }
@@ -156,6 +165,7 @@ public class ExportNCPatcherUtil {
             //复制模块配置文件！
             File umpDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "META-INF");
             if (umpDir.isDirectory()) {
+                contentVO.indicator.setText("导出模块配置文件:" + umpDir.getPath());
                 IoUtil.copyAllFile(umpDir
                         , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
                                 .separatorChar +
@@ -166,6 +176,7 @@ public class ExportNCPatcherUtil {
 
             //复制模块元数据
             if (bmfDir.isDirectory()) {
+                contentVO.indicator.setText("导出模块元数据:" + umpDir.getPath());
                 IoUtil.copyAllFile(bmfDir
                         , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
                                 .separatorChar +
@@ -181,7 +192,7 @@ public class ExportNCPatcherUtil {
                         manifest = null;
                     }
                 }
-
+                contentVO.indicator.setText("代码打包成jar:" + entry.getValue().getName());
                 compressJar(new File(contentVO.outPath + File.separatorChar + entry.getValue().getName()),
                         configVO.toJarThenDelClass, manifest);
             }
@@ -191,8 +202,101 @@ public class ExportNCPatcherUtil {
 
         //处理NCC特殊的模块补丁结构
         //if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
-        buildNCCSqlAndFrontFiles(contentVO);
+        if ("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("rebuildsql"))) {
+            contentVO.indicator.setText("强制直接连接数据库生成SQL合并文件...");
+            reBuildNCCSqlAndFrontFiles(contentVO);
+        } else {
+            contentVO.indicator.setText("使用用友开发工具导出的SQL脚本文件进行SQL合并...");
+            buildNCCSqlAndFrontFiles(contentVO);
+        }
         //}
+    }
+
+    /**
+     * 强制直接连接数据库 读取 构建 SQL文件
+     *
+     * @param contentVO
+     */
+    public static void reBuildNCCSqlAndFrontFiles(ExportContentVO contentVO) {
+        buildNCCHotwebs(new File(contentVO.getProject().getBasePath(), "hotwebs"), contentVO);
+
+        HashMap<String, Module> moduleHomeDir2ModuleMap = contentVO.getModuleHomeDir2ModuleMap();
+        File sqldir = new File(new File(contentVO.getOutPath()).getParentFile(), "SQL脚本");
+        ArrayList<File> moduleOneSqls = new ArrayList<>();
+        //已存在的sql
+        Set exsitSqlSet = null;
+        if (!"false".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("filtersql"))) {
+            exsitSqlSet = new HashSet<>(60000);
+        }
+
+        NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
+        NCDataSourceVO ds = NCPropXmlUtil.get(ProjectNCConfigUtil.getConfigValue("data_source_index") != null
+                ? Integer.parseInt(ProjectNCConfigUtil.getConfigValue("data_source_index")) : 0);
+        if (ds == null) {
+            return;
+        }
+        Connection con = null;
+        try {
+            con = ConnectionUtil.getConn(ds);
+            if (con == null) {
+                return;
+            }
+
+            for (String modulePath : moduleHomeDir2ModuleMap.keySet()) {
+                if (contentVO.ignoreModules.contains(moduleHomeDir2ModuleMap.get(modulePath))) {
+                    //需要跳过的模块
+                    continue;
+                }
+
+                File script = new File(modulePath, "script");
+                if (!script.isDirectory() || script.listFiles().length < 1) {
+                    continue;
+                }
+                File conf = new File(script, "conf");
+                File initdata = new File(conf, "initdata");
+                File itemXml = new File(initdata, "items.xml");
+                if (!itemXml.isFile()) {
+                    continue;
+                }
+
+                File moduleSqlDir = new File(sqldir, moduleHomeDir2ModuleMap.get(modulePath).getName());
+                //根据模块 合并SQL文件们
+                File moduleSqlOne = new File(moduleSqlDir, moduleHomeDir2ModuleMap.get(modulePath).getName() + "_模块汇总.sql");
+
+                moduleSqlOne.deleteOnExit();
+                moduleOneSqls.add(moduleSqlOne);
+                StringBuilder txt = new StringBuilder(80_0000);
+
+                //读取items.xml文件
+                List<ItemsItemVO> itemVOs = ItemsItemVO.read(itemXml);
+                for (ItemsItemVO itemVO : itemVOs) {
+                    if (StringUtil.isBlank(itemVO.getItemKey())) {
+                        continue;
+                    }
+
+                    ConnectionUtil.toInserts(con, itemVO, txt, exsitSqlSet, contentVO);
+                }
+
+                FileUtil.writeUtf8String(txt.toString(), moduleSqlOne);
+            }
+
+            //合并成完全一个文件
+            File sqlOne = new File(sqldir, "全量汇总.sql");
+            sqlOne.deleteOnExit();
+            for (File moduleOneSql : moduleOneSqls) {
+                FileUtil.appendUtf8String("\n-- 模块SQL:  " + moduleOneSql.getPath() + "\n"
+                        + FileUtil.readUtf8String(moduleOneSql)
+                        + "\n\n\n\n\n", sqlOne);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LogUtil.error("重建导出SQL:" + e.toString(), e);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            LogUtil.error("重建导出SQL:" + e.toString(), e);
+        } finally {
+            IoUtil.close(con);
+        }
     }
 
     /**
@@ -233,6 +337,8 @@ public class ExportNCPatcherUtil {
             if (fs == null) {
                 continue;
             }
+
+            contentVO.indicator.setText("SQL合并:" + modulePath);
 
             moduleSqlOne.deleteOnExit();
             moduleOneSqls.add(moduleSqlOne);
@@ -297,7 +403,7 @@ public class ExportNCPatcherUtil {
 
             sql = lines.get(i).trim();
 
-            if (sql.toLowerCase().equals("go")) {
+            if (sql.toLowerCase().equals("go") || sql.toLowerCase().equals(";")) {
                 if (exsitSqlSet != null && exsitSqlSet.contains(sqlfull)) {
                     txt.append(" -- 重复SQL发现(" + exsitSqlSet.size() + "):" + sqlfull).append(" ;\n ");
                     sqlfull = "";
@@ -311,6 +417,10 @@ public class ExportNCPatcherUtil {
             } else {
                 sqlfull += ' ' + sql;
             }
+        }
+
+        if (StringUtil.isNotBlank(sqlfull)) {
+            txt.append(" -- SQL文件结尾异常数据:  " + sqlfull).append(" \n");
         }
     }
 

@@ -3,6 +3,7 @@ package com.air.nc5dev.acion;
 import cn.hutool.core.collection.CollUtil;
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
 import com.air.nc5dev.util.NCPropXmlUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.google.common.base.Joiner;
@@ -23,6 +24,7 @@ import java.util.List;
 public class ShowNCDBUserListAction extends AbstractIdeaAction {
     @Override
     protected void doHandler(AnActionEvent e) throws IOException {
+        NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
         List<NCDataSourceVO> ds = NCPropXmlUtil.getDataSourceVOS();
         if (CollUtil.isEmpty(ds)) {
             LogUtil.info("没有找到数据源列表,请配置NCHOME和NC的数据源!");

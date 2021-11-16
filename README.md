@@ -84,6 +84,19 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 
 # 版本更新
 ``` 
+  <em>3.0 版本 更新:</em> <br>
+      <ul>
+          <li>1. 支持导出补丁构建成NCC特有结构(前后端，前端要自己先build好).</li>
+          <li>1. 支持自动合并和过滤SQL脚本(
+                    nc.prop配置: 
+                        filtersql 是否过滤完全重复SQL语句 默认 true ,<br>
+                        rebuildsql 是否无视iuap导出的SQL采用IDEA插件自动根据items.xml导出SQL 默认 false ,<br>
+                        data_source_index idea导出SQL使用的数据源索引 默认 0 ,<br>
+                        enableSubResultSet 是否支持iuap自带的子表导出 默认 true -此功能暂时不支持，如果用idea强制导出 那么必须手工配置子表到 items-idea.xml(和items.xml一个文件夹里)中 ,<br>
+              )
+          </li>
+      </ul>
+
     <em>2.5.7 版本 更新:</em> <br>
       <ul>
           <li>1. 修复部分NCC的支持性问题.</li>

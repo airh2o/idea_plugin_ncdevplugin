@@ -35,6 +35,7 @@ public class NC5HomeConfigDialogUIListener {
      * @param e
      */
     private void OnTestDb(ActionEvent e) {
+        NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
         if (NCPropXmlUtil.isDataSourceEmpty()) {
             return;
         }
@@ -106,6 +107,7 @@ public class NC5HomeConfigDialogUIListener {
      * @param e
      */
     private void OnAddDesgin(ActionEvent e) {
+        NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
         if (NCPropXmlUtil.isDataSourceEmpty()) {
             return;
         }
@@ -257,6 +259,7 @@ public class NC5HomeConfigDialogUIListener {
         ui.textField_clientip.setText(ProjectNCConfigUtil.getNCClientIP());
         ui.textField_cientport.setText(ProjectNCConfigUtil.getNCClientPort());
 
+        NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
         List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS();
 
         if (null != dataSourceVOS && !dataSourceVOS.isEmpty()) {

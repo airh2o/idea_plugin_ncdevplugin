@@ -139,6 +139,7 @@ public class PatcherDialog
                     contentVO.outPath = exportPath;
                     contentVO.project = event.getProject();
                     contentVO.event = event;
+                    contentVO.indicator = indicator;
                     ExportNCPatcherUtil.export(contentVO);
                     long e = System.currentTimeMillis();
                     LogUtil.info("导出成功,耗时:" + ((e - s) / 1000.0d) + " (秒s)!硬盘路径： " + exportPath);

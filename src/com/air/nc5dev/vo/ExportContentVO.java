@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import lombok.Data;
 
@@ -51,5 +52,5 @@ public class ExportContentVO {
      */
     public List<Module> ignoreModules = Lists.newLinkedList();
 
-
+    public ProgressIndicator indicator;
 }

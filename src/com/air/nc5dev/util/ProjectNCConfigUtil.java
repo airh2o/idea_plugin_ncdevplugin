@@ -193,6 +193,18 @@ public class ProjectNCConfigUtil {
         if (!ProjectNCConfigUtil.configPropertis.containsKey("nc.version")) {
             ProjectNCConfigUtil.configPropertis.put("nc.version", "");
         }
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("filtersql")) {
+            ProjectNCConfigUtil.configPropertis.put("filtersql", "true");
+        }
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("rebuildsql")) {
+            ProjectNCConfigUtil.configPropertis.put("rebuildsql", "false");
+        }
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("data_source_index")) {
+            ProjectNCConfigUtil.configPropertis.put("data_source_index", "0");
+        }
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("enableSubResultSet")) {
+            ProjectNCConfigUtil.configPropertis.put("enableSubResultSet", "true");
+        }
 
         IoUtil.wirtePropertis(ProjectNCConfigUtil.configPropertis, ProjectNCConfigUtil.configFile);
     }

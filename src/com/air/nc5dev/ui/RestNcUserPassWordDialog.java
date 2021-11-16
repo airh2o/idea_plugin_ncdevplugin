@@ -92,6 +92,7 @@ public class RestNcUserPassWordDialog
     protected JComponent createCenterPanel() {
         if (contentPane == null) {
             contentPane = new ResetNCUserPassWordPanel();
+            NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
             List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS();
             if (CollUtil.isEmpty(dataSourceVOS)) {
                 throw new BusinessException("请检查NCHOME或者NC数据源配置,数据源为空!");
