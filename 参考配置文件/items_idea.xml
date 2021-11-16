@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding='gb2312'?>
+<!-- 不通过用友工具 而是IDEA 插件强制读取数据库导出SQL专用 补充某些表  -->
+<items docType="SDP_SCRIPT_ITEM">
+    <!-- sm_appregister  -->
+    <item>
+        <itemKey>sm_apppage</itemKey>
+        <itemName>sm_apppage</itemName>
+        <itemRule>sm_apppage</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and parent_id in(select pk_appregister from sm_appregister where nvl(dr,0)=0
+            and code like '5080%')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>sm_appbutnregister</itemKey>
+        <itemName>sm_appbutnregister</itemName>
+        <itemRule>sm_appbutnregister</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and appid in(select pk_appregister from sm_appregister where nvl(dr,0)=0
+            and code like '5080%')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>sm_appparam</itemKey>
+        <itemName>sm_appparam</itemName>
+        <itemRule>sm_appparam</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and parentid in(select pk_appregister from sm_appregister where nvl(dr,0)=0
+            and code like '5080%')
+        </fixedWhere>
+    </item>
+    <!--    END sm_appregister  -->
+
+    <!--  pub_page_templet   -->
+    <item>
+        <itemKey>pub_area</itemKey>
+        <itemName>pub_area</itemName>
+        <itemRule>pub_area</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and templetid in(select pk_page_templet from pub_page_templet where nvl(dr,0)=0 and appcode like '5080%')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_query_property</itemKey>
+        <itemName>pub_query_property</itemName>
+        <itemRule>pub_query_property</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and areaid in(select pk_area from where templetid in(select pk_page_templet from pub_page_templet where
+            nvl(dr,0)=0 and appcode like '5080%')
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_form_property</itemKey>
+        <itemName>pub_form_property</itemName>
+        <itemRule>pub_form_property</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and areaid in(select pk_area from where templetid in(select pk_page_templet from pub_page_templet where
+            nvl(dr,0)=0 and appcode like '5080%')
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_ncc_queryscheme</itemKey>
+        <itemName>pub_ncc_queryscheme</itemName>
+        <itemRule>pub_ncc_queryscheme</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and areaid in(select pk_area from where templetid in(select pk_page_templet from pub_page_templet where
+            nvl(dr,0)=0 and appcode like '5080%')
+            )
+        </fixedWhere>
+    </item>
+    <!--    END pub_page_templet  -->
+
+    <!--   bd_billtype  -->
+    <item>
+        <itemKey>dap_defitem</itemKey>
+        <itemName>dap_defitem</itemName>
+        <itemRule>dap_defitem</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>dap_billfactor</itemKey>
+        <itemName>dap_billfactor</itemName>
+        <itemRule>dap_billfactor</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_votable</itemKey>
+        <itemName>pub_votable</itemName>
+        <itemRule>pub_votable</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billtobillrefer</itemKey>
+        <itemName>pub_billtobillrefer</itemName>
+        <itemRule>pub_billtobillrefer</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_function</itemKey>
+        <itemName>pub_function</itemName>
+        <itemRule>pub_function</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billaction</itemKey>
+        <itemName>pub_billaction</itemName>
+        <itemRule>pub_billaction</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billactiongroup</itemKey>
+        <itemName>pub_billactiongroup</itemName>
+        <itemRule>pub_billactiongroup</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billactionconfig</itemKey>
+        <itemName>pub_billactionconfig</itemName>
+        <itemRule>pub_billactionconfig</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billactiongroup in(
+            select pk_billactiongroup from pub_billactiongroup where nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_busiclass</itemKey>
+        <itemName>pub_busiclass</itemName>
+        <itemRule>pub_busiclass</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>bd_fwdbilltype</itemKey>
+        <itemName>bd_fwdbilltype</itemName>
+        <itemRule>bd_fwdbilltype</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>bd_relatedapp</itemKey>
+        <itemName>bd_relatedapp</itemName>
+        <itemRule>bd_relatedapp</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>bd_billtype2</itemKey>
+        <itemName>bd_billtype2</itemName>
+        <itemRule>bd_billtype2</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_publishapp</itemKey>
+        <itemName>pub_publishapp</itemName>
+        <itemRule>pub_publishapp</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+        </fixedWhere>
+    </item>
+    <!--    END bd_billtype  -->
+
+    <!--      pub_bcr_nbcr  -->
+    <item>
+        <itemKey>pub_bcr_candiattr</itemKey>
+        <itemName>pub_bcr_candiattr</itemName>
+        <itemRule>pub_bcr_candiattr</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_nbcr in (
+            select pk_nbcr from pub_bcr_nbcr nvl(dr,0)=0 and metaid in (
+            select id from MD_CLASS where FULLCLASSNAME like '%.mmmpsxj.%'
+            )
+            )
+        </fixedWhere>
+    </item>
+    <!--    END pub_bcr_nbcr  -->
+
+    <!--      pub_vochange  -->
+    <item>
+        <itemKey>pub_vochange_b</itemKey>
+        <itemName>pub_vochange_b</itemName>
+        <itemRule>pub_vochange_b</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_vochange in(
+            select pk_vochange from pub_vochange where nvl(dr,0)=0 and src_billtype in (select pk_billtypecode from
+            bd_billtype where nodecode like '5080%')
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_vochange_s</itemKey>
+        <itemName>pub_vochange_s</itemName>
+        <itemRule>pub_vochange_s</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_vochange in(
+            select pk_vochange from pub_vochange where nvl(dr,0)=0 and src_billtype in (select pk_billtypecode from
+            bd_billtype where nodecode like '5080%')
+            )
+        </fixedWhere>
+    </item>
+    <!--    END pub_vochange  -->
+
+    <!--      pub_msgtemp_type  -->
+    <item>
+        <itemKey>pub_msgtemp_var</itemKey>
+        <itemName>消息模板类型变量</itemName>
+        <itemRule>pub_msgtemp_var</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_temptype in(
+            select pk_temptype from pub_msgtemp_type where nvl(dr,0)=0
+            and tempcode in(
+            'mmmpsxj_notif_msg'
+            , 'mmmpsxj_notif_msg_month_bcptxqsq'
+            ,'mmmpsxj_notif_msg_month_dzjptxqsq'
+            ,'WF_MMMPSXJ','MMYEARPLAN'
+            )
+            )
+        </fixedWhere>
+    </item>
+    <!--    END pub_msgtemp_type  -->
+</items>
