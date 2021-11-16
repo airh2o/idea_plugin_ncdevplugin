@@ -205,6 +205,9 @@ public class ProjectNCConfigUtil {
         if (!ProjectNCConfigUtil.configPropertis.containsKey("enableSubResultSet")) {
             ProjectNCConfigUtil.configPropertis.put("enableSubResultSet", "true");
         }
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("includeDeletes")) {
+            ProjectNCConfigUtil.configPropertis.put("includeDeletes", "false");
+        }
 
         IoUtil.wirtePropertis(ProjectNCConfigUtil.configPropertis, ProjectNCConfigUtil.configFile);
     }

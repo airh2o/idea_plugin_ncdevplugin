@@ -62,7 +62,7 @@ public class ConnectionUtil {
             subs(iTable, subResultSets);
         }
 
-        SqlQueryInserts sqls = convert2InsertSQLs(rs, false);
+        SqlQueryInserts sqls = convert2InsertSQLs(rs, "true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("includeDeletes")));
 
         apend(con, itemVO, txt, exsitSqlSet, contentVO, sqls);
     }

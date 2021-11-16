@@ -93,6 +93,7 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
                         rebuildsql 是否无视iuap导出的SQL采用IDEA插件自动根据items.xml导出SQL 默认 false ,<br>
                         data_source_index idea导出SQL使用的数据源索引 默认 0 ,<br>
                         enableSubResultSet 是否支持iuap自带的子表导出 默认 true -此功能暂时不支持，如果用idea强制导出 那么必须手工配置子表到 items-idea.xml(和items.xml一个文件夹里)中 ,<br>
+                        includeDeletes 是否导出delete删除已存在数据的语句 默认 false .<br>
               )
           </li>
       </ul>
