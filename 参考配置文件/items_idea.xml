@@ -59,8 +59,9 @@
         <sysField></sysField>
         <corpField></corpField>
         <grpField></grpField>
-        <fixedWhere>nvl(dr,0)=0
-            and areaid in(select pk_area from where templetid in(select pk_page_templet from pub_page_templet where
+        <fixedWhere> nvl(dr,0)=0
+            and areaid in(select pk_area from pub_area where TEMPLETID
+            in(select pk_page_templet from pub_page_templet where
             nvl(dr,0)=0 and appcode like '5080%')
             )
         </fixedWhere>
@@ -73,7 +74,8 @@
         <corpField></corpField>
         <grpField></grpField>
         <fixedWhere>nvl(dr,0)=0
-            and areaid in(select pk_area from where templetid in(select pk_page_templet from pub_page_templet where
+            and areaid in(select pk_area from PUB_AREA where TEMPLETID
+            in(select pk_page_templet from pub_page_templet where
             nvl(dr,0)=0 and appcode like '5080%')
             )
         </fixedWhere>
@@ -86,7 +88,8 @@
         <corpField></corpField>
         <grpField></grpField>
         <fixedWhere>nvl(dr,0)=0
-            and areaid in(select pk_area from where templetid in(select pk_page_templet from pub_page_templet where
+            and areaid in(select pk_area from PUB_AREA where TEMPLETID
+            in(select pk_page_templet from pub_page_templet where
             nvl(dr,0)=0 and appcode like '5080%')
             )
         </fixedWhere>
@@ -94,7 +97,7 @@
     <!--    END pub_page_templet  -->
 
     <!--   bd_billtype  -->
-    <item>
+    <!--<item>
         <itemKey>dap_defitem</itemKey>
         <itemName>dap_defitem</itemName>
         <itemRule>dap_defitem</itemRule>
@@ -145,7 +148,7 @@
             select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
             )
         </fixedWhere>
-    </item>
+    </item>-->
     <item>
         <itemKey>pub_function</itemKey>
         <itemName>pub_function</itemName>
@@ -185,22 +188,22 @@
             )
         </fixedWhere>
     </item>
-    <item>
-        <itemKey>pub_billactionconfig</itemKey>
-        <itemName>pub_billactionconfig</itemName>
-        <itemRule>pub_billactionconfig</itemRule>
-        <sysField></sysField>
-        <corpField></corpField>
-        <grpField></grpField>
-        <fixedWhere>nvl(dr,0)=0
-            and pk_billactiongroup in(
-            select pk_billactiongroup from pub_billactiongroup where nvl(dr,0)=0
-            and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
-            )
-            )
-        </fixedWhere>
-    </item>
+    <!--  <item>
+          <itemKey>pub_billactionconfig</itemKey>
+          <itemName>pub_billactionconfig</itemName>
+          <itemRule>pub_billactionconfig</itemRule>
+          <sysField></sysField>
+          <corpField></corpField>
+          <grpField></grpField>
+          <fixedWhere>nvl(dr,0)=0
+              and pk_billactiongroup in(
+              select pk_billactiongroup from pub_billactiongroup where nvl(dr,0)=0
+              and pk_billtypeid in(
+              select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+              )
+              )
+          </fixedWhere>
+      </item>-->
     <item>
         <itemKey>pub_busiclass</itemKey>
         <itemName>pub_busiclass</itemName>
@@ -278,7 +281,7 @@
         <grpField></grpField>
         <fixedWhere>nvl(dr,0)=0
             and pk_nbcr in (
-            select pk_nbcr from pub_bcr_nbcr nvl(dr,0)=0 and metaid in (
+            select pk_nbcr from pub_bcr_nbcr where nvl(dr,0)=0 and metaid in (
             select id from MD_CLASS where FULLCLASSNAME like '%.mmmpsxj.%'
             )
             )
@@ -320,7 +323,7 @@
     <!--      pub_msgtemp_type  -->
     <item>
         <itemKey>pub_msgtemp_var</itemKey>
-        <itemName>消息模板类型变量</itemName>
+        <itemName>pub_msgtemp_var</itemName>
         <itemRule>pub_msgtemp_var</itemRule>
         <sysField></sysField>
         <corpField></corpField>

@@ -1,10 +1,12 @@
 package com.air.nc5dev.util.jdbc;
 
+import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.core.util.ObjectUtil;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.ReflectUtil;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.vo.ExportContentVO;
 import com.air.nc5dev.vo.ItemsItemVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
@@ -12,6 +14,7 @@ import com.air.nc5dev.vo.SubTableVO;
 import nc.uap.studio.pub.db.ScriptHelper;
 import nc.uap.studio.pub.db.ScriptService;
 import nc.uap.studio.pub.db.SqlUtil;
+import nc.uap.studio.pub.db.exception.DatabaseRuntimeException;
 import nc.uap.studio.pub.db.model.ITable;
 import nc.uap.studio.pub.db.query.SqlQueryResultSet;
 import nc.uap.studio.pub.db.script.export.SqlQueryInserts;
@@ -49,22 +52,28 @@ public class ConnectionUtil {
     }
 
     public static void toInserts(Connection con, ItemsItemVO itemVO, StringBuilder txt, Set exsitSqlSet, ExportContentVO contentVO) {
-        ITable iTable = SqlUtil.retrieveTable(itemVO.getItemKey(), null, con);
-        SqlQueryResultSet rs = SqlUtil.queryResults(iTable, itemVO.getFixedWhere(), con);
-        if (rs == null) {
-            return;
+        try {
+            ITable iTable = SqlUtil.retrieveTable(itemVO.getItemKey(), null, con);
+            SqlQueryResultSet rs = SqlUtil.queryResults(iTable, itemVO.getFixedWhere(), con);
+            if (rs == null) {
+                return;
+            }
+
+            if (!"false".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("enableSubResultSet"))) {
+                //处理默认的子表
+                List<SqlQueryResultSet> subResultSets = new ArrayList<>();
+                ReflectUtil.setFieldValue(rs, "subResultSets", subResultSets);
+                subs(iTable, subResultSets);
+            }
+
+            SqlQueryInserts sqls = convert2InsertSQLs(rs, "true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("includeDeletes")));
+
+            apend(con, itemVO, txt, exsitSqlSet, contentVO, sqls);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtil.error("导出表:" + itemVO.getItemKey() + " 出错!" + e.toString(), e);
+            throw new RuntimeException("导出表:" + itemVO.getItemKey() + " 出错!" + e.toString(), e);
         }
-
-        if (!"false".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("enableSubResultSet"))) {
-            //处理默认的子表
-            List<SqlQueryResultSet> subResultSets = new ArrayList<>();
-            ReflectUtil.setFieldValue(rs, "subResultSets", subResultSets);
-            subs(iTable, subResultSets);
-        }
-
-        SqlQueryInserts sqls = convert2InsertSQLs(rs, "true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("includeDeletes")));
-
-        apend(con, itemVO, txt, exsitSqlSet, contentVO, sqls);
     }
 
     private static void subs(ITable iTable, List<SqlQueryResultSet> subResultSets) {
