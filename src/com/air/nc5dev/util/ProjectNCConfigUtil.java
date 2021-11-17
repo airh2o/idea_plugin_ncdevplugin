@@ -32,7 +32,7 @@ public class ProjectNCConfigUtil {
     //这是插件实例的唯一标识
     private static final int PLUGIN_RUNTIME_MARK = new Object().hashCode();
     /*** NC配置文件在项目中文件的名字 ***/
-    public static final String DEFUAL_NC_CONFIG_PROJECT_FILENAME = "nc.prop";
+    public static final String DEFUAL_NC_CONFIG_PROJECT_FILENAME = "nc.properties";
     public static final String[] dsTypes = new String[]{"ORACLE11G", "ORACLE10G", "SQLSERVER2008", "DB297"};
     public static final String[] dsTypeClasss = new String[]{"oracle.jdbc.OracleDriver", "oracle.jdbc.OracleDriver"
             , "com.microsoft.sqlserver.jdbc.SQLServerDriver", "com.ibm.db2.jcc.DB2Driver"};
@@ -243,6 +243,13 @@ public class ProjectNCConfigUtil {
             File projectHome = new File(ProjectUtil.getDefaultProject().getBasePath());
             File ideaDir = new File(projectHome, Project.DIRECTORY_STORE_FOLDER);
             configFile = new File(ideaDir, DEFUAL_NC_CONFIG_PROJECT_FILENAME);
+            if (!configFile.isFile()) {
+                configFile = new File(ideaDir, "nc.prop");
+                if (configFile.isFile()) {
+                    configFile.renameTo(new File(ideaDir, DEFUAL_NC_CONFIG_PROJECT_FILENAME));
+                    configFile = new File(ideaDir, DEFUAL_NC_CONFIG_PROJECT_FILENAME);
+                }
+            }
             if (!configFile.exists()) {
                 configFile.createNewFile();
             }
