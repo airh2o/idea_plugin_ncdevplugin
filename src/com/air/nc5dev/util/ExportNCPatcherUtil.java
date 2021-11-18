@@ -235,6 +235,7 @@ public class ExportNCPatcherUtil {
             return;
         }
         Connection con = null;
+        String module = null;
         try {
             con = ConnectionUtil.getConn(ds);
             if (con == null) {
@@ -246,6 +247,7 @@ public class ExportNCPatcherUtil {
                     //需要跳过的模块
                     continue;
                 }
+                module = modulePath;
 
                 File script = new File(modulePath, "script");
                 if (!script.isDirectory() || script.listFiles().length < 1) {
@@ -289,10 +291,10 @@ public class ExportNCPatcherUtil {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            LogUtil.error("重建导出SQL:" + e.toString(), e);
+            LogUtil.error("重建导出SQL:" + e.toString() + ",模块:" + module, e);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            LogUtil.error("重建导出SQL:" + e.toString(), e);
+            LogUtil.error("重建导出SQL:" + e.toString() + ",模块:" + module, e);
         } finally {
             IoUtil.close(con);
         }
