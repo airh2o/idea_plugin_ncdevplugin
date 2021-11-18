@@ -1,0 +1,14 @@
+    NCDataSourceVO dataConf = NCPropXmlUtil.getDataSourceVOS().get(0);
+        Document document = XmlUtil.readXML(propXml);
+        document.getElementsByTagName("dbtype").item(0).setNodeValue(dataConf.getDatabaseType().toUpperCase()
+                .startsWith
+                ("ORACLE")
+                ? dataConf.getDatabaseType() : "SQLSERVER");
+        document.getElementsByTagName("ip").item(0).setNodeValue(dataConf.getDatabaseUrl());
+        document.getElementsByTagName("username").item(0).setNodeValue(dataConf.getUser());
+        document.getElementsByTagName("psw").item(0).setNodeValue(dataConf.getPassword());
+
+        File outdir = new File(e.getProject().getBasePath() + File.separator
+                + "patchers" + File.separator + "单据脚本导出");
+        outdir.mkdirs();
+        document.getElementsByTagName("outputpath").item(0).setNodeValue(outdir.getPath());

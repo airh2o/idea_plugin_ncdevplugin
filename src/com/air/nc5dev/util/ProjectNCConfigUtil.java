@@ -223,6 +223,9 @@ public class ProjectNCConfigUtil {
         if (!ProjectNCConfigUtil.configPropertis.containsKey("includeDeletes")) {
             ProjectNCConfigUtil.configPropertis.put("includeDeletes", "false");
         }
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("reNpmBuild")) {
+            ProjectNCConfigUtil.configPropertis.put("reNpmBuild", "true");
+        }
 
         IoUtil.wirtePropertis(ProjectNCConfigUtil.configPropertis, ProjectNCConfigUtil.configFile);
     }

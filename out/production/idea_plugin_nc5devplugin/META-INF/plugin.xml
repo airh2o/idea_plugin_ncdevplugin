@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>Yonyou NC Dev Tool</name>
-    <version>v2.5.7</version>
+    <version>v3.0</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com</vendor>
 
     <description><![CDATA[
@@ -33,6 +33,24 @@
     ]]></description>
 
     <change-notes><![CDATA[
+      <em>version 3.0 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+           <li>1. suport NCC.</li>
+
+          <li>中文:</li>
+          <li>1. 支持导出补丁构建成NCC特有结构(前后端，前端要自己先build好).</li>
+          <li>1. 支持自动合并和过滤SQL脚本(
+                    nc.prop配置:
+                        filtersql 是否过滤完全重复SQL语句 默认 true ,<br>
+                        rebuildsql 是否无视iuap导出的SQL采用IDEA插件自动根据items.xml导出SQL 默认 false ,<br>
+                        data_source_index idea导出SQL使用的数据源索引 默认 0 ,<br>
+                        enableSubResultSet 是否支持iuap自带的子表导出 默认 true -此功能暂时不支持，如果用idea强制导出 那么必须手工配置子表到 items-idea.xml(和items.xml一个文件夹里)中 ,<br>
+                        includeDeletes 是否导出delete删除已存在数据的语句 默认 false .<br>
+              )
+          </li>
+      </ul>
+
      <em>version 2.5.7 updated:</em> <br>
       <ul>
           <li>english:</li>
@@ -73,7 +91,7 @@
     </change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="173.0"/>
+    <idea-version since-build="178.0"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->

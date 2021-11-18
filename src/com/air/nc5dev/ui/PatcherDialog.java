@@ -3,6 +3,7 @@ package com.air.nc5dev.ui;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.net.Ipv4Util;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.*;
 import com.air.nc5dev.util.idea.LogUtil;
@@ -56,6 +57,7 @@ public class PatcherDialog
     JBCheckBox rebuild;
     JComboBox dataSourceIndex;
     JComboBox ncVersion;
+    JBCheckBox reNpmBuild;
 
     public PatcherDialog(AnActionEvent event) {
         super(event.getProject());
@@ -107,7 +109,7 @@ public class PatcherDialog
             contentPane.add(label_3);
             filtersql = new JBCheckBox();
             filtersql.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("filtersql", "true")));
-            filtersql.setBounds(210, 90, 60, 36);
+            filtersql.setBounds(190, 90, 60, 36);
             contentPane.add(filtersql);
 
             JLabel label_2 = new JBLabel("强制IDEA连接数据库导出SQL:");
@@ -115,7 +117,7 @@ public class PatcherDialog
             contentPane.add(label_2);
             rebuild = new JBCheckBox();
             rebuild.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("rebuildsql", "false")));
-            rebuild.setBounds(210, 130, 60, 36);
+            rebuild.setBounds(190, 130, 60, 36);
             contentPane.add(rebuild);
 
             JLabel label_4 = new JBLabel("强制IDEA连接数据库导出SQL使用NC配置的数据源第几个(0开始):");
@@ -128,10 +130,10 @@ public class PatcherDialog
                             .collect(Collectors.toList())
             ));
             dataSourceIndex.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue("data_source_index"), 0));
-            dataSourceIndex.setBounds(410, 165, 100, 35);
+            dataSourceIndex.setBounds(380, 165, 100, 35);
             contentPane.add(dataSourceIndex);
             JButton button_TestDb = new JButton("测试连接");
-            button_TestDb.setBounds(520, 165, 113, 42);
+            button_TestDb.setBounds(500, 165, 113, 42);
             button_TestDb.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Integer i = dataSourceIndex.getSelectedIndex();
@@ -162,8 +164,16 @@ public class PatcherDialog
             contentPane.add(label_5);
             ncVersion = new JComboBox<NcVersionEnum>(NcVersionEnum.values());
             ncVersion.setSelectedItem(ProjectNCConfigUtil.getNCVerSIon());
-            ncVersion.setBounds(190, 200, 100, 30);
+            ncVersion.setBounds(180, 200, 100, 30);
             contentPane.add(ncVersion);
+
+            JLabel label_6 = new JBLabel("自动删除hotwebs的dist后执行npm run build:");
+            label_6.setBounds(21, 240, 280, 30);
+            contentPane.add(label_6);
+            reNpmBuild = new JBCheckBox();
+            reNpmBuild.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("reNpmBuild", "true")));
+            reNpmBuild.setBounds(280, 240, 60, 36);
+            contentPane.add(reNpmBuild);
 
             //设置点默认值
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
@@ -172,7 +182,7 @@ public class PatcherDialog
                     "patchers" + File.separatorChar + "exportpatcher-" + LocalDateTime.now().format(formatter));
         }
 
-        contentPane.setPreferredSize(new Dimension(780, 260));
+        contentPane.setPreferredSize(new Dimension(780, 280));
         return this.contentPane;
     }
 
@@ -220,8 +230,21 @@ public class PatcherDialog
                     contentVO.indicator = indicator;
                     contentVO.filtersql = filtersql.isSelected();
                     contentVO.rebuildsql = rebuild.isSelected();
+                    contentVO.reNpmBuild = reNpmBuild.isSelected();
                     contentVO.data_source_index = dataSourceIndex.getSelectedIndex();
                     contentVO.ncVersion = (NcVersionEnum) ncVersion.getSelectedItem();
+
+                    if (contentVO.reNpmBuild) {
+                        //你懂得！
+                        if (new File(event.getProject().getBasePath(), "hotwebs").isDirectory()) {
+                            indicator.setText("强制删除前端hotwebs的dist后执行npm run build中...");
+                            IoUtil.cleanUpDirFiles(new File(event.getProject().getBasePath(), "hotwebs" + File.separatorChar + "dist"));
+                            String cm = ExecUtil.npmBuild(new File(event.getProject().getBasePath(), "hotwebs").getPath()
+                                    , (line) -> indicator.setText("npm building:" + StrUtil.removeAllLineBreaks(line)));
+                            LogUtil.info("前端 npm run build: " + cm);
+                        }
+                    }
+
                     ExportNCPatcherUtil.export(contentVO);
                     long e = System.currentTimeMillis();
                     LogUtil.info("导出成功,耗时:" + ((e - s) / 1000.0d) + " (秒s)!硬盘路径： " + exportPath);

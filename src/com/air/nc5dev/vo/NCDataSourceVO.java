@@ -1,7 +1,6 @@
 package com.air.nc5dev.vo;
 
 import com.air.nc5dev.util.ncutils.NC5xEncode;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -18,7 +17,6 @@ import java.util.Objects;
  **/
 @Data
 public class NCDataSourceVO {
-    @JsonIgnore
     private transient Element element;
     private String dataSourceName;
     private String oidMark;
