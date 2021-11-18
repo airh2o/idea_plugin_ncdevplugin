@@ -152,6 +152,21 @@ public class ProjectNCConfigUtil {
         setNCConfigPropertice(KEY_PROJECT_NC_CONFIG_CLIENT_PORT, port);
     }
 
+    /**
+     * 根据key获取NC项目配置值       </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return java.lang.String
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 9:12
+     * @Param [key]
+     */
+    public static final String getConfigValue(@NotNull String key, String ifnull) {
+        String s = getConfigValue(key);
+        return s == null ? ifnull : s;
+    }
 
     /**
      * 根据key获取NC项目配置值       </br>

@@ -1,6 +1,7 @@
 package com.air.nc5dev.vo;
 
 import com.air.nc5dev.util.ncutils.NC5xEncode;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -9,7 +10,7 @@ import org.w3c.dom.NodeList;
 import java.util.Objects;
 
 /**
- * NC数据源
+ * NC锟斤拷锟斤拷源
  *
  * @Author air Email: 209308343@qq.com
  * @Description
@@ -17,7 +18,8 @@ import java.util.Objects;
  **/
 @Data
 public class NCDataSourceVO {
-    private Element element;
+    @JsonIgnore
+    private transient Element element;
     private String dataSourceName;
     private String oidMark;
     private String databaseUrl;

@@ -202,7 +202,7 @@ public class ExportNCPatcherUtil {
 
         //处理NCC特殊的模块补丁结构
         //if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
-        if ("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("rebuildsql"))) {
+        if (contentVO.rebuildsql) {
             contentVO.indicator.setText("强制直接连接数据库生成SQL合并文件...");
             reBuildNCCSqlAndFrontFiles(contentVO);
         } else {
@@ -225,13 +225,12 @@ public class ExportNCPatcherUtil {
         ArrayList<File> moduleOneSqls = new ArrayList<>();
         //已存在的sql
         Set exsitSqlSet = null;
-        if (!"false".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("filtersql"))) {
+        if (contentVO.filtersql) {
             exsitSqlSet = new HashSet<>(60000);
         }
 
         NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
-        NCDataSourceVO ds = NCPropXmlUtil.get(ProjectNCConfigUtil.getConfigValue("data_source_index") != null
-                ? Integer.parseInt(ProjectNCConfigUtil.getConfigValue("data_source_index")) : 0);
+        NCDataSourceVO ds = NCPropXmlUtil.get(contentVO.data_source_index);
         if (ds == null) {
             return;
         }
@@ -312,7 +311,7 @@ public class ExportNCPatcherUtil {
         ArrayList<File> moduleOneSqls = new ArrayList<>();
         //已存在的sql
         Set exsitSqlSet = null;
-        if (!"false".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("filtersql"))) {
+        if (contentVO.filtersql) {
             exsitSqlSet = new HashSet<>(60000);
         }
 
@@ -487,6 +486,39 @@ public class ExportNCPatcherUtil {
                 + File.separatorChar + "nccloud"
                 + File.separatorChar + "WEB-INF"
         );
+
+        //检查是否需要把代码打包成 jar文件
+        ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(module);
+        if (configVO.toJar) {
+            File manifest = null;
+            if (StringUtil.notEmpty(configVO.manifestFilePath)) {
+                manifest = new File(configVO.manifestFilePath);
+                if (!manifest.isFile()) {
+                    manifest = null;
+                }
+            }
+            contentVO.indicator.setText("NCC-hotwebs代码打包成jar:" + module.getName());
+            List<File> jars = compressJar(
+                    new File(contentVO.outPath
+                            + File.separatorChar + module.getName()
+                            + File.separatorChar + "client"
+                            + File.separatorChar + "classes"
+                    )
+                    , new File(outBaseDir, "lib")
+                    , "ui_" + module.getName()
+                    , manifest);
+            //删除打包前文件
+            if (configVO.toJarThenDelClass) {
+                IoUtil.cleanUpDirFiles(new File(contentVO.outPath
+                        + File.separatorChar + module.getName()
+                        + File.separatorChar + "client"
+                        + File.separatorChar + "classes"
+                ));
+            }
+
+            return;
+        }
+
         for (File f : fs) {
             if (f.isDirectory()) {
                 File clientDir = new File(f, "client");
@@ -598,39 +630,55 @@ public class ExportNCPatcherUtil {
      * @date 2020/2/9 0009 14:50
      * @Param [moduleHomeDir, compressEndDeleteClass, contentVO]  模块路径， 是否不保留class文件  true删除class文件,模块配置文件
      */
-    private static void compressJar(File moduleHomeDir, boolean compressEndDeleteClass, File manifest) {
-        File baseDir;
+    private static List<File> compressJar(File moduleHomeDir, boolean compressEndDeleteClass, File manifest) {
+        ArrayList<File> fs = new ArrayList<>();
         //public
-        baseDir = moduleHomeDir;
-        compressJar(new File(baseDir, "classes")
-                , new File(baseDir, "lib")
+        fs.addAll(compressJar(new File(moduleHomeDir
+                        , "classes"
+                )
+                , new File(moduleHomeDir, "lib")
                 , "public_" + moduleHomeDir.getName()
-                , manifest);
+                , manifest));
         //private
-        baseDir = new File(moduleHomeDir, File.separatorChar + "META-INF");
-        compressJar(new File(baseDir, "classes")
-                , new File(baseDir, "lib")
+        fs.addAll(compressJar(new File(moduleHomeDir
+                        , "META-INF"
+                        + File.separatorChar + "classes"
+                )
+                , new File(moduleHomeDir, "META-INF"
+                        + File.separatorChar + "lib"
+                )
                 , "private_" + moduleHomeDir.getName()
-                , manifest);
+                , manifest));
         //client
-        baseDir = new File(moduleHomeDir, File.separatorChar + "client");
-        compressJar(new File(baseDir, "classes")
-                , new File(baseDir, "lib")
+        fs.addAll(compressJar(new File(moduleHomeDir
+                        , "client"
+                        + File.separatorChar + "classes"
+                )
+                , new File(moduleHomeDir, "client"
+                        + File.separatorChar + "lib"
+                )
                 , "ui_" + moduleHomeDir.getName()
-                , manifest);
+                , manifest));
 
         //删除打包前文件
         if (compressEndDeleteClass) {
             //public
-            baseDir = moduleHomeDir;
-            IoUtil.cleanUpDirFiles(new File(baseDir, "classes"));
+            IoUtil.cleanUpDirFiles(new File(moduleHomeDir, "classes"));
             //private
-            baseDir = new File(moduleHomeDir, File.separatorChar + "META-INF");
-            IoUtil.cleanUpDirFiles(new File(baseDir, "classes"));
+            IoUtil.cleanUpDirFiles(new File(moduleHomeDir
+                            , "META-INF"
+                            + File.separatorChar + "classes"
+                    )
+            );
             //client
-            baseDir = new File(moduleHomeDir, File.separatorChar + "client");
-            IoUtil.cleanUpDirFiles(new File(baseDir, "classes"));
+            IoUtil.cleanUpDirFiles(new File(moduleHomeDir
+                            , "client"
+                            + File.separatorChar + "classes"
+                    )
+            );
         }
+
+        return fs;
     }
 
     /**
@@ -644,12 +692,12 @@ public class ExportNCPatcherUtil {
      * @date 2020/2/9 0009 14:53
      * @Param [dir, outDir, jarName,manifest] 要打包的文件，要输出到的文件夹，jar文件名（注意，源码会自动加_src后缀），manifest
      */
-    private static void compressJar(File dir, File outDir, String jarName, File manifest) {
+    private static List<File> compressJar(File dir, File outDir, String jarName, File manifest) {
         try {
             if (dir.listFiles() == null
                     || dir.listFiles().length < 1
                     || (dir.listFiles().length < 2 && dir.listFiles()[0].getName().equals("META-INF"))) {
-                return;
+                return new ArrayList<>();
             }
             outDir.mkdirs();
             //创建MANIFEST.MF
@@ -660,10 +708,12 @@ public class ExportNCPatcherUtil {
             File jarSrcFile = new File(outDir, jarName + "_src.jar");
             IoUtil.makeJar(dir, jarFile, maniFest, new String[]{".java"});
             IoUtil.makeJar(dir, jarSrcFile, maniFest, new String[]{".class"});
+            return CollUtil.toList(jarFile, jarSrcFile);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
         }
+        return new ArrayList<>();
     }
 
     /**
@@ -756,7 +806,7 @@ public class ExportNCPatcherUtil {
         }
 
         //处理NCC特殊的模块补丁结构
-        if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+        if (NcVersionEnum.NCC.equals(contentVO.ncVersion)) {
             processNCCPatchersWhenFinash(ncType, exportDir, module
                     , sourceRoot, classDir, testClassDir, contentVO);
         }

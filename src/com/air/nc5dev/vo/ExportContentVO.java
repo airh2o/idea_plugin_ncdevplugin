@@ -1,5 +1,7 @@
 package com.air.nc5dev.vo;
 
+import com.air.nc5dev.enums.NcVersionEnum;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -53,4 +55,11 @@ public class ExportContentVO {
     public List<Module> ignoreModules = Lists.newLinkedList();
 
     public ProgressIndicator indicator;
+
+    public boolean filtersql = true;
+    public boolean rebuildsql = false;
+    public int data_source_index = 0;
+    public NcVersionEnum ncVersion = ProjectNCConfigUtil.getNCVerSIon();
+
+
 }
