@@ -2,9 +2,6 @@ package com.air.nc5dev.test;
 
 import com.air.nc5dev.util.ExecUtil;
 
-import java.io.*;
-import java.nio.charset.Charset;
-
 /**
  * </br>
  * </br>

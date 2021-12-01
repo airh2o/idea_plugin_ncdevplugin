@@ -1,7 +1,6 @@
 package com.air.nc5dev.util.idea;
 
 import com.air.nc5dev.service.ui.IMeassgeConsole;
-import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.diagnostic.Logger;
 

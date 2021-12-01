@@ -1,14 +1,9 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.io.FileUtil;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.jetbrains.annotations.NotNull;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;

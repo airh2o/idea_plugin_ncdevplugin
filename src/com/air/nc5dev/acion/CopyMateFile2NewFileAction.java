@@ -1,7 +1,6 @@
 package com.air.nc5dev.acion;
 
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
-import com.air.nc5dev.util.ExportNCPatcherUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
@@ -11,7 +10,6 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.io.File;
-import java.util.jar.Manifest;
 
 /**
  * 把一个NC元数据文件复制成新的文件且重置里面的各种id等        </br>

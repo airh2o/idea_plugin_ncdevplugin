@@ -22,8 +22,11 @@
         <corpField></corpField>
         <grpField></grpField>
         <fixedWhere>nvl(dr,0)=0
-            and appid in(select pk_appregister from sm_appregister where nvl(dr,0)=0
+            and ( ( appid in(select pk_appregister from sm_appregister where nvl(dr,0)=0
             and code like '5080%')
+            )
+            or ( BTNCODE='RePickmDelivery' and PAGECODE like '50080102_%' )
+            )
         </fixedWhere>
     </item>
     <item>
@@ -59,7 +62,7 @@
         <sysField></sysField>
         <corpField></corpField>
         <grpField></grpField>
-        <fixedWhere> nvl(dr,0)=0
+        <fixedWhere>nvl(dr,0)=0
             and areaid in(select pk_area from pub_area where TEMPLETID
             in(select pk_page_templet from pub_page_templet where
             nvl(dr,0)=0 and appcode like '5080%')
@@ -97,7 +100,8 @@
     <!--    END pub_page_templet  -->
 
     <!--   bd_billtype  -->
-    <!--<item>
+    <!--
+    <item>
         <itemKey>dap_defitem</itemKey>
         <itemName>dap_defitem</itemName>
         <itemRule>dap_defitem</itemRule>
@@ -148,7 +152,7 @@
             select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
             )
         </fixedWhere>
-    </item>-->
+    </item>      -->
     <item>
         <itemKey>pub_function</itemKey>
         <itemName>pub_function</itemName>
@@ -203,7 +207,7 @@
               )
               )
           </fixedWhere>
-      </item>-->
+      </item> -->
     <item>
         <itemKey>pub_busiclass</itemKey>
         <itemName>pub_busiclass</itemName>
@@ -225,8 +229,14 @@
         <corpField></corpField>
         <grpField></grpField>
         <fixedWhere>nvl(dr,0)=0
-            and pk_billtypeid in(
+            and (
+            pk_billtypeid in(
             select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
+            or
+            pk_backbilltype in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '5080%'
+            )
             )
         </fixedWhere>
     </item>
@@ -341,4 +351,93 @@
         </fixedWhere>
     </item>
     <!--    END pub_msgtemp_type  -->
+
+    <!--    用户定义属性组 -->
+    <item>
+        <itemKey>bd_userdefrule</itemKey>
+        <itemName>bd_userdefrule</itemName>
+        <itemRule>bd_userdefrule</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and 1=2
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>bd_userdefruleref</itemKey>
+        <itemName>bd_userdefruleref</itemName>
+        <itemRule>bd_userdefruleref</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and pk_userdefrule=2
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>bd_userdefitem</itemKey>
+        <itemName>bd_userdefitem</itemName>
+        <itemRule>bd_userdefitem</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and pk_userdefrule=2
+        </fixedWhere>
+    </item>
+    <!--  END  用户定义属性组-->
+
+    <item>
+        <itemKey>md_comp_busimodule</itemKey>
+        <itemName>md_comp_busimodule</itemName>
+        <itemRule>md_comp_busimodule</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and BUSIMODULECODE like '5080%'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>md_dev_busi_module</itemKey>
+        <itemName>md_dev_busi_module</itemName>
+        <itemRule>md_dev_busi_module</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and BUSIMODULE like '5080%'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>md_module</itemKey>
+        <itemName>md_module</itemName>
+        <itemRule>md_module</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and id like 'mmmpsxj%'
+        </fixedWhere>
+    </item>
+
+    <!--    单据编码规则-->
+    <item>
+        <itemKey>pub_bcr_rulebase</itemKey>
+        <itemName>pub_bcr_rulebase</itemName>
+        <itemRule>pub_bcr_rulebase</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and nbcrcode in('MMWEEKSD','MMWEEKPLAN','MMMONTHPLAN','MMYEARPLAN' )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_bcr_elem</itemKey>
+        <itemName>pub_bcr_elem</itemName>
+        <itemRule>pub_bcr_elem</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and pk_billcodebase in(
+                select pk_billcodebase from pub_bcr_rulebase where nvl(dr,0)=0 and nbcrcode in('MMWEEKSD','MMWEEKPLAN','MMMONTHPLAN','MMYEARPLAN' )
+            )
+        </fixedWhere>
+    </item>
+    <!--  END  单据编码规则-->
 </items>

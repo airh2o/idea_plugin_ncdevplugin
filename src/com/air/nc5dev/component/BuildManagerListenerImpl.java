@@ -1,7 +1,5 @@
 package com.air.nc5dev.component;
 
-import com.air.nc5dev.service.ui.IMeassgeConsole;
-import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.idea.LogUtil;
@@ -10,21 +8,13 @@ import com.intellij.debugger.impl.DebuggerManagerListener;
 import com.intellij.debugger.impl.DebuggerSession;
 import com.intellij.execution.Executor;
 import com.intellij.execution.ui.RunContentDescriptor;
-import com.intellij.execution.ui.RunContentManager;
 import com.intellij.execution.ui.RunContentWithExecutorListener;
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileDocumentManagerAdapter;
 import com.intellij.openapi.project.Project;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebuggerManagerListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
 import java.util.UUID;
 
 

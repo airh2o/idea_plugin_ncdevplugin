@@ -1,26 +1,11 @@
 package com.air.nc5dev.ui;
 
-import com.air.nc5dev.util.ExceptionUtil;
-import com.air.nc5dev.util.ExportNCPatcherUtil;
 import com.air.nc5dev.util.RemindUtil;
-import com.air.nc5dev.util.idea.LogUtil;
-import com.air.nc5dev.util.idea.ProjectUtil;
-import com.air.nc5dev.vo.ExportContentVO;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.ui.DialogWrapper;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 /***

@@ -1,9 +1,6 @@
 package com.air.nc5dev.util.jdbc;
 
-import cn.hutool.core.exceptions.UtilException;
-import cn.hutool.core.util.ObjectUtil;
 import com.air.nc5dev.util.CollUtil;
-import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.ReflectUtil;
 import com.air.nc5dev.util.idea.LogUtil;
@@ -12,9 +9,7 @@ import com.air.nc5dev.vo.ItemsItemVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.air.nc5dev.vo.SubTableVO;
 import nc.uap.studio.pub.db.ScriptHelper;
-import nc.uap.studio.pub.db.ScriptService;
 import nc.uap.studio.pub.db.SqlUtil;
-import nc.uap.studio.pub.db.exception.DatabaseRuntimeException;
 import nc.uap.studio.pub.db.model.ITable;
 import nc.uap.studio.pub.db.query.SqlQueryResultSet;
 import nc.uap.studio.pub.db.script.export.SqlQueryInserts;

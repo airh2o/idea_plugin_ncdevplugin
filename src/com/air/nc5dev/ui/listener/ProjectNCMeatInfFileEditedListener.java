@@ -7,8 +7,8 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.util.messages.MessageBusConnection;
-
 import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;

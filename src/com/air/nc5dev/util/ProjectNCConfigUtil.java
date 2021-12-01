@@ -9,7 +9,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

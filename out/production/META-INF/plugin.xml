@@ -1,0 +1,279 @@
+<idea-plugin>
+    <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
+    <name>Yonyou NC Dev Tool</name>
+    <version>v3.0</version>
+    <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com</vendor>
+
+    <description><![CDATA[
+      <p>Yonyou U8Cloud, NC5 NC6 NCCloud and other series of software development tools</p>
+        <p>English: </p>
+        If you do not need to edit metadata and new document development can directly create idea ordinary projects.
+        You can change the name of the old project folder and create a new folder with the same path, and then copy the files in the folder.
+        <ul>
+            <li>First time opening project - Required steps:</li>
+                <li>1. Tools -> Configure NC HOME.</li>
+                <li>2. Tools -> update NC library dependencies execute dependency update!</li>
+                <li>3. Tools -> generate default NC run configuration!</li>
+                <li>4. After you perform the preceding steps for the first time, the project will generate the default client public Private test several source folders. Manually modify the IDEA attribute of several folders in the project structure to correct values</li>
+                <li>5. Select Use Module path to set the output path of test class and non-test class respectively.</li>
+        </ul>
+
+        <p>Chinese: </p>
+      如果不需要元数据编辑和新单据开发的 可以直接新建idea普通的项目就行。如果需要的 可以用eclipse新建好项目和组件以后，用idea打开项目，<br>
+      因为idea有时候有bug打不开eclipse项目 可以老项目文件夹改革个名称 然后idea新建一个同路径的，然后吧文件夹文件复制进来(机智不)。 <br>
+           <ul>
+              <li>第一次打开项目-必须步骤：</li>
+                <li>1. Tools -> 配置NC HOME   进行NC HOME配置！</li>
+                <li>2. Tools -> 更新NC 库依赖 执行依赖更新!</li>
+                <li>3. Tools -> 生成默认NC运行配置!(如果重启IDEA后丢失了运行配置 可以再次执行这个)</li>
+                <li>4. 第一次执行上面步骤以后，会生成项目默认的client public private test 几个源文件夹 请手工在 项目结构修改几个文件夹的IDEA属性为正确值</li>
+                <li>5. 请注意 模块的编译输出路径要选 use module path 分别设置test和非test class输出路径。</li>
+         </ul>
+
+    ]]></description>
+
+    <change-notes><![CDATA[
+      <em>version 3.0 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+           <li>1. suport NCC.</li>
+
+          <li>中文:</li>
+          <li>1. 支持导出补丁构建成NCC特有结构(前后端，前端要自己先build好).</li>
+          <li>1. 支持自动合并和过滤SQL脚本(
+                    nc.prop配置:
+                        filtersql 是否过滤完全重复SQL语句 默认 true ,<br>
+                        rebuildsql 是否无视iuap导出的SQL采用IDEA插件自动根据items.xml导出SQL 默认 false ,<br>
+                        data_source_index idea导出SQL使用的数据源索引 默认 0 ,<br>
+                        enableSubResultSet 是否支持iuap自带的子表导出 默认 true -此功能暂时不支持，如果用idea强制导出 那么必须手工配置子表到 items-idea.xml(和items.xml一个文件夹里)中 ,<br>
+                        includeDeletes 是否导出delete删除已存在数据的语句 默认 false .<br>
+              )
+          </li>
+      </ul>
+
+     <em>version 2.5.7 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+          <li>1. Add the mandatory NC version:<br>
+                In the nc.prop file in the. Idea folder, set the Nc. version parameter to NC5, NC6, NCC, U8Cloud.
+           </li>
+          <li>2. Added special support for NCC (special Hotwebs path and profile path and patch structure)</li>
+          <li>3. Optimize the generation parameters of the operation configuration</li>
+          <li>4. Periodic reminders and metadata replication cannot be used normally and are not useful until repaired</li>
+          <li>5. Fixed the plug-in error in some cases</li>
+
+          <li>中文:</li>
+          <li>1. 修复部分NCC的支持性问题.
+      </ul>
+
+     <em>version 2.5.0 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+          <li>1. Add the mandatory NC version:<br>
+                In the nc.prop file in the. Idea folder, set the Nc. version parameter to NC5, NC6, NCC, U8Cloud.
+           </li>
+          <li>2. Added special support for NCC (special Hotwebs path and profile path and patch structure)</li>
+          <li>3. Optimize the generation parameters of the operation configuration</li>
+          <li>4. Periodic reminders and metadata replication cannot be used normally and are not useful until repaired</li>
+          <li>5. Fixed the plug-in error in some cases</li>
+
+          <li>中文:</li>
+          <li>1. 新增强行指定NC版本: <br>
+                    在.idea文件夹的nc.prop文件配置 nc.version参数为 NC5, NC6,  NCC,  U8Cloud 几种即可。
+               </li>
+              <li>2. 增加对NCC的特殊支持(特殊的hotwebs路径和配置文件路径和补丁结构)</li>
+              <li>3. 优化运行等配置的生成参数</li>
+              <li>4. 定时提醒和元数据复制无法正常使用，暂不修复，用处不大</li>
+              <li>5. 修复部分情况下插件报错的问题</li>
+      </ul>
+
+    ]]>
+    </change-notes>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="178.0"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- Other product support activated in plugin page during upload at https://plugins.jetbrains.com -->
+    <depends optional="true" config-file="plugin-java.xml">com.intellij.modules.java</depends>
+
+    <actions>
+        <action id="nc5dev.config.nchome" class="com.air.nc5dev.acion.NC5HomePathConfigAction" text="配置NC HOME"
+                description="设置NC5的HOME主路径">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift c"/>
+        </action>
+        <action id="nc5dev.config.updateclasspath" class="com.air.nc5dev.acion.UpdateProjectNCDependencyAction"
+                text="更新NC库依赖" description="立即更新当前设置的NC HOME的所有NC类依赖">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift u"/>
+        </action>
+        <action id="nc5dev.config.AddDataSource2DbnToolAction" class="com.air.nc5dev.acion.AddDataSource2DbnToolAction"
+                text="添加数据源到Databse连接列表" description="把NC的数据源直接添加到右侧Database官方管理插件的数据连接里面去">
+        </action>
+        <action id="nc5dev.config.addRunConfig" class="com.air.nc5dev.acion.AddProjectNCRunConfig" text="生成默认NC运行配置"
+                description="生成默认的2个NC运行配置，一个服务端，一个客户端(如果已经有了会跳过)">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift r"/>
+        </action>
+        <action id="nc5dev.export.exportncpatcher" class="com.air.nc5dev.acion.ExportNCPatcherAction"
+                text="导出NC补丁包" description="导出项目为NC的补丁包">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift e"/>
+        </action>
+        <action id="nc5dev.export.RestNcUserPassWordAction" class="com.air.nc5dev.acion.RestNcUserPassWordAction"
+                text="重置NC操作员密码" description="重置NC操作员密码">
+        </action>
+        <action id="nc5dev.info.about" class="com.air.nc5dev.acion.AboutMeAction" text="关于我" description="插件信息">
+        </action>
+        <action id="nc5dev.info.help" class="com.air.nc5dev.acion.HelpMeAction" text="使用帮助" description="打开使用帮助">
+        </action>
+
+        <action id="nc5dev.info.opennchome" class="com.air.nc5dev.acion.OpenNCHomeAction"
+                text="打开NC HOME" description="资源管理器中打开NC根目录">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift h"/>
+        </action>
+        <action id="nc5dev.info.opennchomeierpbin" class="com.air.nc5dev.acion.OpenNCHomeIerpBinAction"
+                text="打开NC ierp\bin" description="资源管理器中打开NC ierp\bin目录">
+        </action>
+        <action id="nc5dev.info.deletenclogs" class="com.air.nc5dev.acion.DeleteNCLogsAction"
+                text="清理NC 日志文件" description="删除NC HOME中nclogs下的日志文件">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift l"/>
+        </action>
+        <action id="nc5dev.info.openncconfigwindow" class="com.air.nc5dev.acion.OpenNCConfigWindowAction"
+                text="打开NC 配置窗口" description="打开NCHOME bin中NC服务器的配置脚本">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift b"/>
+        </action>
+        <action id="nc5dev.info.opennclogconfigfile" class="com.air.nc5dev.acion.OpenNCLogConfigFileAction"
+                text="打开NC 日志配置文件" description="打开NC 日志配置文件">
+        </action>
+        <action id="nc5dev.info.openncdataconfigfile" class="com.air.nc5dev.acion.OpenNCDataConfigFileAction"
+                text="打开NC 数据源配置文件" description="打开NC 数据源配置文件">
+        </action>
+        <action id="nc5dev.info.openjconsole" class="com.air.nc5dev.acion.OpenJconsoleAction"
+                text="打开 Jconsole" description="打开Jconsole">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift j"/>
+        </action>
+        <action id="nc5dev.info.openjvisualvm" class="com.air.nc5dev.acion.OpenJvisualvmAction"
+                text="打开 Jvisualvm" description="打开jvisualvm">
+        </action>
+        <action id="nc5dev.info.showlocalncjavaexe" class="com.air.nc5dev.acion.ShowLocalNCProcessAction"
+                text="显示 本机NC进程列表" description="显示 本机NC后端和Swing端进程列表">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>
+        </action>
+        <action id="nc5dev.info.makejarfile" class="com.air.nc5dev.acion.MakeJarAction"
+                text="文件夹转Jar文件" description="把一个文件夹 比如class文件夹 转换成Jar包">
+        </action>
+        <action id="nc5dev.info.ShowNCDBUserListAction" class="com.air.nc5dev.acion.ShowNCDBUserListAction"
+                text="显示数据源和密码列表" description="显示当前NC的数据库数据源列表和密码">
+        </action>
+        <action id="nc5dev.info.makeNcModulejarfile" class="com.air.nc5dev.acion.MakeNcModuleJarAction"
+                text="NC补丁模块转Jar文件" description="把一个NC补丁的模块文件夹  转换成Jar包">
+        </action>
+        <action id="nc5dev.info.exportBillAll" class="com.air.nc5dev.acion.ExportBillAllAction"
+                text="导出NC6X单据所有脚本" description="导出NC6X单据所有SQL脚本">
+        </action>
+        <action id="nc5dev.info.copyMateFile2NewFile" class="com.air.nc5dev.acion.CopyMateFile2NewFileAction"
+                text="复制元数据文件" description="把一个NC元数据文件复制成新的文件且重置里面的各种id等">
+        </action>
+        <action id="nc5dev.info.SetRemind" class="com.air.nc5dev.acion.SetingRemindAction"
+                text="设置定时提醒" description="设置定时提醒">
+        </action>
+        <action id="nc5dev.info.ClearRemind" class="com.air.nc5dev.acion.ClearRemindAction"
+                text="清空定时提醒" description="清空定时提醒">
+        </action>
+
+        <group id="nc5devtool" text="NC 开发插件配置" popup="true" description="配置NC开发插件"
+               icon="/META-INF/nc-logo.png">
+            <reference ref="nc5dev.config.nchome"/>
+            <reference ref="nc5dev.config.updateclasspath"/>
+            <reference ref="nc5dev.config.addRunConfig"/>
+            <reference ref="nc5dev.config.AddDataSource2DbnToolAction"/>
+            <separator/>
+
+            <reference ref="nc5dev.export.exportncpatcher"/>
+            <reference ref="nc5dev.export.RestNcUserPassWordAction"/>
+            <separator/>
+            <!-- 方便使用的小功能 -->
+            <group id="nc5devtoolRemind" text="定时提醒"
+                   popup="true" description="定时提醒">
+                <reference ref="nc5dev.info.SetRemind"/>
+                <reference ref="nc5dev.info.ClearRemind"/>
+            </group>
+            <separator/>
+
+            <reference ref="nc5dev.info.deletenclogs"/>
+            <reference ref="nc5dev.info.copyMateFile2NewFile"/>
+            <group id="nc5devtoolExportBillAll" text="导出已有节点单据SQL脚本"
+                   popup="true" description="导出已有节点单据SQL脚本">
+                <reference ref="nc5dev.info.exportBillAll"/>
+            </group>
+            <separator/>
+
+            <reference ref="nc5dev.info.opennchome"/>
+            <reference ref="nc5dev.info.opennchomeierpbin"/>
+            <reference ref="nc5dev.info.openncconfigwindow"/>
+            <reference ref="nc5dev.info.opennclogconfigfile"/>
+            <reference ref="nc5dev.info.openncdataconfigfile"/>
+            <separator/>
+
+            <reference ref="nc5dev.info.openjconsole"/>
+            <reference ref="nc5dev.info.openjvisualvm"/>
+            <separator/>
+
+            <reference ref="nc5dev.info.showlocalncjavaexe"/>
+            <reference ref="nc5dev.info.ShowNCDBUserListAction"/>
+            <separator/>
+
+            <reference ref="nc5dev.info.makejarfile"/>
+            <reference ref="nc5dev.info.makeNcModulejarfile"/>
+            <separator/>
+
+            <reference ref="nc5dev.info.about"/>
+            <reference ref="nc5dev.info.help"/>
+            <separator/>
+
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <add-to-group group-id="MainToolBarSettings" anchor="last"/>
+        </group>
+
+        <action id="nc5dev.export.openbmf" class="com.air.nc5dev.acion.EditBmfFileAction"
+                text="编辑元数据" description="打开NC元数据文件">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="before" relative-to-action="CutCopyPasteGroup"/>
+        </action>
+        <action id="nc5dev.export.addwsdl" class="com.air.nc5dev.acion.NewWsdlFilesAction"
+                text="新增WSDL接口" description="新增WSDL接口">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="before" relative-to-action="CutCopyPasteGroup"/>
+        </action>
+
+        <action id="SonarLint.toolwindow.Cancel"
+                class="com.air.nc5dev.acion.LogCleanConsoleAction"
+                text="清空NC插件日志窗口内容"
+                description="清空NC插件日志窗口内容">
+        </action>
+
+    </actions>
+
+
+    <application-components>
+        <component>
+            <implementation-class>com.air.nc5dev.component.SubscribeEventAutoCopyNccClientFilesComponent</implementation-class>
+        </component>
+    </application-components>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!--     <fileTypeFactory implementation="com.air.nc5dev.editor.bmf.languageinfo.BmfMDPFileTypeFactory"/>-->
+
+        <!-- 日志输出窗口服务注册 -->
+        <projectService serviceInterface="com.air.nc5dev.service.ui.IMeassgeConsole"
+                        serviceImplementation="com.air.nc5dev.service.ui.impl.MeassgeConsoleImpl"/>
+        <!-- 日志输出窗口界面注册 -->
+        <toolWindow id="NC插件日志" anchor="bottom" factoryClass="com.air.nc5dev.ui.ToolWindowFactory"/>
+
+        <applicationService serviceImplementation="com.air.nc5dev.util.Actions"/>
+
+        <!-- 生成对象所有的set方法调用 -->
+        <intentionAction>
+            <className>com.air.nc5dev.acion.GenerateAllSetterAction</className>
+        </intentionAction>
+    </extensions>
+
+
+</idea-plugin>

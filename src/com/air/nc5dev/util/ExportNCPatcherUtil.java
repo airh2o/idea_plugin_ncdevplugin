@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.sql.Connection;
-import java.sql.SQLData;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -859,6 +858,9 @@ public class ExportNCPatcherUtil {
             , ExportContentVO contentVO, String exportDir, Module module
             , String ncType, String packgePath, final File classFileDir) {
         ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(module);
+        if (com.air.nc5dev.util.CollUtil.isEmpty(classFileDir.listFiles())) {
+            return;
+        }
         Stream.of(classFileDir.listFiles()).forEach(classFile -> {
             //循环复制所有java文件 ,因为idea编译后 没有分NC这3个文件夹！
             if (!classFile.isFile()) {

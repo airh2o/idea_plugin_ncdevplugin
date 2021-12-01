@@ -254,7 +254,7 @@
 
     <application-components>
         <component>
-            <implementation-class>com.air.nc5dev.component.Component</implementation-class>
+            <implementation-class>com.air.nc5dev.component.SubscribeEventAutoCopyNccClientFilesComponent</implementation-class>
         </component>
     </application-components>
 

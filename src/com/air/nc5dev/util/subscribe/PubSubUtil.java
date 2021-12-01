@@ -4,7 +4,6 @@ import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.subscribe.itf.ISubscriber;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;

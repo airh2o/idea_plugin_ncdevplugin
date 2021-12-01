@@ -4,17 +4,11 @@ import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
 import com.air.nc5dev.util.NCPropXmlUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
-import com.air.nc5dev.util.XmlUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.jz.dialog.ExportDlg;
-import org.w3c.dom.Document;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;

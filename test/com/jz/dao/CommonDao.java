@@ -7,11 +7,7 @@ package com.jz.dao;
 
 import com.jz.bean.PropInfo;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Iterator;
 import java.util.List;
 

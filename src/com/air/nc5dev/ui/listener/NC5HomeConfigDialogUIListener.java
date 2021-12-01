@@ -13,9 +13,9 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.lang3.StringUtils;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.io.File;
