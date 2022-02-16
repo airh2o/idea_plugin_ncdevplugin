@@ -23,7 +23,7 @@ public class SubscribeEventAutoCopyNccClientFilesComponent implements Applicatio
 
     @Override
     public void initComponent() {
-        LogUtil.info("Starting component: " + COMPONENT_NAME);
+       // LogUtil.info("Starting component: " + COMPONENT_NAME);
 
 
         BuildManagerListenerImpl manager = BuildManagerListenerImpl.getInstance();

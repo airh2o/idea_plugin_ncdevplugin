@@ -197,6 +197,7 @@ public class PatcherDialog
     public void onOK() {
         if (isRuning) {
             LogUtil.error("上一次导出任务还未处理完，请稍后再试!");
+            isRuning = false;
             return;
         }
 
@@ -239,7 +240,10 @@ public class PatcherDialog
                             indicator.setText("强制删除前端hotwebs的dist后执行npm run build中...");
                             IoUtil.cleanUpDirFiles(new File(event.getProject().getBasePath(), "hotwebs" + File.separatorChar + "dist"));
                             String cm = ExecUtil.npmBuild(new File(event.getProject().getBasePath(), "hotwebs").getPath()
-                                    , (line) -> indicator.setText("npm building:" + StrUtil.removeAllLineBreaks(line)));
+                                    , (line) -> {
+                                        indicator.setText("npm building:" + StrUtil.removeAllLineBreaks(line));
+                                    }
+                            );
                             LogUtil.info("前端 npm run build: " + cm);
                         }
                     }

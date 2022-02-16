@@ -1,6 +1,7 @@
 package com.air.nc5dev.component;
 
 import com.air.nc5dev.util.IdeaProjectGenerateUtil;
+import com.air.nc5dev.util.NCCActionRefreshUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
@@ -51,6 +52,9 @@ public class BuildManagerListenerImpl implements com.intellij.compiler.server.Bu
                 + ProjectNCConfigUtil.getNCHomePath());
 
         IdeaProjectGenerateUtil.copyProjectMetaInfFiles2NCHomeModules();
+
+        //刷新 ncc路径
+        NCCActionRefreshUtil.reloadProjectAction(project);
     }
 
     @Override

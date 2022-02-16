@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +33,28 @@ public final class XmlUtil extends cn.hutool.core.util.XmlUtil {
             Document document = saxReader.read(xml);
             return document;
         } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * XML 文件 解析成 Document
+     *
+     * @param xml
+     * @return 如果异常返回null
+     */
+    public static final org.w3c.dom.Document xmlFile2Document2(InputStream xml) {
+        try {
+            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            org.w3c.dom.Document parse = documentBuilder.parse(xml);
+            return parse;
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
