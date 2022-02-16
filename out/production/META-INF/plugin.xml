@@ -156,7 +156,7 @@
         </action>
         <action id="nc5dev.info.showlocalncjavaexe" class="com.air.nc5dev.acion.ShowLocalNCProcessAction"
                 text="显示 本机NC进程列表" description="显示 本机NC后端和Swing端进程列表">
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>
+<!--            <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>-->
         </action>
         <action id="nc5dev.info.makejarfile" class="com.air.nc5dev.acion.MakeJarAction"
                 text="文件夹转Jar文件" description="把一个文件夹 比如class文件夹 转换成Jar包">
@@ -195,13 +195,12 @@
         <action id="GoToNCRequestMapping" class="com.air.nc5dev.acion.GoToNCRequestMappingAction"
                 text="搜索NCC请求地址映射Action" description="NCC请求地址映射Action">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>
-<!--            BACK_SLASH-->
+            <!--            BACK_SLASH-->
         </action>
-
-
-
-
-
+        <action id="ReDeployAction" class="com.air.nc5dev.acion.ReDeployAction"
+                text="立即部署更新项目配置到HOME" description="比如ncc的xml文件和重新加载各种项目里的xml信息">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift m"/>
+        </action>
 
 
         <group id="nc5devtool" text="NC 开发插件配置" popup="true" description="配置NC开发插件"
@@ -249,6 +248,7 @@
             <reference ref="nc5dev.info.makejarfile"/>
             <reference ref="nc5dev.info.makeNcModulejarfile"/>
             <reference ref="GoToNCRequestMapping"/>
+            <reference ref="ReDeployAction"/>
             <separator/>
 
             <reference ref="nc5dev.info.about"/>
@@ -262,8 +262,7 @@
 
     <application-components>
         <component>
-            <implementation-class>com.air.nc5dev.component.SubscribeEventAutoCopyNccClientFilesComponent
-            </implementation-class>
+            <implementation-class>com.air.nc5dev.component.SubscribeEventAutoCopyNccClientFilesComponent</implementation-class>
         </component>
     </application-components>
 

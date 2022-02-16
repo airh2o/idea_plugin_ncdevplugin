@@ -6,13 +6,12 @@ import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.ide.actions.GotoActionBase;
 import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
-import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.extensions.ExtensionPointName;
 
 import java.util.ArrayList;
 

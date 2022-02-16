@@ -1,23 +1,17 @@
 package com.air.nc5dev.util;
 
-import a.g.F;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.ZipUtil;
-import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.NCCActionInfoVO;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.io.JarUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

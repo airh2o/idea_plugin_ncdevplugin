@@ -24,21 +24,22 @@ public class SubscribeEventAutoCopyNccClientFilesComponent implements Applicatio
     @Override
     public void initComponent() {
        // LogUtil.info("Starting component: " + COMPONENT_NAME);
+        try {
+            BuildManagerListenerImpl manager = BuildManagerListenerImpl.getInstance();
 
+            MessageBus bus = ApplicationManager.getApplication().getMessageBus();
+            MessageBusConnection connection = bus.connect();
 
-        BuildManagerListenerImpl manager = BuildManagerListenerImpl.getInstance();
-
-        MessageBus bus = ApplicationManager.getApplication().getMessageBus();
-        MessageBusConnection connection = bus.connect();
-
-        //监听编译动作
-        connection.subscribe(BuildManagerListener.TOPIC, manager);
-        //监听debug run动作
-        connection.subscribe(DebuggerManagerListener.TOPIC, manager);
-        //监听其他 运行
-        connection.subscribe(RunContentManager.TOPIC, manager);
-        connection.subscribe(XDebuggerManagerImpl.TOPIC, manager);
-
+            //监听编译动作
+            connection.subscribe(BuildManagerListener.TOPIC, manager);
+            //监听debug run动作
+            connection.subscribe(DebuggerManagerListener.TOPIC, manager);
+            //监听其他 运行
+            connection.subscribe(RunContentManager.TOPIC, manager);
+            connection.subscribe(XDebuggerManagerImpl.TOPIC, manager);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

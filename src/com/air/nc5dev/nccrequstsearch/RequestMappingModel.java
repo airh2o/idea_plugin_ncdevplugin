@@ -5,38 +5,21 @@ import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.NCCActionInfoVO;
 import com.intellij.featureStatistics.FeatureUsageTracker;
-import com.intellij.ide.IdeBundle;
 import com.intellij.ide.IdeEventQueue;
-import com.intellij.ide.actions.GotoClassAction;
-import com.intellij.ide.actions.GotoClassPresentationUpdater;
-import com.intellij.ide.actions.OpenFileAction;
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereManager;
 import com.intellij.ide.actions.searcheverywhere.statistics.SearchEverywhereUsageTriggerCollector;
 import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider;
 import com.intellij.ide.util.gotoByName.FilteringGotoByModel;
 import com.intellij.internal.statistic.eventLog.FeatureUsageData;
 import com.intellij.navigation.NavigationItem;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.DumbAware;
-import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.playback.commands.ActionCommand;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.structuralsearch.IdeaOpenApiClassFinder;
-import com.intellij.ui.ComponentUtil;
-import com.intellij.util.ObjectUtils;
-import kotlin.reflect.jvm.internal.components.ReflectJavaClassFinder;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
-import java.awt.event.InputEvent;
 import java.util.List;
 
 /**
@@ -73,7 +56,7 @@ public class RequestMappingModel extends FilteringGotoByModel implements DumbAwa
 
     @Override
     public String getPromptText() {
-        return "输出请求地址,eg: nccloud/aim/acceptance/querylist.do或acceptance.querylist或acceptance\\querylist等";
+        return "输入请求地址nccloud/aim/acceptance/querylist.do或acceptance.querylist等";
     }
 
     @NotNull

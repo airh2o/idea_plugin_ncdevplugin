@@ -4,7 +4,9 @@ import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.NCCActionRefreshUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.vo.NCCActionInfoVO;
-import com.intellij.ide.util.gotoByName.*;
+import com.intellij.ide.util.gotoByName.ChooseByNameBase;
+import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider;
+import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.Processor;
@@ -15,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 
 /**
