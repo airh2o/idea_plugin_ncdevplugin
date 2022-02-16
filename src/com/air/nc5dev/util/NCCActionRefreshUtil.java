@@ -306,6 +306,9 @@ public class NCCActionRefreshUtil {
                 try {
                     Document document = XmlUtil.xmlFile2Document2(authorizeXml);
                     Element rootElement = XmlUtil.getRootElement(document);
+                    if (rootElement == null) {
+                        continue;
+                    }
                     NodeList authorizeNode = rootElement.getElementsByTagName("authorize");
                     if (authorizeNode == null || authorizeNode.getLength() < 1) {
                         continue;

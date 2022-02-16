@@ -282,7 +282,7 @@
             <className>com.air.nc5dev.acion.GenerateAllSetterAction</className>
         </intentionAction>
 
-        <searchEverywhereContributor implementation="com.air.nc5dev.nccrequstsearch.RequestMappingGoToContributor"/>
+  <!--      <searchEverywhereContributor implementation="com.air.nc5dev.nccrequstsearch.RequestMappingGoToContributor"/>-->
     </extensions>
 
 

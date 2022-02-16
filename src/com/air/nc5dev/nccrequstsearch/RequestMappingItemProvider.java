@@ -43,8 +43,6 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
 
     RequestMappingModel requestMappingModel;
 
-    @NotNull
-    @Override
     public List<String> filterNames(@NotNull ChooseByNameBase chooseByNameBase
             , @NotNull String[] names, @NotNull String inputStr) {
         return new ArrayList<>();
@@ -60,7 +58,6 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
      * @param processor
      * @return
      */
-    @Override
     public boolean filterElements(@NotNull ChooseByNameBase chooseByNameBase, @NotNull String inputStr
             , boolean everywhere, @NotNull ProgressIndicator cancelled
             , @NotNull Processor<Object> processor) {
@@ -81,6 +78,23 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         return vos.isEmpty();
     }
 
+    public boolean filterElements(com.intellij.ide.util.gotoByName.ChooseByNameViewModel chooseByNameBase
+            , java.lang.String inputStr, boolean everywhere, com.intellij.openapi.progress.ProgressIndicator cancelled
+            , com.intellij.util.Processor processor) {
+        if (chooseByNameBase.getProject() != null) {
+            chooseByNameBase.getProject().putUserData(ChooseByNamePopup.CURRENT_SEARCH_PATTERN, inputStr);
+        }
+
+        List<NCCActionInfoVO> vos = search(chooseByNameBase.getProject(), inputStr, everywhere, cancelled, processor);
+
+        cancelled.checkCanceled();
+        if (!com.intellij.util.containers.ContainerUtil.process(vos, processor)) {
+            return false;
+        }
+
+        return vos.isEmpty();
+    }
+
     /**
      * 搜索
      *
@@ -91,9 +105,9 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
      * @param processor
      * @return
      */
-    private List<NCCActionInfoVO> search(ChooseByNameBase chooseByNameBase, String inputStr
+    private List<NCCActionInfoVO> search(Project project, String inputStr
             , boolean everywhere, ProgressIndicator cancelled, Processor<Object> processor) {
-        initScan(chooseByNameBase);
+        initScan(project);
 
         if (StringUtil.isBlank(inputStr)) {
             return EMPTY_LIST;
@@ -103,7 +117,6 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             return EMPTY_LIST;
         }
 
-        Project project = chooseByNameBase.getProject();
         Map<String, Map<String, NCCActionInfoVO>> all = ALL_ACTIONS;
 
         if (!everywhere) {
@@ -133,6 +146,21 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
 
         matchs.sort((c1, c2) -> c1.getScore() - c2.getScore());
         return matchs;
+    }
+
+    /**
+     * 搜索
+     *
+     * @param chooseByNameBase
+     * @param inputStr
+     * @param everywhere
+     * @param cancelled
+     * @param processor
+     * @return
+     */
+    private List<NCCActionInfoVO> search(ChooseByNameBase chooseByNameBase, String inputStr
+            , boolean everywhere, ProgressIndicator cancelled, Processor<Object> processor) {
+        return search(chooseByNameBase.getProject(), inputStr, everywhere, cancelled, processor);
     }
 
     /**
@@ -187,8 +215,7 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
      *
      * @param chooseByNameBase
      */
-    private void initScan(ChooseByNameBase chooseByNameBase) {
-        Project p = chooseByNameBase.getProject();
+    private void initScan(Project p) {
         if (p == null) {
             return;
         }

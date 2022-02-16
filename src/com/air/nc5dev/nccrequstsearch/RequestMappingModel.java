@@ -100,9 +100,13 @@ public class RequestMappingModel extends FilteringGotoByModel implements DumbAwa
         if (StringUtil.isNotBlank(name)) {
             Project project = ProjectUtil.getDefaultProject();
             SearchEverywhereManager seManager = SearchEverywhereManager.getInstance(project);
+
             FeatureUsageTracker.getInstance().triggerFeatureUsed("SearchEverywhere");
-            FeatureUsageData data = SearchEverywhereUsageTriggerCollector.createData("ClassSearchEverywhereContributor").addInputEvent(e);
+           /* FeatureUsageData data = SearchEverywhereUsageTriggerCollector
+                    .createData("ClassSearchEverywhereContributor")
+                    .addInputEvent(e);
             SearchEverywhereUsageTriggerCollector.trigger(project, "dialogOpen", data);
+*/
             IdeEventQueue.getInstance().getPopupManager().closeAllPopups(false);
             seManager.show("ClassSearchEverywhereContributor", name, e);
         }
