@@ -1,6 +1,7 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.RandomUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.ApplicationLibraryUtil;
@@ -583,8 +584,11 @@ public class IdeaProjectGenerateUtil {
                 continue;
             }
 
-            IoUtil.copyFile(f2, nccClientClassDir.getParentFile());
-            FileUtil.del(f1);
+            try {
+                IoUtil.copyFile(f2, nccClientClassDir.getParentFile());
+                FileUtil.del(f1);
+            } catch (Throwable e) {
+            }
         }
     }
 
