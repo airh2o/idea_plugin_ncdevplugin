@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -534,12 +535,13 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * </br>
      * </br>
      *
+     * @param packges 如果穿得有包名，只包含指定报名的
      * @return void
      * @author air Email: 209308343@qq.com
      * @date 2020/1/16 0016 20:07
      * @Param [fromDir, toDir]
      */
-    public static final void copyFile(@NotNull File from, @NotNull final File to) {
+    public static final void copyFile(@NotNull File from, @NotNull final File to, List<String> packges) {
         /*if (!from.isFile()) {
             return;
         }
@@ -552,9 +554,80 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }*/
+        if (CollUtil.isEmpty(packges)) {
+            copyFile(from, to);
+            deleteFileAll(from);
+            return;
+        }
 
+        File[] fs = from.listFiles();
+        for (File f : fs) {
+            if (f.isFile()) {
+                File tof = new File(to, f.getName());
+                if (!tof.getParentFile().exists()) {
+                    tof.getParentFile().mkdirs();
+                }
+                FileUtil.copyFile(f, tof, StandardCopyOption.REPLACE_EXISTING);
+                FileUtil.del(f);
+            } else {
+                if (!hasPackge(f.getPath(), packges)) {
+                    continue;
+                }
+
+                copyFile(f, new File(to, f.getName()), packges);
+            }
+        }
+    }
+
+    public static boolean hasPackge(String path, List<String> nccClientHotwebsPackges) {
+        if (com.air.nc5dev.util.CollUtil.isEmpty(nccClientHotwebsPackges)) {
+            return true;
+        }
+        // \modules\mmmpsxj\client\classes\nccloud
+        path = StringUtil.substring(path, StringUtil.indexOf(path, "client" + File.separatorChar + "classes")
+                + ("client" + File.separatorChar + "classes").length() + 1);
+        path = StringUtil.replaceChars(path, File.separatorChar, '.');
+        if (path.charAt(0) == '.') {
+            path = path.substring(1);
+        }
+
+        if (path.charAt(path.length() - 1) == '.') {
+            path = path.substring(0, path.length() - 1);
+        }
+
+        for (String np : nccClientHotwebsPackges) {
+            if (np.length() < path.length()) {
+                return true;
+            }
+            if (np.charAt(0) == '.') {
+                np = np.substring(1);
+            }
+
+            if (np.charAt(np.length() - 1) == '.') {
+                np = np.substring(0, np.length() - 1);
+            }
+
+            if (np.length() < path.length() || np.startsWith(path)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 把一个文件 复制到指定的文件夹里 </br>
+     * 会自动创建不存在的文件夹      </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/1/16 0016 20:07
+     * @Param [fromDir, toDir]
+     */
+    public static final void copyFile(@NotNull File from, @NotNull final File to) {
         to.mkdirs();
-
         FileUtil.copy(from, to, true);
     }
 
@@ -943,6 +1016,28 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
 
     public static boolean isFile(File f, String endName) {
         return f.isFile() && f.getName().toLowerCase().endsWith(endName.toLowerCase());
+    }
+
+    /**
+     * 删除所有空文件夹
+     *
+     * @param cf
+     */
+    public static void deleteAllEmptyDirs(File dir) {
+        File[] fs = dir.listFiles();
+        if (fs == null) {
+            return ;
+        }
+
+        for (File f : fs) {
+            if (f.isDirectory()) {
+                if (f.listFiles() == null || f.listFiles().length < 1) {
+                    f.delete();
+                }else{
+                    deleteAllEmptyDirs(f);
+                }
+            }
+        }
     }
 }
 

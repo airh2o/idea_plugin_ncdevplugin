@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * 导出补丁的 配置文件 配置信息VO <br/>
@@ -59,6 +60,10 @@ public class ExportConfigVO {
      * 所有的配置信息
      */
     public Properties prop;
+    /**
+     * NCC的话，出补丁 client里哪些class的packge文件需要放入hotwebs，如果这个是空 就全部！
+     */
+    public List<String> nccClientHotwebsPackges;
 
     /**
      * 获取配置的其他信息
@@ -68,5 +73,15 @@ public class ExportConfigVO {
      */
     public String getProperty(String key) {
         return StringUtil.trim(prop.getProperty(key));
+    }
+
+    /**
+     * 获取配置的其他信息
+     *
+     * @param key
+     * @return
+     */
+    public String getProperty(String key, String ifnull) {
+        return StringUtil.get(StringUtil.trim(prop.getProperty(key)), ifnull);
     }
 }

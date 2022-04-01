@@ -193,7 +193,7 @@ public class ExportNCPatcherUtil {
                 }
                 contentVO.indicator.setText("代码打包成jar:" + entry.getValue().getName());
                 compressJar(new File(contentVO.outPath + File.separatorChar + entry.getValue().getName()),
-                        configVO.toJarThenDelClass, manifest);
+                        configVO.toJarThenDelClass, manifest, contentVO);
             }
 
             //模块循环结束
@@ -477,7 +477,7 @@ public class ExportNCPatcherUtil {
         }
 
         File exportDirF = new File(exportDir);
-        File[] fs = exportDirF.listFiles();
+        File[] fs = new File[]{new File(exportDir, module.getName())};
         if (fs == null) {
             LogUtil.info(exportDir + " 文件夹为空，不执行 processNCCPatchersWhenFinash !");
             fs = new File[0];
@@ -490,6 +490,49 @@ public class ExportNCPatcherUtil {
 
         //检查是否需要把代码打包成 jar文件
         ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(module);
+
+        String moduleKey = module.getName() + '_' + System.currentTimeMillis();
+
+        //转移文件到hotwebs
+        for (File f : fs) {
+            if (f.isDirectory()) {
+                File clientDir = new File(f, "client");
+
+                File[] clientFs = clientDir.listFiles();
+                if (com.air.nc5dev.util.CollUtil.isEmpty(clientFs)) {
+                    FileUtil.del(clientDir);
+                    continue;
+                }
+                for (File cf : clientFs) {
+                    if (cf.getName().equals("classes")) {
+                        //如果是classes 要特殊点，有配置文件！
+                        File yyconfig = new File(cf, "yyconfig");
+                        if (yyconfig.isDirectory()) {
+                            File outf = new File(outBaseDir, "extend");
+                            if (!outf.isDirectory()) {
+                                outf.mkdirs();
+                            }
+                            IoUtil.copyFile(yyconfig, outf);
+                            FileUtil.del(yyconfig);
+                        }
+                    }
+
+                    File outf = outBaseDir;
+
+                    if (configVO.toJar) {
+                        outf = new File(outf, moduleKey);
+                    }
+
+                    if (!outf.isDirectory()) {
+                        outf.mkdirs();
+                    }
+                    IoUtil.copyFile(cf, outf, configVO.getNccClientHotwebsPackges());
+                    IoUtil.deleteAllEmptyDirs(cf);
+                }
+            }
+        }
+
+        //检查是否要求打包jar
         if (configVO.toJar) {
             File manifest = null;
             if (StringUtil.notEmpty(configVO.manifestFilePath)) {
@@ -498,61 +541,39 @@ public class ExportNCPatcherUtil {
                     manifest = null;
                 }
             }
-            contentVO.indicator.setText("NCC-hotwebs代码打包成jar:" + module.getName());
+            contentVO.indicator.setText("NCC-client代码打包成jar:" + module.getName());
             List<File> jars = compressJar(
                     new File(contentVO.outPath
                             + File.separatorChar + module.getName()
                             + File.separatorChar + "client"
                             + File.separatorChar + "classes"
                     )
-                    , new File(outBaseDir, "lib")
+                    , new File(contentVO.outPath
+                            + File.separatorChar + module.getName()
+                            + File.separatorChar + "client", "lib")
                     , "ui_" + module.getName()
                     , manifest);
             //删除打包前文件
             if (configVO.toJarThenDelClass) {
-                IoUtil.cleanUpDirFiles(new File(contentVO.outPath
+                FileUtil.del(new File(contentVO.outPath
                         + File.separatorChar + module.getName()
                         + File.separatorChar + "client"
                         + File.separatorChar + "classes"
                 ));
             }
 
-            return;
-        }
+            contentVO.indicator.setText("NCC-hotwebs代码打包成jar:" + module.getName());
+            jars = jars = compressJar(
+                    new File(outBaseDir, moduleKey)
+                    , new File(outBaseDir, "lib")
+                    , "ui_" + module.getName()
+                    , manifest);
+            //删除打包前文件
+            IoUtil.copyFile(new File(outBaseDir, moduleKey), outBaseDir);
+            FileUtil.del(new File(outBaseDir, moduleKey));
 
-        for (File f : fs) {
-            if (f.isDirectory()) {
-                File clientDir = new File(f, "client");
-
-                File[] clientFs = clientDir.listFiles();
-                if (com.air.nc5dev.util.CollUtil.isEmpty(clientFs)) {
-                    clientDir.deleteOnExit();
-                    continue;
-                }
-                for (File cf : clientFs) {
-                    if (cf.getName().equals("classes")) {
-                        //如果是classes 要特殊点，有配置文件！
-                        File yyconfig = new File(cf, "yyconfig");
-                        if (yyconfig.isDirectory()) {
-                            File outf = new File(outBaseDir, "extend"
-                            );
-                            if (!outf.isDirectory()) {
-                                outf.mkdirs();
-                            }
-                            IoUtil.copyFile(yyconfig, outf);
-                            IoUtil.deleteFileAll(yyconfig);
-                        }
-                    }
-
-                    File outf = outBaseDir;
-                    if (!outf.isDirectory()) {
-                        outf.mkdirs();
-                    }
-                    IoUtil.copyFile(cf, outf);
-                    IoUtil.deleteFileAll(cf);
-                }
-
-                clientDir.deleteOnExit();
+            if (configVO.toJarThenDelClass) {
+                IoUtil.cleanUpDirFiles(new File(outBaseDir, "classes"));
             }
         }
     }
@@ -577,6 +598,7 @@ public class ExportNCPatcherUtil {
         cf.ignoreModule = toBoolean(cf.getProperty("config-ignoreModule"), false);
         cf.manifestFilePath = cf.getProperty("config-ManifestFilePath");
         cf.closeJavaP = toBoolean(cf.getProperty("config-closeJavaP"), false);
+        cf.nccClientHotwebsPackges = StringUtil.split2ListAndTrim(cf.getProperty("nccClientHotwebsPackges", ""), ",");
 
         String s = cf.getProperty("config-ignoreFiles");
         if (StringUtils.isNotBlank(s)) {
@@ -631,7 +653,7 @@ public class ExportNCPatcherUtil {
      * @date 2020/2/9 0009 14:50
      * @Param [moduleHomeDir, compressEndDeleteClass, contentVO]  模块路径， 是否不保留class文件  true删除class文件,模块配置文件
      */
-    private static List<File> compressJar(File moduleHomeDir, boolean compressEndDeleteClass, File manifest) {
+    private static List<File> compressJar(File moduleHomeDir, boolean compressEndDeleteClass, File manifest, ExportContentVO contentVO) {
         ArrayList<File> fs = new ArrayList<>();
         //public
         fs.addAll(compressJar(new File(moduleHomeDir
@@ -651,15 +673,17 @@ public class ExportNCPatcherUtil {
                 , "private_" + moduleHomeDir.getName()
                 , manifest));
         //client
-        fs.addAll(compressJar(new File(moduleHomeDir
-                        , "client"
-                        + File.separatorChar + "classes"
-                )
-                , new File(moduleHomeDir, "client"
-                        + File.separatorChar + "lib"
-                )
-                , "ui_" + moduleHomeDir.getName()
-                , manifest));
+        if (!NcVersionEnum.NCC.equals(contentVO.ncVersion)) {
+            fs.addAll(compressJar(new File(moduleHomeDir
+                            , "client"
+                            + File.separatorChar + "classes"
+                    )
+                    , new File(moduleHomeDir, "client"
+                            + File.separatorChar + "lib"
+                    )
+                    , "ui_" + moduleHomeDir.getName()
+                    , manifest));
+        }
 
         //删除打包前文件
         if (compressEndDeleteClass) {
@@ -672,11 +696,13 @@ public class ExportNCPatcherUtil {
                     )
             );
             //client
-            IoUtil.cleanUpDirFiles(new File(moduleHomeDir
-                            , "client"
-                            + File.separatorChar + "classes"
-                    )
-            );
+            if (!NcVersionEnum.NCC.equals(contentVO.ncVersion)) {
+                IoUtil.cleanUpDirFiles(new File(moduleHomeDir
+                                , "client"
+                                + File.separatorChar + "classes"
+                        )
+                );
+            }
         }
 
         return fs;
@@ -767,6 +793,35 @@ public class ExportNCPatcherUtil {
     }
 
     /**
+     * 把一个包 当前的文件夹内所有 java源代码和类文件 复制到补丁对应位置（不包含下级包）      </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/2/4 0004 17:31
+     * @Param [sourcePackge, sourceBaseDirFile,  contentVO, exportDir, moduleName, ncType, packgePath,
+     * classFileDir]
+     */
+    public static final void copyClassAndJavaSourceFiles(File sourcePackge, File sourceBaseDirFile
+            , ExportContentVO contentVO, String exportDir, Module module
+            , String ncType, String packgePath, final File classFileDir) {
+        ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(module);
+
+        if (null == javapCommandPath
+                || configVO.closeJavaP) {
+            copyClassAndJavaSourceFilesBySource(sourcePackge, sourceBaseDirFile
+                    , contentVO, exportDir, module
+                    , ncType, packgePath, classFileDir);
+        } else {
+            copyClassAndJavaSourceFilesByClass(sourcePackge, sourceBaseDirFile
+                    , contentVO, exportDir, module
+                    , ncType, packgePath, classFileDir);
+        }
+    }
+
+    /**
      * 导出一个包       </br>
      * </br>
      * </br>
@@ -810,35 +865,6 @@ public class ExportNCPatcherUtil {
         if (NcVersionEnum.NCC.equals(contentVO.ncVersion)) {
             processNCCPatchersWhenFinash(ncType, exportDir, module
                     , sourceRoot, classDir, testClassDir, contentVO);
-        }
-    }
-
-    /**
-     * 把一个包 当前的文件夹内所有 java源代码和类文件 复制到补丁对应位置（不包含下级包）      </br>
-     * </br>
-     * </br>
-     * </br>
-     *
-     * @return void
-     * @author air Email: 209308343@qq.com
-     * @date 2020/2/4 0004 17:31
-     * @Param [sourcePackge, sourceBaseDirFile,  contentVO, exportDir, moduleName, ncType, packgePath,
-     * classFileDir]
-     */
-    public static final void copyClassAndJavaSourceFiles(File sourcePackge, File sourceBaseDirFile
-            , ExportContentVO contentVO, String exportDir, Module module
-            , String ncType, String packgePath, final File classFileDir) {
-        ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(module);
-
-        if (null == javapCommandPath
-                || configVO.closeJavaP) {
-            copyClassAndJavaSourceFilesBySource(sourcePackge, sourceBaseDirFile
-                    , contentVO, exportDir, module
-                    , ncType, packgePath, classFileDir);
-        } else {
-            copyClassAndJavaSourceFilesByClass(sourcePackge, sourceBaseDirFile
-                    , contentVO, exportDir, module
-                    , ncType, packgePath, classFileDir);
         }
     }
 

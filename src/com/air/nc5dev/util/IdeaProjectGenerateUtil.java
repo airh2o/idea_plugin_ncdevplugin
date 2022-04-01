@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
@@ -134,7 +135,7 @@ public class IdeaProjectGenerateUtil {
         File outFile = new File(homeDir, "patcherconfig.properties");
         if (!outFile.exists()) {
             try {
-                PrintWriter out = new PrintWriter(new FileOutputStream(outFile));
+                PrintWriter out = new PrintWriter(outFile, "UTF-8");
                 out.print(
                         "#模块 " + module.getName() + "(" + homeDir.getPath() + ")" + "导出补丁的配置文件\n" +
                                 "#导出补丁选项参数\n" +
@@ -156,18 +157,20 @@ public class IdeaProjectGenerateUtil {
                                 "#全类名匹配的输出模块\n" +
                                 "nc.ui.glpub.UiManager=gl\n" +
                                 "#非源码的文件输出模块\n" +
-                                "nc.bs.arap.1.txt=arap  \n"
+                                "nc.bs.arap.1.txt=arap\n"
                                 + "#支持包路径匹配（优先级低于 全类名匹配， 包路径优先匹配最精确的包）\n"
-                                + "nc.bs.po=pu  \n "
+                                + "nc.bs.po=pu\n "
                                 + "# 是否跳过此配置文件所在模块，不导出这个模块\n"
-                                + "config-ignoreModule=false \n"
+                                + "config-ignoreModule=false\n"
                                 + "# 不导出的文件列表 多个 用 英文,隔开\n"
                                 + "# 第一个 根据class定位精确不导出， 第二个 根据包名和里面的文件名精确定位不导出， 第三个 根据包名路径下的 所有 都不导出\n"
                                 + "config-ignoreFiles=nc.bs.some.Save2Impl, nc.bs.arap.2.txt, nc.bs.some.impl2 \n"
+                                + "# NCC的话，出补丁 client里哪些class的packge文件需要放入hotwebs，如果这个是空 就全部！\n"
+                                + "nccClientHotwebsPackges=\n"
                 );
                 out.flush();
                 out.close();
-            } catch (FileNotFoundException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -565,7 +568,7 @@ public class IdeaProjectGenerateUtil {
                         , contentVO, outPathRoot.getPath(), module
                         , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, classFileDir);
 
-                if(!StringUtil.replaceAll(StringUtil.replaceAll(sourcePackge.getPath(), File.separator, "/"), "\\", "/").contains("client/yyconfig/")){
+                if (!StringUtil.replaceAll(StringUtil.replaceAll(sourcePackge.getPath(), File.separator, "/"), "\\", "/").contains("client/yyconfig/")) {
                     ExportNCPatcherUtil.copyClassPathOtherFile(sourcePackge, outPathRoot.getPath(), module
                             , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, contentVO);
                 }

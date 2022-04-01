@@ -6,6 +6,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -430,5 +432,21 @@ public  final class StringUtil extends StringUtils{
             return true;
         }
         return false;
+    }
+
+    public static List<String> split2ListAndTrim(String str, String sp) {
+        String[] ss = split(str, sp);
+        if (ss == null || ss.length < 1) {
+            return new ArrayList<>();
+        }
+
+        ArrayList<String> l = new ArrayList<>();
+        for (int i = 0; i < ss.length; i++) {
+            if (ss[i] == null) {
+                continue;
+            }
+            l.add(trim(ss[i]));
+        }
+        return l;
     }
 }
