@@ -1,6 +1,8 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
+import com.air.nc5dev.util.idea.LogUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -627,8 +629,16 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @Param [fromDir, toDir]
      */
     public static final void copyFile(@NotNull File from, @NotNull final File to) {
-        to.mkdirs();
-        FileUtil.copy(from, to, true);
+        try {
+            if (!from.exists()) {
+                return ;
+            }
+            to.mkdirs();
+            FileUtil.copy(from, to, true);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            LogUtil.error("复制文件出错:" + e.getMessage(), e);
+        }
     }
 
     /**
@@ -1026,14 +1036,14 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
     public static void deleteAllEmptyDirs(File dir) {
         File[] fs = dir.listFiles();
         if (fs == null) {
-            return ;
+            return;
         }
 
         for (File f : fs) {
             if (f.isDirectory()) {
                 if (f.listFiles() == null || f.listFiles().length < 1) {
                     f.delete();
-                }else{
+                } else {
                     deleteAllEmptyDirs(f);
                 }
             }
