@@ -6,6 +6,8 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 
 # 因本人目前在微服务公司，所以本人业余接开发私单，有私单才能继续参与NC 继续更新插件啊，人懒又要养家
 
+# buy me a coffee:     
+<img width="200px" height="200px" src="https://s1.ax1x.com/2020/03/30/GeyNdI.md.png"  alt="buy me a coffee"  />     
 
 # 插件截图
  
@@ -21,9 +23,6 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
     
 ![数据库连接生成](https://s1.ax1x.com/2020/11/11/BjA4ET.png "数据库连接生成")   
      
-# buy me a coffee:     
-<img width="200px" height="200px" src="https://s1.ax1x.com/2020/03/30/GeyNdI.md.png"  alt="buy me a coffee"  />     
-
 # 使用方式
 插件安装后使用方式:
 ```
