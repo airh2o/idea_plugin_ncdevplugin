@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>Yonyou NC Dev Tool</name>
-    <version>v3.0</version>
+    <version>v3.1</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com</vendor>
 
     <description><![CDATA[
@@ -156,7 +156,7 @@
         </action>
         <action id="nc5dev.info.showlocalncjavaexe" class="com.air.nc5dev.acion.ShowLocalNCProcessAction"
                 text="显示 本机NC进程列表" description="显示 本机NC后端和Swing端进程列表">
-<!--            <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>-->
+            <!--            <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>-->
         </action>
         <action id="nc5dev.info.makejarfile" class="com.air.nc5dev.acion.MakeJarAction"
                 text="文件夹转Jar文件" description="把一个文件夹 比如class文件夹 转换成Jar包">
@@ -260,11 +260,12 @@
         </group>
     </actions>
 
-    <application-components>
+<!-- 已经使用打开项目后初始化监听的方式   <application-components>
         <component>
-            <implementation-class>com.air.nc5dev.component.SubscribeEventAutoCopyNccClientFilesComponent</implementation-class>
+            <implementation-class>com.air.nc5dev.component.SubscribeEventAutoCopyNccClientFilesComponent
+            </implementation-class>
         </component>
-    </application-components>
+    </application-components>-->
 
     <extensions defaultExtensionNs="com.intellij">
         <!--     <fileTypeFactory implementation="com.air.nc5dev.editor.bmf.languageinfo.BmfMDPFileTypeFactory"/>-->
@@ -282,7 +283,11 @@
             <className>com.air.nc5dev.acion.GenerateAllSetterAction</className>
         </intentionAction>
 
-  <!--      <searchEverywhereContributor implementation="com.air.nc5dev.nccrequstsearch.RequestMappingGoToContributor"/>-->
+        <!--      <searchEverywhereContributor implementation="com.air.nc5dev.nccrequstsearch.RequestMappingGoToContributor"/>-->
+
+        <!--        监听项目打开操作-->
+        <postStartupActivity implementation="com.air.nc5dev.listeners.ProjectOpenListener"/>
+
     </extensions>
 
 

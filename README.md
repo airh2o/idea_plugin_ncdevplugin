@@ -185,6 +185,7 @@ Run Content      com.intellij.execution.ui.RunContentWithExecutorListener
 ```
 事件断点一些不需要的:
 ```text
+
 !"IdePerformanceListener".equals(message.getTopic().getDisplayName()) 
 && !"Application activation notifications".equals(message.getTopic().getDisplayName())
 && !"FrameStateListener".equals(message.getTopic().getDisplayName())
@@ -202,7 +203,9 @@ Run Content      com.intellij.execution.ui.RunContentWithExecutorListener
 && !"NewVirtualFileSystem changes".equals(message.getTopic().getDisplayName())
 && !"Run Content".equals(message.getTopic().getDisplayName())
 && !"DebuggerManagerListener".equals(message.getTopic().getDisplayName())
-&& !"".equals(message.getTopic().getDisplayName())
+&& !"NewVirtualFileSystem changes".equals(message.getTopic().getDisplayName())
+
+
 ```
 
 

@@ -1,12 +1,12 @@
 package com.air.nc5dev.util.idea;
 
+import com.air.nc5dev.util.IoUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.ModuleRootModificationUtil;
-import com.intellij.openapi.roots.OrderRootType;
+import com.intellij.openapi.roots.*;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,19 +39,23 @@ public class ApplicationLibraryUtil {
      * @param theProject
      * @param libraryName
      * @param files
+     * @return
      */
-    public static final void addApplicationLibrary(@Nullable Project theProject, @NotNull String libraryName, @NotNull List<File> files) {
+    public static final LibraryEx addApplicationLibrary(@Nullable Project theProject, @NotNull String libraryName, @NotNull List<File> files) {
         Project project = null == theProject ? ProjectUtil.getDefaultProject() : theProject;
         final LibraryTable.ModifiableModel model = LibraryTablesRegistrar.getInstance().getLibraryTable(project).getModifiableModel();
 
         LibraryEx library = (LibraryEx) model.getLibraryByName(libraryName);
-        // 库存在创建新的
+        LibraryEx.ModifiableModelEx libraryModel = null;
         if (library != null) {
+            //已经存在库的，删除库里的东西
             model.removeLibrary(library);
+            library = (LibraryEx) model.createLibrary(libraryName);
+            libraryModel = library.getModifiableModel();
+        } else {
+            library = (LibraryEx) model.createLibrary(libraryName);
+            libraryModel = library.getModifiableModel();
         }
-        library = (LibraryEx) model.createLibrary(libraryName);
-
-        final LibraryEx.ModifiableModelEx libraryModel = library.getModifiableModel();
 
         //参数转换成路径集合
         List<String> classesRoots = files.stream().map(file -> file.getPath()).collect(Collectors.toList());
@@ -65,32 +70,74 @@ public class ApplicationLibraryUtil {
             } else if (root.toLowerCase().endsWith(".class")) {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);
-            }  else {
+            } else {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);
             }
         }
 
         // 提交库变更
+        final LibraryEx.ModifiableModelEx libraryModelFinal = libraryModel;
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
             @Override
             public void run() {
-                libraryModel.commit();
+                libraryModelFinal.commit();
                 model.commit();
             }
         });
 
-        // 向项目模块依赖中增加新增的库
-        Module[] modules = ModuleManager.getInstance(project).getModules();
-        for (Module module : modules) {
-            if (ModuleRootManager.getInstance(module).getModifiableModel().findLibraryOrderEntry(library) == null) {
-                ModuleRootModificationUtil.addDependency(module, library);
+        return library;
+    }
+
+    public static boolean notHas(ModifiableRootModel modifiableModel, String name) {
+        OrderEntry[] os = modifiableModel.getOrderEntries();
+        if (os == null) {
+            return true;
+        }
+
+        for (OrderEntry orderEntry : os) {
+            if (orderEntry instanceof LibraryOrderEntry
+                    && ((LibraryOrderEntry) orderEntry).getLibraryName().equals(name)) {
+                return false;
             }
         }
+
+        return true;
     }
 
 
     private ApplicationLibraryUtil() {
         throw new RuntimeException("cannot instance Util Class!");
+    }
+
+    /**
+     * 添加NC的依赖们到 模块
+     *
+     * @param module
+     */
+    public static void addLibs2Module(Module module) {
+        //添加依赖！
+        final LibraryTable.ModifiableModel model = LibraryTablesRegistrar.getInstance().getLibraryTable(module.getProject()).getModifiableModel();
+        ArrayList<LibraryEx> LibraryExList = new ArrayList<>();
+        LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Ant_Library));
+        LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Middleware_Library));
+        LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Framework_Library));
+        LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Product_Common_Library));
+        LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_NC_Module_Public_Library));
+        LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Module_Client_Library));
+        LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Module_Private_Library));
+        LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Module_Lang_Library));
+        LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Generated_EJB));
+        LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_NCCloud_Library));
+        LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_RESOURCES));
+
+        for (LibraryEx library : LibraryExList) {
+            if (library == null) {
+                continue;
+            }
+            if (ApplicationLibraryUtil.notHas(ModuleRootManager.getInstance(module).getModifiableModel(), library.getName())) {
+                ModuleRootModificationUtil.addDependency(module, library);
+            }
+        }
     }
 }

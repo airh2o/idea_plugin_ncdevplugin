@@ -15,15 +15,24 @@ import com.intellij.execution.application.ApplicationConfiguration;
 import com.intellij.execution.application.ApplicationConfigurationType;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.impl.RunManagerImpl;
+import com.intellij.ide.SaveAndSyncHandler;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.CompilerModuleExtension;
-import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.*;
+import com.intellij.openapi.roots.impl.ModifiableModelCommitter;
+import com.intellij.openapi.roots.impl.libraries.LibraryEx;
+import com.intellij.openapi.roots.ui.configuration.ModuleEditor;
+import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jps.model.java.JavaResourceRootType;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -57,7 +66,31 @@ public class IdeaProjectGenerateUtil {
         for (Module module : modules) {
             generateSrcDir(module);
             generatePatherConfigFile(module);
+            generatePatherConfigFile(module);
         }
+    }
+
+    /**
+     * 生成NC默认 几个个文件夹 src和META-INF 等文件夹 到项目
+     *
+     * @param project
+     */
+    public static final void generateSrcDir4Modules(Module module) {
+        generateSrcDir(module);
+        generatePatherConfigFile(module);
+        generatePatherConfigFile(module);
+    }
+
+    private static File createDirIfNotExists(File root, String... names) {
+        String p = "";
+        for (String name : names) {
+            p += File.separatorChar + name;
+        }
+        File f = new File(root, p);
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+        return f;
     }
 
     /**
@@ -74,27 +107,28 @@ public class IdeaProjectGenerateUtil {
     public static void generateSrcDir(@NotNull Module module) {
         File homeDir = new File(module.getModuleFilePath()).getParentFile();
         File src = new File(homeDir, "src");
-        File publicf = new File(src, "public");
-        if (!publicf.exists()) {
-            publicf.mkdirs();
-        }
-        File client = new File(src, "client");
-        if (!client.exists()) {
-            client.mkdirs();
-        }
-        File privatef = new File(src, "private");
-        if (!privatef.exists()) {
-            privatef.mkdirs();
-        }
-        File testf = new File(src, "test");
-        if (!testf.exists()) {
-            testf.mkdirs();
-        }
-        File umpDir = new File(homeDir, "META-INF");
-        if (!umpDir.exists()) {
-            umpDir.mkdirs();
-        }
-        File umpFile = new File(umpDir, "module.xml");
+        createDirIfNotExists(src, "public");
+        createDirIfNotExists(src, "private");
+        createDirIfNotExists(src, "client");
+        createDirIfNotExists(src, "test");
+        createDirIfNotExists(homeDir, "META-INF");
+        createDirIfNotExists(homeDir, "METADATA");
+        createDirIfNotExists(homeDir, "resources");
+        createDirIfNotExists(homeDir, "designmodel", "ace");
+        createDirIfNotExists(homeDir, "designmodel", "coderule");
+        createDirIfNotExists(homeDir, "designmodel", "funcmodel");
+        createDirIfNotExists(homeDir, "designmodel", "systemplatebase");
+        createDirIfNotExists(homeDir, "designmodel", "templet");
+        createDirIfNotExists(homeDir, "config", "billcodepredata");
+        createDirIfNotExists(homeDir, "config", "doc-lucene-config");
+        createDirIfNotExists(homeDir, "config", "pfxx");
+        createDirIfNotExists(homeDir, "config", "tabconfig");
+        createDirIfNotExists(homeDir, "script", "dbcreate");
+        createDirIfNotExists(homeDir, "script", "dbml", "simpchn");
+        createDirIfNotExists(homeDir, "script", "conf", "pdm");
+        File initdata = createDirIfNotExists(homeDir, "script", "conf", "initdata");
+
+        File umpFile = new File(new File(homeDir, "META-INF"), "module.xml");
         if (!umpFile.exists()) {
             try {
                 PrintWriter out = new PrintWriter(new FileOutputStream(umpFile));
@@ -314,37 +348,50 @@ public class IdeaProjectGenerateUtil {
         if (!ncHome.exists() && !ncHome.isDirectory()) {
             Messages.showInfoMessage("NC HOME不正确，请在 Tools 菜单下 配置NC HOME 菜单进行配置！", "警告");
         }
+        ArrayList<LibraryEx> LibraryExList = new ArrayList<>();
+        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Ant_Library
+                , IoUtil.serachAllNcAntJars(ncHome)));
 
-        ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Ant_Library
-                , IoUtil.serachAllNcAntJars(ncHome));
+        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Middleware_Library
+                , IoUtil.serachMiddleware_LibraryJars(ncHome)));
 
-        ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Product_Common_Library
-                , IoUtil.serachProduct_Common_LibraryJars(ncHome));
+        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Framework_Library
+                , IoUtil.serachFramework_LibraryJars(ncHome)));
 
-        ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Middleware_Library
-                , IoUtil.serachMiddleware_LibraryJars(ncHome));
+        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Product_Common_Library
+                , IoUtil.serachProduct_Common_LibraryJars(ncHome)));
 
-        ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Framework_Library
-                , IoUtil.serachFramework_LibraryJars(ncHome));
+        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NC_Module_Public_Library
+                , IoUtil.serachNC_Module_Public_Library(ncHome)));
 
-        ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NC_Module_Public_Library
-                , IoUtil.serachNC_Module_Public_Library(ncHome));
+        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Client_Library
+                , IoUtil.serachModule_Client_Library(ncHome)));
 
-        ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Client_Library
-                , IoUtil.serachModule_Client_Library(ncHome));
+        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Private_Library
+                , IoUtil.serachModule_Private_Library(ncHome)));
 
-        ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Private_Library
-                , IoUtil.serachModule_Private_Library(ncHome));
+        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Lang_Library
+                , IoUtil.serachModule_Lang_Library(ncHome)));
 
-        ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Lang_Library
-                , IoUtil.serachModule_Lang_Library(ncHome));
-
-        ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Generated_EJB
-                , IoUtil.serachGenerated_EJB(ncHome));
+        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Generated_EJB
+                , IoUtil.serachGenerated_EJB(ncHome)));
 
         if (new File(ProjectNCConfigUtil.getNCHome(), "hotwebs" + File.separatorChar + "nccloud").isDirectory()) {
-            ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NCCloud_Library
-                    , IoUtil.serachNCCloud_Library(ncHome));
+            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NCCloud_Library
+                    , IoUtil.serachNCCloud_Library(ncHome)));
+        }
+
+        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_RESOURCES
+                , IoUtil.serachResources(ncHome)));
+
+        // 向项目模块依赖中增加新增的库
+        Module[] modules = ModuleManager.getInstance(project).getModules();
+        for (Module module : modules) {
+            for (LibraryEx library : LibraryExList) {
+                if (ApplicationLibraryUtil.notHas(ModuleRootManager.getInstance(module).getModifiableModel(), library.getName())) {
+                    ModuleRootModificationUtil.addDependency(module, library);
+                }
+            }
         }
     }
 
@@ -596,5 +643,68 @@ public class IdeaProjectGenerateUtil {
     }
 
     private IdeaProjectGenerateUtil() {
+    }
+
+    /**
+     * 设置 新模块的 源码等文件夹 结构
+     *
+     * @param module
+     * @commot file://
+     * @see ModulesConfigurator#apply()
+     */
+    public static void setModuleStructureConfigurable(Module module) {
+        //这里必须 ！防止文件还没出现！！！！！！！
+        FileDocumentManager.getInstance().saveAllDocuments();
+        SaveAndSyncHandler.getInstance().refreshOpenFiles();
+        VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
+
+        ModifiableModuleModel modifiableModel = ModuleManager.getInstance(module.getProject()).getModifiableModel();
+        ModulesConfigurator modulesConfigurator = new ModulesConfigurator(module.getProject());
+        ModuleEditor editor = modulesConfigurator.getOrCreateModuleEditor(module);
+        ContentEntry[] contentEntries = editor.getModifiableRootModel().getContentEntries();
+        ContentEntry contentEntry = contentEntries[0];
+        VirtualFile root = contentEntry.getRootModel().getContentRoots()[0];
+        VirtualFile f = VirtualFileManager.getInstance().refreshAndFindFileByUrl(root.getUrl() + "/src/public");
+        if (f != null) {
+            contentEntry.addSourceFolder(f, false);
+        }
+        f = VirtualFileManager.getInstance().refreshAndFindFileByUrl(root.getUrl() + "/src/client");
+        if (f != null) {
+            contentEntry.addSourceFolder(f, false);
+        }
+        f = VirtualFileManager.getInstance().refreshAndFindFileByUrl(root.getUrl() + "/src/private");
+        if (f != null) {
+            contentEntry.addSourceFolder(f, false);
+        }
+        f = VirtualFileManager.getInstance().refreshAndFindFileByUrl(root.getUrl() + "/src/test");
+        if (f != null) {
+            contentEntry.addSourceFolder(f, true);
+        }
+        f = VirtualFileManager.getInstance().refreshAndFindFileByUrl(root.getUrl() + "/resources");
+        if (f != null) {
+            contentEntry.addSourceFolder(f, JavaResourceRootType.RESOURCE);
+        }
+        f = VirtualFileManager.getInstance().refreshAndFindFileByUrl(root.getUrl() + "/METADATA");
+        if (f != null) {
+            contentEntry.addSourceFolder(f, JavaResourceRootType.RESOURCE);
+        }
+        f = VirtualFileManager.getInstance().refreshAndFindFileByUrl(root.getUrl() + "/META-INF");
+        if (f != null) {
+            contentEntry.addSourceFolder(f, JavaResourceRootType.RESOURCE);
+        }
+
+        SourceFolder[] sfs = contentEntry.getSourceFolders();
+        for (SourceFolder sf : sfs) {
+            if (sf.getUrl().endsWith("src")) {
+                contentEntry.removeSourceFolder(sf);
+            }
+        }
+
+        try {
+            ModifiableModelCommitter.multiCommit(new ModifiableRootModel[]{editor.apply()}, modifiableModel);
+        } catch (ConfigurationException e) {
+            e.printStackTrace();
+            LogUtil.error("新模块自动配置结构失败:" + e.getMessage(), e);
+        }
     }
 }

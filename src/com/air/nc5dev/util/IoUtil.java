@@ -77,20 +77,16 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
     public static final ArrayList<File> serachProduct_Common_LibraryJars(File ncHome) {
         ArrayList<File> all = new ArrayList<>();
 
-        File f = new File(ncHome, "resources");
-        if (f.exists()) {
-            all.add(f);
-        }
-
-        f = new File(ncHome, "lib");
-        if (f.exists()) {
-            all.addAll(getAllJarFiles(f, true));
-        }
-        f = new File(ncHome, "external" + File.separatorChar + "classes");
+        File f = new File(ncHome, "external" + File.separatorChar + "classes");
         if (f.exists()) {
             all.add(f);
         }
         f = new File(ncHome, "external" + File.separatorChar + "lib");
+        if (f.exists()) {
+            all.addAll(getAllJarFiles(f, true));
+        }
+
+        f = new File(ncHome, "lib");
         if (f.exists()) {
             all.addAll(getAllJarFiles(f, true));
         }
@@ -287,6 +283,24 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         File f = new File(ncHome, "langlib");
         if (f.exists()) {
             all.addAll(getAllJarFiles(f, true));
+        }
+
+        return all;
+    }
+
+    /**
+     * 获取NC的 所有 模块的 所有    resources
+     *
+     * @param ncHome
+     * @return
+     */
+    public static final ArrayList<File> serachResources(File ncHome) {
+        ArrayList<File> all = new ArrayList<>();
+
+        File f = new File(ncHome, "resources");
+
+        if (f.exists()) {
+            all.add(f);
         }
 
         return all;
@@ -631,7 +645,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
     public static final void copyFile(@NotNull File from, @NotNull final File to) {
         try {
             if (!from.exists()) {
-                return ;
+                return;
             }
             to.mkdirs();
             FileUtil.copy(from, to, true);
