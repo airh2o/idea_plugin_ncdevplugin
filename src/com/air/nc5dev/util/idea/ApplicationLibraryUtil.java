@@ -96,8 +96,9 @@ public class ApplicationLibraryUtil {
         }
 
         for (OrderEntry orderEntry : os) {
-            if (orderEntry instanceof LibraryOrderEntry
-                    && ((LibraryOrderEntry) orderEntry).getLibraryName().equals(name)) {
+            if (orderEntry != null
+                    && orderEntry instanceof LibraryOrderEntry
+                    && name.equals(((LibraryOrderEntry) orderEntry).getLibraryName())) {
                 return false;
             }
         }
