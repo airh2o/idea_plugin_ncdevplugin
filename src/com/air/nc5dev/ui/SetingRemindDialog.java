@@ -1,5 +1,6 @@
 package com.air.nc5dev.ui;
 
+import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.util.RemindUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -52,9 +53,6 @@ public class SetingRemindDialog
      * @return void
      */
     public void onOK() {
-
-        String title = setingRemindPanel.textArea_title.getText();
-        String msg = setingRemindPanel.textArea_msg.getText();
         TimeUnit[] tuns = new TimeUnit[]{
                 TimeUnit.SECONDS
                 , TimeUnit.MINUTES
@@ -64,7 +62,21 @@ public class SetingRemindDialog
         TimeUnit timeUnit = tuns[setingRemindPanel.comboBox_timeUnit.getSelectedIndex()];
         long time = Long.parseLong(setingRemindPanel.textField_time.getText());
 
-        RemindUtil.add(time, timeUnit, title, msg);
+        String title = setingRemindPanel.textArea_title.getText();
+        String msg = StrUtil.replace(setingRemindPanel.textArea_msg.getText()
+                , "${minutes}"
+                , timeUnit.toMinutes(time) + ""
+        );
+        msg = StrUtil.replace(msg
+                , "${hours}"
+                , timeUnit.toHours(time) + ""
+        );
+        msg = StrUtil.replace(msg
+                , "${seconds}"
+                , timeUnit.toSeconds(time) + ""
+        );
+
+        RemindUtil.add(setingRemindPanel.comboBox_type.getSelectedIndex() == 0, time, timeUnit, title, msg);
 
         dispose();
     }

@@ -1,7 +1,9 @@
 package com.air.nc5dev.util;
 
+import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.ui.Messages;
 
+import javax.swing.*;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -17,18 +19,47 @@ import java.util.concurrent.TimeUnit;
  * @Version
  */
 public class RemindUtil {
-    private static final Timer timer = new Timer();
+    private static Timer timer = new Timer();
 
-    public static void clear() {
-        timer.purge();
+    public static synchronized void clear() {
+        if (timer == null) {
+            return;
+        }
+        timer.cancel();
+        timer = null;
     }
 
-    public static void add(long time, TimeUnit unit, String title, String msg) {
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Messages.showInfoMessage(msg, title);
-            }
-        }, unit.toMillis(time));
+    public static synchronized void add(boolean loop, long time, TimeUnit unit, String title, String msg) {
+        if (timer != null) {
+            timer.cancel();
+        }
+        timer = new Timer();
+
+        if (loop) {
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    //  Messages.showInfoMessage(msg, title);
+                    int i = JOptionPane.showConfirmDialog(null, msg
+                            , title + " (点击 否 立即终止定时提醒)"
+                            , JOptionPane.ERROR_MESSAGE);
+                    if (JOptionPane.NO_OPTION == i) {
+                       clear();
+                    }
+                }
+            }, unit.toMillis(time), unit.toMillis(time));
+        } else {
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    int i = JOptionPane.showConfirmDialog(null, msg
+                            , title + " (点击 否 立即终止定时提醒)"
+                            , JOptionPane.ERROR_MESSAGE);
+                    if (JOptionPane.NO_OPTION == i) {
+                        clear();
+                    }
+                }
+            }, unit.toMillis(time));
+        }
     }
 }

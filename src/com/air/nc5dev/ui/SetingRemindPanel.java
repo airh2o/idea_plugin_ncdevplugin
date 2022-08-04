@@ -25,7 +25,7 @@ public class SetingRemindPanel extends JPanel {
 		setLayout(null);
 
 		this.textArea_title = new JTextArea();
-		this.textArea_title.setText("请输入提醒标题");
+		this.textArea_title.setText("起来走走吧!");
 		this.textArea_title.setBounds(10, 81, 463, 130);
 		add(this.textArea_title);
 
@@ -64,7 +64,7 @@ public class SetingRemindPanel extends JPanel {
 		add(this.lblNewLabel_3);
 
 		this.textArea_msg = new JTextArea();
-		this.textArea_msg.setText("请输入提醒内容");
+		this.textArea_msg.setText("你坐了 ${minutes} 分钟了！起来走走吧！");
 		this.textArea_msg.setBounds(10, 246, 463, 130);
 		add(this.textArea_msg);
 

@@ -1,7 +1,10 @@
 package com.air.nc5dev.listeners;
 
 import com.air.nc5dev.util.IdeaProjectGenerateUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.ApplicationLibraryUtil;
+import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.ide.util.projectWizard.ModuleBuilderListener;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.ModuleListener;
@@ -31,6 +34,17 @@ public class NCModuleInitModuleBuilderListenerImpl implements ModuleListener {
 
     @Override
     public void moduleAdded(@NotNull Project project, @NotNull Module module) {
+       /* ProjectUtil.setProject(project);
+        ProjectNCConfigUtil.initConfigFile();
+        if (StringUtil.isBlank(ProjectNCConfigUtil.getNCHomePath())) {
+            //没有配置NC home！
+            return;
+        }*/
+
+        onAdd(module);
+    }
+
+    private void onAdd(@NotNull Module module) {
         IdeaProjectGenerateUtil.generateSrcDir4Modules(module);
 
         ApplicationLibraryUtil.addLibs2Module(module);

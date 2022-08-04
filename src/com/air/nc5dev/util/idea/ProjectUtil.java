@@ -16,9 +16,7 @@ import org.dom4j.Element;
 import org.dom4j.io.XMLWriter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -105,7 +103,7 @@ public class ProjectUtil {
      */
     public static Project getDefaultProject() {
         //因为IDEA可能打开多个项目，所以这里 2个办法 先根据之前按钮触发的最后一次 项目如果不是null 直接返回
-        if (project != null) {
+        if (project != null && project.isOpen() && !project.isDisposed()) {
             return project;
         }
         //实在没办法了，直接返回最后一个打开的项目
@@ -125,7 +123,17 @@ public class ProjectUtil {
      */
     @Deprecated
     public static Project getProjectByName(String name) {
-        return getDefaultProject();
+        Project[] openProjects = getProjectMannager().getOpenProjects();
+        if (openProjects == null || openProjects.length < 1) {
+            return null;
+        }
+
+        for (Project p : openProjects) {
+            if (p.getName().equals(name)) {
+                return p;
+            }
+        }
+        return null;
     }
 
     /* *
@@ -178,6 +186,20 @@ public class ProjectUtil {
     public static File getResourceTemplates(String name) {
         return new File(getResource().getPath()
                 + File.separatorChar + "templates", name);
+    }
+
+    public static String getResourceTemplatesUtf8Txt(String name) {
+        File f = new File(getResource().getPath()
+                + File.separatorChar + "templates", name);
+        if (!f.isFile()) {
+            return null;
+        }
+
+        try {
+            return IoUtil.readUtf8(new FileInputStream(f));
+        } catch (FileNotFoundException e) {
+            return null;
+        }
     }
 
     public static File getResource() {

@@ -1,7 +1,12 @@
 package com.air.nc5dev.listeners;
 
 import com.air.nc5dev.component.SubscribeEventAutoCopyNccClientFilesComponent;
+import com.air.nc5dev.service.ui.IMeassgeConsole;
+import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.IdeaProjectGenerateUtil;
+import com.air.nc5dev.util.idea.LogUtil;
+import com.air.nc5dev.util.idea.ProjectUtil;
+import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +25,19 @@ import org.jetbrains.annotations.NotNull;
 public class ProjectOpenListener implements StartupActivity.DumbAware {
     @Override
     public void runActivity(@NotNull Project project) {
+        try {
+            run(project);
+        } catch (Throwable e) {
+            //不要弹框报错！
+            try {
+                IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class);
+                service.getConsoleView().print(ExceptionUtil.getExcptionDetall(e) + "\n", ConsoleViewContentType.ERROR_OUTPUT);
+            } catch (Throwable ex) {
+            }
+        }
+    }
+
+    private void run(@NotNull Project project) {
         //自动生成NC几个默认文件夹！
         autoCreateNCSrcDirs(project);
 

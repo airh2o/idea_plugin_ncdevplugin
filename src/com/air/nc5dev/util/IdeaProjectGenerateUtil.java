@@ -3,6 +3,7 @@ package com.air.nc5dev.util;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.ApplicationLibraryUtil;
 import com.air.nc5dev.util.idea.LogUtil;
@@ -66,7 +67,6 @@ public class IdeaProjectGenerateUtil {
         for (Module module : modules) {
             generateSrcDir(module);
             generatePatherConfigFile(module);
-            generatePatherConfigFile(module);
         }
     }
 
@@ -77,7 +77,6 @@ public class IdeaProjectGenerateUtil {
      */
     public static final void generateSrcDir4Modules(Module module) {
         generateSrcDir(module);
-        generatePatherConfigFile(module);
         generatePatherConfigFile(module);
     }
 
@@ -133,14 +132,8 @@ public class IdeaProjectGenerateUtil {
             try {
                 PrintWriter out = new PrintWriter(new FileOutputStream(umpFile));
                 out.print(
-                        String.format("<?xml version=\"1.0\" encoding=\"gb2312\"?>\n"
-                                        + "<module name=\"%s\">\n"
-                                        + "\t<public>\n"
-                                        + "\t</public>\n"
-                                        + "\t<private>\n"
-                                        + "\t</private>\n"
-                                        + "</module>"
-                                , module.getName())
+                        StrUtil.replace(ProjectUtil.getResourceTemplatesUtf8Txt("module.xml")
+                                , "${moduleName}", module.getName())
                 );
                 out.flush();
                 out.close();
@@ -170,38 +163,10 @@ public class IdeaProjectGenerateUtil {
         if (!outFile.exists()) {
             try {
                 PrintWriter out = new PrintWriter(outFile, "UTF-8");
-                out.print(
-                        "#模块 " + module.getName() + "(" + homeDir.getPath() + ")" + "导出补丁的配置文件\n" +
-                                "#导出补丁选项参数\n" +
-                                "config-notest=true\n" +
-                                "#是否导出源码\n" +
-                                "config-exportsourcefile=true\n" +
-                                "#是否打包成jar(所有idea项目和模块 才打包，其他非模块和项目名字的不打包)\n" +
-                                "config-compressjar=false\n" +
-                                "#打包成jar的是否保留classess里的文件\n" +
-                                "config-compressEndDeleteClass=true\n" +
-                                "#如果打包jar，那么 META-INF.MF 文件模板磁盘全路径\n" +
-                                "config-ManifestFilePath=\n" +
-                                "#是否猜测模块，默认true，开启后 如果配置文件没有指明的类会根据包名第三个判断模块\n" +
-                                "# （比如 nc.ui.pub.ButtonBar 第三个是pub 所以认为模块是 pub）\n" +
-                                "config-guessModule=false\n" +
-                                "#关闭使用JAVAP方式判断 源码文件对应,默认false\n" +
-                                "config-closeJavaP=false\n" +
-                                "\n" +
-                                "#全类名匹配的输出模块\n" +
-                                "nc.ui.glpub.UiManager=gl\n" +
-                                "#非源码的文件输出模块\n" +
-                                "nc.bs.arap.1.txt=arap\n"
-                                + "#支持包路径匹配（优先级低于 全类名匹配， 包路径优先匹配最精确的包）\n"
-                                + "nc.bs.po=pu\n "
-                                + "# 是否跳过此配置文件所在模块，不导出这个模块\n"
-                                + "config-ignoreModule=false\n"
-                                + "# 不导出的文件列表 多个 用 英文,隔开\n"
-                                + "# 第一个 根据class定位精确不导出， 第二个 根据包名和里面的文件名精确定位不导出， 第三个 根据包名路径下的 所有 都不导出\n"
-                                + "config-ignoreFiles=nc.bs.some.Save2Impl, nc.bs.arap.2.txt, nc.bs.some.impl2 \n"
-                                + "# NCC的话，出补丁 client里哪些class的packge文件需要放入hotwebs，如果这个是空 就全部！\n"
-                                + "nccClientHotwebsPackges=\n"
-                );
+                String txt = ProjectUtil.getResourceTemplatesUtf8Txt("patcherconfig.properties");
+                txt = StrUtil.replace(txt, "${moduleName}", module.getName());
+                txt = StrUtil.replace(txt, "${modulePath}", homeDir.getPath());
+                out.print(txt);
                 out.flush();
                 out.close();
             } catch (Exception e) {
@@ -241,6 +206,7 @@ public class IdeaProjectGenerateUtil {
                     //FIELD_NC_HOME
                     //FIELD_EX_MODULES
                     envs.put("FIELD_NC_HOME", ProjectNCConfigUtil.getNCHomePath());
+                    envs.put("FIELD_CLINET_PORT", ProjectNCConfigUtil.getNCClientPort());
                     conf.setEnvs(envs);
                     conf.setWorkingDirectory(ncHome.getPath());
                 } else if (clientClass.equals(((ApplicationConfiguration) rc).MAIN_CLASS_NAME)) {
@@ -267,25 +233,38 @@ public class IdeaProjectGenerateUtil {
 
             HashMap<String, String> envs = new HashMap<>();
             envs.put("FIELD_NC_HOME", ProjectNCConfigUtil.getNCHomePath());
+            envs.put("FIELD_CLINET_PORT", ProjectNCConfigUtil.getNCClientPort());
             conf.setEnvs(envs);
 
             conf.setVMParameters(
-                    " -Dnc.http.port=" + ProjectNCConfigUtil.getNCClientPort()
+                    " -Dnc.http.port=$FIELD_CLINET_PORT$ "
                             + " -Dcom.sun.management.jmxremote "
-                            + "-Dcom.sun.management.jmxremote.port=" + RandomUtil.randomInt(25000, 55000)
+                            + " -Dcom.sun.management.jmxremote.port=" + RandomUtil.randomInt(25000, 55000)
                             + " -Dcom.sun.management.jmxremote.ssl=false "
-                            + "-Dcom.sun.management.jmxremote.authenticate=false "
-                            + "-Dnc.exclude.modules1=可以配置你需要排除的模块" //${FIELD_EX_MODULES}
-                            + " -Dnc.runMode=develop -Dnc.server.location=$FIELD_NC_HOME$ -Dorg.owasp.esapi.resources=$FIELD_NC_HOME$/ierp/bin/esapi "
+                            + " -Dcom.sun.management.jmxremote.authenticate=false "
+                            + " -Dnc.exclude.modules1=可以配置你需要排除的模块" //${FIELD_EX_MODULES}
+                            + " -Dnc.runMode=develop "
+                            + " -Dnc.server.location=$FIELD_NC_HOME$ "
+                            + " -Dorg.owasp.esapi.resources=$FIELD_NC_HOME$/ierp/bin/esapi "
                             + " -DEJBConfigDir=$FIELD_NC_HOME$/ejbXMLs"
                             + " -DExtServiceConfigDir=$FIELD_NC_HOME$/ejbXMLs"
                             + " -XX:+HeapDumpOnOutOfMemoryError "
                             + " -Duap.hotwebs=" + ProjectNCConfigUtil.getNcHotWebsList()
-                            + " -Djava.awt.headless=true -Dlog4j.ignoreTCL=true -Duser.timezone=GMT+8 "
+                            + " -Djava.awt.headless=true "
+                            + " -Dlog4j.ignoreTCL=true "
+                            + " -Duser.timezone=GMT+8 "
                             + (
-                            NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon()) ?
-                                    " -Dfile.encoding=UTF-8 " : " -Xmx768m -XX:MaxPermSize=256m "
-                    )
+                                    NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon()) ?
+                                            " -Dfile.encoding=UTF-8 "
+                                            : " -Xmx768m -XX:MaxPermSize=256m "
+                                                + " -Dfile.encoding=GBK "
+                            )
+                            + " -Xdebug -Xrunjdwp:transport=dt_socket,address=" + RandomUtil.randomInt(25000, 55000) + ",server=y,suspend=n "
+                            + " -Dnc.server.name= "
+                            + " -Dnc.server.startCount=0 "
+                            + " -Dnc.bs.logging.format=text "
+                            + " -Drun.side=server "
+                            + " -Dnc.run.side=server "
             );
             conf.setWorkingDirectory(ncHome.getPath());
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
