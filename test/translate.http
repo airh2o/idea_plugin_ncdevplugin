@@ -1,0 +1,18 @@
+POST http://fanyi.youdao.com/translate?doctype=json&type=AUTO&i=计算
+Content-Type: application/json
+
+{
+  "type": "EN2ZH_CN",
+  "errorCode": 0,
+  "elapsedTime": 1,
+  "translateResult": [
+    [
+      {
+        "src": "计算",
+        "tgt": ""
+      }
+    ]
+  ]
+}
+
+###

@@ -68,6 +68,32 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
                                         nc.bs.arap.1.txt=arap   
         nc.bs.arap.DzTakeF1Impl.wsdl=arap    
  ```
+
+.idea文件夹里 nc.properties 插件项目配置信息选项说明：
+```properties
+#### 是否过滤SQL
+filtersql=true
+#### 是否启用子查询结果生成SQL
+enableSubResultSet=true
+### 强制生成SQL 要用的第几个数据源
+data_source_index=0
+#### 客户端ip
+clientip=127.0.0.1
+#### 是否管理 自动复制ncc客户端文件到NChome
+close_client_copy=false
+#### 是否强制链接数据库 导出SQL
+rebuildsql=false
+#### 客户端端口
+clientport=13100
+#### NChome 路径
+home=I\:\\runtime\\NCC2105HOME
+### 强制指定nc版本
+nc.version=NCC
+############ 是否启用 编译后 理解进行NC代码规范检查
+buildAfterNCCodeCheck=false
+
+```
+
 # 常见问题
 1. IDEA 重启后如果提示运行配置的
     variables 比如 FIELD_NC_HOME 等无效，请无视他
@@ -168,12 +194,13 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 
 
 # 感谢
-部分代码 参考或使用了 部分插件开源项目的代码。
+部分代码 参考或使用了 部分插件开源项目的代码和功能灵感设计。
 涉及到的有(列表可能不全，请谅解，实际已源码和项目为准)：
 IDEA plugin 官方示例项目 或 开源插件：
 比如 https://github.com/SonarSource/sonarlint-intellij , https://github.com/gejun123456/intellij-generateAllSetMethod  等
-框架比如 guava hutool 等等
+框架比如 guava hutool 小乖乖 等等
 再次感谢开源项目参与者们的无私奉献！
+
 
 #### 备注
 IDEA常见事件: 事件分发 com.intellij.util.messages.impl.MessageBusImpl.invokeListener                    

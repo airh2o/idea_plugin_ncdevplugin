@@ -3,6 +3,7 @@ package com.air.nc5dev.nccrequstsearch;
 import com.air.nc5dev.acion.GoToNCRequestMappingAction;
 import com.intellij.ide.actions.searcheverywhere.AbstractGotoSEContributor;
 import com.intellij.ide.util.gotoByName.FilteringGotoByModel;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
@@ -19,8 +20,7 @@ import org.jetbrains.annotations.Nullable;
  * @Version
  */
 public class RequestMappingGoToContributor extends AbstractGotoSEContributor {
-    protected RequestMappingGoToContributor(@Nullable Project project
-            , @Nullable PsiElement context) {
+    protected RequestMappingGoToContributor(@Nullable Project project, @Nullable PsiElement context) {
         super(project, context);
     }
 

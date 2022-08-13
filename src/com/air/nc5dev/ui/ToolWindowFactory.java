@@ -43,7 +43,7 @@ public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFact
         toolWindow.setType(ToolWindowType.DOCKED, null);
         toolWindow.setTitle("(QQ 209308343 有业务可联系 感谢支持)");
         try {
-            toolWindow.setIcon(AllIcons.Ide.Info_notifications);
+            toolWindow.setIcon(AllIcons.General.Information);
         } catch (Throwable e) {
         }
         toolWindow.setToHideOnEmptyContent(true);

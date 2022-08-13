@@ -58,7 +58,11 @@ public class ProjectNCConfigUtil {
      * @Param []
      */
     public static final File getNCHome() {
-        return new File(getConfigValue(KEY_PROJECT_NC_CONFIG_NCHOME));
+        String configValue = getConfigValue(KEY_PROJECT_NC_CONFIG_NCHOME);
+        if (StringUtil.isBlank(configValue)) {
+            return null;
+        }
+        return new File(configValue);
     }
 
     /**
@@ -203,6 +207,9 @@ public class ProjectNCConfigUtil {
 
         if (!ProjectNCConfigUtil.configPropertis.containsKey("close_client_copy")) {
             ProjectNCConfigUtil.configPropertis.put("close_client_copy", "false");
+        }
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("buildAfterNCCodeCheck")) {
+            ProjectNCConfigUtil.configPropertis.put("buildAfterNCCodeCheck", "false");
         }
         if (!ProjectNCConfigUtil.configPropertis.containsKey("nc.version")) {
             ProjectNCConfigUtil.configPropertis.put("nc.version", "");

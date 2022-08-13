@@ -53,7 +53,7 @@ public class Actions {
     Actions(ActionManager actionManager) {
         cleanConsoleAction = new LogCleanConsoleAction("清空NC插件日志窗口内容",
                 "清空NC插件日志窗口内容",
-                AllIcons.Actions.Clear);
+                AllIcons.Actions.Close);
         topLineAction = new LogMoveUpAction("首行",
                 "跳转到首行",
                 AllIcons.Actions.MoveUp);
