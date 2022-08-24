@@ -4,6 +4,8 @@ import com.air.nc5dev.component.SubscribeEventAutoCopyNccClientFilesComponent;
 import com.air.nc5dev.service.ui.IMeassgeConsole;
 import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.IdeaProjectGenerateUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.execution.ui.ConsoleViewContentType;
@@ -26,6 +28,13 @@ public class ProjectOpenListener implements StartupActivity.DumbAware {
     @Override
     public void runActivity(@NotNull Project project) {
         try {
+            ProjectUtil.setProject(project);
+            ProjectNCConfigUtil.initConfigFile();
+            if (StringUtil.isBlank(ProjectNCConfigUtil.getNCHomePath())) {
+                //没有配置NC home！
+                return;
+            }
+
             run(project);
         } catch (Throwable e) {
             //不要弹框报错！

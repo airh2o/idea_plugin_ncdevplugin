@@ -34,12 +34,12 @@ public class NCModuleInitModuleBuilderListenerImpl implements ModuleListener {
 
     @Override
     public void moduleAdded(@NotNull Project project, @NotNull Module module) {
-       /* ProjectUtil.setProject(project);
+        ProjectUtil.setProject(project);
         ProjectNCConfigUtil.initConfigFile();
         if (StringUtil.isBlank(ProjectNCConfigUtil.getNCHomePath())) {
             //没有配置NC home！
             return;
-        }*/
+        }
 
         onAdd(module);
     }

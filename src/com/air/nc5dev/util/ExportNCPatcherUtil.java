@@ -897,9 +897,17 @@ public class ExportNCPatcherUtil {
                 return;
             }
 
-            //获得源文件名字
+            //获得源文件名字 C:\Users\airh2o\IdeaProjects\ncctest\out\production\mmmpsxj\nc\bs\pub\action\N_36D1_SIGNAL.class
 
             String javaFullName = StringUtil.get(getClassFileSourceFileName(classFile.getPath(), sourcePackge), "");
+
+            //这里判断一下， 解决 如果 public新建了一个 和 private一模一样的包路径，会导致 private的class可能跑到了 public里！
+            if (!new File(sourcePackge, javaFullName).isFile()
+                    && !new File(sourcePackge, javaFullName + ".java").isFile()
+            ) {
+                return;
+            }
+
             String pageJava = packgePath;
             if (pageJava.startsWith(File.separator)) {
                 pageJava = pageJava.substring(File.separator.length());
@@ -1290,7 +1298,7 @@ public class ExportNCPatcherUtil {
             return fileName;
         }
 
-        return null;
+        return fileName;
     }
 
     /**
