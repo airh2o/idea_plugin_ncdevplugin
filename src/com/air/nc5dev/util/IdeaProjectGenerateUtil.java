@@ -17,6 +17,9 @@ import com.intellij.execution.application.ApplicationConfigurationType;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.ide.SaveAndSyncHandler;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.impl.ApplicationImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
@@ -254,11 +257,11 @@ public class IdeaProjectGenerateUtil {
                             + " -Dlog4j.ignoreTCL=true "
                             + " -Duser.timezone=GMT+8 "
                             + (
-                                    NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon()) ?
-                                            " -Dfile.encoding=UTF-8 "
-                                            : " -Xmx768m -XX:MaxPermSize=256m "
-                                                + " -Dfile.encoding=GBK "
-                            )
+                            NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon()) ?
+                                    " -Dfile.encoding=UTF-8 "
+                                    : " -Xmx768m -XX:MaxPermSize=256m "
+                                    + " -Dfile.encoding=GBK "
+                    )
                             + " -Xdebug -Xrunjdwp:transport=dt_socket,address=" + RandomUtil.randomInt(25000, 55000) + ",server=y,suspend=n "
                             + " -Dnc.server.name= "
                             + " -Dnc.server.startCount=0 "
@@ -679,11 +682,13 @@ public class IdeaProjectGenerateUtil {
             }
         }
 
-        try {
-            ModifiableModelCommitter.multiCommit(new ModifiableRootModel[]{editor.apply()}, modifiableModel);
-        } catch (ConfigurationException e) {
-            e.printStackTrace();
-            LogUtil.error("新模块自动配置结构失败:" + e.getMessage(), e);
-        }
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            try {
+                ModifiableModelCommitter.multiCommit(new ModifiableRootModel[]{editor.apply()}, modifiableModel);
+            } catch (ConfigurationException e) {
+                e.printStackTrace();
+                LogUtil.error("新模块自动配置结构失败:" + e.getMessage(), e);
+            }
+        });
     }
 }

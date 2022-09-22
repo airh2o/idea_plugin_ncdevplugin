@@ -12,6 +12,7 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiFile;
 
 /**
@@ -32,11 +33,22 @@ public class ReConfigModuleAction extends AbstractIdeaAction {
         Module module = LangDataKeys.MODULE.getData(e.getDataContext());
 
         if (module == null) {
+            int updateClassPath = Messages.showYesNoDialog(String.format("是否确定重新部署项目所有模块?%s", project.getBasePath())
+                    , "询问", Messages.getQuestionIcon());
+            if (updateClassPath != Messages.OK) {
+                return;
+            }
+
             Module[] modules = ModuleManager.getInstance(project).getModules();
             for (Module module1 : modules) {
                 setModuel(module1);
             }
         } else {
+            int updateClassPath = Messages.showYesNoDialog(String.format("是否确定重新部署模块%s?", module.getModuleFilePath())
+                    , "询问", Messages.getQuestionIcon());
+            if (updateClassPath != Messages.OK) {
+                return;
+            }
             setModuel(module);
         }
     }

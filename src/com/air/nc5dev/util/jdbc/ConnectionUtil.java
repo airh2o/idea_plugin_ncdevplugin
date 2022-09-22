@@ -4,6 +4,7 @@ import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.ReflectUtil;
 import com.air.nc5dev.util.idea.LogUtil;
+import com.air.nc5dev.util.ncutils.AESEncode;
 import com.air.nc5dev.vo.ExportContentVO;
 import com.air.nc5dev.vo.ItemsItemVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
@@ -43,7 +44,12 @@ public class ConnectionUtil {
         if (StringUtils.isNotBlank(ds.getDriverClassName())) {
             Class.forName(ds.getDriverClassName());
         }
-        return DriverManager.getConnection(ds.getDatabaseUrl(), ds.getUser(), ds.getPassword());
+        try {
+            return DriverManager.getConnection(ds.getDatabaseUrl(), ds.getUser(), ds.getPassword());
+        } catch (Throwable e) {
+            //NCC 新的加密方式？
+            return DriverManager.getConnection(ds.getDatabaseUrl(), ds.getUser(), AESEncode.decrypt(ds.getPasswordOrgin()));
+        }
     }
 
     public static void toInserts(Connection con, ItemsItemVO itemVO, StringBuilder txt, Set exsitSqlSet, ExportContentVO contentVO) {

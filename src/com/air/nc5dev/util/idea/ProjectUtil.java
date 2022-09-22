@@ -17,6 +17,7 @@ import org.dom4j.io.XMLWriter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -189,15 +190,14 @@ public class ProjectUtil {
     }
 
     public static String getResourceTemplatesUtf8Txt(String name) {
-        File f = new File(getResource().getPath()
-                + File.separatorChar + "templates", name);
-        if (!f.isFile()) {
+        InputStream input = ProjectUtil.class.getResourceAsStream("/" + "templates" + "/" + name);
+        if (input == null) {
             return null;
         }
 
         try {
-            return IoUtil.readUtf8(new FileInputStream(f));
-        } catch (FileNotFoundException e) {
+            return IoUtil.readUtf8(input);
+        } catch (Exception e) {
             return null;
         }
     }

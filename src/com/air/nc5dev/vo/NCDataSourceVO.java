@@ -23,6 +23,7 @@ public class NCDataSourceVO {
     private String databaseUrl;
     private String user;
     private String password;
+    String passwordOrgin;
     private String driverClassName;
     private String databaseType;
     private String maxCon;
@@ -48,6 +49,7 @@ public class NCDataSourceVO {
         databaseUrl = getSonElementTextContent(element, "databaseUrl", 0);
         user = getSonElementTextContent(element, "user", 0);
         password = getSonElementTextContent(element, "password", 0);
+        passwordOrgin = password;
         password = new NC5xEncode().decode(password);
         driverClassName = getSonElementTextContent(element, "driverClassName", 0);
         databaseType = getSonElementTextContent(element, "databaseType", 0);

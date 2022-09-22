@@ -28,7 +28,11 @@ public class NC6xEncode {
     }
 
     public String encode(String s, Object... expars) {
-        return getEncodedPassword((NcUserVo) expars[0], s);
+        try {
+            return getEncodedPassword((NcUserVo) expars[0], s);
+        } catch (Throwable e) {
+            return s;
+        }
     }
 
     /**

@@ -213,7 +213,7 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift m"/>
         </action>
         <action id="nc5dev.info.ReConfigModuleAction" class="com.air.nc5dev.acion.ReConfigModuleAction"
-                text="重新配置模块结构" description="立即重新自动设置模块的依赖结构和源文件夹等配置">
+                text="重新配置模块结构(对模块右键 只配置此模块，否则配置整个所有模块)" description="立即重新自动设置模块的依赖结构和源文件夹等配置(对模块右键 只配置此模块，否则配置整个所有模块)">
         </action>
 
         <action id="nc5dev.info.JavadocGenerateAction" class="com.air.nc5dev.acion.JavadocGenerateAction"
@@ -345,13 +345,15 @@
         <postStartupActivity implementation="com.air.nc5dev.listeners.ProjectOpenListener"/>
 
 
-        <!--        搜索NCC URL路径的窗口注册-->
+        <!--        搜索NCC URL路径的窗口注册
         <toolWindow id="NCCloud Action请求地址映射搜索" anchor="right"
                     factoryClass="com.air.nc5dev.ui.nccactionsearch.NccActionSearchToolWindow" secondary="true"/>
         <applicationService
                 serviceImplementation="com.air.nc5dev.util.docgenerate.TemplatePersistentConfiguration"/>
         <applicationConfigurable groupId="tools" displayName="Getter Setter Template" id="Xstudio.Plugin.SpringJava"
                                  instance="com.xstudio.plugin.idea.sj.getset.TemplateConfigurable"/>
+-->
+
 
         <!--        代码 合法性 检查！-->
         <checkinHandlerFactory implementation="com.air.nc5dev.codecheck.NCCheckinHandlerFactoryImpl"
