@@ -976,7 +976,11 @@ public class ExportNCPatcherUtil {
             }
         }
 
-        IoUtil.copyFile(from, dir);
+        try {
+            IoUtil.copyFile(from, dir);
+        } catch (Throwable e) {
+            LogUtil.error(e.toString(), e);
+        }
     }
 
     /**

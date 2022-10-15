@@ -72,8 +72,8 @@ public class ConnectionUtil {
             apend(con, itemVO, txt, exsitSqlSet, contentVO, sqls);
         } catch (Exception e) {
             e.printStackTrace();
-            LogUtil.error("导出表:" + itemVO.getItemKey() + " 出错!" + e.toString(), e);
-            throw new RuntimeException("导出表:" + itemVO.getItemKey() + " 出错!" + e.toString(), e);
+            LogUtil.error("导出表:" + itemVO.getItemKey() + " 出错!" + e.toString() + " ," + itemVO.getFixedWhere(), e);
+            throw new RuntimeException("导出表:" + itemVO.getItemKey() + " 出错!" + e.toString() + " ," + itemVO.getFixedWhere(), e);
         }
     }
 

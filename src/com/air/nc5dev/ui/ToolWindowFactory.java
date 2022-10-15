@@ -20,6 +20,7 @@
 package com.air.nc5dev.ui;
 
 import com.air.nc5dev.service.ui.impl.MeassgeConsoleImpl;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.subscribe.PubSubUtil;
 import com.air.nc5dev.util.subscribe.impl.LogWinAutoShowWhenErr;
 import com.intellij.icons.AllIcons;
@@ -53,9 +54,13 @@ public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFact
     }
 
     private static void addLogTab(Project project, ToolWindow toolWindow) {
-        logPanel = new LogPanel(toolWindow, project);
-        Content logContent = toolWindow.getContentManager().getFactory().createContent(logPanel, TAB_LOGS, false);
-        toolWindow.getContentManager().addContent(logContent);
+        try {
+            logPanel = new LogPanel(toolWindow, project);
+            Content logContent = toolWindow.getContentManager().getFactory().createContent(logPanel, TAB_LOGS, false);
+            toolWindow.getContentManager().addContent(logContent);
+        } catch (Throwable e) {
+            LogUtil.error(e.toString(), e);
+        }
     }
 
     @Override

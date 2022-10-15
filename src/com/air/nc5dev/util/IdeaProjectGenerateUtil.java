@@ -419,15 +419,18 @@ public class IdeaProjectGenerateUtil {
             if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
                 copyModuleNccConfigDir2NChome(module);
                 if (!"true".equals(ProjectNCConfigUtil.getConfigValue("close_client_copy"))) {
-                    copyModuleNccActionDir2NChome(module);
+                    try {
+                        copyModuleNccActionDir2NChome(module);
+                    } catch (Throwable e) {
+                        LogUtil.error(e.toString(), e);
+                    }
                 } else {
                     LogUtil.tryInfo(module.getModuleFilePath()
                             + " 模块执行：NCC-hotwebs文件复制到NCHOME. 配置了跳过。执行跳过。");
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LogUtil.error(e.toString(), e);
-            e.printStackTrace();
         }
     }
 
