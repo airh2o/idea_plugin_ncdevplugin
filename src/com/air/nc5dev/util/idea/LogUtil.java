@@ -59,13 +59,17 @@ public class LogUtil {
     }
 
     public static void error(String msg, Throwable t) {
+        error(msg, t, false);
+    }
+
+    public static void error(String msg, Throwable t, boolean showDig) {
         IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class);
         if (service == null) {
             LOGGER.debug("com.air.nc5dev.util.idea.ProjectUtil.getService(java.lang.Class<T>) null for msg: " + msg, t);
             return;
         }
 
-        service.error(msg, t);
+        service.error(msg, t, showDig);
     }
 
     public static void clear() {

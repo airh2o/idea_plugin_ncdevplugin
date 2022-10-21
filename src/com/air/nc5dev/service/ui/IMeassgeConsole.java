@@ -25,7 +25,7 @@ public interface IMeassgeConsole {
 
     public void error(String msg);
 
-    public void error(String msg, Throwable t);
+    public void error(String msg, Throwable t, boolean showDig);
 
     public void clear();
 

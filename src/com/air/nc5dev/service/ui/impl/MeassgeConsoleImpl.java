@@ -59,12 +59,21 @@ public class MeassgeConsoleImpl implements IMeassgeConsole, Disposable {
     }
 
     @Override
-    public void error(String msg, Throwable t) {
+    public void error(String msg, Throwable t, boolean showDig) {
         t = null == t ? new RuntimeException() : t;
-        error(msg);
-        StringWriter errors = new StringWriter();
-        t.printStackTrace(new PrintWriter(errors));
-        error(errors.toString());
+
+        if (showDig) {
+            error(msg);
+            StringWriter errors = new StringWriter();
+            t.printStackTrace(new PrintWriter(errors));
+            error(errors.toString());
+        }else{
+            getConsoleView().print(msg + "\n", ConsoleViewContentType.ERROR_OUTPUT);
+            StringWriter errors = new StringWriter();
+            t.printStackTrace(new PrintWriter(errors));
+            getConsoleView().print(errors.toString() + "\n", ConsoleViewContentType.ERROR_OUTPUT);
+        }
+
         PubSubUtil.publishAsync(KEY, t);
     }
 

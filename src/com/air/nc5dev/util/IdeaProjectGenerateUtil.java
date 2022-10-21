@@ -5,6 +5,7 @@ import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
+import com.air.nc5dev.service.ui.IMeassgeConsole;
 import com.air.nc5dev.util.idea.ApplicationLibraryUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
@@ -614,15 +615,15 @@ public class IdeaProjectGenerateUtil {
         }
         File f2;
         for (File f1 : fs1) {
-            f2 = new File(f1, "client" + File.separatorChar + "classes");
-            if (!f2.isDirectory()) {
-                continue;
-            }
-
             try {
+                f2 = new File(f1, "client" + File.separatorChar + "classes");
+                if (!f2.isDirectory()) {
+                    continue;
+                }
                 IoUtil.copyFile(f2, nccClientClassDir.getParentFile());
                 FileUtil.del(f1);
             } catch (Throwable e) {
+                LogUtil.error(e.getMessage(), e);
             }
         }
     }
