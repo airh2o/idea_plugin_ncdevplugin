@@ -169,11 +169,9 @@ public class ProjectUtil {
         try {
             t = ServiceManager.getService(project, clazz);
         } catch (Throwable e) {
-            e.printStackTrace();
             return null;
         }
         if (t == null) {
-            LOG.error("Could not find service: " + clazz.getName());
             return null;
         }
 
@@ -181,7 +179,11 @@ public class ProjectUtil {
     }
 
     public static <T> T getService(Class<T> clazz) {
-        return getService(getDefaultProject(), clazz);
+        try {
+            return getService(getDefaultProject(), clazz);
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     public static File getResourceTemplates(String name) {
