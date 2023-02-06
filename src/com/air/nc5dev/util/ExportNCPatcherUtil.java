@@ -84,6 +84,7 @@ public class ExportNCPatcherUtil {
         //获得所有的 模块
         Module[] modules = ModuleManager.getInstance(contentVO.project).getModules();
         contentVO.modules = CollUtil.toList(modules);
+
         //模块文件夹根路径 ： 模块对象
         for (Module module : modules) {
             contentVO.moduleHomeDir2ModuleMap.put(new File(module.getModuleFilePath()).getParent(), module);
@@ -119,6 +120,11 @@ public class ExportNCPatcherUtil {
 
             if (contentVO.ignoreModules.contains(entry.getValue())) {
                 //需要跳过的模块
+                continue;
+            }
+
+            if (contentVO.isSelectExport()
+                    && !contentVO.getSelectModules().values().contains(entry.getValue())) {
                 continue;
             }
 
@@ -165,10 +171,18 @@ public class ExportNCPatcherUtil {
             File umpDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "META-INF");
             if (umpDir.isDirectory()) {
                 contentVO.indicator.setText("导出模块配置文件:" + umpDir.getPath());
-                IoUtil.copyAllFile(umpDir
-                        , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
-                                .separatorChar +
-                                "META-INF"));
+                if (contentVO.isSelectExport() && !contentVO.getSelectFiles().contains(umpDir.getPath())) {
+                    copyAll(umpDir
+                            , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
+                                    .separatorChar +
+                                    "META-INF")
+                            , contentVO);
+                } else {
+                    IoUtil.copyAllFile(umpDir
+                            , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
+                                    .separatorChar +
+                                    "META-INF"));
+                }
             }
 
             File bmfDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "METADATA");
@@ -176,10 +190,18 @@ public class ExportNCPatcherUtil {
             //复制模块元数据
             if (bmfDir.isDirectory()) {
                 contentVO.indicator.setText("导出模块元数据:" + umpDir.getPath());
-                IoUtil.copyAllFile(bmfDir
-                        , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
-                                .separatorChar +
-                                "METADATA"));
+                if (contentVO.isSelectExport() && !contentVO.getSelectFiles().contains(umpDir.getPath())) {
+                    copyAll(bmfDir
+                            , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
+                                    .separatorChar +
+                                    "METADATA")
+                            , contentVO);
+                } else {
+                    IoUtil.copyAllFile(bmfDir
+                            , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
+                                    .separatorChar +
+                                    "METADATA"));
+                }
             }
 
             //检查是否需要把代码打包成 jar文件
@@ -209,6 +231,68 @@ public class ExportNCPatcherUtil {
             buildNCCSqlAndFrontFiles(contentVO);
         }
         //}
+
+        if (contentVO.isFormat4Ygj()) {
+            //转换云管家格式！
+            toYgjFormatExportStract(contentVO);
+        }
+    }
+
+    /**
+     * 把补丁转换成云管家格式
+     *
+     * @param contentVO
+     */
+    public static void toYgjFormatExportStract(ExportContentVO contentVO) {
+        File pather = new File(contentVO.getOutPath()).getParentFile();
+        File base = new File(pather.getParentFile(), pather.getName() + "-云管家补丁");
+        contentVO.indicator.setText("转换成云管家补丁格式..." + base.getPath());
+        if (base.exists()) {
+            IoUtil.deleteFileAll(base);
+            base.deleteOnExit();
+        }
+
+        File replacement = new File(base, "replacement");
+        /*   File readme = new File(base, "readme.txt");
+        File packmetadata = new File(base, "packmetadata.xml");
+        File installpatch = new File(base, "installpatch.xml");*/
+
+        for (File src : pather.listFiles()) {
+            FileUtil.move(src, replacement, true);
+        }
+
+        //输出 描述文件！
+        try {
+            new AutoGenerPathcherInfo4YunGuanJiaUtil().run(
+                    base.getPath()
+                    , base.getName()
+                    , NcVersionEnum.NCC.equals(contentVO.getNcVersion())
+                    , contentVO
+            );
+
+            contentVO.setOutPath(base.getPath());
+        } catch (Throwable e) {
+            e.printStackTrace();
+            e.printStackTrace();
+            LogUtil.error("转换成云管家补丁格式出错:" + e.toString(), e);
+        }
+    }
+
+    private static void copyAll(File from, File to, ExportContentVO contentVO) {
+        if (from.isFile()) {
+            for (String path : contentVO.getSelectFiles()) {
+                if (canExport(contentVO, from, null, null
+                        , null, null, null, null, null)) {
+                    IoUtil.copyAllFile(from, to);
+                }
+            }
+            return;
+        }
+
+        File[] fs = from.listFiles();
+        for (File f : fs) {
+            copyAll(f, f.isFile() ? to : new File(to, f.getName()), contentVO);
+        }
     }
 
     /**
@@ -220,7 +304,7 @@ public class ExportNCPatcherUtil {
         buildNCCHotwebs(new File(contentVO.getProject().getBasePath(), "hotwebs"), contentVO);
 
         HashMap<String, Module> moduleHomeDir2ModuleMap = contentVO.getModuleHomeDir2ModuleMap();
-        File sqldir = new File(new File(contentVO.getOutPath()).getParentFile(), "SQL脚本");
+        File sqldir = new File(new File(contentVO.getOutPath()).getParentFile(), "sql");
         ArrayList<File> moduleOneSqls = new ArrayList<>();
         //已存在的sql
         Set exsitSqlSet = null;
@@ -246,6 +330,13 @@ public class ExportNCPatcherUtil {
                     //需要跳过的模块
                     continue;
                 }
+
+                if (contentVO.isSelectExport()
+                        && !contentVO.getSelectModules().values().contains(moduleHomeDir2ModuleMap.get(modulePath))) {
+                    //需要跳过的模块
+                    continue;
+                }
+
                 module = modulePath;
 
                 File script = new File(modulePath, "script");
@@ -308,7 +399,7 @@ public class ExportNCPatcherUtil {
         buildNCCHotwebs(new File(contentVO.getProject().getBasePath(), "hotwebs"), contentVO);
 
         HashMap<String, Module> moduleHomeDir2ModuleMap = contentVO.getModuleHomeDir2ModuleMap();
-        File sqldir = new File(new File(contentVO.getOutPath()).getParentFile(), "SQL脚本");
+        File sqldir = new File(new File(contentVO.getOutPath()).getParentFile(), "sql");
         ArrayList<File> moduleOneSqls = new ArrayList<>();
         //已存在的sql
         Set exsitSqlSet = null;
@@ -318,6 +409,12 @@ public class ExportNCPatcherUtil {
 
         for (String modulePath : moduleHomeDir2ModuleMap.keySet()) {
             if (contentVO.ignoreModules.contains(moduleHomeDir2ModuleMap.get(modulePath))) {
+                //需要跳过的模块
+                continue;
+            }
+
+            if (contentVO.isSelectExport()
+                    && !contentVO.getSelectModules().values().contains(moduleHomeDir2ModuleMap.get(modulePath))) {
                 //需要跳过的模块
                 continue;
             }
@@ -897,6 +994,11 @@ public class ExportNCPatcherUtil {
                 return;
             }
 
+            if (!canExport(contentVO, classFile, sourcePackge, sourceBaseDirFile, exportDir
+                    , module, packgePath, classFile, ncType)) {
+                return;
+            }
+
             //获得源文件名字 C:\Users\airh2o\IdeaProjects\ncctest\out\production\mmmpsxj\nc\bs\pub\action\N_36D1_SIGNAL.class
 
             String javaFullName = StringUtil.get(getClassFileSourceFileName(classFile.getPath(), sourcePackge), "");
@@ -1109,6 +1211,11 @@ public class ExportNCPatcherUtil {
                 return;
             }
 
+            if (!canExport(contentVO, javaFile, sourcePackge, sourceBaseDirFile, exportDir
+                    , module, packgePath, classFileDir, ncType)) {
+                return;
+            }
+
             String javaFullName = javaFile.getPath().substring((sourceBaseDirFile.getPath()).length() + 1);
             javaFullName = javaFullName.substring(0, javaFullName.length() - ".java".length());
             if (javaFullName.startsWith(File.separator)) {
@@ -1155,6 +1262,92 @@ public class ExportNCPatcherUtil {
         });
     }
 
+    private static boolean canExport(ExportContentVO contentVO, File file, @Nullable File sourcePackge
+            , @Nullable File sourceBaseDirFile, @Nullable String exportDir, @Nullable Module module
+            , @Nullable String packgePath, @Nullable File classFileDir, String ncType) {
+        if (!contentVO.isSelectExport() || file == null) {
+            return true;
+        }
+
+        String path = file.getPath();
+        path = StringUtil.replaceChars(path, "/", File.separator);
+        path = StringUtil.replaceChars(path, "\\", File.separator);
+        String orginPath = path;
+        if (contentVO.getSelectFiles().contains(path)) {
+            return true;
+        }
+
+        String out = null;
+        String modulePath = null;
+        if (module != null) {
+            CompilerModuleExtension compilerModuleExtension = CompilerModuleExtension.getInstance(module);
+            out = compilerModuleExtension.getCompilerOutputPath().getPath();
+            out = StringUtil.replaceChars(out, "/", File.separator);
+            out = StringUtil.replaceChars(out, "\\", File.separator);
+            if (out.indexOf(out.length() - 1) != File.separatorChar) {
+                out = out + File.separatorChar;
+            }
+
+            modulePath = module.getModuleFile().getParent().getPath();
+            modulePath = StringUtil.replaceChars(modulePath, "/", File.separator);
+            modulePath = StringUtil.replaceChars(modulePath, "\\", File.separator);
+        }
+
+        for (String key : contentVO.getSelectFiles()) {
+            String s = key;
+            if (sourceBaseDirFile != null) {
+                s = StringUtil.remove(key, sourceBaseDirFile.getPath() + File.separatorChar);
+            }
+            if (StringUtil.endsWith(s.toLowerCase(), ".java")) {
+                s = s.substring(0, s.length() - 5);
+            }
+            if (out != null) {
+                path = StringUtil.remove(path, out);
+            }
+
+            if (StringUtil.startsWith(path, s)) {
+                //选择了这个文件或者这个文件所属的文件夹或上级文件夹！
+                return true;
+            }
+
+            if (StringUtil.equals(s, modulePath)) {
+                //选择了整个模块！
+                return true;
+            }
+
+            //3个文件夹
+            if (StringUtil.endsWith(s, File.separatorChar + NC_TYPE_PRIVATE)
+                    || StringUtil.endsWith(s, File.separatorChar + NC_TYPE_PUBLIC)
+                    || StringUtil.endsWith(s, File.separatorChar + NC_TYPE_CLIENT)
+                    || StringUtil.endsWith(s, File.separatorChar + NC_TYPE_TEST)
+            ) {
+                String s2 = s;
+                boolean is = false;
+                if (StringUtil.endsWith(s2, File.separatorChar + NC_TYPE_PRIVATE)) {
+                    s2 = StringUtil.removeEnd(s2, File.separatorChar + NC_TYPE_PRIVATE);
+                    is = NC_TYPE_PRIVATE.equals(ncType);
+                } else if (StringUtil.endsWith(s2, File.separatorChar + NC_TYPE_PUBLIC)) {
+                    s2 = StringUtil.removeEnd(s2, File.separatorChar + NC_TYPE_PUBLIC);
+                    is = NC_TYPE_PUBLIC.equals(ncType);
+                } else if (StringUtil.endsWith(s2, File.separatorChar + NC_TYPE_CLIENT)) {
+                    s2 = StringUtil.removeEnd(s2, File.separatorChar + NC_TYPE_CLIENT);
+                    is = NC_TYPE_CLIENT.equals(ncType);
+                } else if (StringUtil.endsWith(s2, File.separatorChar + NC_TYPE_TEST)) {
+                    s2 = StringUtil.removeEnd(s2, File.separatorChar + NC_TYPE_TEST);
+                    is = NC_TYPE_TEST.equals(ncType);
+                }
+                s2 = StringUtil.removeEnd(s2, File.separatorChar + "src");
+                s2 = StringUtil.removeEnd(s2, File.separatorChar + "java");
+                if (is && StringUtil.equals(s2, modulePath)) {
+                    //选择了模块的3个文件夹某一个
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      * 把一个包里的 非代码文件 复制到补丁 对应位置里      </br>
      * 比如 wsdl json 各种类路径配置文件等     </br>
@@ -1177,6 +1370,11 @@ public class ExportNCPatcherUtil {
             final String fileName = file.getName().toLowerCase();
             if (fileName.endsWith(".class")
                     || fileName.endsWith(".java")) {
+                return;
+            }
+
+            if (!canExport(contentVO, file, sourcePackge, null, exportDir
+                    , module, packgePath, null, ncType)) {
                 return;
             }
 

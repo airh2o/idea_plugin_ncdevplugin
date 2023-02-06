@@ -11,11 +11,11 @@ Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin
 
 # 插件截图
  
-![快速面板](https://s1.ax1x.com/2020/11/11/BjAfbV.png "快速操作面板")    
+![快速面板](readme/imgs/1.png "快速操作面板")    
 
-![配置NCHOME](https://s1.ax1x.com/2020/11/11/BjARuq.png "配置NCHOME")    
+![配置NCHOME](readme/imgs/2.png "配置NCHOME")    
 
-![补丁导出界面](https://s1.ax1x.com/2020/11/11/BjA5UU.png "补丁导出界面")    
+![补丁导出界面](readme/imgs/3.png "补丁导出界面")    
 
 ![日志窗口](https://s1.ax1x.com/2020/11/11/BjAgvn.png "日志窗口")  
   
@@ -91,7 +91,9 @@ home=I\:\\runtime\\NCC2105HOME
 nc.version=NCC
 ############ 是否启用 编译后 理解进行NC代码规范检查
 buildAfterNCCodeCheck=false
-
+###### 导出补丁格式 采用云管家格式，默认true
+format4Ygj=true
+####
 ```
 
 # 常见问题
@@ -109,10 +111,10 @@ buildAfterNCCodeCheck=false
 
 # 版本更新
 ``` 
-  <em>3.0 版本 更新:</em> <br>
+  <em>3.1 版本 更新:</em> <br>
       <ul>
-          <li>1. 支持导出补丁构建成NCC特有结构(前后端，前端要自己先build好).</li>
-          <li>1. 支持自动合并和过滤SQL脚本(
+          <li>1. 支持导出补丁右侧选则只导出哪些模块或文件.</li>
+          <li>2. 支持导出云管家格式补丁(
                     nc.prop配置: 
                         filtersql 是否过滤完全重复SQL语句 默认 true ,<br>
                         rebuildsql 是否无视iuap导出的SQL采用IDEA插件自动根据items.xml导出SQL 默认 false ,<br>
@@ -120,10 +122,24 @@ buildAfterNCCodeCheck=false
                         enableSubResultSet 是否支持iuap自带的子表导出 默认 true -此功能暂时不支持，如果用idea强制导出 那么必须手工配置子表到 items-idea.xml(和items.xml一个文件夹里)中 ,<br>
                         includeDeletes 是否导出delete删除已存在数据的语句 默认 false .<br>
                         reNpmBuild 是否强制执行npm build 默认 true .<br>
+                        format4Ygj 导出云管家模式 默认 true .<br>
               )
           </li>
       </ul>
-
+     <em>3.0 版本 更新:</em> <br>
+          <ul>
+              <li>1. 支持导出补丁构建成NCC特有结构(前后端，前端要自己先build好).</li>
+              <li>1. 支持自动合并和过滤SQL脚本(
+                        nc.prop配置: 
+                            filtersql 是否过滤完全重复SQL语句 默认 true ,<br>
+                            rebuildsql 是否无视iuap导出的SQL采用IDEA插件自动根据items.xml导出SQL 默认 false ,<br>
+                            data_source_index idea导出SQL使用的数据源索引 默认 0 ,<br>
+                            enableSubResultSet 是否支持iuap自带的子表导出 默认 true -此功能暂时不支持，如果用idea强制导出 那么必须手工配置子表到 items-idea.xml(和items.xml一个文件夹里)中 ,<br>
+                            includeDeletes 是否导出delete删除已存在数据的语句 默认 false .<br>
+                            reNpmBuild 是否强制执行npm build 默认 true .<br>
+                  )
+              </li>
+          </ul>
     <em>2.5.7 版本 更新:</em> <br>
       <ul>
           <li>1. 修复部分NCC的支持性问题.</li>

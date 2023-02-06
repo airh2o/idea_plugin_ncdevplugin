@@ -232,7 +232,12 @@ public class ProjectNCConfigUtil {
         if (!ProjectNCConfigUtil.configPropertis.containsKey("reNpmBuild")) {
             ProjectNCConfigUtil.configPropertis.put("reNpmBuild", "true");
         }
-
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("format4Ygj")) {
+            ProjectNCConfigUtil.configPropertis.put("format4Ygj", "true");
+        }
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("selectExport")) {
+            ProjectNCConfigUtil.configPropertis.put("selectExport", "false");
+        }
         IoUtil.wirtePropertis(ProjectNCConfigUtil.configPropertis, ProjectNCConfigUtil.configFile);
     }
 

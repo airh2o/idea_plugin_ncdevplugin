@@ -309,10 +309,11 @@
             <reference ref="nc5dev.info.ReConfigModuleAction"/>
             <separator/>
 
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <add-to-group group-id="MainToolBarSettings" anchor="last"/>
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+            <add-to-group group-id="MainToolBarSettings" anchor="first"/>
+
             <!--            加入 右键菜单-->
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
         </group>
     </actions>
 

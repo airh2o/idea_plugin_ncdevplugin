@@ -537,6 +537,10 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @Param [fromDir, toDir]
      */
     public static final void copyAllFile(@NotNull File fromDir, @NotNull final File toDir) {
+        if (fromDir.isFile()) {
+            copyFile(fromDir, toDir);
+            return ;
+        }
         Stream.of(fromDir.listFiles()).forEach(file -> {
             if (!file.isFile()) {
                 return;
