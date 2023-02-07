@@ -75,11 +75,13 @@ public class PatcherDialog
         super(event.getProject());
         this.event = event;
         init();
-        setTitle("导出NC补丁包..." + (
-                ExportContentVO.EVENT_POPUP_CLICK.equals(event.getPlace())
-                        ? "(项目树点击的导出:只导出选中的模块和文件。如果不想这样 可以点击 Tools菜单选中导出)"
-                        : "(Tools菜单点击的导出:导出全部项目。如果不想这样 可以点击 左侧项目树 选中要导出的模块或具体文件)"
-        ));
+        setTitle("导出NC补丁包..."
+                       /* + (
+                        ExportContentVO.EVENT_POPUP_CLICK.equals(event.getPlace())
+                                ? "(项目树点击的导出:只导出选中的模块和文件。如果不想这样 可以点击 Tools菜单选中导出)"
+                                : "(Tools菜单点击的导出:导出全部项目。如果不想这样 可以点击 左侧项目树 选中要导出的模块或具体文件)"
+                )*/
+        );
     }
 
     @Nullable

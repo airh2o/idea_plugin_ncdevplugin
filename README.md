@@ -1,6 +1,6 @@
 # idea_plugin_nc5devplugin
-Yonyou NC5x or U8Cloud or NC6x Idea devtool Plugin   
-实现了 Idea NC5x 6x U8Cloud 开发插件，功能比较简单
+Yonyou NC5x or U8Cloud or NC6x or NCCloud or YonBIP Idea devtool Plugin   
+实现了 Idea Yonyou NC5x or U8Cloud or NC6x or NCCloud(新版改名叫YonBip) or YonBIP 开发插件。
 
 # 注意，因为本人懒等原因，最新的插件是 项目根目录的 zip文件哦，不是发行版里的哦！！！！
 
