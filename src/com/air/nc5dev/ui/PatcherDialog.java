@@ -67,6 +67,7 @@ public class PatcherDialog
     JComboBox ncVersion;
     JBCheckBox reNpmBuild;
     JBCheckBox format4Ygj;
+    JBCheckBox reWriteSourceFile;
     JBCheckBox selectExport;
     JBTable selectTable;
     DefaultTableModel defaultTableModel;
@@ -202,17 +203,25 @@ public class PatcherDialog
             format4Ygj.setBounds(280, 250, 60, 36);
             contentPane.add(format4Ygj);
 
+            JLabel label_10 = new JBLabel("混淆覆写导出的源码文件内容(java文件和js源码:__SOURCE__CODE__):");
+            label_10.setBounds(21, 280, 400, 30);
+            contentPane.add(label_10);
+            reWriteSourceFile = new JBCheckBox();
+            reWriteSourceFile.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("reWriteSourceFile", "false")));
+            reWriteSourceFile.setBounds(420, 280, 60, 36);
+            contentPane.add(reWriteSourceFile);
+
             JLabel label_8 = new JBLabel("只导出选中的模块或文件:");
-            label_8.setBounds(21, 280, 280, 30);
+            label_8.setBounds(21, 320, 280, 30);
             contentPane.add(label_8);
             selectExport = new JBCheckBox();
             this.selectExport.setSelected(ExportContentVO.EVENT_POPUP_CLICK.equals(event.getPlace()));
-            this.selectExport.setBounds(280, 280, 60, 36);
+            this.selectExport.setBounds(280, 320, 60, 36);
             this.selectExport.addChangeListener((e) -> updateSelectFileTable());
             contentPane.add(this.selectExport);
 
             JLabel label_9 = new JBLabel("当前选中的要导出的内容:");
-            label_9.setBounds(21, 300, 280, 30);
+            label_9.setBounds(21, 350, 280, 30);
             contentPane.add(label_9);
             Vector heads = new Vector();
             heads.add("选择");
@@ -223,7 +232,7 @@ public class PatcherDialog
             selectTable.setBorder(LineBorder.createBlackLineBorder());
             JScrollPane jScrollPane = new JBScrollPane(this.selectTable);
             jScrollPane.setAutoscrolls(true);
-            jScrollPane.setBounds(21, 330, 770, 200);
+            jScrollPane.setBounds(21, 375, 770, 200);
             // 对每一列设置单元格渲染器
             for (int i = 0; i < selectTable.getColumnCount(); i++) {
                 selectTable.getColumnModel().getColumn(i).setCellRenderer(new MyTableRenderer());
@@ -340,6 +349,7 @@ public class PatcherDialog
                     contentVO.indicator = indicator;
                     contentVO.filtersql = filtersql.isSelected();
                     contentVO.rebuildsql = rebuild.isSelected();
+                    contentVO.reWriteSourceFile = reWriteSourceFile.isSelected();
                     contentVO.reNpmBuild = reNpmBuild.isSelected();
                     contentVO.format4Ygj = format4Ygj.isSelected();
                     contentVO.data_source_index = dataSourceIndex.getSelectedIndex();

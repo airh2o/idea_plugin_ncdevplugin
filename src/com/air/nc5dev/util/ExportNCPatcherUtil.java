@@ -16,6 +16,7 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -235,6 +236,75 @@ public class ExportNCPatcherUtil {
         if (contentVO.isFormat4Ygj()) {
             //转换云管家格式！
             toYgjFormatExportStract(contentVO);
+        }
+
+        if (contentVO.isReWriteSourceFile()) {
+            reWriteSourceFile(contentVO);
+        }
+    }
+
+    /**
+     * 覆盖写入混淆字符串到源码文件 java和js的
+     *
+     * @param f
+     */
+    public static void reWriteSourceFile(File f) {
+        if (f.isDirectory()) {
+            for (File f1 : f.listFiles()) {
+                reWriteSourceFile(f1);
+            }
+        }else{
+            int size = 30+ new Random().nextInt(200);
+            String txt = "QQ:209308343@qq.com 微信:yongyourj 时间:" + V.nowDateTime() + "\n";
+            for (int i = 0; i < size; i++) {
+                txt += UUID.randomUUID().toString();
+            }
+
+            FileUtil.writeUtf8String(txt, f);
+        }
+    }
+
+    /**
+     * 覆盖写入混淆字符串到源码文件 java和js的
+     *
+     * @param contentVO
+     */
+    public static void reWriteSourceFile(ExportContentVO contentVO) {
+        ArrayList<String> javas = Lists.newArrayList();
+        ArrayList<String> jss = Lists.newArrayList();
+        contentVO.indicator.setText("正在覆盖写入混淆字符串到源码文件...");
+        if (contentVO.isFormat4Ygj()) {
+            //云管家格式的
+            javas.add(contentVO.getOutPath() + File.separatorChar + "replacement" + File.separatorChar + "modules");
+            javas.add(contentVO.getOutPath() + File.separatorChar + "replacement" + File.separatorChar + "hotwebs"
+                    + File.separatorChar + "nccloud" + File.separatorChar + "WEB-INF" + File.separatorChar + "classes"
+            );
+            jss.add(contentVO.getOutPath() + File.separatorChar + "replacement" + File.separatorChar + "hotwebs"
+                    + File.separatorChar + "nccloud" + File.separatorChar + "resources"
+                    + File.separatorChar + "__SOURCE__CODE__" + File.separatorChar + "src"
+            );
+        } else {
+            javas.add(contentVO.getOutPath());
+            jss.add(new File(contentVO.getOutPath()).getParentFile().getPath() + File.separatorChar + "hotwebs"
+                    + File.separatorChar + "nccloud" + File.separatorChar + "resources"
+                    + File.separatorChar + "__SOURCE__CODE__" + File.separatorChar + "src"
+            );
+        }
+
+        for (String java : javas) {
+            File f = new File(java);
+            if (!f.exists()) {
+                continue;
+            }
+            reWriteSourceFile(f);
+        }
+
+        for (String java : jss) {
+            File f = new File(java);
+            if (!f.exists()) {
+                continue;
+            }
+            reWriteSourceFile(f);
         }
     }
 

@@ -71,6 +71,7 @@ public class ExportContentVO {
 
     public boolean filtersql = true;
     public boolean rebuildsql = false;
+    public boolean reWriteSourceFile = false;
     public int data_source_index = 0;
     public NcVersionEnum ncVersion = ProjectNCConfigUtil.getNCVerSIon();
     public boolean reNpmBuild = true;

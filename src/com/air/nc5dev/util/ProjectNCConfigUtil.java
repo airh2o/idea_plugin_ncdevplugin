@@ -238,6 +238,9 @@ public class ProjectNCConfigUtil {
         if (!ProjectNCConfigUtil.configPropertis.containsKey("selectExport")) {
             ProjectNCConfigUtil.configPropertis.put("selectExport", "false");
         }
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("reWriteSourceFile")) {
+            ProjectNCConfigUtil.configPropertis.put("reWriteSourceFile", "false");
+        }
         IoUtil.wirtePropertis(ProjectNCConfigUtil.configPropertis, ProjectNCConfigUtil.configFile);
     }
 
