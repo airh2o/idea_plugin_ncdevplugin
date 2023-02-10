@@ -444,10 +444,8 @@ public class PatcherDialog
                         } else {
                             zip = new File(dirToOpen.getParentFile().getParentFile(), dirToOpen.getParentFile().getName() + ".zip");
                             contentVO.indicator.setText("自动打包成zip压缩包中..." + zip.getPath());
-                            zip = ZipUtil.zip(dirToOpen.getParentFile());
-                            File src = zip;
+                            File src = ZipUtil.zip(dirToOpen.getParentFile());
                             zip = new File(dirToOpen.getParentFile().getParentFile(), dirToOpen.getParentFile().getName() + ".zip");
-                            FileUtil.move(src, zip, true);
                         }
                         LogUtil.info("自动打包成补丁zip压缩包的硬盘路径： " + zip.getPath());
                     } catch (Exception ex) {
