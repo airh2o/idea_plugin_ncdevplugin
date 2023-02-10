@@ -92,7 +92,7 @@ public class PatcherDialog
         if (contentPane == null) {
             int x = 21;
             int y = 16;
-            int height = 50;
+            int height = 30;
             int width = 600;
             
             contentPane = //new JBPanel();
