@@ -76,6 +76,7 @@ public class ExportContentVO {
     public NcVersionEnum ncVersion = ProjectNCConfigUtil.getNCVerSIon();
     public boolean reNpmBuild = true;
     public boolean format4Ygj = true;
+    public boolean deleteDir = true;
     /**
      * 是否 导出选定的文件
      */

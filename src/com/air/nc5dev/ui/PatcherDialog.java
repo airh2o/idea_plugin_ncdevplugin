@@ -68,6 +68,7 @@ public class PatcherDialog
     JComboBox ncVersion;
     JBCheckBox reNpmBuild;
     JBCheckBox format4Ygj;
+    JBCheckBox deleteDir;
     JBCheckBox reWriteSourceFile;
     JBCheckBox selectExport;
     JBTable selectTable;
@@ -94,7 +95,7 @@ public class PatcherDialog
             int y = 16;
             int height = 30;
             int width = 600;
-            
+
             contentPane = //new JBPanel();
                     new JBScrollPane();
             contentPane.setLayout(null);
@@ -227,6 +228,17 @@ public class PatcherDialog
             panel6.add(label_7);
             panel6.add(format4Ygj);
             contentPane.add(panel6);
+
+            JLabel label_12 = new JBLabel("是否只保留zip文件(删除补丁文件夹):");
+            deleteDir = new JBCheckBox();
+            deleteDir.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("deleteDir", "true")));
+            JBPanel panel12 = new JBPanel();
+            //  panel6.setBorder(LineBorder.createGrayLineBorder());
+            panel12.setLayout(new BoxLayout(panel12, BoxLayout.X_AXIS));
+            panel12.setBounds(x, y = y + height + 5, width, height);
+            panel12.add(label_12);
+            panel12.add(deleteDir);
+            contentPane.add(panel12);
 
             JLabel label_10 = new JBLabel("混淆覆写导出的源码文件内容(java文件和js源码:__SOURCE__CODE__):");
             reWriteSourceFile = new JBCheckBox();
@@ -382,6 +394,7 @@ public class PatcherDialog
                     contentVO.rebuildsql = rebuild.isSelected();
                     contentVO.reWriteSourceFile = reWriteSourceFile.isSelected();
                     contentVO.reNpmBuild = reNpmBuild.isSelected();
+                    contentVO.deleteDir = deleteDir.isSelected();
                     contentVO.format4Ygj = format4Ygj.isSelected();
                     contentVO.data_source_index = dataSourceIndex.getSelectedIndex();
                     contentVO.ncVersion = (NcVersionEnum) ncVersion.getSelectedItem();
@@ -426,8 +439,16 @@ public class PatcherDialog
                         File zip = new File(dirToOpen.getParentFile(), dirToOpen.getName() + ".zip");
                         contentVO.indicator.setText("自动打包成zip压缩包中..." + zip.getPath());
                         zip = ZipUtil.zip(dirToOpen);
+                        LogUtil.info("自动打包成补丁zip压缩包的硬盘路径： " + zip.getPath());
                     } catch (Exception ex) {
                         ex.printStackTrace();
+                    }
+
+                    if (contentVO.isDeleteDir()) {
+                        try {
+                            FileUtil.del(dirToOpen);
+                        } catch (Throwable ex) {
+                        }
                     }
 
                     desktop.open(dirToOpen.getParentFile());

@@ -241,6 +241,9 @@ public class ProjectNCConfigUtil {
         if (!ProjectNCConfigUtil.configPropertis.containsKey("reWriteSourceFile")) {
             ProjectNCConfigUtil.configPropertis.put("reWriteSourceFile", "false");
         }
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("deleteDir")) {
+            ProjectNCConfigUtil.configPropertis.put("deleteDir", "true");
+        }
         IoUtil.wirtePropertis(ProjectNCConfigUtil.configPropertis, ProjectNCConfigUtil.configFile);
     }
 

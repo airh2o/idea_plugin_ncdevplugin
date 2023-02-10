@@ -1,6 +1,8 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.ExportContentVO;
 import com.google.common.collect.Lists;
@@ -51,32 +53,33 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
     public void run(String dir, String name, boolean ncc, ExportContentVO contentVO) throws Throwable {
         File root = new File(dir);
         if (!root.isDirectory()) {
-            System.out.println("not dir , exit.");
+            LogUtil.error("生成云管家描述文件错误: not dir , exit." + root.getPath());
             return;
         }
 
         try {
-            readme(dir, name, root);
+            readme(dir, name, root, contentVO);
         } catch (Throwable e) {
             e.printStackTrace();
+            LogUtil.error(e.getMessage(), e);
         }
 
         try {
-            packmetadata(dir, name, root);
+            packmetadata(dir, name, root, contentVO);
         } catch (Throwable e) {
             e.printStackTrace();
+            LogUtil.error(e.getMessage(), e);
         }
 
         try {
-            installpatch(dir, name, root);
+            installpatch(dir, name, root, contentVO);
         } catch (Throwable e) {
             e.printStackTrace();
+            LogUtil.error(e.getMessage(), e);
         }
-
-        System.out.println("gener sucess!");
     }
 
-    public void installpatch(String dir, String name, File root) throws IOException {
+    public void installpatch(String dir, String name, File root, ExportContentVO contentVO) throws IOException {
         String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<installpatch>\n";
         File replacement = new File(dir, "replacement");
@@ -94,16 +97,24 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
         outputString2File(new File(dir, "installpatch.xml"), xml);
     }
 
-    public void packmetadata(String dir, String name, File root) throws IOException {
+    public void packmetadata(String dir, String name, File root, ExportContentVO contentVO) throws IOException {
         List<String> lines = null;
 
-        if (new File(dir, "packmetadata.xml").isFile()) {
+/*        if (new File(dir, "packmetadata.xml").isFile()) {
             lines = read2Strings(new FileInputStream(new File(dir, "packmetadata.xml")));
-        } else {
-            lines = read2Strings(
-                    new FileInputStream(ProjectUtil.getResourceTemplates("packmetadata.xml"))
-            );
+        } else {*/
+        try {
+            File resourceTemplates = ProjectUtil.getResourceTemplates("packmetadata.xml");
+            if (resourceTemplates != null) {
+                lines = FileUtil.readUtf8Lines(resourceTemplates);
+                LogUtil.info("云管家信息文件:packmetadata.xml,模板路径： " + resourceTemplates.getPath());
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            LogUtil.error(e.getMessage(), e);
         }
+
+        /*  }*/
 
         if (CollUtil.isEmpty(lines)) {
             lines = Lists.newArrayListWithCapacity(40);
@@ -145,31 +156,44 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
             }
         }
 
-        lines.set(i_name, "    <patchName>" + fullname + "</patchName>");
-        lines.set(i_id, "    <id>" + no + "</id>");
-        lines.set(i_create, "    <time>" + date + "</time>");
+        lines.set(i_name, "    <patchName>" + fullname + "</patchName>" + "\n");
+        lines.set(i_id, "    <id>" + no + "</id>" + "\n");
+        lines.set(i_create, "    <time>" + date + "</time>" + "\n");
 
-        outputString2File(new File(dir, "packmetadata.xml"), builderString(lines));
+        File out = new File(dir, "packmetadata.xml");
+
+        contentVO.indicator.setText("云管家信息文件:packmetadata.xml..." + out.getPath() + " , " + lines.size());
+        LogUtil.info("云管家信息文件:packmetadata.xml,输出路径： " + out.getPath() + "   , " + lines.size());
+
+        outputString2File(out, builderString(lines));
     }
 
-    public void readme(String dir, String name, File root) throws IOException {
+    public void readme(String dir, String name, File root, ExportContentVO contentVO) throws IOException {
         List<String> lines = null;
-
+/*
         if (new File(dir, "readme.txt").isFile()) {
             lines = read2Strings(new FileInputStream(new File(dir, "readme.txt")));
-        } else {
-            lines = read2Strings(
-                    new FileInputStream(ProjectUtil.getResourceTemplates("readme.template"))
-            );
+        } else {*/
+        try {
+            File resourceTemplates = ProjectUtil.getResourceTemplates("readme.template");
+            if (resourceTemplates != null) {
+                lines = FileUtil.readUtf8Lines(resourceTemplates);
+                LogUtil.info("云管家信息文件:readme.txt,模板路径： " + resourceTemplates.getPath());
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            LogUtil.error(e.getMessage(), e);
         }
 
+        /*  }
+         */
         if (CollUtil.isEmpty(lines)) {
             lines = Lists.newArrayListWithCapacity(40);
-            lines.add(" \n");
+            lines.add("\n");
             lines.add("==============================================================================\n");
             lines.add("1)补丁基本信息\n");
             lines.add("==============================================================================\n");
-            lines.add(" \n");
+            lines.add("\n");
             lines.add("	补丁名称 -\n");
             lines.add("	补丁编号 -\n");
             lines.add("	产品版本 - \n");
@@ -181,36 +205,36 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
             lines.add("	补丁创建时间 - 2022-07-01 18:02:52\n");
             lines.add("	是否需要部署 - true\n");
             lines.add("	是否需要重新生成客户端Applet Jar包 - true\n");
-            lines.add(" \n");
+            lines.add("\n");
             lines.add("==============================================================================\n");
             lines.add("2)补丁安装步骤说明\n");
             lines.add("==============================================================================\n");
-            lines.add(" \n");
-            lines.add(" \n");
+            lines.add("\n");
+            lines.add("\n");
             lines.add("	补丁安装前置准备工作(比如数据备份)\n");
             lines.add("	======================================================================\n");
-            lines.add(" \n");
-            lines.add(" \n");
-            lines.add(" \n");
+            lines.add("\n");
+            lines.add("\n");
+            lines.add("\n");
             lines.add("	补丁安装\n");
             lines.add("	======================================================================\n");
-            lines.add(" \n");
-            lines.add(" \n");
-            lines.add(" \n");
+            lines.add("\n");
+            lines.add("\n");
+            lines.add("\n");
             lines.add("	补丁安装后置工作\n");
             lines.add("	======================================================================\n");
-            lines.add(" \n");
-            lines.add(" \n");
-            lines.add(" \n");
+            lines.add("\n");
+            lines.add("\n");
+            lines.add("\n");
             lines.add("	补丁安装成功的验证工作\n");
             lines.add("	======================================================================\n");
-            lines.add(" \n");
-            lines.add(" \n");
-            lines.add(" \n");
+            lines.add("\n");
+            lines.add("\n");
+            lines.add("\n");
             lines.add("	其它信息\n");
             lines.add("	======================================================================\n");
-            lines.add(" \n");
-            lines.add(" \n");
+            lines.add("\n");
+            lines.add("\n");
             lines.add("==============================================================================\n");
             lines.add("3)补丁修复bug列表说明\n");
             lines.add("==============================================================================\n");
@@ -238,32 +262,39 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
             int i = Integer.parseInt(s);
             v = "V" + (i + 1);
         } catch (Throwable e) {
+            e.printStackTrace();
+            LogUtil.error(e.getMessage(), e);
         }
         fullname = name + "-" + v;
-        lines.set(i_name, "\t补丁名称 - " + fullname);
+        lines.set(i_name, "\t补丁名称 - " + fullname + "\n");
 
         no = UUID.randomUUID().toString();
-        lines.set(i_no, "\t补丁编号 - " + no);
+        lines.set(i_no, "\t补丁编号 - " + no + "\n");
 
         if (trim(lines.get(i_module)).equals("补丁修改模块 -")) {
             try {
                 lines.set(i_module, "\t补丁修改模块 - "
                         + findFirstDir(new File(new File(root, "replacement"), "modules").listFiles()).getName()
+                        + "\n"
                 );
             } catch (Throwable e) {
+                e.printStackTrace();
+                LogUtil.error(e.getMessage(), e);
             }
         }
 
-        lines.set(i_create, "\t补丁创建时间 - " + date);
+        lines.set(i_create, "\t补丁创建时间 - " + date + "\n");
 
-        outputString2File(new File(dir, "readme.txt"), builderString(lines));
+        File out = new File(dir, "readme.txt");
+
+        contentVO.indicator.setText("云管家信息文件:raedme.txt..." + out.getPath() + " , " + lines.size());
+        LogUtil.info("云管家信息文件:raedme.txt,输出路径： " + out.getPath() + "   , " + lines.size());
+
+        outputString2File(out, builderString(lines));
     }
 
     public void outputString2File(File file, String s) throws IOException {
-        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
-        out.write(s);
-        out.flush();
-        out.close();
+        FileUtil.writeUtf8String(s, file);
     }
 
     public static File findFirstDir(File[] ss) {
@@ -295,7 +326,7 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
     private static String builderString(List<String> ss) {
         StringBuilder sb = new StringBuilder(500);
         for (String s : ss) {
-            sb.append(s).append('\n');
+            sb.append(s);
         }
         return sb.toString();
     }

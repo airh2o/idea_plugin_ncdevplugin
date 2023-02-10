@@ -93,6 +93,8 @@ nc.version=NCC
 buildAfterNCCodeCheck=false
 ###### 导出补丁格式 采用云管家格式，默认true
 format4Ygj=true
+#### 是否只保留zip文件(删除补丁文件夹)
+deleteDir=true
 ####
 ```
 
