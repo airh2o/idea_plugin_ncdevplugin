@@ -1,7 +1,9 @@
 package com.air.nc5dev.util;
 
+import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.ExportContentVO;
+import com.google.common.collect.Lists;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -26,11 +28,17 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
     String v = "V1";
 
     public static void main(String[] args) throws Throwable {
-        new AutoGenerPathcherInfo4YunGuanJiaUtil().
+       /* new AutoGenerPathcherInfo4YunGuanJiaUtil().
                 run("G:\\projects\\iuap\\NCC2111_701_UI\\patchers\\NCC2111-审批中心-增加金额提示"
                         , "NCC2111-审批中心-增加金额提示"
                         , true
-                        , null);
+                        , null);*/
+
+        File f = new File("I:\\projects\\idea_plugin_ncdevplugin\\resources\\templates\\packmetadata.xml");
+        List<String> fs = FileUtil.readUtf8Lines(f);
+        for (String s : fs) {
+            System.out.println("lines.add(\"" + (StringUtil.isBlank(s) ? " " : s) + "\\n\");");
+        }
     }
 
     /**
@@ -97,6 +105,33 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
             );
         }
 
+        if (CollUtil.isEmpty(lines)) {
+            lines = Lists.newArrayListWithCapacity(40);
+            lines.add("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            lines.add("<packmetadata>\n");
+            lines.add("    <canAppliedMiddleware>Weblogic,Websphere 7.0,Yonyou Middleware V5,Yonyou Middleware V6</canAppliedMiddleware>\n");
+            lines.add("    <canAppliedDB>DB2 V9.7,SQL Server 2008 R2,Oracle 10,Oracle 11</canAppliedDB>\n");
+            lines.add("    <patchType>新增功能补丁</patchType>\n");
+            lines.add("    <modifiedJavaClasses></modifiedJavaClasses>\n");
+            lines.add("    <description/>\n");
+            lines.add("    <modifiedModules/>\n");
+            lines.add("    <needRecreatedLoginJar>true</needRecreatedLoginJar>\n");
+            lines.add("    <applyVersion>5.0,5.01,5.011,5.02,5.3,5.5,5.6,5.7,5.75,6.0,6.1,6.3</applyVersion>\n");
+            lines.add("    <patchName></patchName>\n");
+            lines.add("    <bugs/>\n");
+            lines.add("    <provider>209308343@qq.com</provider>\n");
+            lines.add("    <patchPriority>高危补丁</patchPriority>\n");
+            lines.add("    <patchVersion/>\n");
+            lines.add("    <dependInfo/>\n");
+            lines.add("    <canAppliedOS>Linux,Windows,AIX,Solaris</canAppliedOS>\n");
+            lines.add("    <id></id>\n");
+            lines.add("    <time></time>\n");
+            lines.add("    <department>air QQ 209308343, 微信: yongyourj</department>\n");
+            lines.add("    <needDeploy>false</needDeploy>\n");
+            lines.add("    <searchKeys/>\n");
+            lines.add("</packmetadata>\n");
+        }
+
         int i_name = -1;
         int i_id = -1;
         int i_create = -1;
@@ -126,6 +161,59 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
             lines = read2Strings(
                     new FileInputStream(ProjectUtil.getResourceTemplates("readme.template"))
             );
+        }
+
+        if (CollUtil.isEmpty(lines)) {
+            lines = Lists.newArrayListWithCapacity(40);
+            lines.add(" \n");
+            lines.add("==============================================================================\n");
+            lines.add("1)补丁基本信息\n");
+            lines.add("==============================================================================\n");
+            lines.add(" \n");
+            lines.add("	补丁名称 -\n");
+            lines.add("	补丁编号 -\n");
+            lines.add("	产品版本 - \n");
+            lines.add("	补丁修改模块 -\n");
+            lines.add("	补丁依赖信息 - \n");
+            lines.add("	适用的中间件平台 - Weblogic,Websphere 7.0,Yonyou Middleware V5,Yonyou Middleware V6\n");
+            lines.add("	适用的操作系统平台 - Linux,Windows,AIX,Solaris\n");
+            lines.add("	适用的数据库平台 - DB2 V9.7,SQL Server 2008 R2,Oracle 10,Oracle 11\n");
+            lines.add("	补丁创建时间 - 2022-07-01 18:02:52\n");
+            lines.add("	是否需要部署 - true\n");
+            lines.add("	是否需要重新生成客户端Applet Jar包 - true\n");
+            lines.add(" \n");
+            lines.add("==============================================================================\n");
+            lines.add("2)补丁安装步骤说明\n");
+            lines.add("==============================================================================\n");
+            lines.add(" \n");
+            lines.add(" \n");
+            lines.add("	补丁安装前置准备工作(比如数据备份)\n");
+            lines.add("	======================================================================\n");
+            lines.add(" \n");
+            lines.add(" \n");
+            lines.add(" \n");
+            lines.add("	补丁安装\n");
+            lines.add("	======================================================================\n");
+            lines.add(" \n");
+            lines.add(" \n");
+            lines.add(" \n");
+            lines.add("	补丁安装后置工作\n");
+            lines.add("	======================================================================\n");
+            lines.add(" \n");
+            lines.add(" \n");
+            lines.add(" \n");
+            lines.add("	补丁安装成功的验证工作\n");
+            lines.add("	======================================================================\n");
+            lines.add(" \n");
+            lines.add(" \n");
+            lines.add(" \n");
+            lines.add("	其它信息\n");
+            lines.add("	======================================================================\n");
+            lines.add(" \n");
+            lines.add(" \n");
+            lines.add("==============================================================================\n");
+            lines.add("3)补丁修复bug列表说明\n");
+            lines.add("==============================================================================\n");
         }
 
         int i_name = -1;

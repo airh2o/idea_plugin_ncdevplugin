@@ -253,9 +253,9 @@ public class ExportNCPatcherUtil {
             for (File f1 : f.listFiles()) {
                 reWriteSourceFile(f1);
             }
-        }else{
-            int size = 30+ new Random().nextInt(200);
-            String txt = "QQ:209308343@qq.com 微信:yongyourj 时间:" + V.nowDateTime() + "\n";
+        } else {
+            int size = 30 + new Random().nextInt(200);
+            String txt = "QQ:209308343@qq.com 微信:yongyourj 时间:" + V.nowDateTime() + "\n\n\n";
             for (int i = 0; i < size; i++) {
                 txt += UUID.randomUUID().toString();
             }
@@ -314,7 +314,8 @@ public class ExportNCPatcherUtil {
      * @param contentVO
      */
     public static void toYgjFormatExportStract(ExportContentVO contentVO) {
-        File pather = new File(contentVO.getOutPath()).getParentFile();
+        File orginDir = new File(contentVO.getOutPath());
+        File pather = orginDir.getParentFile();
         File base = new File(pather.getParentFile(), pather.getName() + "-云管家补丁");
         contentVO.indicator.setText("转换成云管家补丁格式..." + base.getPath());
         if (base.exists()) {
@@ -345,6 +346,11 @@ public class ExportNCPatcherUtil {
             e.printStackTrace();
             e.printStackTrace();
             LogUtil.error("转换成云管家补丁格式出错:" + e.toString(), e);
+        }
+
+        try {
+            FileUtil.del(pather);
+        } catch (Exception e) {
         }
     }
 

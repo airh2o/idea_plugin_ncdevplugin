@@ -1,6 +1,10 @@
 package com.air.nc5dev.ui;
 
+import cn.hutool.core.exceptions.UtilException;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.*;
 import com.air.nc5dev.util.idea.LogUtil;
@@ -18,10 +22,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.components.JBCheckBox;
-import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.components.JBTextField;
+import com.intellij.ui.components.*;
 import com.intellij.ui.table.JBTable;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
@@ -89,28 +90,32 @@ public class PatcherDialog
     @Override
     protected JComponent createCenterPanel() {
         if (contentPane == null) {
+            int x = 21;
+            int y = 16;
+            int height = 50;
+            int width = 600;
+            
             contentPane = //new JBPanel();
                     new JBScrollPane();
             contentPane.setLayout(null);
             contentPane.setAutoscrolls(true);
-
             JLabel label = new JBLabel("补丁名称:");
-            label.setBounds(21, 16, 82, 31);
+            label.setBounds(x, y, 82, height);
             contentPane.add(label);
             textField_saveName = new JBTextField();
-            textField_saveName.setBounds(117, 14, 462, 36);
+            textField_saveName.setBounds(117, 14, 462, height);
             contentPane.add(textField_saveName);
             textField_saveName.setColumns(10);
 
             JLabel label_1 = new JBLabel("导出位置:");
-            label_1.setBounds(21, 50, 82, 31);
+            label_1.setBounds(x, 50, 82, height);
             contentPane.add(label_1);
             textField_savePath = new JBTextField();
             textField_savePath.setColumns(10);
-            textField_savePath.setBounds(117, 50, 462, 36);
+            textField_savePath.setBounds(117, y = y + height + 5, 462, height);
             contentPane.add(textField_savePath);
             JButton button_selectSavePath = new JButton("选择路径");
-            button_selectSavePath.setBounds(583, 50, 113, 36);
+            button_selectSavePath.setBounds(583, 50, 113, height);
             button_selectSavePath.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     String userDir = System.getProperty("user.home");
@@ -125,24 +130,29 @@ public class PatcherDialog
             contentPane.add(button_selectSavePath);
 
             JLabel label_3 = new JBLabel("汇总SQL文件时 过滤重复SQL:");
-            label_3.setBounds(21, 90, 200, 31);
             contentPane.add(label_3);
             filtersql = new JBCheckBox();
             filtersql.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("filtersql", "true")));
-            filtersql.setBounds(190, 90, 60, 36);
-            contentPane.add(filtersql);
+            JBPanel panel1 = new JBPanel();
+            //  panel1.setBorder(LineBorder.createGrayLineBorder());
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+            panel1.setBounds(x, y = y + height + 5, width, height);
+            panel1.add(label_3);
+            panel1.add(filtersql);
+            contentPane.add(panel1);
 
             JLabel label_2 = new JBLabel("强制IDEA连接数据库导出SQL:");
-            label_2.setBounds(21, 116, 200, 31);
-            contentPane.add(label_2);
             rebuild = new JBCheckBox();
             rebuild.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("rebuildsql", "false")));
-            rebuild.setBounds(190, 116, 60, 36);
-            contentPane.add(rebuild);
+            JBPanel panel2 = new JBPanel();
+            //panel2.setBorder(LineBorder.createGrayLineBorder());
+            panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+            panel2.setBounds(x, y = y + height + 5, width, height);
+            panel2.add(label_2);
+            panel2.add(rebuild);
+            contentPane.add(panel2);
 
             JLabel label_4 = new JBLabel("强制IDEA连接数据库导出SQL使用NC配置的数据源第几个(0开始):");
-            label_4.setBounds(21, 150, 400, 31);
-            contentPane.add(label_4);
             List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS();
             dataSourceIndex = new JComboBox(new Vector(
                     dataSourceVOS.stream()
@@ -150,10 +160,8 @@ public class PatcherDialog
                             .collect(Collectors.toList())
             ));
             dataSourceIndex.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue("data_source_index"), 0));
-            dataSourceIndex.setBounds(380, 150, 100, 35);
             contentPane.add(dataSourceIndex);
             JButton button_TestDb = new JButton("测试连接");
-            button_TestDb.setBounds(500, 150, 113, 42);
             button_TestDb.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Integer i = dataSourceIndex.getSelectedIndex();
@@ -177,51 +185,73 @@ public class PatcherDialog
                     }
                 }
             });
-            contentPane.add(button_TestDb);
+            JBPanel panel3 = new JBPanel();
+            //  panel3.setBorder(LineBorder.createGrayLineBorder());
+            panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
+            panel3.setBounds(x, y = y + height + 5, width, height);
+            panel3.add(label_4);
+            panel3.add(dataSourceIndex);
+            panel3.add(button_TestDb);
+            contentPane.add(panel3);
 
             JLabel label_5 = new JBLabel("强制指定导出使用的NC版本:");
-            label_5.setBounds(21, 200, 180, 30);
-            contentPane.add(label_5);
             ncVersion = new JComboBox<NcVersionEnum>(NcVersionEnum.values());
             ncVersion.setSelectedItem(ProjectNCConfigUtil.getNCVerSIon());
-            ncVersion.setBounds(180, 200, 100, 30);
-            contentPane.add(ncVersion);
+            JBPanel panel4 = new JBPanel();
+            //  panel4.setBorder(LineBorder.createGrayLineBorder());
+            panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
+            panel4.setBounds(x, y = y + height + 5, width, height);
+            panel4.add(label_5);
+            panel4.add(ncVersion);
+            contentPane.add(panel4);
 
             JLabel label_6 = new JBLabel("自动删除hotwebs的dist后执行npm run build:");
-            label_6.setBounds(21, 225, 280, 30);
-            contentPane.add(label_6);
             reNpmBuild = new JBCheckBox();
             reNpmBuild.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("reNpmBuild", "true")));
-            reNpmBuild.setBounds(280, 225, 60, 36);
-            contentPane.add(reNpmBuild);
+            JBPanel panel5 = new JBPanel();
+            //  panel5.setBorder(LineBorder.createGrayLineBorder());
+            panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
+            panel5.setBounds(x, y = y + height + 5, width, height);
+            panel5.add(label_6);
+            panel5.add(reNpmBuild);
+            contentPane.add(panel5);
+
 
             JLabel label_7 = new JBLabel("导出云管家格式:");
-            label_7.setBounds(21, 250, 280, 30);
-            contentPane.add(label_7);
             format4Ygj = new JBCheckBox();
             format4Ygj.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("format4Ygj", "true")));
-            format4Ygj.setBounds(280, 250, 60, 36);
-            contentPane.add(format4Ygj);
+            JBPanel panel6 = new JBPanel();
+            //  panel6.setBorder(LineBorder.createGrayLineBorder());
+            panel6.setLayout(new BoxLayout(panel6, BoxLayout.X_AXIS));
+            panel6.setBounds(x, y = y + height + 5, width, height);
+            panel6.add(label_7);
+            panel6.add(format4Ygj);
+            contentPane.add(panel6);
 
             JLabel label_10 = new JBLabel("混淆覆写导出的源码文件内容(java文件和js源码:__SOURCE__CODE__):");
-            label_10.setBounds(21, 280, 400, 30);
-            contentPane.add(label_10);
             reWriteSourceFile = new JBCheckBox();
             reWriteSourceFile.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("reWriteSourceFile", "false")));
-            reWriteSourceFile.setBounds(420, 280, 60, 36);
-            contentPane.add(reWriteSourceFile);
+            JBPanel panel7 = new JBPanel();
+            //  panel7.setBorder(LineBorder.createGrayLineBorder());
+            panel7.setLayout(new BoxLayout(panel7, BoxLayout.X_AXIS));
+            panel7.setBounds(x, y = y + height + 5, width, height);
+            panel7.add(label_10);
+            panel7.add(reWriteSourceFile);
+            contentPane.add(panel7);
 
             JLabel label_8 = new JBLabel("只导出选中的模块或文件:");
-            label_8.setBounds(21, 320, 280, 30);
-            contentPane.add(label_8);
             selectExport = new JBCheckBox();
             this.selectExport.setSelected(ExportContentVO.EVENT_POPUP_CLICK.equals(event.getPlace()));
-            this.selectExport.setBounds(280, 320, 60, 36);
             this.selectExport.addChangeListener((e) -> updateSelectFileTable());
-            contentPane.add(this.selectExport);
+            JBPanel panel10 = new JBPanel();
+            panel10.setLayout(new BoxLayout(panel10, BoxLayout.X_AXIS));
+            panel10.setBounds(x, y = y + height + 5, 500, height);
+            panel10.add(label_8);
+            panel10.add(selectExport);
+            contentPane.add(panel10);
 
             JLabel label_9 = new JBLabel("当前选中的要导出的内容:");
-            label_9.setBounds(21, 350, 280, 30);
+            label_9.setBounds(x, y = y + height + 5, 280, height);
             contentPane.add(label_9);
             Vector heads = new Vector();
             heads.add("选择");
@@ -232,7 +262,7 @@ public class PatcherDialog
             selectTable.setBorder(LineBorder.createBlackLineBorder());
             JScrollPane jScrollPane = new JBScrollPane(this.selectTable);
             jScrollPane.setAutoscrolls(true);
-            jScrollPane.setBounds(21, 375, 770, 200);
+            jScrollPane.setBounds(x, y = y + height + 5, 770, 200);
             // 对每一列设置单元格渲染器
             for (int i = 0; i < selectTable.getColumnCount(); i++) {
                 selectTable.getColumnModel().getColumn(i).setCellRenderer(new MyTableRenderer());
@@ -247,9 +277,10 @@ public class PatcherDialog
                     + File.separatorChar + "patchers"
                     + File.separatorChar + "patcher-" + event.getProject().getName() + "-" + LocalDateTime.now().format(formatter)
             );
+
+            contentPane.setPreferredSize(new Dimension(width + 40, y + 10));
         }
 
-        contentPane.setPreferredSize(new Dimension(780, 600));
         return this.contentPane;
     }
 
@@ -390,7 +421,16 @@ public class PatcherDialog
 
                     Desktop desktop = Desktop.getDesktop();
                     File dirToOpen = new File(contentVO.getOutPath());
-                    desktop.open(dirToOpen);
+
+                    try {
+                        File zip = new File(dirToOpen.getParentFile(), dirToOpen.getName() + ".zip");
+                        contentVO.indicator.setText("自动打包成zip压缩包中..." + zip.getPath());
+                        zip = ZipUtil.zip(dirToOpen);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
+                    desktop.open(dirToOpen.getParentFile());
                 } catch (Throwable iae) {
                     LogUtil.error("自动打开路径失败: " + ExceptionUtil.getExcptionDetall(iae));
                 } finally {
