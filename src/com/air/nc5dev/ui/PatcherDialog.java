@@ -436,22 +436,41 @@ public class PatcherDialog
                     File dirToOpen = new File(contentVO.getOutPath());
 
                     try {
-                        File zip = new File(dirToOpen.getParentFile(), dirToOpen.getName() + ".zip");
-                        contentVO.indicator.setText("自动打包成zip压缩包中..." + zip.getPath());
-                        zip = ZipUtil.zip(dirToOpen);
+                        File zip = null;
+                        if (contentVO.isFormat4Ygj()) {
+                            zip = new File(dirToOpen.getParentFile(), dirToOpen.getName() + ".zip");
+                            contentVO.indicator.setText("自动打包成zip压缩包中..." + zip.getPath());
+                            zip = ZipUtil.zip(dirToOpen);
+                        } else {
+                            zip = new File(dirToOpen.getParentFile().getParentFile(), dirToOpen.getParentFile().getName() + ".zip");
+                            contentVO.indicator.setText("自动打包成zip压缩包中..." + zip.getPath());
+                            zip = ZipUtil.zip(dirToOpen.getParentFile());
+                            File src = zip;
+                            zip = new File(dirToOpen.getParentFile().getParentFile(), dirToOpen.getParentFile().getName() + ".zip");
+                            FileUtil.move(src, zip, true);
+                        }
                         LogUtil.info("自动打包成补丁zip压缩包的硬盘路径： " + zip.getPath());
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
 
-                    if (contentVO.isDeleteDir()) {
-                        try {
-                            FileUtil.del(dirToOpen);
-                        } catch (Throwable ex) {
+                    if (contentVO.isFormat4Ygj()) {
+                        if (contentVO.isDeleteDir()) {
+                            try {
+                                FileUtil.del(dirToOpen);
+                            } catch (Throwable ex) {
+                            }
                         }
+                        desktop.open(dirToOpen.getParentFile());
+                    } else {
+                        if (contentVO.isDeleteDir()) {
+                            try {
+                                FileUtil.del(dirToOpen.getParentFile());
+                            } catch (Throwable ex) {
+                            }
+                        }
+                        desktop.open(dirToOpen.getParentFile().getParentFile());
                     }
-
-                    desktop.open(dirToOpen.getParentFile());
                 } catch (Throwable iae) {
                     LogUtil.error("自动打开路径失败: " + ExceptionUtil.getExcptionDetall(iae));
                 } finally {
