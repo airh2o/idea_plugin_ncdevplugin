@@ -245,7 +245,7 @@ public class PatcherDialog
             JLabel label_12 = new JBLabel("是否只保留zip文件(删除补丁文件夹):");
             deleteDir = new JBCheckBox();
             deleteDir.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("deleteDir", "true")));
-            deleteDir.addChangeListener(ev -> {
+            deleteDir.addActionListener(ev -> {
                 if (deleteDir.isSelected()) {
                     zip.setSelected(true);
                 }
