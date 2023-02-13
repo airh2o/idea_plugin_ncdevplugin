@@ -244,6 +244,9 @@ public class ProjectNCConfigUtil {
         if (!ProjectNCConfigUtil.configPropertis.containsKey("deleteDir")) {
             ProjectNCConfigUtil.configPropertis.put("deleteDir", "true");
         }
+        if (!ProjectNCConfigUtil.configPropertis.containsKey("zip")) {
+            ProjectNCConfigUtil.configPropertis.put("zip", "true");
+        }
         IoUtil.wirtePropertis(ProjectNCConfigUtil.configPropertis, ProjectNCConfigUtil.configFile);
     }
 

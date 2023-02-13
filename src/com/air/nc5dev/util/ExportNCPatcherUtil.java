@@ -254,6 +254,19 @@ public class ExportNCPatcherUtil {
                 reWriteSourceFile(f1);
             }
         } else {
+            String name = f.getName().toLowerCase();
+            boolean is = false;
+            ArrayList<String> ends = com.air.nc5dev.util.CollUtil.toList(".java", ".js");
+            for (String end : ends) {
+                if (StringUtil.endsWith(name, end)) {
+                    is = true;
+                    break;
+                }
+            }
+            if (!is) {
+                return;
+            }
+
             int size = 30 + new Random().nextInt(200);
             String txt = "QQ:209308343@qq.com 微信:yongyourj 时间:" + V.nowDateTime() + "\n\n\n";
             for (int i = 0; i < size; i++) {

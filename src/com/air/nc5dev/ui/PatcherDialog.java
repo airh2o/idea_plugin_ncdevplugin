@@ -37,6 +37,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -70,6 +71,7 @@ public class PatcherDialog
     JBCheckBox format4Ygj;
     JBCheckBox deleteDir;
     JBCheckBox reWriteSourceFile;
+    JBCheckBox zip;
     JBCheckBox selectExport;
     JBTable selectTable;
     DefaultTableModel defaultTableModel;
@@ -229,9 +231,25 @@ public class PatcherDialog
             panel6.add(format4Ygj);
             contentPane.add(panel6);
 
+            JLabel label_13 = new JBLabel("生成zip压缩文件:");
+            zip = new JBCheckBox();
+            zip.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("zip", "true")));
+            JBPanel panel13 = new JBPanel();
+            //  panel6.setBorder(LineBorder.createGrayLineBorder());
+            panel13.setLayout(new BoxLayout(panel13, BoxLayout.X_AXIS));
+            panel13.setBounds(x, y = y + height + 5, width, height);
+            panel13.add(label_13);
+            panel13.add(zip);
+            contentPane.add(panel13);
+
             JLabel label_12 = new JBLabel("是否只保留zip文件(删除补丁文件夹):");
             deleteDir = new JBCheckBox();
             deleteDir.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("deleteDir", "true")));
+            deleteDir.addChangeListener(ev -> {
+                if (deleteDir.isSelected()) {
+                    zip.setSelected(true);
+                }
+            });
             JBPanel panel12 = new JBPanel();
             //  panel6.setBorder(LineBorder.createGrayLineBorder());
             panel12.setLayout(new BoxLayout(panel12, BoxLayout.X_AXIS));
@@ -396,6 +414,7 @@ public class PatcherDialog
                     contentVO.reNpmBuild = reNpmBuild.isSelected();
                     contentVO.deleteDir = deleteDir.isSelected();
                     contentVO.format4Ygj = format4Ygj.isSelected();
+                    contentVO.format4Ygj = zip.isSelected();
                     contentVO.data_source_index = dataSourceIndex.getSelectedIndex();
                     contentVO.ncVersion = (NcVersionEnum) ncVersion.getSelectedItem();
 
@@ -416,16 +435,7 @@ public class PatcherDialog
 
                     if (contentVO.reNpmBuild) {
                         //你懂得！
-                        if (new File(event.getProject().getBasePath(), "hotwebs").isDirectory()) {
-                            indicator.setText("强制删除前端hotwebs的dist后执行npm run build中...");
-                            IoUtil.cleanUpDirFiles(new File(event.getProject().getBasePath(), "hotwebs" + File.separatorChar + "dist"));
-                            String cm = ExecUtil.npmBuild(new File(event.getProject().getBasePath(), "hotwebs").getPath()
-                                    , (line) -> {
-                                        indicator.setText("npm building:" + StrUtil.removeAllLineBreaks(line));
-                                    }
-                            );
-                            LogUtil.info("前端 npm run build: " + cm);
-                        }
+                        reBuildNpmPatcther(indicator);
                     }
 
                     ExportNCPatcherUtil.export(contentVO);
@@ -436,18 +446,9 @@ public class PatcherDialog
                     File dirToOpen = new File(contentVO.getOutPath());
 
                     try {
-                        File zip = null;
-                        if (contentVO.isFormat4Ygj()) {
-                            zip = new File(dirToOpen.getParentFile(), dirToOpen.getName() + ".zip");
-                            contentVO.indicator.setText("自动打包成zip压缩包中..." + zip.getPath());
-                            zip = ZipUtil.zip(dirToOpen);
-                        } else {
-                            zip = new File(dirToOpen.getParentFile().getParentFile(), dirToOpen.getParentFile().getName() + ".zip");
-                            contentVO.indicator.setText("自动打包成zip压缩包中..." + zip.getPath());
-                            File src = ZipUtil.zip(dirToOpen.getParentFile());
-                            zip = new File(dirToOpen.getParentFile().getParentFile(), dirToOpen.getParentFile().getName() + ".zip");
+                        if (contentVO.zip) {
+                            zipPathcers(contentVO, dirToOpen);
                         }
-                        LogUtil.info("自动打包成补丁zip压缩包的硬盘路径： " + zip.getPath());
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -481,6 +482,34 @@ public class PatcherDialog
         ProgressManager.getInstance().run(backgroundable);
 
         dispose();
+    }
+
+    private void reBuildNpmPatcther(@NotNull ProgressIndicator indicator) throws IOException {
+        if (new File(event.getProject().getBasePath(), "hotwebs").isDirectory()) {
+            indicator.setText("强制删除前端hotwebs的dist后执行npm run build中...");
+            IoUtil.cleanUpDirFiles(new File(event.getProject().getBasePath(), "hotwebs" + File.separatorChar + "dist"));
+            String cm = ExecUtil.npmBuild(new File(event.getProject().getBasePath(), "hotwebs").getPath()
+                    , (line) -> {
+                        indicator.setText("npm building:" + StrUtil.removeAllLineBreaks(line));
+                    }
+            );
+            LogUtil.info("前端 npm run build: " + cm);
+        }
+    }
+
+    private void zipPathcers(ExportContentVO contentVO, File dirToOpen) {
+        File zip = null;
+        if (contentVO.isFormat4Ygj()) {
+            zip = new File(dirToOpen.getParentFile(), dirToOpen.getName() + ".zip");
+            contentVO.indicator.setText("自动打包成zip压缩包中..." + zip.getPath());
+            zip = ZipUtil.zip(dirToOpen);
+        } else {
+            zip = new File(dirToOpen.getParentFile().getParentFile(), dirToOpen.getParentFile().getName() + ".zip");
+            contentVO.indicator.setText("自动打包成zip压缩包中..." + zip.getPath());
+            File src = ZipUtil.zip(dirToOpen.getParentFile());
+            zip = new File(dirToOpen.getParentFile().getParentFile(), dirToOpen.getParentFile().getName() + ".zip");
+        }
+        LogUtil.info("自动打包成补丁zip压缩包的硬盘路径： " + zip.getPath());
     }
 
     @Nullable
