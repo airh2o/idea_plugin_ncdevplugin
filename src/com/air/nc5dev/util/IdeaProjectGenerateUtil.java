@@ -332,6 +332,15 @@ public class IdeaProjectGenerateUtil {
             Messages.showInfoMessage("NC HOME不正确，请在 Tools 菜单下 配置NC HOME 菜单进行配置！", "警告");
         }
         ArrayList<LibraryEx> LibraryExList = new ArrayList<>();
+
+        if (NcVersionEnum.U8Cloud.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+            File jar = new File(ncHome, "external" + File.separatorChar + "lib" + File.separatorChar + "xerces.jar");
+            if (jar.isFile()) {
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.U8C_RUN_FIRST_DEPEND
+                        , CollUtil.toList(jar)));
+            }
+        }
+
         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Ant_Library
                 , IoUtil.serachAllNcAntJars(ncHome)));
 

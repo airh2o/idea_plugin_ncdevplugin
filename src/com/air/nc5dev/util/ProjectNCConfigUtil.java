@@ -344,6 +344,8 @@ public class ProjectNCConfigUtil {
     /*****    NC 依赖库： Resources     ****/
     public static final String LIB_RESOURCES = "NC_LIBS/Resources";
 
+    /*****    U8C 依赖库： 解决启用优先级         ****/
+    public static final String U8C_RUN_FIRST_DEPEND = "U8C_RUN_FIRST_DEPEND/Run_Library";
 
     private ProjectNCConfigUtil() {
         throw new RuntimeException("cannot instance Util Class!");
