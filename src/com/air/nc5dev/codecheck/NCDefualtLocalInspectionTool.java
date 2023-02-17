@@ -1,6 +1,9 @@
 package com.air.nc5dev.codecheck;
 
-import com.intellij.codeInspection.*;
+import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool;
+import com.intellij.codeInspection.InspectionManager;
+import com.intellij.codeInspection.ProblemDescriptor;
+import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;

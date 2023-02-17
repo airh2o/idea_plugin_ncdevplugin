@@ -1,7 +1,6 @@
 package com.air.nc5dev.codecheck;
 
 import com.intellij.codeInspection.ex.GlobalInspectionContextImpl;
-import com.intellij.codeInspection.ex.InspectionProfileImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NotNullLazyValue;
 import com.intellij.ui.content.ContentManager;

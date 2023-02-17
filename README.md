@@ -18,7 +18,9 @@ Yonyou NC5x or U8Cloud or NC6x or NCCloud or YonBIP Idea devtool Plugin
 ![补丁导出界面](readme/imgs/3.png "补丁导出界面")    
 
 ![日志窗口](https://s1.ax1x.com/2020/11/11/BjAgvn.png "日志窗口")  
-  
+
+![NC代码规范检查](readme/imgs/4.png "NC代码规范检查")
+
 ![重置密码](https://s1.ax1x.com/2020/11/11/BjAWD0.png "重置密码")  
     
 ![数据库连接生成](https://s1.ax1x.com/2020/11/11/BjA4ET.png "数据库连接生成")   
@@ -113,6 +115,11 @@ deleteDir=true
 
 # 版本更新
 ``` 
+<em>3.3 版本 更新:</em> <br>
+      <ul>
+          <li>1. 新增NC代码规范检查功能，可支持检查是否client private public 导包存在错误.</li>
+      </ul>
+      
   <em>3.1 版本 更新:</em> <br>
       <ul>
           <li>1. 支持导出补丁右侧选则只导出哪些模块或文件.</li>
@@ -215,7 +222,8 @@ deleteDir=true
 部分代码 参考或使用了 部分插件开源项目的代码和功能灵感设计。
 涉及到的有(列表可能不全，请谅解，实际已源码和项目为准)：
 IDEA plugin 官方示例项目 或 开源插件：
-比如 https://github.com/SonarSource/sonarlint-intellij , https://github.com/gejun123456/intellij-generateAllSetMethod  等
+比如 https://github.com/SonarSource/sonarlint-intellij , https://github.com/gejun123456/intellij-generateAllSetMethod
+  ,https://github.com/jshiell/checkstyle-idea 等
 框架比如 guava hutool 小乖乖 等等
 再次感谢开源项目参与者们的无私奉献！
 

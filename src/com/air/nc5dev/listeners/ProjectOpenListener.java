@@ -6,7 +6,6 @@ import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
-import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.project.Project;

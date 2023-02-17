@@ -11,13 +11,13 @@ import com.air.nc5dev.vo.ExportContentVO;
 import com.air.nc5dev.vo.ItemsItemVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.apache.commons.compress.utils.Lists;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -1385,13 +1385,13 @@ public class ExportNCPatcherUtil {
         for (String key : contentVO.getSelectFiles()) {
             String s = key;
             if (sourceBaseDirFile != null) {
-                s = StringUtil.remove(key, sourceBaseDirFile.getPath() + File.separatorChar);
+                s = StringUtil.removeAll(key, sourceBaseDirFile.getPath() + File.separatorChar);
             }
             if (StringUtil.endsWith(s.toLowerCase(), ".java")) {
                 s = s.substring(0, s.length() - 5);
             }
             if (out != null) {
-                path = StringUtil.remove(path, out);
+                path = StringUtil.removeAll(path, out);
             }
 
             if (StringUtil.startsWith(path, s)) {

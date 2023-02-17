@@ -6,7 +6,6 @@ import lombok.Data;
 
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 /**
  * 导出补丁的 配置文件 配置信息VO <br/>

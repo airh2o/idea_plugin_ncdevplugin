@@ -5,13 +5,9 @@ import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.ApplicationLibraryUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
-import com.intellij.ide.util.projectWizard.ModuleBuilderListener;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.ModuleListener;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.impl.libraries.LibraryEx;
-import com.intellij.openapi.roots.libraries.LibraryTable;
-import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 import org.jetbrains.annotations.NotNull;
 
 /**

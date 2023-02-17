@@ -1,6 +1,5 @@
 package com.air.nc5dev.util.docgenerate;
 
-import cn.hutool.core.net.URLEncoder;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson.JSON;
@@ -11,7 +10,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class WebTranslateApi {
     private static final ObjectMapper objectMapper = new ObjectMapper();

@@ -1,8 +1,6 @@
 package com.air.nc5dev.ui;
 
-import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
@@ -13,7 +11,7 @@ import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.vo.ExportContentVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.alibaba.fastjson.JSON;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -24,7 +22,6 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.*;
 import com.intellij.ui.table.JBTable;
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,8 +38,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Vector;
 import java.util.stream.Collectors;
 
 /***

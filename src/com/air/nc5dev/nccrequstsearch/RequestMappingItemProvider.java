@@ -129,9 +129,9 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         }
 
         //匹配
-        String txt = StringUtil.replaceChars(inputStr, '/', '.');
+        String txt = StringUtil.replaceChars(inputStr, "/", ".");
         txt = StringUtil.replaceAll(txt, " ", ".");
-        txt = StringUtil.replaceChars(txt, '\\', '.');
+        txt = StringUtil.replaceChars(txt, "\\", ".");
         txt = txt.toLowerCase();
         final String str = txt;
 

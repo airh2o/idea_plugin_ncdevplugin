@@ -4,9 +4,7 @@ import com.air.nc5dev.acion.base.AbstractIdeaAction;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 
-import java.awt.*;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 public class OpenYonbipDevWebAction extends AbstractIdeaAction {

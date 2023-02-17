@@ -1,16 +1,12 @@
 package com.air.nc5dev.util.ncutils;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Provider;
-import java.security.SecureRandom;
-import java.security.Security;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
+import java.security.*;
 
 public class AESGeneratorKey {
     private static final byte[] KEY_END = new byte[]{43, 65, 23, 6, -54, -24, -16, 26, 7, 34, -29, -52, -14, 27, 38, 41};

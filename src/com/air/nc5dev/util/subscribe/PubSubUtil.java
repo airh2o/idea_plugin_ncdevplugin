@@ -1,6 +1,5 @@
 package com.air.nc5dev.util.subscribe;
 
-import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.subscribe.itf.ISubscriber;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,8 +1,8 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IORuntimeException;
 import com.air.nc5dev.util.idea.LogUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -539,7 +539,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
     public static final void copyAllFile(@NotNull File fromDir, @NotNull final File toDir) {
         if (fromDir.isFile()) {
             copyFile(fromDir, toDir);
-            return ;
+            return;
         }
         Stream.of(fromDir.listFiles()).forEach(file -> {
             if (!file.isFile()) {
@@ -604,9 +604,11 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
             return true;
         }
         // \modules\mmmpsxj\client\classes\nccloud
-        path = StringUtil.substring(path, StringUtil.indexOf(path, "client" + File.separatorChar + "classes")
-                + ("client" + File.separatorChar + "classes").length() + 1);
-        path = StringUtil.replaceChars(path, File.separatorChar, '.');
+        path = StringUtils.substring(path
+                ,  StringUtils.indexOf(path, "client" + File.separatorChar + "classes")
+                        + ("client" + File.separatorChar + "classes").length() + 1
+        );
+        path = StringUtils.replaceChars(path, File.separatorChar, '.');
         if (path.charAt(0) == '.') {
             path = path.substring(1);
         }
@@ -1017,7 +1019,8 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         try {
             if (f.isFile() && tof.isFile()) {
                 return f.length() == tof.length() && f.lastModified() == tof.lastModified();
-                // return DigestUtils.md5Hex(new FileInputStream(f)).equals(DigestUtils.md5Hex(new FileInputStream(tof)));
+                // return DigestUtils.md5Hex(new FileInputStream(f)).equals(DigestUtils.md5Hex(new FileInputStream
+                // (tof)));
             }
 
            /* if (f.isDirectory() && tof.isDirectory()) {

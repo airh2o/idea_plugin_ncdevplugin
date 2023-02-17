@@ -1,111 +1,11 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>Yonyou NC Dev Tool</name>
-    <version>v3.2.1</version>
+    <version>v3.3</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com 微信: yongyourj 欢迎私活联系</vendor>
 
-    <description><![CDATA[
-      <p>Yonyou U8Cloud, NC5 NC6 NCCloud YonBip and other series of software development tools</p>
-        <p>English: </p>
-        If you do not need to edit metadata and new document development can directly create idea ordinary projects.
-        You can change the name of the old project folder and create a new folder with the same path, and then copy the files in the folder.
-        <ul>
-            <li>First time opening project - Required steps:</li>
-                <li>1. Tools -> Configure NC HOME.</li>
-                <li>2. Tools -> update NC library dependencies execute dependency update!</li>
-                <li>3. Tools -> generate default NC run configuration!</li>
-                <li>4. After you perform the preceding steps for the first time, the project will generate the default client public Private test several source folders. Manually modify the IDEA attribute of several folders in the project structure to correct values</li>
-                <li>5. Select Use Module path to set the output path of test class and non-test class respectively.</li>
-        </ul>
-
-        <p>Chinese: </p>
-      如果不需要元数据编辑和新单据开发的 可以直接新建idea普通的项目就行。如果需要的 可以用eclipse新建好项目和组件以后，用idea打开项目，<br>
-      因为idea有时候有bug打不开eclipse项目 可以老项目文件夹改革个名称 然后idea新建一个同路径的，然后吧文件夹文件复制进来(机智不)。 <br>
-           <ul>
-              <li>第一次打开项目-必须步骤：</li>
-                <li>1. Tools -> 配置NC HOME   进行NC HOME配置！</li>
-                <li>2. Tools -> 更新NC 库依赖 执行依赖更新!</li>
-                <li>3. Tools -> 生成默认NC运行配置!(如果重启IDEA后丢失了运行配置 可以再次执行这个)</li>
-                <li>4. 第一次执行上面步骤以后，会生成项目默认的client public private test 几个源文件夹 请手工在 项目结构修改几个文件夹的IDEA属性为正确值</li>
-                <li>5. 请注意 模块的编译输出路径要选 use module path 分别设置test和非test class输出路径。</li>
-         </ul>
-
-    ]]></description>
-
-    <change-notes><![CDATA[
-      <em>version 3.2.1 updated:</em> <br>
-      <ul>
-          <li>english:</li>
-           <li>1. suport Yunguanjia.</li>
-           <li>2. export patcher auto zip.</li>
-           <li>3. export patcher select files.</li>
-
-          <li>中文:</li>
-          <li>1. 支持导出补丁构建成云管家格式.</li>
-          <li>2. 支持导出补丁自动打包成zip.</li>
-          <li>3. 支持导出补丁选择要导出的文件.</li>
-
-      </ul>
-
-      <em>version 3.0 updated:</em> <br>
-      <ul>
-          <li>english:</li>
-           <li>1. suport NCC.</li>
-
-          <li>中文:</li>
-          <li>1. 支持导出补丁构建成NCC特有结构(前后端，前端要自己先build好).</li>
-          <li>1. 支持自动合并和过滤SQL脚本(
-                    nc.prop配置:
-                        filtersql 是否过滤完全重复SQL语句 默认 true ,<br>
-                        rebuildsql 是否无视iuap导出的SQL采用IDEA插件自动根据items.xml导出SQL 默认 false ,<br>
-                        data_source_index idea导出SQL使用的数据源索引 默认 0 ,<br>
-                        enableSubResultSet 是否支持iuap自带的子表导出 默认 true -此功能暂时不支持，如果用idea强制导出 那么必须手工配置子表到 items-idea.xml(和items.xml一个文件夹里)中 ,<br>
-                        includeDeletes 是否导出delete删除已存在数据的语句 默认 false .<br>
-              )
-          </li>
-      </ul>
-
-     <em>version 2.5.7 updated:</em> <br>
-      <ul>
-          <li>english:</li>
-          <li>1. Add the mandatory NC version:<br>
-                In the nc.prop file in the. Idea folder, set the Nc. version parameter to NC5, NC6, NCC, U8Cloud.
-           </li>
-          <li>2. Added special support for NCC (special Hotwebs path and profile path and patch structure)</li>
-          <li>3. Optimize the generation parameters of the operation configuration</li>
-          <li>4. Periodic reminders and metadata replication cannot be used normally and are not useful until repaired</li>
-          <li>5. Fixed the plug-in error in some cases</li>
-
-          <li>中文:</li>
-          <li>1. 修复部分NCC的支持性问题.
-      </ul>
-
-     <em>version 2.5.0 updated:</em> <br>
-      <ul>
-          <li>english:</li>
-          <li>1. Add the mandatory NC version:<br>
-                In the nc.prop file in the. Idea folder, set the Nc. version parameter to NC5, NC6, NCC, U8Cloud.
-           </li>
-          <li>2. Added special support for NCC (special Hotwebs path and profile path and patch structure)</li>
-          <li>3. Optimize the generation parameters of the operation configuration</li>
-          <li>4. Periodic reminders and metadata replication cannot be used normally and are not useful until repaired</li>
-          <li>5. Fixed the plug-in error in some cases</li>
-
-          <li>中文:</li>
-          <li>1. 新增强行指定NC版本: <br>
-                    在.idea文件夹的nc.prop文件配置 nc.version参数为 NC5, NC6,  NCC,  U8Cloud 几种即可。
-               </li>
-              <li>2. 增加对NCC的特殊支持(特殊的hotwebs路径和配置文件路径和补丁结构)</li>
-              <li>3. 优化运行等配置的生成参数</li>
-              <li>4. 定时提醒和元数据复制无法正常使用，暂不修复，用处不大</li>
-              <li>5. 修复部分情况下插件报错的问题</li>
-      </ul>
-
-    ]]>
-    </change-notes>
-
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="178.0"/>
+    <idea-version since-build="211.7628.21"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -299,7 +199,7 @@
             <reference ref="GenerateGetSetAction"/>
             <reference ref="GenerateGetAction"/>
             <reference ref="GenerateSetAction"/>
-            <reference ref="NCCodeCheckAction"/>
+<!--            <reference ref="NCCodeCheckAction"/>-->
             <separator/>
 
             <reference ref="nc5dev.info.openjconsole"/>
@@ -323,11 +223,118 @@
             <reference ref="nc5dev.info.ReConfigModuleAction"/>
             <separator/>
 
+            <!--            代码检查-->
+            <separator/>
+            <group id="CheckStylePluginTreeActions" text="Filter" popup="true">
+                <action id="CheckStyleScrollToSourceAction"
+                        class="org.infernus.idea.checkstyle.actions.ScrollToSource"
+                        text="Autoscroll to Source"
+                        description="Auto-scroll to the source location of errors and warnings"
+                        icon="/general/autoscrollToSource.svg"/>
+
+                <action id="CheckStyleExpandAllAction"
+                        class="org.infernus.idea.checkstyle.actions.ExpandAll"
+                        text="Expand All"
+                        description="Expand all elements in the tool window"
+                        icon="/actions/expandall.svg"/>
+
+                <action id="CheckStyleCollapseAllAction"
+                        class="org.infernus.idea.checkstyle.actions.CollapseAll"
+                        text="Collapse All"
+                        description="Collapse all elements in the tool window"
+                        icon="/actions/collapseall.svg"/>
+
+                <separator/>
+
+                <action id="CheckStyleDisplayErrorsAction"
+                        class="org.infernus.idea.checkstyle.actions.DisplayErrors"
+                        text="Display Errors"
+                        description="Display error results"
+                        icon="/general/error.svg"/>
+
+                <action id="CheckStyleDisplayWarningsAction"
+                        class="org.infernus.idea.checkstyle.actions.DisplayWarnings"
+                        text="Display Warnings"
+                        description="Display warning results"
+                        icon="/general/warning.svg"/>
+
+                <action id="CheckStyleDisplayInfoAction"
+                        class="org.infernus.idea.checkstyle.actions.DisplayInfo"
+                        text="Display Information Results"
+                        description="Display information results"
+                        icon="/general/information.svg"/>
+            </group>
+
+            <group id="CheckStylePluginActions" text="NC代码规范检查(Air 209308043@qq.com 微信: yongyourj 欢迎私活联系)" popup="true">
+                <action id="CheckStyleCloseAction"
+                        class="org.infernus.idea.checkstyle.actions.Close"
+                        text="关闭NC代码规范检查窗口"
+                        description="Close the CheckStyle tool window"
+                        icon="/actions/cancel.svg"/>
+
+                <action id="CheckStyleStopCheck"
+                        class="org.infernus.idea.checkstyle.actions.StopCheck"
+                        text="Stop the Running Scan"
+                        description="Stop the scan currently being run"
+                        icon="/actions/suspend.svg">
+                </action>
+
+                <separator/>
+
+                <action id="CheckStyleCurrentFileAction"
+                        class="org.infernus.idea.checkstyle.actions.ScanCurrentFile"
+                        text="Check Current File"
+                        description="Run Checkstyle on the current file in the editor"
+                        icon="/actions/execute.svg">
+
+                    <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+                </action>
+
+                <action id="CheckStyleModuleFilesAction"
+                        class="org.infernus.idea.checkstyle.actions.ScanModule"
+                        text="Check Module"
+                        description="Run Checkstyle on all files in the current module"
+                        icon="/nodes/ideaModule.svg">
+                </action>
+
+                <action id="CheckStyleProjectFilesAction"
+                        class="org.infernus.idea.checkstyle.actions.ScanProject"
+                        text="Check Project"
+                        description="Run Checkstyle on all files in the current project"
+                        icon="/nodes/ideaProject.svg">
+                </action>
+
+                <action id="CheckStyleModifiedFilesAction"
+                        class="org.infernus.idea.checkstyle.actions.ScanModifiedFiles"
+                        text="Check All Modified Files"
+                        description="Run Checkstyle on all modified files"
+                        icon="/actions/listChanges.svg">
+                </action>
+
+                <action id="CheckStyleDefaultChangeListAction"
+                        class="org.infernus.idea.checkstyle.actions.ScanCurrentChangeList"
+                        text="Check Files in the Current Change List"
+                        description="Run Checkstyle on the current change list"
+                        icon="/vcs/patch.svg">
+                </action>
+
+                <separator/>
+
+                <action id="CheckStyleClearCheckCacheAction"
+                        class="org.infernus.idea.checkstyle.actions.ResetLoadedRulesFiles"
+                        text="Reload Rules Files"
+                        description="Clear the rules file cache and blocked configurations, forcing a reload of changed rules"
+                        icon="/actions/refresh.svg">
+                </action>
+            </group>
+
+
             <add-to-group group-id="ToolsMenu" anchor="first"/>
             <add-to-group group-id="MainToolBarSettings" anchor="first"/>
 
             <!--            加入 右键菜单-->
             <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+            <add-to-group group-id="MainMenu" anchor="before" relative-to-action="HelpMenu"/>
         </group>
     </actions>
 
@@ -376,7 +383,191 @@
         <inspectionToolProvider implementation="com.air.nc5dev.codecheck.NCLocalInspectionToolProvider"/>
 
 
+
+
+
+        <!--        codecheck 项目参考-->
+        <applicationService serviceImplementation="org.infernus.idea.checkstyle.config.ApplicationConfigurationState"/>
+
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.StaticScanner"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.checker.CheckerFactoryCache"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.checker.CheckerFactory"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.checker.ModuleClassPathBuilder"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.model.ConfigurationLocationFactory"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.CheckstyleProjectService"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.config.ConfigurationLocationSource"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.config.PluginConfigurationManager"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.config.ProjectConfigurationState"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.CheckstylePluginApi"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.util.ProjectFilePaths"/>
+
+        <postStartupActivity implementation="org.infernus.idea.checkstyle.startup.NotifyUserIfPluginUpdated"/>
+        <postStartupActivity implementation="org.infernus.idea.checkstyle.startup.DisableCheckstyleLogging"/>
+
+        <projectConfigurable instance="org.infernus.idea.checkstyle.CheckStyleConfigurable" parentId="tools"/>
+
+        <moduleConfigurationEditorProvider implementation="org.infernus.idea.checkstyle.CheckstyleModuleConfigurationEditorProvider"/>
+
+        <moduleService serviceImplementation="org.infernus.idea.checkstyle.config.ModuleConfigurationState"/>
+
+        <localInspection implementationClass="org.infernus.idea.checkstyle.CheckStyleInspection"
+                         bundle="org.infernus.idea.checkstyle.CheckStyleBundle"
+                         key="inspection.display-name"
+                         groupKey="inspection.group"
+                         level="WARNING"
+                         enabledByDefault="true"
+                         runForWholeFile="true"
+                         language=""/>
+
+        <checkinHandlerFactory id="CheckStyleIDEACheckInHandlerFactory"
+                               implementation="org.infernus.idea.checkstyle.handlers.ScanFilesBeforeCheckinHandlerFactory"/>
+
+        <toolWindow id="NC代码检查"
+                    anchor="bottom"
+                    canCloseContents="false"
+                    factoryClass="org.infernus.idea.checkstyle.toolwindow.CheckStyleToolWindowFactory"
+                    icon="/org/infernus/idea/checkstyle/images/checkstyle13.png"/>
+        <schemeImporter name="NC代码检查 配置"
+                        schemeClass="com.intellij.psi.codeStyle.CodeStyleScheme"
+                        implementationClass="org.infernus.idea.checkstyle.importer.CheckStyleCodeStyleImporter"/>
+
+        <notificationGroup displayType="BALLOON"
+                           id="CheckStyleIDEABalloonGroup"
+                           key="plugin.notification.alerts"/>
+        <notificationGroup displayType="NONE"
+                           id="CheckStyleIDEALogOnlyGroup"
+                           key="plugin.notification.logging"/>
+
     </extensions>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <description><![CDATA[
+      <p>Yonyou U8Cloud, NC5 NC6 NCCloud YonBip and other series of software development tools</p>
+        <p>English: </p>
+        If you do not need to edit metadata and new document development can directly create idea ordinary projects.
+        You can change the name of the old project folder and create a new folder with the same path, and then copy the files in the folder.
+        <ul>
+            <li>First time opening project - Required steps:</li>
+                <li>1. Tools -> Configure NC HOME.</li>
+                <li>2. Tools -> update NC library dependencies execute dependency update!</li>
+                <li>3. Tools -> generate default NC run configuration!</li>
+                <li>4. After you perform the preceding steps for the first time, the project will generate the default client public Private test several source folders. Manually modify the IDEA attribute of several folders in the project structure to correct values</li>
+                <li>5. Select Use Module path to set the output path of test class and non-test class respectively.</li>
+        </ul>
+
+        <p>Chinese: </p>
+      如果不需要元数据编辑和新单据开发的 可以直接新建idea普通的项目就行。如果需要的 可以用eclipse新建好项目和组件以后，用idea打开项目，<br>
+      因为idea有时候有bug打不开eclipse项目 可以老项目文件夹改革个名称 然后idea新建一个同路径的，然后吧文件夹文件复制进来(机智不)。 <br>
+           <ul>
+              <li>第一次打开项目-必须步骤：</li>
+                <li>1. Tools -> 配置NC HOME   进行NC HOME配置！</li>
+                <li>2. Tools -> 更新NC 库依赖 执行依赖更新!</li>
+                <li>3. Tools -> 生成默认NC运行配置!(如果重启IDEA后丢失了运行配置 可以再次执行这个)</li>
+                <li>4. 第一次执行上面步骤以后，会生成项目默认的client public private test 几个源文件夹 请手工在 项目结构修改几个文件夹的IDEA属性为正确值</li>
+                <li>5. 请注意 模块的编译输出路径要选 use module path 分别设置test和非test class输出路径。</li>
+         </ul>
+
+    ]]></description>
+
+    <change-notes><![CDATA[
+     <em>version 3.3 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+           <li>1. add feature: check nc code style.</li>
+
+          <li>中文:</li>
+          <li>1. 新增NC代码规范检查功能，可支持检查是否client private public 导包存在错误..</li>
+
+      </ul>
+
+
+      <em>version 3.2.1 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+           <li>1. suport Yunguanjia.</li>
+           <li>2. export patcher auto zip.</li>
+           <li>3. export patcher select files.</li>
+
+          <li>中文:</li>
+          <li>1. 支持导出补丁构建成云管家格式.</li>
+          <li>2. 支持导出补丁自动打包成zip.</li>
+          <li>3. 支持导出补丁选择要导出的文件.</li>
+
+      </ul>
+
+      <em>version 3.0 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+           <li>1. suport NCC.</li>
+
+          <li>中文:</li>
+          <li>1. 支持导出补丁构建成NCC特有结构(前后端，前端要自己先build好).</li>
+          <li>1. 支持自动合并和过滤SQL脚本(
+                    nc.prop配置:
+                        filtersql 是否过滤完全重复SQL语句 默认 true ,<br>
+                        rebuildsql 是否无视iuap导出的SQL采用IDEA插件自动根据items.xml导出SQL 默认 false ,<br>
+                        data_source_index idea导出SQL使用的数据源索引 默认 0 ,<br>
+                        enableSubResultSet 是否支持iuap自带的子表导出 默认 true -此功能暂时不支持，如果用idea强制导出 那么必须手工配置子表到 items-idea.xml(和items.xml一个文件夹里)中 ,<br>
+                        includeDeletes 是否导出delete删除已存在数据的语句 默认 false .<br>
+              )
+          </li>
+      </ul>
+
+     <em>version 2.5.7 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+          <li>1. Add the mandatory NC version:<br>
+                In the nc.prop file in the. Idea folder, set the Nc. version parameter to NC5, NC6, NCC, U8Cloud.
+           </li>
+          <li>2. Added special support for NCC (special Hotwebs path and profile path and patch structure)</li>
+          <li>3. Optimize the generation parameters of the operation configuration</li>
+          <li>4. Periodic reminders and metadata replication cannot be used normally and are not useful until repaired</li>
+          <li>5. Fixed the plug-in error in some cases</li>
+
+          <li>中文:</li>
+          <li>1. 修复部分NCC的支持性问题.
+      </ul>
+
+     <em>version 2.5.0 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+          <li>1. Add the mandatory NC version:<br>
+                In the nc.prop file in the. Idea folder, set the Nc. version parameter to NC5, NC6, NCC, U8Cloud.
+           </li>
+          <li>2. Added special support for NCC (special Hotwebs path and profile path and patch structure)</li>
+          <li>3. Optimize the generation parameters of the operation configuration</li>
+          <li>4. Periodic reminders and metadata replication cannot be used normally and are not useful until repaired</li>
+          <li>5. Fixed the plug-in error in some cases</li>
+
+          <li>中文:</li>
+          <li>1. 新增强行指定NC版本: <br>
+                    在.idea文件夹的nc.prop文件配置 nc.version参数为 NC5, NC6,  NCC,  U8Cloud 几种即可。
+               </li>
+              <li>2. 增加对NCC的特殊支持(特殊的hotwebs路径和配置文件路径和补丁结构)</li>
+              <li>3. 优化运行等配置的生成参数</li>
+              <li>4. 定时提醒和元数据复制无法正常使用，暂不修复，用处不大</li>
+              <li>5. 修复部分情况下插件报错的问题</li>
+      </ul>
+
+    ]]>
+    </change-notes>
 
 </idea-plugin>

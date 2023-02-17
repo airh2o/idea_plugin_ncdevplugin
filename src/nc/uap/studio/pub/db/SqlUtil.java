@@ -1,20 +1,5 @@
 package nc.uap.studio.pub.db;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import nc.uap.studio.pub.db.exception.DatabaseRuntimeException;
 import nc.uap.studio.pub.db.model.IColumn;
 import nc.uap.studio.pub.db.model.IFkConstraint;
@@ -26,7 +11,10 @@ import nc.uap.studio.pub.db.model.impl.PkConstraint;
 import nc.uap.studio.pub.db.model.impl.Table;
 import nc.uap.studio.pub.db.query.IQueryInfo;
 import nc.uap.studio.pub.db.query.SqlQueryResultSet;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.sql.*;
+import java.util.*;
 
 public class SqlUtil {
     private static final String DB_TYPE_ORACLE = "Oracle";

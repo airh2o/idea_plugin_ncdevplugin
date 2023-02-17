@@ -6,6 +6,7 @@ import com.air.nc5dev.vo.NCCActionInfoVO;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -128,7 +129,7 @@ public class NCCActionRefreshUtil {
         }
 
         List<File> actionXmls = Stream.of(actionFiles)
-                .filter(f -> StringUtil.endsWithIgnoreCase(f.getName(), ".xml"))
+                .filter(f -> StringUtils.endsWithIgnoreCase(f.getName(), ".xml"))
                 .collect(Collectors.toList());
 
         if (CollUtil.isEmpty(actionXmls)) {
@@ -143,7 +144,7 @@ public class NCCActionRefreshUtil {
             }
         }
         List<File> authorizeXmls = Stream.of(authorizeFiles)
-                .filter(f -> StringUtil.endsWithIgnoreCase(f.getName(), ".xml"))
+                .filter(f -> StringUtils.endsWithIgnoreCase(f.getName(), ".xml"))
                 .collect(Collectors.toList());
 
         Map<String, String> action2AppcodeMap = new HashMap<>(100);

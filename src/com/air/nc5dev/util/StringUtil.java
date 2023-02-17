@@ -1,6 +1,7 @@
 package com.air.nc5dev.util;
 
-import org.apache.commons.lang.StringUtils;
+
+import cn.hutool.core.util.StrUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,15 +20,15 @@ import java.util.regex.Pattern;
  * @version 505
  * @date 2019年8月9日 下午9:14:26
  */
-public  final class StringUtil extends StringUtils{
+public final class StringUtil extends StrUtil {
     /**
      * 字符串 == null 或者 trim后是空 <br>
      * <br>
      *
-     * @author air
-     * @date 2019年8月9日 下午9:15:29
      * @param s
      * @return
+     * @author air
+     * @date 2019年8月9日 下午9:15:29
      */
     public static boolean isEmpty(String s) {
         return null == s || s.trim().length() < 1;
@@ -37,10 +38,10 @@ public  final class StringUtil extends StringUtils{
      * 字符串 != null && trim后 !=空 <br>
      * <br>
      *
+     * @param s
+     * @return
      * @author air
      * @date 2019年8月9日 下午9:15:29
-     * @param  s
-     * @return
      */
     public static boolean notEmpty(String s) {
         return null != s && !(s.trim().length() < 1);
@@ -50,10 +51,10 @@ public  final class StringUtil extends StringUtils{
      * 任何一个 字符串 == null 或者 trim后是空 返回true <br>
      * <br>
      *
-     * @author air
-     * @date 2019年8月9日 下午9:15:29
      * @param strs
      * @return
+     * @author air
+     * @date 2019年8月9日 下午9:15:29
      */
     public static boolean isEmptys(String... strs) {
         if (null == strs || strs.length < 1) {
@@ -73,10 +74,10 @@ public  final class StringUtil extends StringUtils{
      * 字符串转换成数字,如果是空或null 返回0 <br>
      * <br>
      *
-     * @author air
-     * @date 2019年8月9日 下午9:15:06
      * @param s
      * @return
+     * @author air
+     * @date 2019年8月9日 下午9:15:06
      */
     public static int toInt(String s) {
         if (isEmpty(s)) {
@@ -93,35 +94,37 @@ public  final class StringUtil extends StringUtils{
      * 如果 传入的字符串是空or null 就返回 第二个值 <br>
      * <br>
      *
-     * @author air
-     * @date 2019年8月9日 下午9:14:40
      * @param s
      * @param ifEmptyReturn
      * @return
+     * @author air
+     * @date 2019年8月9日 下午9:14:40
      */
     public static String get(String s, String ifEmptyReturn) {
         return isEmpty(s) ? ifEmptyReturn : s;
     }
+
     /**
      * 如果 传入的字符串是空or null 就返回 "" <br>
      * <br>
      *
-     * @author air
-     * @date 2019年8月9日 下午9:14:40
      * @param s
      * @return
+     * @author air
+     * @date 2019年8月9日 下午9:14:40
      */
     public static String get(String s) {
         return isEmpty(s) ? "" : s;
     }
+
     /**
      * 安全把一个对象转成 String, null 返回 "" 否则返回tostring <br>
      * <br>
      *
-     * @author air
-     * @date 2019年8月9日 下午9:49:33
      * @param o
      * @return
+     * @author air
+     * @date 2019年8月9日 下午9:49:33
      */
     public static String of(Object o) {
         return o == null ? "" : o.toString();
@@ -130,13 +133,13 @@ public  final class StringUtil extends StringUtils{
     /**
      * 把一个对象安全的变成字符串,如果是null返回"" </br> </br>
      *
-     * @author air Email:209308343@qq.com
-     * @date 2019-8-15 下午8:33:49
      * @param o
      * @return
+     * @author air Email:209308343@qq.com
+     * @date 2019-8-15 下午8:33:49
      */
     public static String getSafeString(Object o) {
-        if (null == o ) {
+        if (null == o) {
             return "";
         }
 
@@ -146,15 +149,12 @@ public  final class StringUtil extends StringUtils{
     /**
      * 字符串编码转换的实现方法
      *
-     * @param str
-     *            待转换编码的字符串
-     * @param oldCharset
-     *            原编码
-     * @param newCharset
-     *            目标编码
-     * @deprecated
+     * @param str        待转换编码的字符串
+     * @param oldCharset 原编码
+     * @param newCharset 目标编码
      * @return
      * @throws
+     * @deprecated
      */
     @Deprecated
     public static String changeCharset(String str, String oldCharset,
@@ -173,12 +173,12 @@ public  final class StringUtil extends StringUtils{
 
     /**
      * 获得字符串编码 </br>
-     * 			</br>
+     * </br>
      *
-     * @author air Email:209308343@qq.com
-     * @date 2019-8-17 下午12:18:03
      * @param str
      * @return
+     * @author air Email:209308343@qq.com
+     * @date 2019-8-17 下午12:18:03
      */
     public static String getEncoding(String str) {
         String encode;
@@ -241,11 +241,11 @@ public  final class StringUtil extends StringUtils{
     /**
      * 计算字符串 src 总 给定字符串 des 出现的次数 </br> </br>
      *
-     * @author air Email:209308343@qq.com
-     * @date 2019-8-17 下午6:16:06
      * @param src
      * @param des
      * @return
+     * @author air Email:209308343@qq.com
+     * @date 2019-8-17 下午6:16:06
      */
     public static int findCount(String src, String des) {
         int index = 0;
@@ -256,20 +256,21 @@ public  final class StringUtil extends StringUtils{
         }
         return count;
     }
+
     /**
      * 计算字符串 src 总 给定字符串 des 出现的次数 达到阀值over,也就是出现次数只要 >= over 返回true </br> </br>
      *
-     * @author air Email:209308343@qq.com
-     * @date 2019-8-17 下午6:16:06
      * @param src
      * @param des
      * @return
+     * @author air Email:209308343@qq.com
+     * @date 2019-8-17 下午6:16:06
      */
     public static boolean isCountOver(String src, String des, int over) {
         int index = 0;
         int count = 0;
         while ((index = src.indexOf(des, index)) != -1) {
-            if(count >= over){
+            if (count >= over) {
                 return true;
             }
             count++;
@@ -277,20 +278,21 @@ public  final class StringUtil extends StringUtils{
         }
         return false;
     }
+
     /**
      * 把一个字符串从 老的编码 转换到 新的编码 </br> </br>
      *
-     * @author air Email:209308343@qq.com
-     * @date 2019-8-27 下午7:36:58
      * @param s
      * @param oldCharEncode
      * @param newCharEncode
      * @return
+     * @author air Email:209308343@qq.com
+     * @date 2019-8-27 下午7:36:58
      */
     public static String converEncode(String s, String oldCharEncode,
                                       String newCharEncode) {
-        if(isEmpty(oldCharEncode)
-                || isEmpty(newCharEncode)){
+        if (isEmpty(oldCharEncode)
+                || isEmpty(newCharEncode)) {
             return s;
         }
 
@@ -330,57 +332,62 @@ public  final class StringUtil extends StringUtils{
 
     /**
      * 字符串格式化,把占位符替换成 参数
-     *                       </br>
-     *                       </br>
-     * @author air Email:209308343@qq.com
-     * @date 2019-10-26 下午7:36:52
-     * @param s 母字符串 比如 select 1 from dual where 1 != %s;
+     * </br>
+     * </br>
+     *
+     * @param s    母字符串 比如 select 1 from dual where 1 != %s;
      * @param pars 参数值 比如 2 就是  select 1 from dual where 1 != 2;
      * @return
+     * @author air Email:209308343@qq.com
+     * @date 2019-10-26 下午7:36:52
      */
-    public static final String format(String s, String... pars){
-        if(isEmpty(s)){
+    public static final String format(String s, String... pars) {
+        if (isEmpty(s)) {
             return s;
         }
 
         return String.format(s, pars);
     }
+
     /**
      * 把一个字符串src 里的 所有 from 替换成 to
-     *    不使用 正则！                   </br>
-     *                       </br>
-     * @author air Email:209308343@qq.com
-     * @date 2019年12月6日 上午9:16:18
+     * 不使用 正则！                   </br>
+     * </br>
+     *
      * @param src
      * @param from
      * @param to
      * @return
+     * @author air Email:209308343@qq.com
+     * @date 2019年12月6日 上午9:16:18
      */
     public static final String replaceAll(String src, String from, String to) {
         String re = src;
-        while(re.contains(from)) {
+        while (re.contains(from)) {
             re = replace(re, from, to);
         }
 
         return re;
     }
+
     /**
      * 把一个字符串src 里的 第一次遇见的 from 替换成 to
-     *    不使用 正则！                   </br>
-     *                       </br>
-     * @author air Email:209308343@qq.com
-     * @date 2019年12月6日 上午9:16:18
+     * 不使用 正则！                   </br>
+     * </br>
+     *
      * @param src
      * @param from
      * @param to
      * @return
+     * @author air Email:209308343@qq.com
+     * @date 2019年12月6日 上午9:16:18
      */
     public static final String replace(String src, String from, String to) {
         char[] cs = src.toCharArray();
         char[] cf = from.toCharArray();
         char[] ct = to.toCharArray();
 
-        if(cs.length < cf.length) {
+        if (cs.length < cf.length) {
             return src;
         }
 
@@ -388,20 +395,20 @@ public  final class StringUtil extends StringUtils{
         int mark = 0;
 
         for (int i = 0; i < cs.length; i++) {
-            if(mark == cf.length) {
+            if (mark == cf.length) {
                 break;
-            }else if(cs[i] == cf[mark]) {
-                if(start == -1) {
+            } else if (cs[i] == cf[mark]) {
+                if (start == -1) {
                     start = i;
                 }
-                ++ mark;
-            }else if(start != -1){
+                ++mark;
+            } else if (start != -1) {
                 start = -1;
                 mark = 0;
             }
         }
 
-        if(start > -1 && mark > 0) {
+        if (start > -1 && mark > 0) {
             StringBuilder sb = new StringBuilder(cs.length - cf.length + ct.length);
             for (int i = 0; i < start; i++) {
                 sb.append(cs[i]);
@@ -448,5 +455,21 @@ public  final class StringUtil extends StringUtils{
             l.add(trim(ss[i]));
         }
         return l;
+    }
+
+    public static boolean startsWith(String str, String start) {
+        return startWith(str, start);
+    }
+
+    public static String removeStart(String s, String st) {
+        return removePrefix(s, st);
+    }
+
+    public static boolean endsWith(String s, String e) {
+        return endWith(s, e);
+    }
+
+    public static String removeEnd(String str, String s) {
+        return removeSuffix(str, s);
     }
 }

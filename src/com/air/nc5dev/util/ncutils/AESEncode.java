@@ -1,5 +1,14 @@
 package com.air.nc5dev.util.ncutils;
 
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import nc.vo.framework.rsa.Encode;
+import org.apache.commons.crypto.cipher.CryptoCipher;
+import org.apache.commons.crypto.utils.ReflectionUtils;
+import org.apache.commons.crypto.utils.Utils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,14 +17,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.util.Properties;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import com.air.nc5dev.util.ProjectNCConfigUtil;
-import nc.vo.framework.rsa.Encode;
-import org.apache.commons.crypto.cipher.CryptoCipher;
-import org.apache.commons.crypto.utils.ReflectionUtils;
-import org.apache.commons.crypto.utils.Utils;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class AESEncode {
     static final IvParameterSpec iv = new IvParameterSpec(getUTF8Bytes("1234567890123456"));

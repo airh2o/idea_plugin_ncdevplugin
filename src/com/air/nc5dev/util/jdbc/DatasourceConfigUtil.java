@@ -2,11 +2,9 @@ package com.air.nc5dev.util.jdbc;
 
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.NCDataSourceVO;
-import com.alibaba.fastjson.JSON;
 import com.intellij.openapi.project.Project;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 

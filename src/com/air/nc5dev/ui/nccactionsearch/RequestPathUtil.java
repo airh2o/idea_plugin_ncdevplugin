@@ -1,5 +1,6 @@
 package com.air.nc5dev.ui.nccactionsearch;
 
+import com.air.nc5dev.util.CollUtil;
 import com.intellij.lang.jvm.annotation.*;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -9,7 +10,6 @@ import com.intellij.psi.impl.java.stubs.index.JavaAnnotationIndex;
 import com.intellij.psi.impl.source.tree.java.PsiArrayInitializerMemberValueImpl;
 import com.intellij.psi.impl.source.tree.java.PsiReferenceExpressionImpl;
 import com.intellij.psi.search.GlobalSearchScope;
-import org.apache.commons.collections.CollectionUtils;
 
 import javax.swing.*;
 import java.lang.reflect.Field;
@@ -59,15 +59,15 @@ public class RequestPathUtil {
     private static List<RequestPath> getRequestPaths(PsiClass psiClass, Module module, List<String> parentRequestMapping) {
         List<RequestPath> requestPaths = new ArrayList<>();
         // 获取 class 的requestMapping路径
-        if (CollectionUtils.isEmpty(parentRequestMapping)) {
+        if (CollUtil.isEmpty(parentRequestMapping)) {
             for (Mapping mapping : Annotations.getClasz()) {
                 PsiAnnotation requestMappingAnnotation = psiClass.getAnnotation(mapping.getQualifiedName());
                 parentRequestMapping = getPath(requestMappingAnnotation, mapping);
-                if (!CollectionUtils.isEmpty(parentRequestMapping)) {
+                if (CollUtil.isNotEmpty(parentRequestMapping)) {
                     break;
                 }
             }
-            if (CollectionUtils.isEmpty(parentRequestMapping)) {
+            if (CollUtil.isEmpty(parentRequestMapping)) {
                 parentRequestMapping = Collections.singletonList("");
             }
         }
@@ -87,7 +87,7 @@ public class RequestPathUtil {
                 PsiAnnotation annotation = psiMethod.getAnnotation(mapping.getQualifiedName());
                 if (null != annotation) {
                     List<String> path = getPath(annotation, mapping);
-                    if (!CollectionUtils.isEmpty(path)) {
+                    if (CollUtil.isNotEmpty(path)) {
                         for (String parentRequest : parentRequestMapping) {
                             for (String s : path) {
                                 List<String> methods = getMethod(annotation, mapping);

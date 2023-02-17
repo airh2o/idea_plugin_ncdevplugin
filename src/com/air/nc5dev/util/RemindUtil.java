@@ -1,7 +1,5 @@
 package com.air.nc5dev.util;
 
-import com.air.nc5dev.util.idea.ProjectUtil;
-import com.intellij.openapi.ui.Messages;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

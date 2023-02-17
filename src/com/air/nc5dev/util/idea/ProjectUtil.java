@@ -16,8 +16,10 @@ import org.dom4j.Element;
 import org.dom4j.io.XMLWriter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
-import java.net.URL;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**

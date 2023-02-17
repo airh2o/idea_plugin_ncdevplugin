@@ -1,6 +1,5 @@
 package com.air.nc5dev.vo;
 
-import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
@@ -14,11 +13,13 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.pom.Navigatable;
 import lombok.Data;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**

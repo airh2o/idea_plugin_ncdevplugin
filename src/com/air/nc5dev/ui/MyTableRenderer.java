@@ -1,10 +1,8 @@
 package com.air.nc5dev.ui;
 
-import java.awt.Color;
-import java.awt.Component;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
 
 public class MyTableRenderer extends DefaultTableCellRenderer {
 

@@ -1,10 +1,8 @@
 package com.air.nc5dev.util.idea;
 
-import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.*;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx;

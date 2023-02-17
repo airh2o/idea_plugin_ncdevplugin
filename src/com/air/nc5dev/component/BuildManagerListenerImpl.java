@@ -1,17 +1,13 @@
 package com.air.nc5dev.component;
 
-import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.codecheck.NCApplicationInspectionProfileManager;
 import com.air.nc5dev.codecheck.NCDefualtLocalInspectionTool;
 import com.air.nc5dev.codecheck.NCGlobalInspectionContextImpl;
 import com.air.nc5dev.codecheck.NCInspectionContextImpl;
-import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.*;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
-import com.air.nc5dev.vo.ExportContentVO;
 import com.google.common.collect.Lists;
-import com.intellij.analysis.AnalysisScope;
 import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.ex.*;
 import com.intellij.debugger.impl.DebuggerManagerListener;
@@ -38,11 +34,8 @@ import com.intellij.xdebugger.XDebuggerManagerListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
