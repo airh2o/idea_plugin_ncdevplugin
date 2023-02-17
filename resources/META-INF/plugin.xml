@@ -283,7 +283,7 @@
 
                 <action id="CheckStyleCurrentFileAction"
                         class="org.infernus.idea.checkstyle.actions.ScanCurrentFile"
-                        text="Check Current File"
+                        text="检查当前文件的NC代码规范"
                         description="Run Checkstyle on the current file in the editor"
                         icon="/actions/execute.svg">
 

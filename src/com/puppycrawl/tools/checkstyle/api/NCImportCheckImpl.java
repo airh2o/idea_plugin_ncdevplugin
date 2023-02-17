@@ -135,7 +135,8 @@ public class NCImportCheckImpl extends AbstarctCheckImpl {
                                 , SeverityLevel.WARNING
                                 , null
                                 , this.getClass()
-                                , "NCC(BIP)项目中,如果非重量端开发的:client包中应该使用nccloud.framework.service.ServiceLocator而不是nc.bs.framework.common.NCLocator!");
+                                , "NCC(BIP)项目中,如果非重量端开发的:client包中应该使用nccloud.framework.service.ServiceLocator而不是nc.bs" +
+                                ".framework.common.NCLocator!");
                         fileContext.getViolations().add(violation);
                         continue;
                     }
@@ -144,7 +145,7 @@ public class NCImportCheckImpl extends AbstarctCheckImpl {
                 //想办法找到这个类所在的范围
                 Set<Integer> froms = findClassFrom(line);
 
-                if (froms.contains(fileFrom)) {
+                if (froms.contains(fileFrom) || froms.contains(FROM_PUBLIC)) {
                     continue;
                 }
 
