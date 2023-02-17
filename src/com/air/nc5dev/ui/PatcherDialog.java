@@ -413,7 +413,7 @@ public class PatcherDialog
                     contentVO.reNpmBuild = reNpmBuild.isSelected();
                     contentVO.deleteDir = deleteDir.isSelected();
                     contentVO.format4Ygj = format4Ygj.isSelected();
-                    contentVO.format4Ygj = zip.isSelected();
+                    contentVO.zip = zip.isSelected();
                     contentVO.data_source_index = dataSourceIndex.getSelectedIndex();
                     contentVO.ncVersion = (NcVersionEnum) ncVersion.getSelectedItem();
 
