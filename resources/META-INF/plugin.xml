@@ -132,25 +132,25 @@
 
         <action id="nc5dev.info.JavadocGenerateAction" class="com.air.nc5dev.acion.JavadocGenerateAction"
                 text="生成Java Doc注释" description="根据方法名或属性名等翻译后生成注释">
-            <add-to-group group-id="GenerateGroup" anchor="last"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift 1"/>
+<!--            <add-to-group group-id="GenerateGroup" anchor="last"/>-->
         </action>
         <action id="SerializeGenerator" class="com.air.nc5dev.util.docgenerate.SerializeGenerator"
                 text="生成Serialize ID" description="Generate SerialVersionUID">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift s"/>
-            <add-to-group group-id="GenerateGroup" anchor="last"/>
+<!--            <add-to-group group-id="GenerateGroup" anchor="last"/>-->
         </action>
         <action id="GenerateGetSetAction" class="com.air.nc5dev.util.docgenerate.GenerateGetSetAction"
                 text="生成get set方法" description="Getter and Setter With Comment">
-            <add-to-group group-id="GenerateGroup" anchor="last"/>
+<!--            <add-to-group group-id="GenerateGroup" anchor="last"/>-->
         </action>
         <action id="GenerateGetAction" class="com.air.nc5dev.util.docgenerate.GenerateGetAction"
                 text="生成get方法" description="Getter With Comment">
-            <add-to-group group-id="GenerateGroup" anchor="last"/>
+<!--            <add-to-group group-id="GenerateGroup" anchor="last"/>-->
         </action>
         <action id="GenerateSetAction" class="com.air.nc5dev.util.docgenerate.GenerateSetAction"
                 text="生成set方法" description="Setter With Comment">
-            <add-to-group group-id="GenerateGroup" anchor="last"/>
+<!--            <add-to-group group-id="GenerateGroup" anchor="last"/>-->
         </action>
         <action id="NCCodeCheckAction" class="com.air.nc5dev.acion.NCCodeCheckAction"
                 text="立即运行NC代码检查" description="检查代码是否符合最低NC规范要求">
@@ -357,9 +357,9 @@
         <applicationService serviceImplementation="com.air.nc5dev.util.Actions"/>
 
         <!-- 生成对象所有的set方法调用 -->
-        <intentionAction>
-            <className>com.air.nc5dev.acion.GenerateAllSetterAction</className>
-        </intentionAction>
+<!--        <intentionAction>-->
+<!--            <className>com.air.nc5dev.acion.GenerateAllSetterAction</className>-->
+<!--        </intentionAction>-->
 
         <!--      <searchEverywhereContributor implementation="com.air.nc5dev.nccrequstsearch.RequestMappingGoToContributor"/>-->
 

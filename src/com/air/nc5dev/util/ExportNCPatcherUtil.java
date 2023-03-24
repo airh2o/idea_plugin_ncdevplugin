@@ -441,7 +441,8 @@ public class ExportNCPatcherUtil {
 
                 File moduleSqlDir = new File(sqldir, moduleHomeDir2ModuleMap.get(modulePath).getName());
                 //根据模块 合并SQL文件们
-                File moduleSqlOne = new File(moduleSqlDir, moduleHomeDir2ModuleMap.get(modulePath).getName() + "_模块汇总.sql");
+                File moduleSqlOne = new File(moduleSqlDir, moduleHomeDir2ModuleMap.get(modulePath).getName() + "_模块汇总" +
+                        ".sql");
 
                 moduleSqlOne.deleteOnExit();
                 moduleOneSqls.add(moduleSqlOne);
@@ -839,7 +840,8 @@ public class ExportNCPatcherUtil {
      * @date 2020/2/9 0009 14:50
      * @Param [moduleHomeDir, compressEndDeleteClass, contentVO]  模块路径， 是否不保留class文件  true删除class文件,模块配置文件
      */
-    private static List<File> compressJar(File moduleHomeDir, boolean compressEndDeleteClass, File manifest, ExportContentVO contentVO) {
+    private static List<File> compressJar(File moduleHomeDir, boolean compressEndDeleteClass, File manifest,
+                                          ExportContentVO contentVO) {
         ArrayList<File> fs = new ArrayList<>();
         //public
         fs.addAll(compressJar(new File(moduleHomeDir
@@ -1116,7 +1118,8 @@ public class ExportNCPatcherUtil {
             }
 
             //获得类对于的模块名字
-            String outModuleName = getOutModuleName(contentVO
+            String outModuleName = NC_TYPE_CLIENT.equals(ncType) && NcVersionEnum.NCC.equals(contentVO.ncVersion) ?
+                    module.getName() : getOutModuleName(contentVO
                     , javaFullClassName, classFile, module, module.getName());
 
             final String baseOutDirPath = exportDir + File.separatorChar + outModuleName;
@@ -1318,7 +1321,8 @@ public class ExportNCPatcherUtil {
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "\\", ".");
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "/", ".");
             //检查是否配置了 特殊输出路径
-            String outModuleName = getOutModuleName(contentVO
+            String outModuleName = NC_TYPE_CLIENT.equals(ncType) && NcVersionEnum.NCC.equals(contentVO.ncVersion) ?
+            module.getName() : getOutModuleName(contentVO
                     , javaFullClassName, javaFile, module, module.getName());
 
             final String baseOutDirPath = exportDir + File.separatorChar
