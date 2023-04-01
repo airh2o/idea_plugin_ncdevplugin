@@ -37,8 +37,14 @@ public class RunConfigurationUtil {
         RunManagerImpl runManagerImpl = getRunManagerImpl(project);
         RunnerAndConfigurationSettingsImpl runnerAndConfigurationSettings = new RunnerAndConfigurationSettingsImpl
                 (runManagerImpl, conf);
-        runnerAndConfigurationSettings.setSingleton(singleton);
-        runnerAndConfigurationSettings.setShared(share);
+        try {
+            runnerAndConfigurationSettings.setSingleton(singleton);
+        } catch (Throwable e) {
+        }
+        try {
+            runnerAndConfigurationSettings.setShared(share);
+        } catch (Throwable e) {
+        }
         runManagerImpl.addConfiguration(runnerAndConfigurationSettings);
     }
 
