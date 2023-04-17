@@ -39,7 +39,7 @@ public abstract class AbstractIdeaAction extends AnAction {
 
         try {
             // 自动重新加载一次 插件配置文件
-            ProjectNCConfigUtil.initConfigFile();
+            ProjectNCConfigUtil.initConfigFile(e.getProject());
 
             doHandler(e);
         } catch (Exception e1) {

@@ -22,7 +22,7 @@ public class ReConfigModuleAction extends AbstractIdeaAction {
     protected void doHandler(AnActionEvent e) {
         Project project = e.getProject();
         ProjectUtil.setProject(project);
-        ProjectNCConfigUtil.initConfigFile();
+        ProjectNCConfigUtil.initConfigFile(project);
         if (StringUtil.isBlank(ProjectNCConfigUtil.getNCHomePath())) {
             //没有配置NC home！
             return;

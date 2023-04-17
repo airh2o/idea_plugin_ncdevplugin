@@ -296,7 +296,7 @@ public class NC5HomeConfigDialogUIListener {
 
     public static final NC5HomeConfigDialogUIListener build(NC5HomeConfigDiaLogPanel setUI) {
         //每次弹出窗口 自动重新加载一次 插件配置文件
-        ProjectNCConfigUtil.initConfigFile();
+        ProjectNCConfigUtil.initConfigFile(ProjectUtil.getProject());
 
         NC5HomeConfigDialogUIListener nC5HomeConfigDialogUIListner = new NC5HomeConfigDialogUIListener(setUI);
 

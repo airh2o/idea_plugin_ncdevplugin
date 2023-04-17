@@ -222,8 +222,7 @@ public class NCCActionRefreshUtil {
      */
     public static void loadNCHome(Project project) {
         ProjectUtil.setProject(project);
-        ProjectNCConfigUtil.initConfigFile();
-        ;
+        ProjectNCConfigUtil.initConfigFile(project);
         File ncHome = ProjectNCConfigUtil.getNCHome();
         if (!ncHome.isDirectory()) {
             return;

@@ -28,7 +28,7 @@ public class ProjectOpenListener implements StartupActivity.DumbAware {
     public void runActivity(@NotNull Project project) {
         try {
             ProjectUtil.setProject(project);
-            ProjectNCConfigUtil.initConfigFile();
+            ProjectNCConfigUtil.initConfigFile(project);
             if (StringUtil.isBlank(ProjectNCConfigUtil.getNCHomePath())) {
                 //没有配置NC home！
                 return;

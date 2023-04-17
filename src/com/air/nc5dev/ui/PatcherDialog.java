@@ -170,7 +170,8 @@ public class PatcherDialog
                     NCDataSourceVO ds = NCPropXmlUtil.get(i);
                     if (ds == null) {
                         Messages.showErrorDialog(event.getProject(), "数据源索引不存在: " + i + " ,数据源数量: "
-                                        + (NCPropXmlUtil.getDataSourceVOS() == null ? 0 : NCPropXmlUtil.getDataSourceVOS().size())
+                                        + (NCPropXmlUtil.getDataSourceVOS() == null ? 0 :
+                                        NCPropXmlUtil.getDataSourceVOS().size())
                                 , "错误:");
                         return;
                     }
@@ -259,7 +260,8 @@ public class PatcherDialog
 
             JLabel label_10 = new JBLabel("混淆覆写导出的源码文件内容(java文件和js源码:__SOURCE__CODE__):");
             reWriteSourceFile = new JBCheckBox();
-            reWriteSourceFile.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("reWriteSourceFile", "false")));
+            reWriteSourceFile.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue(
+                    "reWriteSourceFile", "false")));
             JBPanel panel7 = new JBPanel();
             //  panel7.setBorder(LineBorder.createGrayLineBorder());
             panel7.setLayout(new BoxLayout(panel7, BoxLayout.X_AXIS));
@@ -441,7 +443,6 @@ public class PatcherDialog
                     long e = System.currentTimeMillis();
                     LogUtil.info("导出成功,耗时:" + ((e - s) / 1000.0d) + " (秒s)!硬盘路径： " + contentVO.getOutPath());
 
-                    Desktop desktop = Desktop.getDesktop();
                     File dirToOpen = new File(contentVO.getOutPath());
 
                     try {
@@ -452,6 +453,7 @@ public class PatcherDialog
                         ex.printStackTrace();
                     }
 
+                    File opendir = null;
                     if (contentVO.isFormat4Ygj()) {
                         if (contentVO.isDeleteDir()) {
                             try {
@@ -459,7 +461,8 @@ public class PatcherDialog
                             } catch (Throwable ex) {
                             }
                         }
-                        desktop.open(dirToOpen.getParentFile());
+
+                        opendir = dirToOpen.getParentFile();
                     } else {
                         if (contentVO.isDeleteDir()) {
                             try {
@@ -467,7 +470,12 @@ public class PatcherDialog
                             } catch (Throwable ex) {
                             }
                         }
-                        desktop.open(dirToOpen.getParentFile().getParentFile());
+                        opendir = dirToOpen.getParentFile().getParentFile();
+                    }
+
+                    if (opendir != null) {
+                        Desktop desktop = Desktop.getDesktop();
+                        desktop.open(opendir);
                     }
                 } catch (Throwable iae) {
                     LogUtil.error("自动打开路径失败: " + ExceptionUtil.getExcptionDetall(iae));

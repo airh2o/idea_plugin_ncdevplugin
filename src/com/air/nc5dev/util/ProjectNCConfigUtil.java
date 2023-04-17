@@ -5,6 +5,7 @@ import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import lombok.Getter;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -35,15 +37,15 @@ public class ProjectNCConfigUtil {
     public static final String[] dsTypes = new String[]{"ORACLE11G", "ORACLE10G", "SQLSERVER2008", "DB297"};
     public static final String[] dsTypeClasss = new String[]{"oracle.jdbc.OracleDriver", "oracle.jdbc.OracleDriver"
             , "com.microsoft.sqlserver.jdbc.SQLServerDriver", "com.ibm.db2.jcc.DB2Driver"};
-    private static boolean isInit = false;
+    private static Map<String, Boolean> isInit = Maps.newConcurrentMap();
     /**** NC项目里配置文件 属性集合 ***/
-    private static Properties configPropertis;
+    private static Map<String, Properties> configPropertis = Maps.newConcurrentMap();
     /**** NC项目里配置文件 ***/
-    private static File configFile;
+    private static Map<String, File> configFile = Maps.newConcurrentMap();
 
     static {
         //init config
-        initConfigFile();
+        //   initConfigFile(ProjectUtil.getProject());
     }
 
     /**
@@ -76,8 +78,23 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:11
      * @Param []
      */
+    public static final String getNCHomePath(Project project) {
+        return getConfigValue(project, KEY_PROJECT_NC_CONFIG_NCHOME);
+    }
+
+    /**
+     * 获取 NC主目录        </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return java.lang.String
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 9:11
+     * @Param []
+     */
     public static final String getNCHomePath() {
-        return getConfigValue(KEY_PROJECT_NC_CONFIG_NCHOME);
+        return getConfigValue(ProjectUtil.getProject(), KEY_PROJECT_NC_CONFIG_NCHOME);
     }
 
     /**
@@ -167,7 +184,22 @@ public class ProjectNCConfigUtil {
      * @Param [key]
      */
     public static final String getConfigValue(@NotNull String key, String ifnull) {
-        String s = getConfigValue(key);
+        return getConfigValue(ProjectUtil.getProject(), key, ifnull);
+    }
+
+    /**
+     * 根据key获取NC项目配置值       </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return java.lang.String
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 9:12
+     * @Param [key]
+     */
+    public static final String getConfigValue(Project project, @NotNull String key, String ifnull) {
+        String s = getConfigValue(project, key);
         return s == null ? ifnull : s;
     }
 
@@ -183,11 +215,35 @@ public class ProjectNCConfigUtil {
      * @Param [key]
      */
     public static final String getConfigValue(@NotNull String key) {
-        if (!isInit) {
-            initConfigFile();
+        return getConfigValue(ProjectUtil.getProject(), key);
+    }
+
+    /**
+     * 根据key获取NC项目配置值       </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return java.lang.String
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 9:12
+     * @Param [key]
+     */
+    public static final String getConfigValue(Project project, @NotNull String key) {
+        if (!isInited(project)) {
+            initConfigFile(project);
         }
 
-        return configPropertis.getProperty(key);
+        return configPropertis.get(project.getBasePath()).getProperty(key);
+    }
+
+    @Deprecated
+    public static final void saveConfig2File() {
+        saveConfig2File(ProjectUtil.getProject());
+    }
+
+    public static boolean isInited(Project project) {
+        return Boolean.TRUE.equals(isInit.get(project.getBasePath()));
     }
 
     /***
@@ -200,54 +256,56 @@ public class ProjectNCConfigUtil {
      * @Param []
      * @return void
      */
-    public static final void saveConfig2File() {
-        if (!isInit) {
-            initConfigFile();
+    public static final void saveConfig2File(Project project) {
+        if (!isInited(project)) {
+            initConfigFile(project);
         }
 
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("close_client_copy")) {
-            ProjectNCConfigUtil.configPropertis.put("close_client_copy", "false");
+        Properties prop = configPropertis.get(project.getBasePath());
+
+        if (!prop.containsKey("close_client_copy")) {
+            prop.put("close_client_copy", "false");
         }
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("buildAfterNCCodeCheck")) {
-            ProjectNCConfigUtil.configPropertis.put("buildAfterNCCodeCheck", "false");
+        if (!prop.containsKey("buildAfterNCCodeCheck")) {
+            prop.put("buildAfterNCCodeCheck", "false");
         }
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("nc.version")) {
-            ProjectNCConfigUtil.configPropertis.put("nc.version", "");
+        if (!prop.containsKey("nc.version")) {
+            prop.put("nc.version", "");
         }
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("filtersql")) {
-            ProjectNCConfigUtil.configPropertis.put("filtersql", "true");
+        if (!prop.containsKey("filtersql")) {
+            prop.put("filtersql", "true");
         }
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("rebuildsql")) {
-            ProjectNCConfigUtil.configPropertis.put("rebuildsql", "false");
+        if (!prop.containsKey("rebuildsql")) {
+            prop.put("rebuildsql", "false");
         }
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("data_source_index")) {
-            ProjectNCConfigUtil.configPropertis.put("data_source_index", "0");
+        if (!prop.containsKey("data_source_index")) {
+            prop.put("data_source_index", "0");
         }
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("enableSubResultSet")) {
-            ProjectNCConfigUtil.configPropertis.put("enableSubResultSet", "true");
+        if (!prop.containsKey("enableSubResultSet")) {
+            prop.put("enableSubResultSet", "true");
         }
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("includeDeletes")) {
-            ProjectNCConfigUtil.configPropertis.put("includeDeletes", "false");
+        if (!prop.containsKey("includeDeletes")) {
+            prop.put("includeDeletes", "false");
         }
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("reNpmBuild")) {
-            ProjectNCConfigUtil.configPropertis.put("reNpmBuild", "true");
+        if (!prop.containsKey("reNpmBuild")) {
+            prop.put("reNpmBuild", "true");
         }
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("format4Ygj")) {
-            ProjectNCConfigUtil.configPropertis.put("format4Ygj", "true");
+        if (!prop.containsKey("format4Ygj")) {
+            prop.put("format4Ygj", "true");
         }
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("selectExport")) {
-            ProjectNCConfigUtil.configPropertis.put("selectExport", "false");
+        if (!prop.containsKey("selectExport")) {
+            prop.put("selectExport", "false");
         }
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("reWriteSourceFile")) {
-            ProjectNCConfigUtil.configPropertis.put("reWriteSourceFile", "false");
+        if (!prop.containsKey("reWriteSourceFile")) {
+            prop.put("reWriteSourceFile", "false");
         }
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("deleteDir")) {
-            ProjectNCConfigUtil.configPropertis.put("deleteDir", "true");
+        if (!prop.containsKey("deleteDir")) {
+            prop.put("deleteDir", "true");
         }
-        if (!ProjectNCConfigUtil.configPropertis.containsKey("zip")) {
-            ProjectNCConfigUtil.configPropertis.put("zip", "true");
+        if (!prop.containsKey("zip")) {
+            prop.put("zip", "true");
         }
-        IoUtil.wirtePropertis(ProjectNCConfigUtil.configPropertis, ProjectNCConfigUtil.configFile);
+        IoUtil.wirtePropertis(prop, ProjectNCConfigUtil.configFile.get(project.getBasePath()));
     }
 
     /**
@@ -262,20 +320,36 @@ public class ProjectNCConfigUtil {
      * @Param [key, value]
      */
     public static final void setNCConfigPropertice(@NotNull String key, String value) {
-        if (!isInit) {
-            initConfigFile();
+        setNCConfigPropertice(ProjectUtil.getProject(), key, value);
+    }
+
+    /**
+     * 设置NC项目配置       </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 9:13
+     * @Param [key, value]
+     */
+    public static final void setNCConfigPropertice(Project project, @NotNull String key, String value) {
+        if (!isInited(project)) {
+            initConfigFile(project);
         }
 
-        configPropertis.setProperty(key, value);
+        configPropertis.get(project.getBasePath()).setProperty(key, value);
     }
 
     /**
      * 检查项目是否有 NC配置文件，没有就初始化
      */
-    public static void initConfigFile() {
-        if (ProjectUtil.getDefaultProject() == null) {
+    public static void initConfigFile(Project project) {
+        if (project == null) {
             throw new RuntimeException("project not finish yet, try restart idea!");
         }
+
         File configFile = new File("");
         try {
             File projectHome = new File(ProjectUtil.getDefaultProject().getBasePath());
@@ -291,12 +365,12 @@ public class ProjectNCConfigUtil {
             if (!configFile.exists()) {
                 configFile.createNewFile();
             }
-            isInit = true;
+            isInit.put(project.getBasePath(), true);
             //读取
             Properties ncConf = new Properties();
             ncConf.load(new FileInputStream(configFile));
-            ProjectNCConfigUtil.configPropertis = ncConf;
-            ProjectNCConfigUtil.configFile = configFile;
+            configPropertis.put(project.getBasePath(), ncConf);
+            ProjectNCConfigUtil.configFile.put(project.getBasePath(), configFile);
 
             if (StringUtils.isBlank(getNCClientIP())) {
                 setNCClientIP("127.0.0.1");
@@ -305,7 +379,7 @@ public class ProjectNCConfigUtil {
                 setNCClientPort("80");
             }
         } catch (IOException e) {
-            Messages.showErrorDialog(ProjectUtil.getDefaultProject()
+            Messages.showErrorDialog(project
                     , "文件路径: " + configFile.getPath() + " ,异常: " + e.toString()
                     , "实例化项目NC配置文件错误");
         }

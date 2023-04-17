@@ -49,7 +49,7 @@ public class GoToNCRequestMappingAction extends GotoActionBase implements DumbAw
         ProjectUtil.setProject(e.getProject());
         try {
             // 自动重新加载一次 插件配置文件
-            ProjectNCConfigUtil.initConfigFile();
+            ProjectNCConfigUtil.initConfigFile(e.getProject());
         } catch (Exception e1) {
             LogUtil.error("emmmmm 出现异常,淡定不要惊慌,如果影响使用请QQ209308343通知我: ", e1);
         }
