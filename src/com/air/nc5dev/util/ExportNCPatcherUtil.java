@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -177,12 +178,17 @@ public class ExportNCPatcherUtil {
                             , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
                                     .separatorChar +
                                     "META-INF")
-                            , contentVO);
+                            , contentVO
+                            , configVO.notExportModelueXml ? f -> !"module.xml".equalsIgnoreCase(f.getName()) :
+                                    f -> true);
                 } else {
                     IoUtil.copyAllFile(umpDir
                             , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
                                     .separatorChar +
-                                    "META-INF"));
+                                    "META-INF")
+                            , configVO.notExportModelueXml ? f -> !"module.xml".equalsIgnoreCase(f.getName()) :
+                                    f -> true
+                    );
                 }
             }
 
@@ -223,15 +229,15 @@ public class ExportNCPatcherUtil {
         }
 
         //处理NCC特殊的模块补丁结构
-        //if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
-        if (contentVO.rebuildsql) {
-            contentVO.indicator.setText("强制直接连接数据库生成SQL合并文件...");
-            reBuildNCCSqlAndFrontFiles(contentVO);
-        } else {
-            contentVO.indicator.setText("使用用友开发工具导出的SQL脚本文件进行SQL合并...");
-            buildNCCSqlAndFrontFiles(contentVO);
+        if (contentVO.exportSql) {
+            if (contentVO.rebuildsql) {
+                contentVO.indicator.setText("强制直接连接数据库生成SQL合并文件...");
+                reBuildNCCSqlAndFrontFiles(contentVO);
+            } else {
+                contentVO.indicator.setText("使用用友开发工具导出的SQL脚本文件进行SQL合并...");
+                buildNCCSqlAndFrontFiles(contentVO);
+            }
         }
-        //}
 
         if (contentVO.isFormat4Ygj()) {
             //转换云管家格式！
@@ -367,6 +373,23 @@ public class ExportNCPatcherUtil {
         }
     }
 
+    private static void copyAll(File from, File to, ExportContentVO contentVO, Function<File, Boolean> filter) {
+        if (from.isFile()) {
+            for (String path : contentVO.getSelectFiles()) {
+                if (canExport(contentVO, from, null, null
+                        , null, null, null, null, null)) {
+                    IoUtil.copyAllFile(from, to);
+                }
+            }
+            return;
+        }
+
+        File[] fs = from.listFiles();
+        for (File f : fs) {
+            copyAll(f, f.isFile() ? to : new File(to, f.getName()), contentVO, filter);
+        }
+    }
+
     private static void copyAll(File from, File to, ExportContentVO contentVO) {
         if (from.isFile()) {
             for (String path : contentVO.getSelectFiles()) {
@@ -390,7 +413,9 @@ public class ExportNCPatcherUtil {
      * @param contentVO
      */
     public static void reBuildNCCSqlAndFrontFiles(ExportContentVO contentVO) {
-        buildNCCHotwebs(new File(contentVO.getProject().getBasePath(), "hotwebs"), contentVO);
+        if (contentVO.exportResources) {
+            buildNCCHotwebs(new File(contentVO.getProject().getBasePath(), "hotwebs"), contentVO);
+        }
 
         HashMap<String, Module> moduleHomeDir2ModuleMap = contentVO.getModuleHomeDir2ModuleMap();
         File sqldir = new File(new File(contentVO.getOutPath()).getParentFile(), "sql");
@@ -469,6 +494,16 @@ public class ExportNCPatcherUtil {
                         + FileUtil.readUtf8String(moduleOneSql)
                         + "\n\n\n\n\n", sqlOne);
             }
+
+            if (contentVO.onleyFullSql) {
+                File[] fs = sqlOne.getParentFile().listFiles();
+                for (File f : fs) {
+                    if (f.getName().equals(sqlOne.getName())) {
+                        continue;
+                    }
+                   FileUtil.del(f);
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             LogUtil.error("重建导出SQL:" + e.toString() + ",模块:" + module, e);
@@ -486,7 +521,9 @@ public class ExportNCPatcherUtil {
      * @param contentVO
      */
     public static void buildNCCSqlAndFrontFiles(ExportContentVO contentVO) {
-        buildNCCHotwebs(new File(contentVO.getProject().getBasePath(), "hotwebs"), contentVO);
+        if (contentVO.exportResources) {
+            buildNCCHotwebs(new File(contentVO.getProject().getBasePath(), "hotwebs"), contentVO);
+        }
 
         HashMap<String, Module> moduleHomeDir2ModuleMap = contentVO.getModuleHomeDir2ModuleMap();
         File sqldir = new File(new File(contentVO.getOutPath()).getParentFile(), "sql");
@@ -786,6 +823,7 @@ public class ExportNCPatcherUtil {
         cf.manifestFilePath = cf.getProperty("config-ManifestFilePath");
         cf.closeJavaP = toBoolean(cf.getProperty("config-closeJavaP"), false);
         cf.nccClientHotwebsPackges = StringUtil.split2ListAndTrim(cf.getProperty("nccClientHotwebsPackges", ""), ",");
+        cf.notExportModelueXml = toBoolean(cf.getProperty("not-export-modelue-xml"), false);
 
         String s = cf.getProperty("config-ignoreFiles");
         if (StringUtils.isNotBlank(s)) {
@@ -1322,7 +1360,7 @@ public class ExportNCPatcherUtil {
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "/", ".");
             //检查是否配置了 特殊输出路径
             String outModuleName = NC_TYPE_CLIENT.equals(ncType) && NcVersionEnum.NCC.equals(contentVO.ncVersion) ?
-            module.getName() : getOutModuleName(contentVO
+                    module.getName() : getOutModuleName(contentVO
                     , javaFullClassName, javaFile, module, module.getName());
 
             final String baseOutDirPath = exportDir + File.separatorChar

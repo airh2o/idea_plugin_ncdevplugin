@@ -1,4 +1,5 @@
 # idea_plugin_nc5devplugin
+
 Yonyou NC5x or U8Cloud or NC6x or NCCloud or YonBIP Idea devtool Plugin   
 实现了 Idea Yonyou NC5x or U8Cloud or NC6x or NCCloud(新版改名叫YonBip) or YonBIP 开发插件。
 
@@ -6,27 +7,30 @@ Yonyou NC5x or U8Cloud or NC6x or NCCloud or YonBIP Idea devtool Plugin
 
 # 因本人目前在微服务公司，所以本人业余接开发私单，有私单才能继续参与NC 继续更新插件啊，人懒又要养家
 
-# buy me a coffee:     
+# buy me a coffee:
+
 <img width="200px" height="200px" src="https://s1.ax1x.com/2020/03/30/GeyNdI.md.png"  alt="buy me a coffee"  />     
 
 # 插件截图
- 
-![快速面板](readme/imgs/1.png "快速操作面板")    
 
-![配置NCHOME](readme/imgs/2.png "配置NCHOME")    
+![快速面板](readme/imgs/1.png "快速操作面板")
 
-![补丁导出界面](readme/imgs/3.png "补丁导出界面")    
+![配置NCHOME](readme/imgs/2.png "配置NCHOME")
 
-![日志窗口](https://s1.ax1x.com/2020/11/11/BjAgvn.png "日志窗口")  
+![补丁导出界面](readme/imgs/3.png "补丁导出界面")
+
+![日志窗口](https://s1.ax1x.com/2020/11/11/BjAgvn.png "日志窗口")
 
 ![NC代码规范检查](readme/imgs/4.png "NC代码规范检查")
 
-![重置密码](https://s1.ax1x.com/2020/11/11/BjAWD0.png "重置密码")  
-    
-![数据库连接生成](https://s1.ax1x.com/2020/11/11/BjA4ET.png "数据库连接生成")   
-     
+![重置密码](https://s1.ax1x.com/2020/11/11/BjAWD0.png "重置密码")
+
+![数据库连接生成](https://s1.ax1x.com/2020/11/11/BjA4ET.png "数据库连接生成")
+
 # 使用方式
+
 插件安装后使用方式:
+
 ```
 第一次新建项目-必须步骤：
 1. Tools -> 配置NC HOME   进行NC HOME配置！ 
@@ -35,85 +39,93 @@ Yonyou NC5x or U8Cloud or NC6x or NCCloud or YonBIP Idea devtool Plugin
 4. 第一次执行上面步骤以后，会生成项目默认的client public private test 几个源文件夹 请手工在 项目结构修改几个文件夹的IDEA属性为正确值
 5. 请注意 模块的编译输出路径要选 use module path 分别设置test和非test class输出路径。
 ```
-![注意简单使用方式,数据库配置不管他 没用处的,就是个显示功能](https://s1.ax1x.com/2020/11/09/B7FcOH.jpg "注意简单使用方式,数据库配置不管他 没用处的,就是个显示功能")  
 
- 导出补丁支持 模块写一个配置文件 自定义相对路径：     
- ```
-  本文件必须放入模块的根目录 文件名： patcherconfig.properties   
-  文件用法(可参考示例文件 patcherconfig.properties 所有参数都可以配或不配置 插件有默认值的哈)：   
-  
-    class全限定名=相对路径(也就是NC模块名字)   
-    例子(对test无效)：    
-    nc.ui.gl.AddVoucherLineAction=gl   
-    
-    支持包路径比如:    
-    nc.ui.gl=gl2       
-    nc.ui=gl3       
-    会根据 包路径判断模块名字，优先级是 全路径》包路径(包路径从最末级逐个向上匹配)》模块猜测       
-    
-    特殊参数：   
-    ##是否不要test代码，默认true
-    config-notest=false         
-    ##是否导出源代码，默认true
-    config-exportsourcefile=true         
-    ##是否把代码打包成jar文件， 默认false    
-    config-compressjar=false        
-    ##如果启用了代码打包成jar文件，是否删除class文件  默认false
-    config-compressEndDeleteClass      
-    ##如果打包jar，那么 META-INF.MF 文件模板磁盘全路径(可以不配置 采用默认)  
-    config-ManifestFilePath=path             
-    #是否猜测模块，默认false，开启后 如果配置文件没有指明的类会根据包名第三个判断模块       
-    # （比如 nc.ui.pub.ButtonBar 第三个是pub 所以认为模块是 pub）     
-    config-guessModule=true     
-    类路径配置文件:     
-        比如我要把 nc.bs.arap包里 1.txt和DzTakeF1Impl.wsdl文件输出到 arap模块下的包文件夹里:   
-                                        nc.bs.arap.1.txt=arap   
-        nc.bs.arap.DzTakeF1Impl.wsdl=arap    
+![注意简单使用方式,数据库配置不管他 没用处的,就是个显示功能](https://s1.ax1x.com/2020/11/09/B7FcOH.jpg "注意简单使用方式,数据库配置不管他 没用处的,就是个显示功能")
+
+导出补丁支持 模块写一个配置文件 自定义相对路径：
+ ```properties
+  #本文件必须放入模块的根目录 文件名： patcherconfig.properties   
+#文件用法(可参考示例文件 patcherconfig.properties 所有参数都可以配或不配置 插件有默认值的哈)：   
+# class全限定名=相对路径(也就是NC模块名字)   
+#例子(对test无效)：    
+nc.ui.gl.AddVoucherLineAction=gl   
+# 支持包路径比如:    
+nc.ui.gl=gl2       
+nc.ui=gl3       
+#  会根据 包路径判断模块名字，优先级是 全路径》包路径(包路径从最末级逐个向上匹配)》模块猜测       
+# 特殊参数：   
+##是否不要test代码，默认true
+config-notest=false         
+##是否导出源代码，默认true
+config-exportsourcefile=true         
+##是否把代码打包成jar文件， 默认false    
+config-compressjar=false        
+##如果启用了代码打包成jar文件，是否删除class文件  默认false
+config-compressEndDeleteClass
+##如果打包jar，那么 META-INF.MF 文件模板磁盘全路径(可以不配置 采用默认)  
+config-ManifestFilePath=path             
+#是否猜测模块，默认false，开启后 如果配置文件没有指明的类会根据包名第三个判断模块       
+# （比如 nc.ui.pub.ButtonBar 第三个是pub 所以认为模块是 pub）     
+config-guessModule=true     
+# 类路径配置文件:     
+#     比如我要把 nc.bs.arap包里 1.txt和DzTakeF1Impl.wsdl文件输出到 arap模块下的包文件夹里:   
+nc.bs.arap.1.txt=arap   
+nc.bs.arap.DzTakeF1Impl.wsdl=arap    
+# 是否不导出 modelue.xml 默认false
+not-export-modelue-xml=false     
  ```
 
-.idea文件夹里 nc.properties 插件项目配置信息选项说明：
+.idea 文件夹里 nc.properties 插件项目配置信息选项说明：
+
 ```properties
-#### 是否过滤SQL
-filtersql=true
-#### 是否启用子查询结果生成SQL
-enableSubResultSet=true
-### 强制生成SQL 要用的第几个数据源
-data_source_index=0
-#### 客户端ip
-clientip=127.0.0.1
-#### 是否管理 自动复制ncc客户端文件到NChome
-close_client_copy=false
-#### 是否强制链接数据库 导出SQL
-rebuildsql=false
-#### 客户端端口
-clientport=13100
-#### NChome 路径
+#IDEA插件配置文件， 位于项目跟 .idea文件夹内
+#NC的HOME根目录
 home=I\:\\runtime\\NCC2105HOME
-### 强制指定nc版本
+#客户端ip
+clientip=127.0.0.1
+#客户端端口
+clientport=13100
+#是否过滤重复sql
+filtersql=true
+#是否启用iuap默认的子表配置， 目前没实现
+enableSubResultSet=true
+#是否不使用iuap导出的script的SQL文件进行汇总，而是强制使用IDEA插件连接NC数据库导出SQL语句
+rebuildsql=true
+#IDEA如果配置的强制导出SQL， 默认的数据源索引（NC的数据源列表第几个 0开始）
+data_source_index=0
+#IDEA如果强制导出SQL 是否导出delete语句
+includeDeletes=false
+#是否关闭 NCC的hotwebs文件的实时复制
+close_client_copy=false
+#强制指定NC的版本 NC5, NC6,  NCC,  U8Cloud
 nc.version=NCC
-############ 是否启用 编译后 理解进行NC代码规范检查
-buildAfterNCCodeCheck=false
-###### 导出补丁格式 采用云管家格式，默认true
-format4Ygj=true
-#### 是否只保留zip文件(删除补丁文件夹)
-deleteDir=true
+#是否删除hotwebs的dist 然后强行npm run build一下
+reNpmBuild=true
+# 是否导出前端资源 resources文件夹，默认是
+exportResources=true
+# 是否导出sql，默认是
+exportSql=true
+# 是否只保留全量sql单个文件，默认是
+onleyFullSql=true
 ####
 ```
 
 # 常见问题
-1. IDEA 重启后如果提示运行配置的
-    variables 比如 FIELD_NC_HOME 等无效，请无视他
-    ，因为在项目运行列表里里配置了
-    ，无需在 file > setting > apperarance & behavior > path variables 里配置全局的！    
 
+1. IDEA 重启后如果提示运行配置的 variables 比如 FIELD_NC_HOME 等无效，请无视他 ，因为在项目运行列表里里配置了 ，无需在 file > setting > apperarance & behavior >
+   path variables 里配置全局的！
 
 # 已知BUG
-1. 注意： 如果你没有设置JAVAHOME或者ufjdk没有javap工具，导出补丁不会导出 同一个源文件内的非public类中匿名且非public的类文件。但如果有javap就会导出 但同时耗时较长！    
+
+1. 注意： 如果你没有设置JAVAHOME或者ufjdk没有javap工具，导出补丁不会导出 同一个源文件内的非public类中匿名且非public的类文件。但如果有javap就会导出 但同时耗时较长！
+
 # 未来待实现功能
+
 1. 元数据编辑 - 暂不完成
-2. WSDL新增功能  - 暂不完成
+2. WSDL新增功能 - 暂不完成
 
 # 版本更新
+
 ``` 
 <em>3.3 版本 更新:</em> <br>
       <ul>
@@ -217,26 +229,25 @@ deleteDir=true
           </ul>
 ```
 
-
 # 感谢
-部分代码 参考或使用了 部分插件开源项目的代码和功能灵感设计。
-涉及到的有(列表可能不全，请谅解，实际已源码和项目为准)：
-IDEA plugin 官方示例项目 或 开源插件：
-比如 https://github.com/SonarSource/sonarlint-intellij , https://github.com/gejun123456/intellij-generateAllSetMethod
-  ,https://github.com/jshiell/checkstyle-idea 等
-框架比如 guava hutool 小乖乖 等等
-再次感谢开源项目参与者们的无私奉献！
 
+部分代码 参考或使用了 部分插件开源项目的代码和功能灵感设计。 涉及到的有(列表可能不全，请谅解，实际已源码和项目为准)： IDEA plugin 官方示例项目 或 开源插件：
+比如 https://github.com/SonarSource/sonarlint-intellij , https://github.com/gejun123456/intellij-generateAllSetMethod
+,https://github.com/jshiell/checkstyle-idea 等 框架比如 guava hutool 小乖乖 等等 再次感谢开源项目参与者们的无私奉献！
 
 #### 备注
-IDEA常见事件: 事件分发 com.intellij.util.messages.impl.MessageBusImpl.invokeListener                    
+
+IDEA常见事件: 事件分发 com.intellij.util.messages.impl.MessageBusImpl.invokeListener
+
 ```text
    Build Manager   com.intellij.compiler.server.BuildManagerListener                                         
    compilation status        com.intellij.openapi.compiler.CompilationStatusListener                  
 Run Content      com.intellij.execution.ui.RunContentWithExecutorListener                       
 
 ```
+
 事件断点一些不需要的:
+
 ```text
 
 !"IdePerformanceListener".equals(message.getTopic().getDisplayName()) 

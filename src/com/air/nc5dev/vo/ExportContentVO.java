@@ -87,6 +87,11 @@ public class ExportContentVO {
     public Map<String, Module> selectFile2ModuleMap = Maps.newHashMap();
     public List<String> selectFiles = Lists.newArrayList();
 
+    public boolean exportResources = true;
+    public boolean exportSql = true;
+    public boolean onleyFullSql = true;
+
+
     public void init() {
         if (isSelectExport()) {
             initSelectModuleAndFiles();

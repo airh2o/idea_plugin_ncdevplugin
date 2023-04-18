@@ -2,12 +2,15 @@ package com.air.nc5dev.util;
 
 import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.util.idea.LogUtil;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
@@ -191,13 +194,20 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
     public static final ArrayList<File> serachModule_Client_Library(File ncHome) {
         ArrayList<File> all = serachAllNcClientClass(ncHome);
         all.addAll(serachAllNcClientJars(ncHome));
-        //增加数据交换支持 eg:
-        //D:\runtimes\U8Cloud_HEXIN\modules\dm\client\extension\classes\
-        all.addAll(serachAllNcClass(new File(ncHome, "modules")
-                , "client" + File.separatorChar + "extension"
-                        + File.separatorChar + "classes"
-                , false));
-        return all;
+
+        return (ArrayList<File>) CollUtil.addAllColls(
+                all
+                //增加数据交换支持 eg:
+                //D:\runtimes\U8Cloud_HEXIN\modules\dm\client\extension\classes\
+                , serachAllNcClass(new File(ncHome, "modules")
+                        , "client" + File.separatorChar + "extension"
+                                + File.separatorChar + "classes"
+                        , false)
+                , serachAllNcClass(new File(ncHome, "modules")
+                        , "hyext" + File.separatorChar + "client" + File.separatorChar + "extension"
+                                + File.separatorChar + "classes"
+                        , false)
+        );
     }
 
     /**
@@ -331,8 +341,11 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @return
      */
     public static final ArrayList<File> serachAllNcPublicClass(File ncHome) {
-        return serachAllNcClass(new File(ncHome, "modules")
-                , "classes", false);
+        return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
+                , "classes", false)
+                , serachAllNcClass(new File(ncHome, "modules")
+                        , "hyext" + File.separatorChar + "classes", false)
+        );
     }
 
     /**
@@ -342,8 +355,12 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @return
      */
     public static final ArrayList<File> serachAllNcClientClass(File ncHome) {
-        return serachAllNcClass(new File(ncHome, "modules")
-                , "client" + File.separatorChar + "classes", false);
+        return (ArrayList<File>) CollUtil.addAllColls(
+                serachAllNcClass(new File(ncHome, "modules")
+                        , "client" + File.separatorChar + "classes", false)
+                , serachAllNcClass(new File(ncHome, "modules")
+                        , "hyext" + File.separatorChar + "client" + File.separatorChar + "classes", false)
+        );
     }
 
     /**
@@ -353,8 +370,11 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @return
      */
     public static final ArrayList<File> serachAllNcPrivateClass(File ncHome) {
-        return serachAllNcClass(new File(ncHome, "modules")
-                , "META-INF" + File.separatorChar + "classes", false);
+        return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
+                , "META-INF" + File.separatorChar + "classes", false)
+                , serachAllNcClass(new File(ncHome, "modules")
+                        , "hyext" + File.separatorChar + "META-INF" + File.separatorChar + "classes", false)
+        );
     }
 
     /**
@@ -364,8 +384,11 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @return
      */
     public static final ArrayList<File> serachAllNcPublicJars(File ncHome) {
-        return serachAllNcClass(new File(ncHome, "modules")
-                , "lib", true);
+        return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
+                , "lib", true)
+                , serachAllNcClass(new File(ncHome, "modules")
+                        , "hyext" + File.separatorChar + "lib", true)
+        );
     }
 
     /**
@@ -375,8 +398,12 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @return
      */
     public static final ArrayList<File> serachAllNcClientJars(File ncHome) {
-        return serachAllNcClass(new File(ncHome, "modules")
-                , "client" + File.separatorChar + "lib", true);
+        return (ArrayList<File>) CollUtil.addAllColls(
+                serachAllNcClass(new File(ncHome, "modules")
+                        , "client" + File.separatorChar + "lib", true)
+                , serachAllNcClass(new File(ncHome, "modules")
+                        , "hyext" + File.separatorChar + "client" + File.separatorChar + "lib", true)
+        );
     }
 
     /**
@@ -386,8 +413,11 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @return
      */
     public static final ArrayList<File> serachAllNcPrivateJars(File ncHome) {
-        return serachAllNcClass(new File(ncHome, "modules")
-                , "META-INF" + File.separatorChar + "lib", true);
+        return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
+                , "META-INF" + File.separatorChar + "lib", true)
+                , serachAllNcClass(new File(ncHome, "modules")
+                        , "hyext" + File.separatorChar + "META-INF" + File.separatorChar + "lib", true)
+        );
     }
 
     /**
@@ -536,6 +566,36 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @date 2020/1/16 0016 20:07
      * @Param [fromDir, toDir]
      */
+    public static final void copyAllFile(@NotNull File fromDir, @NotNull final File toDir,
+                                         Function<File, Boolean> filter) {
+        if (fromDir.isFile()) {
+            copyFile(fromDir, toDir);
+            return;
+        }
+        Stream.of(fromDir.listFiles()).forEach(file -> {
+            if (!file.isFile()) {
+                return;
+            }
+
+            if (!filter.apply(file)) {
+                return;
+            }
+
+            copyFile(file, toDir);
+        });
+    }
+
+    /**
+     * 把一个文件夹 本目录当前级次内所有文件复制到指定的路径（不会复制下级文件夹！）        </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/1/16 0016 20:07
+     * @Param [fromDir, toDir]
+     */
     public static final void copyAllFile(@NotNull File fromDir, @NotNull final File toDir) {
         if (fromDir.isFile()) {
             copyFile(fromDir, toDir);
@@ -605,7 +665,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         }
         // \modules\mmmpsxj\client\classes\nccloud
         path = StringUtils.substring(path
-                ,  StringUtils.indexOf(path, "client" + File.separatorChar + "classes")
+                , StringUtils.indexOf(path, "client" + File.separatorChar + "classes")
                         + ("client" + File.separatorChar + "classes").length() + 1
         );
         path = StringUtils.replaceChars(path, File.separatorChar, '.');

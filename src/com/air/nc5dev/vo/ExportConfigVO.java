@@ -63,6 +63,13 @@ public class ExportConfigVO {
      * NCC的话，出补丁 client里哪些class的packge文件需要放入hotwebs，如果这个是空 就全部！
      */
     public List<String> nccClientHotwebsPackges;
+    /**
+     * 是否不导出 modelue.xml 默认false
+     */
+    public boolean notExportModelueXml = false;
+
+
+
 
     /**
      * 获取配置的其他信息

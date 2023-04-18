@@ -68,6 +68,9 @@ public class PatcherDialog
     JComboBox ncVersion;
     JBCheckBox reNpmBuild;
     JBCheckBox format4Ygj;
+    JBCheckBox exportResources;
+    JBCheckBox exportSql;
+    JBCheckBox onleyFullSql;
     JBCheckBox deleteDir;
     JBCheckBox reWriteSourceFile;
     JBCheckBox zip;
@@ -143,10 +146,32 @@ public class PatcherDialog
             panel1.add(filtersql);
             contentPane.add(panel1);
 
-            JLabel label_2 = new JBLabel("强制IDEA连接数据库导出SQL:");
+            JLabel label_2 = new JBLabel("是否导出SQL:");
+            exportSql = new JBCheckBox();
+            exportSql.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("exportSql", "true")));
+            JBPanel panel2 = new JBPanel();
+            //panel2.setBorder(LineBorder.createGrayLineBorder());
+            panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+            panel2.setBounds(x, y = y + height + 5, width, height);
+            panel2.add(label_2);
+            panel2.add(exportSql);
+            contentPane.add(panel2);
+
+            label_2 = new JBLabel("是否只保留全量sql单个文件:");
+            onleyFullSql = new JBCheckBox();
+            onleyFullSql.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("onleyFullSql", "true")));
+            panel2 = new JBPanel();
+            //panel2.setBorder(LineBorder.createGrayLineBorder());
+            panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+            panel2.setBounds(x, y = y + height + 5, width, height);
+            panel2.add(label_2);
+            panel2.add(onleyFullSql);
+            contentPane.add(panel2);
+
+            label_2 = new JBLabel("强制IDEA连接数据库导出SQL:");
             rebuild = new JBCheckBox();
             rebuild.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("rebuildsql", "false")));
-            JBPanel panel2 = new JBPanel();
+            panel2 = new JBPanel();
             //panel2.setBorder(LineBorder.createGrayLineBorder());
             panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
             panel2.setBounds(x, y = y + height + 5, width, height);
@@ -208,17 +233,28 @@ public class PatcherDialog
             panel4.add(ncVersion);
             contentPane.add(panel4);
 
-            JLabel label_6 = new JBLabel("自动删除hotwebs的dist后执行npm run build:");
+            JLabel label_6 = new JBLabel("是否导出前端资源(resources):");
+            exportResources = new JBCheckBox();
+            exportResources.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("exportResources",
+                    "true")));
+            JBPanel panel5 = new JBPanel();
+            //  panel5.setBorder(LineBorder.createGrayLineBorder());
+            panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
+            panel5.setBounds(x, y = y + height + 5, width, height);
+            panel5.add(label_6);
+            panel5.add(exportResources);
+            contentPane.add(panel5);
+
+            label_6 = new JBLabel("自动删除hotwebs的dist后执行npm run build:");
             reNpmBuild = new JBCheckBox();
             reNpmBuild.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("reNpmBuild", "true")));
-            JBPanel panel5 = new JBPanel();
+            panel5 = new JBPanel();
             //  panel5.setBorder(LineBorder.createGrayLineBorder());
             panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
             panel5.setBounds(x, y = y + height + 5, width, height);
             panel5.add(label_6);
             panel5.add(reNpmBuild);
             contentPane.add(panel5);
-
 
             JLabel label_7 = new JBLabel("导出云管家格式:");
             format4Ygj = new JBCheckBox();
@@ -415,6 +451,9 @@ public class PatcherDialog
                     contentVO.reNpmBuild = reNpmBuild.isSelected();
                     contentVO.deleteDir = deleteDir.isSelected();
                     contentVO.format4Ygj = format4Ygj.isSelected();
+                    contentVO.exportResources = exportResources.isSelected();
+                    contentVO.exportSql = exportSql.isSelected();
+                    contentVO.onleyFullSql = onleyFullSql.isSelected();
                     contentVO.zip = zip.isSelected();
                     contentVO.data_source_index = dataSourceIndex.getSelectedIndex();
                     contentVO.ncVersion = (NcVersionEnum) ncVersion.getSelectedItem();
@@ -434,7 +473,7 @@ public class PatcherDialog
                         contentVO.initSelectModules();
                     }
 
-                    if (contentVO.reNpmBuild) {
+                    if (contentVO.exportResources && contentVO.reNpmBuild) {
                         //你懂得！
                         reBuildNpmPatcther(indicator);
                     }
@@ -474,8 +513,13 @@ public class PatcherDialog
                     }
 
                     if (opendir != null) {
-                        Desktop desktop = Desktop.getDesktop();
-                        desktop.open(opendir);
+                        try {
+                            Desktop desktop = Desktop.getDesktop();
+                            desktop.open(opendir);
+                        } catch (Throwable ioException) {
+                            ioException.printStackTrace();
+                            LogUtil.info("导出成功！路径: " + opendir.getPath());
+                        }
                     }
                 } catch (Throwable iae) {
                     LogUtil.error("自动打开路径失败: " + ExceptionUtil.getExcptionDetall(iae));

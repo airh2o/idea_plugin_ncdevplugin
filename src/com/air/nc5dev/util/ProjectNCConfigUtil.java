@@ -305,6 +305,15 @@ public class ProjectNCConfigUtil {
         if (!prop.containsKey("zip")) {
             prop.put("zip", "true");
         }
+        if (!prop.containsKey("exportResources")) {
+            prop.put("exportResources", "true");
+        }
+        if (!prop.containsKey("exportSql")) {
+            prop.put("exportSql", "true");
+        }
+        if (!prop.containsKey("onleyFullSql")) {
+            prop.put("onleyFullSql", "true");
+        }
         IoUtil.wirtePropertis(prop, ProjectNCConfigUtil.configFile.get(project.getBasePath()));
     }
 

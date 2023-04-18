@@ -173,6 +173,32 @@ public class CollUtil extends cn.hutool.core.collection.CollUtil {
         return ArrayUtil.addAll(arr, adds);
     }
 
+
+    /**
+     * 加入全部
+     *
+     * @param <T>        集合元素类型
+     * @param collection 被加入的集合 {@link Collection}
+     * @param iterable   要加入的内容{@link Iterable}
+     * @return 原集合
+     */
+    public static <T> Collection<T> addAllColls(Collection<T> collection, Iterable<T>... iterables) {
+        if (iterables == null) {
+            return collection;
+        }
+
+        Collection<T> r = collection;
+        for (Iterable<T> i : iterables) {
+            if (i == null) {
+                continue;
+            }
+
+            r = addAll(r, i.iterator());
+        }
+
+        return r;
+    }
+
     /**
      * 返回一个空的 ArrayList 对象
      *
