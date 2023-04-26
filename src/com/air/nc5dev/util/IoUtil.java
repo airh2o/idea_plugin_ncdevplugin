@@ -2,7 +2,6 @@ package com.air.nc5dev.util;
 
 import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.util.idea.LogUtil;
-import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +9,6 @@ import java.io.*;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
@@ -204,7 +202,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
                                 + File.separatorChar + "classes"
                         , false)
                 , serachAllNcClass(new File(ncHome, "modules")
-                        , "hyext" + File.separatorChar + "client" + File.separatorChar + "extension"
+                        , "client" + File.separatorChar + "hyext" + File.separatorChar + "extension"
                                 + File.separatorChar + "classes"
                         , false)
         );
@@ -342,7 +340,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      */
     public static final ArrayList<File> serachAllNcPublicClass(File ncHome) {
         return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
-                , "classes", false)
+                        , "classes", false)
                 , serachAllNcClass(new File(ncHome, "modules")
                         , "hyext" + File.separatorChar + "classes", false)
         );
@@ -359,7 +357,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
                 serachAllNcClass(new File(ncHome, "modules")
                         , "client" + File.separatorChar + "classes", false)
                 , serachAllNcClass(new File(ncHome, "modules")
-                        , "hyext" + File.separatorChar + "client" + File.separatorChar + "classes", false)
+                        , "client" + File.separatorChar + "hyext" + File.separatorChar + "classes", false)
         );
     }
 
@@ -371,9 +369,9 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      */
     public static final ArrayList<File> serachAllNcPrivateClass(File ncHome) {
         return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
-                , "META-INF" + File.separatorChar + "classes", false)
+                        , "META-INF" + File.separatorChar + "classes", false)
                 , serachAllNcClass(new File(ncHome, "modules")
-                        , "hyext" + File.separatorChar + "META-INF" + File.separatorChar + "classes", false)
+                        , "META-INF" + File.separatorChar + "hyext" + File.separatorChar + "classes", false)
         );
     }
 
@@ -385,7 +383,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      */
     public static final ArrayList<File> serachAllNcPublicJars(File ncHome) {
         return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
-                , "lib", true)
+                        , "lib", true)
                 , serachAllNcClass(new File(ncHome, "modules")
                         , "hyext" + File.separatorChar + "lib", true)
         );
@@ -402,7 +400,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
                 serachAllNcClass(new File(ncHome, "modules")
                         , "client" + File.separatorChar + "lib", true)
                 , serachAllNcClass(new File(ncHome, "modules")
-                        , "hyext" + File.separatorChar + "client" + File.separatorChar + "lib", true)
+                        , "client" + File.separatorChar + "hyext" + File.separatorChar + "lib", true)
         );
     }
 
@@ -414,9 +412,9 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      */
     public static final ArrayList<File> serachAllNcPrivateJars(File ncHome) {
         return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
-                , "META-INF" + File.separatorChar + "lib", true)
+                        , "META-INF" + File.separatorChar + "lib", true)
                 , serachAllNcClass(new File(ncHome, "modules")
-                        , "hyext" + File.separatorChar + "META-INF" + File.separatorChar + "lib", true)
+                        , "META-INF" + File.separatorChar + "hyext" + File.separatorChar + "lib", true)
         );
     }
 
