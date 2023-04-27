@@ -31,7 +31,7 @@ Yonyou NC5x or U8Cloud or NC6x or NCCloud or YonBIP Idea devtool Plugin
 
 插件安装后使用方式:
 
-```
+```txt
 第一次新建项目-必须步骤：
 1. Tools -> 配置NC HOME   进行NC HOME配置！ 
 2. Tools -> 更新NC 库依赖 执行依赖更新! 
@@ -43,8 +43,8 @@ Yonyou NC5x or U8Cloud or NC6x or NCCloud or YonBIP Idea devtool Plugin
 ![注意简单使用方式,数据库配置不管他 没用处的,就是个显示功能](https://s1.ax1x.com/2020/11/09/B7FcOH.jpg "注意简单使用方式,数据库配置不管他 没用处的,就是个显示功能")
 
 导出补丁支持 模块写一个配置文件 自定义相对路径：
- ```properties
-  #本文件必须放入模块的根目录 文件名： patcherconfig.properties   
+```properties
+#本文件必须放入模块的根目录 文件名： patcherconfig.properties   
 #文件用法(可参考示例文件 patcherconfig.properties 所有参数都可以配或不配置 插件有默认值的哈)：   
 # class全限定名=相对路径(也就是NC模块名字)   
 #例子(对test无效)：    
@@ -228,6 +228,14 @@ onleyFullSql=true
               <li>3. 修复IDEA同时打开多个项目 ,每次配置文件打开自动加载新的项目插件配置文件。</li>
           </ul>
 ```
+
+# 版本兼容性
+V2以及以下版本 兼容IDEA2017+ 支持JDK5 和JDK6
+V3以及以上版本 兼容IDEA2021+ 支持JDK8+
+
+如果你用的是BIP，启动服务有问题 可以参数修改JVM参数：
+-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl     
+-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl     
 
 # 感谢
 
