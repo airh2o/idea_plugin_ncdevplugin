@@ -5,10 +5,11 @@ Yonyou NC5x or U8Cloud or NC6x or NCCloud or YonBIP Idea devtool Plugin
 
 # 注意，因为本人懒等原因，最新的插件是 项目根目录的 zip文件哦，不是发行版里的哦！！！！
 
-# 因本人目前在微服务公司，所以本人业余接开发私单，有私单才能继续参与NC 继续更新插件啊，人懒又要养家
-
-# buy me a coffee:
-
+# 因本人目前在微服务公司，所以本人业余接开发私单，有私单才能继续参与NC 继续更新插件
+ 业余专门接 U8C NC5 NC6 NCC BIP，java微服务，前后端分离，小程序 H5APP 等等私活， ncc这些开发都是用友高级以上认证，项目都是100家以上经验！      
+ 每年至少会做10家以上私单项目！        
+ 
+# 交个朋友，支持一杯咖啡:
 <img width="200px" height="200px" src="https://s1.ax1x.com/2020/03/30/GeyNdI.md.png"  alt="buy me a coffee"  />     
 
 # 插件截图
@@ -229,13 +230,14 @@ onleyFullSql=true
           </ul>
 ```
 
-# 版本兼容性
-V2以及以下版本 兼容IDEA2017+ 支持JDK5 和JDK6
-V3以及以上版本 兼容IDEA2021+ 支持JDK8+
+# 版本兼容性 
+V2以及以下版本 兼容IDEA2017+ 支持JDK5 和JDK6            
+V3以及以上版本 兼容IDEA2021+ 支持JDK8+                      
+老版本的下载，见根目录 idea_plugin_ncdevplugin.zip 里的提交历史 下载历史文件即可！           
 
-如果你用的是BIP，启动服务有问题 可以参数修改JVM参数：
--Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl     
--Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl     
+如果你用的是BIP，启动服务有问题 可以参数修改JVM参数：       
+-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl           
+-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl               
 
 # 感谢
 
