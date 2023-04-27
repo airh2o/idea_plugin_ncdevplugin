@@ -1,14 +1,13 @@
-# idea_plugin_nc5devplugin
+# 简介
 
-Yonyou NC5x or U8Cloud or NC6x or NCCloud or YonBIP Idea devtool Plugin   
-实现了 Idea Yonyou NC5x or U8Cloud or NC6x or NCCloud(新版改名叫YonBip) or YonBIP 开发插件。
+用友 Yonyou NC5系列 、 U8Cloud、 NC6系列 、 NCCloud 、 YonBIP Idea devtool Plugin   
+实现了 Idea Yonyou NC5x 、 U8Cloud 、 NC6x 、 NCCloud(新版改名叫YonBip) 、 YonBIP 开发插件。            
 
-# 注意，因为本人懒等原因，最新的插件是 项目根目录的 zip文件哦，不是发行版里的哦！！！！
+注意，最新的插件安装包是 项目根目录的 zip文件！    
 
 # 因本人目前在微服务公司，所以本人业余接开发私单，有私单才能继续参与NC 继续更新插件
- 业余专门接 U8C NC5 NC6 NCC BIP，java微服务，前后端分离，小程序 H5APP 等等私活， ncc这些开发都是用友高级以上认证，项目都是100家以上经验！      
- 每年至少会做10家以上私单项目！        
- 
+## 业余专门接 U8C NC5 NC6 NCC BIP，java微服务，前后端分离，小程序 H5APP 等等私活， ncc这些开发都是用友高级以上认证，项目都是100家以上经验！      每年至少会做10家以上私单项目！                    
+## 业务联系方式: QQ 209308343   微信： yongyourj                  
 # 交个朋友，支持一杯咖啡:
 <img width="200px" height="200px" src="https://s1.ax1x.com/2020/03/30/GeyNdI.md.png"  alt="buy me a coffee"  />     
 
