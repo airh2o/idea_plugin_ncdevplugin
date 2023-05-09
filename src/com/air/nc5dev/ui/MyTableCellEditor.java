@@ -1,5 +1,7 @@
 package com.air.nc5dev.ui;
 
+import lombok.Data;
+
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
@@ -7,8 +9,9 @@ import java.awt.event.*;
 import java.io.Serializable;
 import java.util.EventObject;
 
+@Data
 public class MyTableCellEditor extends AbstractCellEditor implements TableCellEditor {
-
+    PatcherDialog patcherDialog;
     protected JComponent editorComponent; // 编辑组件
     protected EditorDelegate delegate;    // 编辑代表
     protected int clickCountToStart = 1;
@@ -28,7 +31,8 @@ public class MyTableCellEditor extends AbstractCellEditor implements TableCellEd
         textField.addActionListener(delegate);
     }
 
-    public MyTableCellEditor(final JCheckBox checkBox) {
+    public MyTableCellEditor(PatcherDialog patcherDialog, final JCheckBox checkBox) {
+        this.patcherDialog = patcherDialog;
         editorComponent = checkBox;
         checkBox.setSelected(false);
         checkBox.setHorizontalAlignment(JCheckBox.CENTER);
@@ -125,9 +129,9 @@ public class MyTableCellEditor extends AbstractCellEditor implements TableCellEd
     }
 
     public Component getTreeCellEditorComponent(JTree tree, Object value,
-            boolean isSelected,
-            boolean expanded,
-            boolean leaf, int row) {
+                                                boolean isSelected,
+                                                boolean expanded,
+                                                boolean leaf, int row) {
         String stringValue = tree.convertValueToText(value, isSelected,
                 expanded, leaf, row, false);
 
@@ -137,8 +141,8 @@ public class MyTableCellEditor extends AbstractCellEditor implements TableCellEd
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value,
-            boolean isSelected,
-            int row, int column) {
+                                                 boolean isSelected,
+                                                 int row, int column) {
         delegate.setValue(value);
         return editorComponent;
     }
@@ -153,6 +157,7 @@ public class MyTableCellEditor extends AbstractCellEditor implements TableCellEd
         public Object getCellEditorValue() {
             return value;
         }
+
         public void setValue(Object value) {
             this.value = value;
         }
@@ -163,16 +168,20 @@ public class MyTableCellEditor extends AbstractCellEditor implements TableCellEd
             }
             return true;
         }
+
         public boolean shouldSelectCell(EventObject anEvent) {
             return true;
         }
+
         public boolean startCellEditing(EventObject anEvent) {
             return true;
         }
+
         public boolean stopCellEditing() {
             fireEditingStopped();
             return true;
         }
+
         public void cancelCellEditing() {
             fireEditingCanceled();
         }
@@ -181,6 +190,7 @@ public class MyTableCellEditor extends AbstractCellEditor implements TableCellEd
         public void actionPerformed(ActionEvent e) {
             MyTableCellEditor.this.stopCellEditing();
         }
+
         @Override
         public void itemStateChanged(ItemEvent e) {
             MyTableCellEditor.this.stopCellEditing();

@@ -22,6 +22,10 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.*;
 import com.intellij.ui.table.JBTable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +37,8 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -54,6 +60,7 @@ import java.util.stream.Collectors;
  * @Param
  * @return
  */
+@Data
 public class PatcherDialog
         extends DialogWrapper {
     //全局标识， 是否有导出任务未处理完
@@ -327,6 +334,8 @@ public class PatcherDialog
             updateSelectFileTable();
             selectTable = new JBTable(defaultTableModel);
             selectTable.setBorder(LineBorder.createBlackLineBorder());
+            selectTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            selectTable.addMouseListener(new MySelectFileTableMouseAdpaterImpl(this));
             JScrollPane jScrollPane = new JBScrollPane(this.selectTable);
             jScrollPane.setAutoscrolls(true);
             jScrollPane.setBounds(x, y = y + height + 5, 770, 200);
@@ -334,7 +343,7 @@ public class PatcherDialog
             for (int i = 0; i < selectTable.getColumnCount(); i++) {
                 selectTable.getColumnModel().getColumn(i).setCellRenderer(new MyTableRenderer());
             }
-            selectTable.getColumnModel().getColumn(0).setCellEditor(new MyTableCellEditor(new JBCheckBox()));
+            selectTable.getColumnModel().getColumn(0).setCellEditor(new MyTableCellEditor(this, new JBCheckBox()));
             contentPane.add(jScrollPane);
 
             //设置点默认值
@@ -349,6 +358,66 @@ public class PatcherDialog
         }
 
         return this.contentPane;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class MySelectFileTableMouseAdpaterImpl extends MouseAdapter {
+        PatcherDialog patcherDialog;
+
+        @Override
+        public void mousePressed(MouseEvent me) {
+            if (SwingUtilities.isRightMouseButton(me)) {
+                final int row = patcherDialog.selectTable.rowAtPoint(me.getPoint());
+                System.out.println("row:" + row);
+                if (row != -1) {
+                    final int column = patcherDialog.selectTable.columnAtPoint(me.getPoint());
+
+                    final JPopupMenu popup = new JPopupMenu();
+                    JMenuItem selectAllOrNot = new JMenuItem("全选/全消");
+
+                    selectAllOrNot.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            //高亮选择指定的行
+                            List<SelectDTO> ds = patcherDialog.getSelectDtos();
+                            if (ds != null) {
+                                for (SelectDTO d : ds) {
+                                    d.setSelect(!d.isSelect());
+                                }
+                                patcherDialog.setSelectTableDatas(ds);
+                            }
+                            // patcherDialog.selectTable.setRowSelectionInterval(row, row);
+                        }
+                    });
+                    popup.add(selectAllOrNot);
+                    popup.add(new JSeparator());
+
+                    JMenuItem edit = new JMenuItem("编辑");
+                    popup.add(edit);
+                    edit.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            System.out.println("编辑");
+                            patcherDialog.selectTable.clearSelection(); //清除高亮选择状态
+                            patcherDialog.selectTable.editCellAt(row, column); //设置某列为可编辑
+                        }
+                    });
+
+                    JMenuItem calcel = new JMenuItem("删行");
+                    calcel.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            List<SelectDTO> ds = patcherDialog.getSelectDtos();
+                            if (ds != null && ds.size() > row) {
+                                ds.remove(row);
+                                patcherDialog.setSelectTableDatas(ds);
+                            }
+                        }
+                    });
+                    popup.add(new JSeparator());
+                    popup.add(calcel);
+                    popup.show(me.getComponent(), me.getX(), me.getY());
+                }
+            }
+        }
     }
 
     public void fitTableColumns(JTable myTable) {
@@ -370,33 +439,56 @@ public class PatcherDialog
                 width = Math.max(width, preferedWidth);
             }
             header.setResizingColumn(column); // 此行很重要
-            column.setWidth(width + myTable.getIntercellSpacing().width);
+            column.setWidth(width + myTable.getIntercellSpacing().width + 5);
         }
     }
 
     private void updateSelectFileTable() {
-        ArrayList<Vector> rows = Lists.newArrayList();
+        ArrayList<SelectDTO> rows = Lists.newArrayList();
         if (selectExport.isSelected()) {
             VirtualFile[] selects = LangDataKeys.VIRTUAL_FILE_ARRAY.getData(event.getDataContext());
             for (VirtualFile select : selects) {
-                Vector row = new Vector();
-                rows.add(row);
-                row.add(true);
-                row.add(select.getPath());
+                rows.add(SelectDTO.builder()
+                        .select(true)
+                        .path(select.getPath())
+                        .file(select)
+                        .build());
             }
         } else {
-            Vector row = new Vector();
-            rows.add(row);
-            row.add(true);
-            row.add("全部");
+            rows.add(SelectDTO.builder()
+                    .select(true)
+                    .path("全部")
+                    .build());
         }
+
+        setSelectTableDatas(rows);
+    }
+
+    @lombok.Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class SelectDTO {
+        @Builder.Default
+        boolean select = true;
+        String path;
+        VirtualFile file;
+    }
+
+    List<SelectDTO> selectDtos;
+
+    public void setSelectTableDatas(List<SelectDTO> rows) {
+        setSelectDtos(rows);
 
         while (defaultTableModel.getRowCount() > 0) {
             defaultTableModel.removeRow(0);
         }
 
-        for (Vector row : rows) {
-            defaultTableModel.addRow(row);
+        for (SelectDTO row : rows) {
+            Vector v = new Vector();
+            v.add(row.isSelect());
+            v.add(row.getPath());
+            defaultTableModel.addRow(v);
         }
 
         fitTableColumns(selectTable);

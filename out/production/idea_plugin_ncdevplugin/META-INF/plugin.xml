@@ -93,7 +93,7 @@
                 text="NC补丁模块转Jar文件" description="把一个NC补丁的模块文件夹  转换成Jar包">
         </action>
         <action id="nc5dev.info.exportBillAll" class="com.air.nc5dev.acion.ExportBillAllAction"
-                text="导出NC6X单据所有脚本(此功能不确定是否完善,暂不维护!)" description="导出NC6X单据所有SQL脚本(不确定这个是否导出完整)">
+                text="导出NC6X单据所有脚本(此功能不确定是否完善,暂不维护!请使用导出补丁弹框的IDEA强制连接数据库导出SQL功能)" description="导出NC6X单据所有SQL脚本(不确定这个是否导出完整)">
         </action>
         <action id="nc5dev.info.copyMateFile2NewFile" class="com.air.nc5dev.acion.CopyMateFile2NewFileAction"
                 text="复制元数据文件" description="把一个NC元数据文件复制成新的文件且重置里面的各种id等">
@@ -104,14 +104,14 @@
         <action id="nc5dev.info.ClearRemind" class="com.air.nc5dev.acion.ClearRemindAction"
                 text="清空定时提醒" description="清空定时提醒">
         </action>
-        <action id="nc5dev.export.openbmf" class="com.air.nc5dev.acion.EditBmfFileAction"
+        <!--<action id="nc5dev.export.openbmf" class="com.air.nc5dev.acion.EditBmfFileAction"
                 text="编辑元数据" description="打开NC元数据文件">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="before" relative-to-action="CutCopyPasteGroup"/>
         </action>
         <action id="nc5dev.export.addwsdl" class="com.air.nc5dev.acion.NewWsdlFilesAction"
                 text="新增WSDL接口" description="新增WSDL接口">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="before" relative-to-action="CutCopyPasteGroup"/>
-        </action>
+        </action>-->
         <action id="SonarLint.toolwindow.Cancel"
                 class="com.air.nc5dev.acion.LogCleanConsoleAction"
                 text="清空NC插件日志窗口内容"
