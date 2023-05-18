@@ -17,6 +17,7 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -44,10 +45,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /***
@@ -443,11 +444,20 @@ public class PatcherDialog
         }
     }
 
+    public static Map<Project, List<VirtualFile>> FORCEADDSELECTFILES = new ConcurrentHashMap<>();
     private void updateSelectFileTable() {
         ArrayList<SelectDTO> rows = Lists.newArrayList();
         if (selectExport.isSelected()) {
             VirtualFile[] selects = LangDataKeys.VIRTUAL_FILE_ARRAY.getData(event.getDataContext());
+            List<VirtualFile> vs = FORCEADDSELECTFILES.getOrDefault(event.getProject(), new CopyOnWriteArrayList<>());
             for (VirtualFile select : selects) {
+                rows.add(SelectDTO.builder()
+                        .select(true)
+                        .path(select.getPath())
+                        .file(select)
+                        .build());
+            }
+            for (VirtualFile select : vs) {
                 rows.add(SelectDTO.builder()
                         .select(true)
                         .path(select.getPath())
