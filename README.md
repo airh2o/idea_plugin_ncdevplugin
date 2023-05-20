@@ -19,13 +19,15 @@
 
 ![补丁导出界面](readme/imgs/3.png "补丁导出界面")
 
-![日志窗口](https://s1.ax1x.com/2020/11/11/BjAgvn.png "日志窗口")
-
 ![NC代码规范检查](readme/imgs/4.png "NC代码规范检查")
+
+![编辑文件右键菜单](readme/imgs/5.png "编辑文件右键菜单")
 
 ![重置密码](https://s1.ax1x.com/2020/11/11/BjAWD0.png "重置密码")
 
 ![数据库连接生成](https://s1.ax1x.com/2020/11/11/BjA4ET.png "数据库连接生成")
+
+![日志窗口](https://s1.ax1x.com/2020/11/11/BjAgvn.png "日志窗口")
 
 # 使用方式
 

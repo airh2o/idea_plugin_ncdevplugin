@@ -88,14 +88,23 @@ public class ExportContentVO {
     public List<String> selectFiles = Lists.newArrayList();
 
     public boolean exportResources = true;
+    public boolean exportModules = true;
     public boolean exportSql = true;
     public boolean onleyFullSql = true;
-
+    public boolean saveConfig = true;
     public String name;
+    /**
+     * 是否强制不压缩成jar文件
+     */
+    public boolean no2Jar = false;
+    public boolean exportHotwebsClass = true;
+    /**
+     * 前端源码项目路径
+     */
+    public String hotwebsResourcePath;
 
     public ExportContentVO copyBaseInfo() {
         ExportContentVO c = new ExportContentVO();
-        c.filtersql = filtersql;
         c.filtersql = filtersql;
         c.rebuildsql = rebuildsql;
         c.reWriteSourceFile = reWriteSourceFile;
@@ -108,9 +117,17 @@ public class ExportContentVO {
         c.selectExport = selectExport;
         c.selectFiles = selectFiles;
         c.exportResources = exportResources;
+        c.exportHotwebsClass = exportHotwebsClass;
         c.exportSql = exportSql;
         c.onleyFullSql = onleyFullSql;
         c.name = name;
+        c.exportModules = exportModules;
+        c.module2ExportConfigVoMap = null;
+        c.ignoreModules = null;
+        c.moduleHomeDir2ModuleMap = null;
+        c.selectFile2ModuleMap = null;
+        c.selectModules = null;
+        c.no2Jar = no2Jar;
         return c;
     }
 

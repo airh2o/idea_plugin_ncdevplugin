@@ -328,6 +328,11 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
         StringBuilder sb = new StringBuilder(500);
         for (String s : ss) {
             sb.append(s);
+
+            if (!s.endsWith("\n")) {
+                sb.append('\n');
+            }
+
         }
         return sb.toString();
     }

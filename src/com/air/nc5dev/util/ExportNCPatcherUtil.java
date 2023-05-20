@@ -2,6 +2,7 @@ package com.air.nc5dev.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.LogUtil;
@@ -71,18 +72,27 @@ public class ExportNCPatcherUtil {
     public static String javapCommandPath = null;
 
     public static void saveConfig(Project pro, ExportContentVO contentVO) {
-        ExportContentVO c = contentVO.copyBaseInfo();
-        FileUtil.writeUtf8String(JSON.toJSONString(c), new File(new File(pro.getBasePath(), ".idea"),
-                "ExportContentVO.json"));
+        try {
+            ExportContentVO c = contentVO.copyBaseInfo();
+            FileUtil.writeUtf8String(JSON.toJSONString(c), new File(new File(pro.getBasePath(), ".idea"),
+                    "ExportContentVO.json"));
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     public static ExportContentVO readConfig(Project pro) {
-        String str = FileUtil.readUtf8String(new File(new File(pro.getBasePath(), ".idea")
-                , "ExportContentVO.json"));
-        if (StrUtil.isBlank(str)) {
+        try {
+            String str = FileUtil.readUtf8String(new File(new File(pro.getBasePath(), ".idea")
+                    , "ExportContentVO.json"));
+            if (StrUtil.isBlank(str)) {
+                return null;
+            }
+            return JSON.parseObject(str, ExportContentVO.class);
+        } catch (Throwable e) {
+            e.printStackTrace();
             return null;
         }
-        return JSON.parseObject(str, ExportContentVO.class);
     }
 
     /**
@@ -113,6 +123,8 @@ public class ExportNCPatcherUtil {
         //排除配置文件里设置的 不需要的模块
         contentVO.moduleHomeDir2ModuleMap.forEach((path, module) -> {
             ExportConfigVO configVO = loadExportConfig(path, module);
+
+            configVO.toJar = configVO.toJar && !contentVO.no2Jar;
             contentVO.module2ExportConfigVoMap.put(module, configVO);
 
             if (configVO.ignoreModule) {
@@ -257,6 +269,11 @@ public class ExportNCPatcherUtil {
             }
         }
 
+        //处理NCC特殊的模块补丁结构  这里针对是 某些文件指定的模块路径没有新建idea模块，这里处理下这种
+        if (NcVersionEnum.NCC.equals(contentVO.ncVersion)) {
+            processNCCPatchersWhenFinashLeft(contentVO);
+        }
+
         if (contentVO.isFormat4Ygj()) {
             //转换云管家格式！
             toYgjFormatExportStract(contentVO);
@@ -264,6 +281,97 @@ public class ExportNCPatcherUtil {
 
         if (contentVO.isReWriteSourceFile()) {
             reWriteSourceFile(contentVO);
+        }
+
+        if (!contentVO.exportModules) {
+            //不导出 modules~！
+            File dir = new File(contentVO.getOutPath());
+            if (contentVO.isFormat4Ygj()) {
+                dir = new File(dir, "replacement");
+                dir = new File(dir, "modules");
+            }
+
+            FileUtil.del(dir);
+        }
+
+        if (!contentVO.exportResources) {
+            //不导出 resources ~！
+            File dir = new File(contentVO.getOutPath());
+            if (contentVO.isFormat4Ygj()) {
+                dir = new File(dir, "replacement");
+                dir = new File(dir, "hotwebs");
+                dir = new File(dir, "nccloud");
+                dir = new File(dir, "resources");
+            }
+
+            FileUtil.del(dir);
+        }
+
+        if (!contentVO.exportHotwebsClass) {
+            //不导出 前端代码 ~！
+            File dir = new File(contentVO.getOutPath());
+            if (contentVO.isFormat4Ygj()) {
+                dir = new File(dir, "replacement");
+                dir = new File(dir, "hotwebs");
+                dir = new File(dir, "nccloud");
+                dir = new File(dir, "WEB-INF");
+            }
+
+            FileUtil.del(dir);
+        }
+    }
+
+    public static void processNCCPatchersWhenFinashLeft(ExportContentVO contentVO) {
+        File outTop = new File(contentVO.getOutPath());
+        if (contentVO.isFormat4Ygj()) {
+            outTop = new File(outTop, "replacement");
+        }
+        outTop = new File(outTop, "hotwebs");
+        outTop = new File(outTop, "nccloud");
+        outTop = new File(outTop, "WEB-INF");
+
+        File dir = new File(contentVO.getOutPath());
+        if (contentVO.isFormat4Ygj()) {
+            dir = new File(dir, "replacement");
+            dir = new File(dir, "modules");
+        }
+
+        File[] fs = dir.listFiles();
+        if (fs == null) {
+            return ;
+        }
+
+        for (File f : fs) {
+            if (!f.isDirectory()) {
+                continue;
+            }
+
+            File client = new File(f, "client");
+            if (!client.isDirectory()) {
+                continue;
+            }
+
+            File classes = new File(client, "classes");
+            if (classes.isDirectory()) {
+                File[] fs2 = classes.listFiles();
+                if (fs2 != null) {
+                    for (File f2 : fs2) {
+                        FileUtil.move(f2, new File(outTop, "classes"), true);
+                    }
+                }
+            }
+
+            File lib = new File(client, "lib");
+            if (lib.isDirectory()) {
+                File[] fs2 = lib.listFiles();
+                if (fs2 != null) {
+                    for (File f2 : fs2) {
+                        FileUtil.move(f2, new File(outTop, "lib"), true);
+                    }
+                }
+            }
+
+            FileUtil.del(client);
         }
     }
 
@@ -713,11 +821,6 @@ public class ExportNCPatcherUtil {
     private static void processNCCPatchersWhenFinash(@NotNull String ncType, @NotNull String exportDir
             , @NotNull Module module, @NotNull String sourceRoot
             , @NotNull String classDir, @Nullable String testClassDir, @NotNull ExportContentVO contentVO) {
-        //目前只有client包位置特殊
-        if (!NC_TYPE_CLIENT.equals(ncType)) {
-            return;
-        }
-
         File exportDirF = new File(exportDir);
         File[] fs = new File[]{new File(exportDir, module.getName())};
         if (fs == null) {
