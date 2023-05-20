@@ -91,6 +91,28 @@ public class ExportContentVO {
     public boolean exportSql = true;
     public boolean onleyFullSql = true;
 
+    public String name;
+
+    public ExportContentVO copyBaseInfo() {
+        ExportContentVO c = new ExportContentVO();
+        c.filtersql = filtersql;
+        c.filtersql = filtersql;
+        c.rebuildsql = rebuildsql;
+        c.reWriteSourceFile = reWriteSourceFile;
+        c.data_source_index = data_source_index;
+        c.ncVersion = ncVersion;
+        c.reNpmBuild = reNpmBuild;
+        c.format4Ygj = format4Ygj;
+        c.zip = zip;
+        c.deleteDir = deleteDir;
+        c.selectExport = selectExport;
+        c.selectFiles = selectFiles;
+        c.exportResources = exportResources;
+        c.exportSql = exportSql;
+        c.onleyFullSql = onleyFullSql;
+        c.name = name;
+        return c;
+    }
 
     public void init() {
         if (isSelectExport()) {

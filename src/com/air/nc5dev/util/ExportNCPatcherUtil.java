@@ -2,6 +2,7 @@ package com.air.nc5dev.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
@@ -10,10 +11,12 @@ import com.air.nc5dev.vo.ExportConfigVO;
 import com.air.nc5dev.vo.ExportContentVO;
 import com.air.nc5dev.vo.ItemsItemVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
+import com.alibaba.fastjson.JSON;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -66,6 +69,21 @@ public class ExportNCPatcherUtil {
     public static final String NC_TYPE_TEST = "test";
 
     public static String javapCommandPath = null;
+
+    public static void saveConfig(Project pro, ExportContentVO contentVO) {
+        ExportContentVO c = contentVO.copyBaseInfo();
+        FileUtil.writeUtf8String(JSON.toJSONString(c), new File(new File(pro.getBasePath(), ".idea"),
+                "ExportContentVO.json"));
+    }
+
+    public static ExportContentVO readConfig(Project pro) {
+        String str = FileUtil.readUtf8String(new File(new File(pro.getBasePath(), ".idea")
+                , "ExportContentVO.json"));
+        if (StrUtil.isBlank(str)) {
+            return null;
+        }
+        return JSON.parseObject(str, ExportContentVO.class);
+    }
 
     /**
      * 导出补丁到指定的文件夹   </br>
@@ -355,7 +373,7 @@ public class ExportNCPatcherUtil {
         try {
             new AutoGenerPathcherInfo4YunGuanJiaUtil().run(
                     base.getPath()
-                    , base.getName()
+                    , StringUtil.get(contentVO.getName(), base.getName())
                     , NcVersionEnum.NCC.equals(contentVO.getNcVersion())
                     , contentVO
             );
@@ -501,7 +519,7 @@ public class ExportNCPatcherUtil {
                     if (f.getName().equals(sqlOne.getName())) {
                         continue;
                     }
-                   FileUtil.del(f);
+                    FileUtil.del(f);
                 }
             }
         } catch (SQLException e) {

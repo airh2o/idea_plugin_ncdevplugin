@@ -83,6 +83,7 @@ public class PatcherDialog
     JBCheckBox reWriteSourceFile;
     JBCheckBox zip;
     JBCheckBox selectExport;
+    JBCheckBox selectExport2;
     JBTable selectTable;
     DefaultTableModel defaultTableModel;
 
@@ -103,262 +104,302 @@ public class PatcherDialog
     @Override
     protected JComponent createCenterPanel() {
         if (contentPane == null) {
-            int x = 21;
-            int y = 16;
-            int height = 30;
-            int width = 600;
-
-            contentPane = //new JBPanel();
-                    new JBScrollPane();
-            contentPane.setLayout(null);
-            contentPane.setAutoscrolls(true);
-            JLabel label = new JBLabel("补丁名称:");
-            label.setBounds(x, y, 82, height);
-            contentPane.add(label);
-            textField_saveName = new JBTextField();
-            textField_saveName.setBounds(117, 14, 462, height);
-            contentPane.add(textField_saveName);
-            textField_saveName.setColumns(10);
-
-            JLabel label_1 = new JBLabel("导出位置:");
-            label_1.setBounds(x, 50, 82, height);
-            contentPane.add(label_1);
-            textField_savePath = new JBTextField();
-            textField_savePath.setColumns(10);
-            textField_savePath.setBounds(117, y = y + height + 5, 462, height);
-            contentPane.add(textField_savePath);
-            JButton button_selectSavePath = new JButton("选择路径");
-            button_selectSavePath.setBounds(583, 50, 113, height);
-            button_selectSavePath.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    String userDir = System.getProperty("user.home");
-                    JFileChooser fileChooser = new JFileChooser(userDir);
-                    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                    int flag = fileChooser.showOpenDialog(null);
-                    if (flag == JFileChooser.APPROVE_OPTION) {
-                        textField_savePath.setText(fileChooser.getSelectedFile().getAbsolutePath());
-                    }
-                }
-            });
-            contentPane.add(button_selectSavePath);
-
-            JLabel label_3 = new JBLabel("汇总SQL文件时 过滤重复SQL:");
-            contentPane.add(label_3);
-            filtersql = new JBCheckBox();
-            filtersql.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("filtersql", "true")));
-            JBPanel panel1 = new JBPanel();
-            //  panel1.setBorder(LineBorder.createGrayLineBorder());
-            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
-            panel1.setBounds(x, y = y + height + 5, width, height);
-            panel1.add(label_3);
-            panel1.add(filtersql);
-            contentPane.add(panel1);
-
-            JLabel label_2 = new JBLabel("是否导出SQL:");
-            exportSql = new JBCheckBox();
-            exportSql.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("exportSql", "true")));
-            JBPanel panel2 = new JBPanel();
-            //panel2.setBorder(LineBorder.createGrayLineBorder());
-            panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-            panel2.setBounds(x, y = y + height + 5, width, height);
-            panel2.add(label_2);
-            panel2.add(exportSql);
-            contentPane.add(panel2);
-
-            label_2 = new JBLabel("是否只保留全量sql单个文件:");
-            onleyFullSql = new JBCheckBox();
-            onleyFullSql.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("onleyFullSql", "true")));
-            panel2 = new JBPanel();
-            //panel2.setBorder(LineBorder.createGrayLineBorder());
-            panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-            panel2.setBounds(x, y = y + height + 5, width, height);
-            panel2.add(label_2);
-            panel2.add(onleyFullSql);
-            contentPane.add(panel2);
-
-            label_2 = new JBLabel("强制IDEA连接数据库导出SQL:");
-            rebuild = new JBCheckBox();
-            rebuild.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("rebuildsql", "false")));
-            panel2 = new JBPanel();
-            //panel2.setBorder(LineBorder.createGrayLineBorder());
-            panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-            panel2.setBounds(x, y = y + height + 5, width, height);
-            panel2.add(label_2);
-            panel2.add(rebuild);
-            contentPane.add(panel2);
-
-            JLabel label_4 = new JBLabel("强制IDEA连接数据库导出SQL使用NC配置的数据源第几个(0开始):");
-            List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS();
-            dataSourceIndex = new JComboBox(new Vector(
-                    dataSourceVOS.stream()
-                            .map(v -> v.getDataSourceName() + '/' + v.getUser())
-                            .collect(Collectors.toList())
-            ));
-            dataSourceIndex.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue("data_source_index"), 0));
-            contentPane.add(dataSourceIndex);
-            JButton button_TestDb = new JButton("测试连接");
-            button_TestDb.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    Integer i = dataSourceIndex.getSelectedIndex();
-                    NCDataSourceVO ds = NCPropXmlUtil.get(i);
-                    if (ds == null) {
-                        Messages.showErrorDialog(event.getProject(), "数据源索引不存在: " + i + " ,数据源数量: "
-                                        + (NCPropXmlUtil.getDataSourceVOS() == null ? 0 :
-                                        NCPropXmlUtil.getDataSourceVOS().size())
-                                , "错误:");
-                        return;
-                    }
-                    Connection conn = null;
-                    try {
-                        conn = ConnectionUtil.getConn(ds);
-                        Messages.showInfoMessage(event.getProject(), JSON.toJSONString(ds, true), "恭喜!测试成功:");
-                    } catch (Throwable ex) {
-                        ex.printStackTrace();
-                        Messages.showErrorDialog(event.getProject(), "连接失败: " + JSON.toJSONString(ds, true)
-                                + " !错误原因:\n" + ExceptionUtil.toStringLines(ex, 5), "错误");
-                    } finally {
-                        IoUtil.close(conn);
-                    }
-                }
-            });
-            JBPanel panel3 = new JBPanel();
-            //  panel3.setBorder(LineBorder.createGrayLineBorder());
-            panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
-            panel3.setBounds(x, y = y + height + 5, width, height);
-            panel3.add(label_4);
-            panel3.add(dataSourceIndex);
-            panel3.add(button_TestDb);
-            contentPane.add(panel3);
-
-            JLabel label_5 = new JBLabel("强制指定导出使用的NC版本:");
-            ncVersion = new JComboBox<NcVersionEnum>(NcVersionEnum.values());
-            ncVersion.setSelectedItem(ProjectNCConfigUtil.getNCVerSIon());
-            JBPanel panel4 = new JBPanel();
-            //  panel4.setBorder(LineBorder.createGrayLineBorder());
-            panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
-            panel4.setBounds(x, y = y + height + 5, width, height);
-            panel4.add(label_5);
-            panel4.add(ncVersion);
-            contentPane.add(panel4);
-
-            JLabel label_6 = new JBLabel("是否导出前端资源(resources):");
-            exportResources = new JBCheckBox();
-            exportResources.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("exportResources",
-                    "true")));
-            JBPanel panel5 = new JBPanel();
-            //  panel5.setBorder(LineBorder.createGrayLineBorder());
-            panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
-            panel5.setBounds(x, y = y + height + 5, width, height);
-            panel5.add(label_6);
-            panel5.add(exportResources);
-            contentPane.add(panel5);
-
-            label_6 = new JBLabel("自动删除hotwebs的dist后执行npm run build:");
-            reNpmBuild = new JBCheckBox();
-            reNpmBuild.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("reNpmBuild", "true")));
-            panel5 = new JBPanel();
-            //  panel5.setBorder(LineBorder.createGrayLineBorder());
-            panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
-            panel5.setBounds(x, y = y + height + 5, width, height);
-            panel5.add(label_6);
-            panel5.add(reNpmBuild);
-            contentPane.add(panel5);
-
-            JLabel label_7 = new JBLabel("导出云管家格式:");
-            format4Ygj = new JBCheckBox();
-            format4Ygj.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("format4Ygj", "true")));
-            JBPanel panel6 = new JBPanel();
-            //  panel6.setBorder(LineBorder.createGrayLineBorder());
-            panel6.setLayout(new BoxLayout(panel6, BoxLayout.X_AXIS));
-            panel6.setBounds(x, y = y + height + 5, width, height);
-            panel6.add(label_7);
-            panel6.add(format4Ygj);
-            contentPane.add(panel6);
-
-            JLabel label_13 = new JBLabel("生成zip压缩文件:");
-            zip = new JBCheckBox();
-            zip.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("zip", "true")));
-            JBPanel panel13 = new JBPanel();
-            //  panel6.setBorder(LineBorder.createGrayLineBorder());
-            panel13.setLayout(new BoxLayout(panel13, BoxLayout.X_AXIS));
-            panel13.setBounds(x, y = y + height + 5, width, height);
-            panel13.add(label_13);
-            panel13.add(zip);
-            contentPane.add(panel13);
-
-            JLabel label_12 = new JBLabel("是否只保留zip文件(删除补丁文件夹):");
-            deleteDir = new JBCheckBox();
-            deleteDir.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("deleteDir", "true")));
-            deleteDir.addActionListener(ev -> {
-                if (deleteDir.isSelected()) {
-                    zip.setSelected(true);
-                }
-            });
-            JBPanel panel12 = new JBPanel();
-            //  panel6.setBorder(LineBorder.createGrayLineBorder());
-            panel12.setLayout(new BoxLayout(panel12, BoxLayout.X_AXIS));
-            panel12.setBounds(x, y = y + height + 5, width, height);
-            panel12.add(label_12);
-            panel12.add(deleteDir);
-            contentPane.add(panel12);
-
-            JLabel label_10 = new JBLabel("混淆覆写导出的源码文件内容(java文件和js源码:__SOURCE__CODE__):");
-            reWriteSourceFile = new JBCheckBox();
-            reWriteSourceFile.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue(
-                    "reWriteSourceFile", "false")));
-            JBPanel panel7 = new JBPanel();
-            //  panel7.setBorder(LineBorder.createGrayLineBorder());
-            panel7.setLayout(new BoxLayout(panel7, BoxLayout.X_AXIS));
-            panel7.setBounds(x, y = y + height + 5, width, height);
-            panel7.add(label_10);
-            panel7.add(reWriteSourceFile);
-            contentPane.add(panel7);
-
-            JLabel label_8 = new JBLabel("只导出选中的模块或文件:");
-            selectExport = new JBCheckBox();
-            this.selectExport.setSelected(ExportContentVO.EVENT_POPUP_CLICK.equals(event.getPlace()));
-            this.selectExport.addChangeListener((e) -> updateSelectFileTable());
-            JBPanel panel10 = new JBPanel();
-            panel10.setLayout(new BoxLayout(panel10, BoxLayout.X_AXIS));
-            panel10.setBounds(x, y = y + height + 5, 500, height);
-            panel10.add(label_8);
-            panel10.add(selectExport);
-            contentPane.add(panel10);
-
-            JLabel label_9 = new JBLabel("当前选中的要导出的内容:");
-            label_9.setBounds(x, y = y + height + 5, 280, height);
-            contentPane.add(label_9);
-            Vector heads = new Vector();
-            heads.add("选择");
-            heads.add("路径");
-            defaultTableModel = new DefaultTableModel(heads, 0);
-            updateSelectFileTable();
-            selectTable = new JBTable(defaultTableModel);
-            selectTable.setBorder(LineBorder.createBlackLineBorder());
-            selectTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            selectTable.addMouseListener(new MySelectFileTableMouseAdpaterImpl(this));
-            JScrollPane jScrollPane = new JBScrollPane(this.selectTable);
-            jScrollPane.setAutoscrolls(true);
-            jScrollPane.setBounds(x, y = y + height + 5, 770, 200);
-            // 对每一列设置单元格渲染器
-            for (int i = 0; i < selectTable.getColumnCount(); i++) {
-                selectTable.getColumnModel().getColumn(i).setCellRenderer(new MyTableRenderer());
-            }
-            selectTable.getColumnModel().getColumn(0).setCellEditor(new MyTableCellEditor(this, new JBCheckBox()));
-            contentPane.add(jScrollPane);
-
-            //设置点默认值
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
-            this.textField_saveName.setText("modules");
-            this.textField_savePath.setText(ProjectUtil.getDefaultProject().getBasePath()
-                    + File.separatorChar + "patchers"
-                    + File.separatorChar + "patcher-" + event.getProject().getName() + "-" + LocalDateTime.now().format(formatter)
-            );
-
-            contentPane.setPreferredSize(new Dimension(width + 40, y + 10));
+            contentPaneInit();
         }
 
         return this.contentPane;
+    }
+
+    private void contentPaneInit() {
+        int x = 21;
+        int y = 16;
+        int height = 30;
+        int width = 600;
+
+
+        JBPanel jp = new JBPanel();
+        jp.setLayout(null);
+
+        contentPane = new JBScrollPane(jp);
+        contentPane.setAutoscrolls(true);
+
+        JBScrollPane jbxx = new JBScrollPane(jp);
+        jbxx.setAutoscrolls(true);
+
+        JBScrollPane qd = new JBScrollPane(jp);
+        qd.setAutoscrolls(true);
+
+        JBScrollPane hd = new JBScrollPane(jp);
+        hd.setAutoscrolls(true);
+
+        JBScrollPane jg = new JBScrollPane(jp);
+        jg.setAutoscrolls(true);
+
+        JBScrollPane xx = new JBScrollPane(jp);
+        xx.setAutoscrolls(true);
+
+        JBTabbedPane jtab = new JBTabbedPane();
+        jtab.addTab("基本信息", jbxx);
+        jtab.addTab("前端补丁", qd);
+        jtab.addTab("后端补丁", hd);
+        jtab.addTab("补丁结构", jg);
+        jtab.addTab("补丁信息", xx);
+
+        JLabel label = new JBLabel("补丁名称:");
+        label.setBounds(x, y, 82, height);
+        jp.add(label);
+        textField_saveName = new JBTextField();
+        textField_saveName.setBounds(117, 14, 462, height);
+        jp.add(textField_saveName);
+        textField_saveName.setColumns(10);
+
+        JLabel label_1 = new JBLabel("导出位置:");
+        label_1.setBounds(x, 50, 82, height);
+        jp.add(label_1);
+        textField_savePath = new JBTextField();
+        textField_savePath.setColumns(10);
+        textField_savePath.setBounds(117, y = y + height + 5, 462, height);
+        jp.add(textField_savePath);
+        JButton button_selectSavePath = new JButton("选择路径");
+        button_selectSavePath.setBounds(583, 50, 113, height);
+        button_selectSavePath.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String userDir = System.getProperty("user.home");
+                JFileChooser fileChooser = new JFileChooser(userDir);
+                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                int flag = fileChooser.showOpenDialog(null);
+                if (flag == JFileChooser.APPROVE_OPTION) {
+                    textField_savePath.setText(fileChooser.getSelectedFile().getAbsolutePath());
+                }
+            }
+        });
+        jp.add(button_selectSavePath);
+
+        JLabel label_3 = new JBLabel("汇总SQL文件时 过滤重复SQL:");
+        jp.add(label_3);
+        filtersql = new JBCheckBox();
+        filtersql.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("filtersql", "true")));
+        JBPanel panel1 = new JBPanel();
+        //  panel1.setBorder(LineBorder.createGrayLineBorder());
+        panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+        panel1.setBounds(x, y = y + height + 5, width, height);
+        panel1.add(label_3);
+        panel1.add(filtersql);
+        jp.add(panel1);
+
+        JLabel label_2 = new JBLabel("是否导出SQL:");
+        exportSql = new JBCheckBox();
+        exportSql.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("exportSql", "true")));
+        JBPanel panel2 = new JBPanel();
+        //panel2.setBorder(LineBorder.createGrayLineBorder());
+        panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+        panel2.setBounds(x, y = y + height + 5, width, height);
+        panel2.add(label_2);
+        panel2.add(exportSql);
+        jp.add(panel2);
+
+        label_2 = new JBLabel("是否只保留全量sql单个文件:");
+        onleyFullSql = new JBCheckBox();
+        onleyFullSql.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("onleyFullSql", "true")));
+        panel2 = new JBPanel();
+        //panel2.setBorder(LineBorder.createGrayLineBorder());
+        panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+        panel2.setBounds(x, y = y + height + 5, width, height);
+        panel2.add(label_2);
+        panel2.add(onleyFullSql);
+        jp.add(panel2);
+
+        label_2 = new JBLabel("强制IDEA连接数据库导出SQL:");
+        rebuild = new JBCheckBox();
+        rebuild.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("rebuildsql", "false")));
+        panel2 = new JBPanel();
+        //panel2.setBorder(LineBorder.createGrayLineBorder());
+        panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+        panel2.setBounds(x, y = y + height + 5, width, height);
+        panel2.add(label_2);
+        panel2.add(rebuild);
+        jp.add(panel2);
+
+        JLabel label_4 = new JBLabel("强制IDEA连接数据库导出SQL使用NC配置的数据源第几个(0开始):");
+        List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS();
+        dataSourceIndex = new JComboBox(new Vector(
+                dataSourceVOS.stream()
+                        .map(v -> v.getDataSourceName() + '/' + v.getUser())
+                        .collect(Collectors.toList())
+        ));
+        dataSourceIndex.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue("data_source_index"), 0));
+        jp.add(dataSourceIndex);
+        JButton button_TestDb = new JButton("测试连接");
+        button_TestDb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Integer i = dataSourceIndex.getSelectedIndex();
+                NCDataSourceVO ds = NCPropXmlUtil.get(i);
+                if (ds == null) {
+                    Messages.showErrorDialog(event.getProject(), "数据源索引不存在: " + i + " ,数据源数量: "
+                                    + (NCPropXmlUtil.getDataSourceVOS() == null ? 0 :
+                                    NCPropXmlUtil.getDataSourceVOS().size())
+                            , "错误:");
+                    return;
+                }
+                Connection conn = null;
+                try {
+                    conn = ConnectionUtil.getConn(ds);
+                    Messages.showInfoMessage(event.getProject(), JSON.toJSONString(ds, true), "恭喜!测试成功:");
+                } catch (Throwable ex) {
+                    ex.printStackTrace();
+                    Messages.showErrorDialog(event.getProject(), "连接失败: " + JSON.toJSONString(ds, true)
+                            + " !错误原因:\n" + ExceptionUtil.toStringLines(ex, 5), "错误");
+                } finally {
+                    IoUtil.close(conn);
+                }
+            }
+        });
+        JBPanel panel3 = new JBPanel();
+        //  panel3.setBorder(LineBorder.createGrayLineBorder());
+        panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
+        panel3.setBounds(x, y = y + height + 5, width, height);
+        panel3.add(label_4);
+        panel3.add(dataSourceIndex);
+        panel3.add(button_TestDb);
+        jp.add(panel3);
+
+        JLabel label_5 = new JBLabel("强制指定导出使用的NC版本:");
+        ncVersion = new JComboBox<NcVersionEnum>(NcVersionEnum.values());
+        ncVersion.setSelectedItem(ProjectNCConfigUtil.getNCVerSIon());
+        JBPanel panel4 = new JBPanel();
+        //  panel4.setBorder(LineBorder.createGrayLineBorder());
+        panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
+        panel4.setBounds(x, y = y + height + 5, width, height);
+        panel4.add(label_5);
+        panel4.add(ncVersion);
+        jp.add(panel4);
+
+        JLabel label_6 = new JBLabel("是否导出前端资源(resources):");
+        exportResources = new JBCheckBox();
+        exportResources.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("exportResources",
+                "true")));
+        JBPanel panel5 = new JBPanel();
+        //  panel5.setBorder(LineBorder.createGrayLineBorder());
+        panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
+        panel5.setBounds(x, y = y + height + 5, width, height);
+        panel5.add(label_6);
+        panel5.add(exportResources);
+        jp.add(panel5);
+
+        label_6 = new JBLabel("自动删除hotwebs的dist后执行npm run build:");
+        reNpmBuild = new JBCheckBox();
+        reNpmBuild.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("reNpmBuild", "true")));
+        panel5 = new JBPanel();
+        //  panel5.setBorder(LineBorder.createGrayLineBorder());
+        panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
+        panel5.setBounds(x, y = y + height + 5, width, height);
+        panel5.add(label_6);
+        panel5.add(reNpmBuild);
+        jp.add(panel5);
+
+        JLabel label_7 = new JBLabel("导出云管家格式:");
+        format4Ygj = new JBCheckBox();
+        format4Ygj.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("format4Ygj", "true")));
+        JBPanel panel6 = new JBPanel();
+        //  panel6.setBorder(LineBorder.createGrayLineBorder());
+        panel6.setLayout(new BoxLayout(panel6, BoxLayout.X_AXIS));
+        panel6.setBounds(x, y = y + height + 5, width, height);
+        panel6.add(label_7);
+        panel6.add(format4Ygj);
+        jp.add(panel6);
+
+        JLabel label_13 = new JBLabel("生成zip压缩文件:");
+        zip = new JBCheckBox();
+        zip.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("zip", "true")));
+        JBPanel panel13 = new JBPanel();
+        //  panel6.setBorder(LineBorder.createGrayLineBorder());
+        panel13.setLayout(new BoxLayout(panel13, BoxLayout.X_AXIS));
+        panel13.setBounds(x, y = y + height + 5, width, height);
+        panel13.add(label_13);
+        panel13.add(zip);
+        jp.add(panel13);
+
+        JLabel label_12 = new JBLabel("是否只保留zip文件(删除补丁文件夹):");
+        deleteDir = new JBCheckBox();
+        deleteDir.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("deleteDir", "true")));
+        deleteDir.addActionListener(ev -> {
+            if (deleteDir.isSelected()) {
+                zip.setSelected(true);
+            }
+        });
+        JBPanel panel12 = new JBPanel();
+        //  panel6.setBorder(LineBorder.createGrayLineBorder());
+        panel12.setLayout(new BoxLayout(panel12, BoxLayout.X_AXIS));
+        panel12.setBounds(x, y = y + height + 5, width, height);
+        panel12.add(label_12);
+        panel12.add(deleteDir);
+        jp.add(panel12);
+
+        JLabel label_10 = new JBLabel("混淆覆写导出的源码文件内容(java文件和js源码:__SOURCE__CODE__):");
+        reWriteSourceFile = new JBCheckBox();
+        reWriteSourceFile.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue(
+                "reWriteSourceFile", "false")));
+        JBPanel panel7 = new JBPanel();
+        //  panel7.setBorder(LineBorder.createGrayLineBorder());
+        panel7.setLayout(new BoxLayout(panel7, BoxLayout.X_AXIS));
+        panel7.setBounds(x, y = y + height + 5, width, height);
+        panel7.add(label_10);
+        panel7.add(reWriteSourceFile);
+        jp.add(panel7);
+
+        JLabel label_8 = new JBLabel("只导出选中的模块或文件:");
+        selectExport = new JBCheckBox();
+        this.selectExport.setSelected(ExportContentVO.EVENT_POPUP_CLICK.equals(event.getPlace()));
+        this.selectExport.addItemListener((e) -> updateSelectFileTable());
+        JBPanel panel10 = new JBPanel();
+        panel10.setLayout(new BoxLayout(panel10, BoxLayout.X_AXIS));
+        panel10.setBounds(x, y = y + height + 5, 200, height);
+        panel10.add(label_8);
+        panel10.add(selectExport);
+        jp.add(panel10);
+
+        label_8 = new JBLabel("只导出右键选择的只导出的文件:");
+        selectExport2 = new JBCheckBox();
+        selectExport2.setSelected(ExportContentVO.EVENT_POPUP_CLICK.equals(event.getPlace()));
+        selectExport2.addItemListener((e) -> updateSelectFileTable2());
+        panel10 = new JBPanel();
+        panel10.setLayout(new BoxLayout(panel10, BoxLayout.X_AXIS));
+        panel10.setBounds(x + 210, y, 200, height);
+        panel10.add(label_8);
+        panel10.add(selectExport2);
+        jp.add(panel10);
+
+        JLabel label_9 = new JBLabel("当前选中的要导出的内容:");
+        label_9.setBounds(x, y = y + height + 5, 280, height);
+        jp.add(label_9);
+        Vector heads = new Vector();
+        heads.add("选择");
+        heads.add("路径");
+        defaultTableModel = new DefaultTableModel(heads, 0);
+        updateSelectFileTable();
+        selectTable = new JBTable(defaultTableModel);
+        selectTable.setBorder(LineBorder.createBlackLineBorder());
+        selectTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        selectTable.addMouseListener(new MySelectFileTableMouseAdpaterImpl(this));
+        //  JScrollPane jScrollPane = new JBScrollPane(selectTable);
+        // jScrollPane.setAutoscrolls(true);
+        selectTable.setBounds(x, y = y + height + 5, 770, 200);
+        // 对每一列设置单元格渲染器
+        for (int i = 0; i < selectTable.getColumnCount(); i++) {
+            selectTable.getColumnModel().getColumn(i).setCellRenderer(new MyTableRenderer());
+        }
+        selectTable.getColumnModel().getColumn(0).setCellEditor(new MyTableCellEditor(this, new JBCheckBox()));
+        jp.add(selectTable);
+
+        //设置点默认值
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
+        this.textField_saveName.setText("modules");
+        this.textField_savePath.setText(ProjectUtil.getDefaultProject().getBasePath()
+                + File.separatorChar + "patchers"
+                + File.separatorChar + "patcher-" + event.getProject().getName() + "-" + LocalDateTime.now().format(formatter)
+        );
+
+        jp.setPreferredSize(new Dimension(width + 40, y + 10));
     }
 
     @Data
@@ -445,8 +486,10 @@ public class PatcherDialog
     }
 
     public static Map<Project, List<VirtualFile>> FORCEADDSELECTFILES = new ConcurrentHashMap<>();
+
     private void updateSelectFileTable() {
         ArrayList<SelectDTO> rows = Lists.newArrayList();
+        selectExport2.setSelected(false);
         if (selectExport.isSelected()) {
             VirtualFile[] selects = LangDataKeys.VIRTUAL_FILE_ARRAY.getData(event.getDataContext());
             List<VirtualFile> vs = FORCEADDSELECTFILES.getOrDefault(event.getProject(), new CopyOnWriteArrayList<>());
@@ -457,6 +500,28 @@ public class PatcherDialog
                         .file(select)
                         .build());
             }
+            for (VirtualFile select : vs) {
+                rows.add(SelectDTO.builder()
+                        .select(true)
+                        .path(select.getPath())
+                        .file(select)
+                        .build());
+            }
+        } else {
+            rows.add(SelectDTO.builder()
+                    .select(true)
+                    .path("全部")
+                    .build());
+        }
+
+        setSelectTableDatas(rows);
+    }
+
+    private void updateSelectFileTable2() {
+        ArrayList<SelectDTO> rows = Lists.newArrayList();
+        selectExport.setSelected(false);
+        if (selectExport2.isSelected()) {
+            List<VirtualFile> vs = FORCEADDSELECTFILES.getOrDefault(event.getProject(), new CopyOnWriteArrayList<>());
             for (VirtualFile select : vs) {
                 rows.add(SelectDTO.builder()
                         .select(true)
@@ -520,16 +585,16 @@ public class PatcherDialog
             return;
         }
 
-        if ((null == this.textField_saveName.getText()) || ("".equals(this.textField_saveName.getText()))) {
+       /* if ((null == this.textField_saveName.getText()) || ("".equals(this.textField_saveName.getText()))) {
             LogUtil.error("请输入补丁包名字!");
             return;
-        }
+        }*/
         if ((null == this.textField_savePath.getText()) || ("".equals(this.textField_savePath.getText()))) {
             LogUtil.error("请选择补丁要导出到的路径!");
             return;
         }
 
-        String dirName = this.textField_saveName.getText();
+        String dirName = "modules"; //this.textField_saveName.getText();
         dirName = null == dirName || dirName.trim().isEmpty() ? "export" : dirName;
         String exportPath = this.textField_savePath.getText() + File.separatorChar + dirName;
         Task.Backgroundable backgroundable = new Task.Backgroundable(event.getProject(), "导出中...请等待...") {
@@ -543,6 +608,7 @@ public class PatcherDialog
                 try {
                     long s = System.currentTimeMillis();
                     ExportContentVO contentVO = new ExportContentVO();
+                    contentVO.name = textField_saveName.getText();
                     contentVO.outPath = exportPath;
                     contentVO.project = event.getProject();
                     contentVO.event = event;
@@ -561,7 +627,7 @@ public class PatcherDialog
                     contentVO.ncVersion = (NcVersionEnum) ncVersion.getSelectedItem();
 
                     contentVO.init();
-                    contentVO.selectExport = selectExport.isSelected();
+                    contentVO.selectExport = selectExport.isSelected() || selectExport2.isSelected();
                     if (contentVO.selectExport) {
                         Vector<Vector> rows = defaultTableModel.getDataVector();
                         contentVO.setSelectFiles(Lists.newArrayList());
