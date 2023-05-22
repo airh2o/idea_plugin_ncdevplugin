@@ -792,7 +792,7 @@ public class PatcherDialog
 
                     ExportNCPatcherUtil.export(contentVO);
                     long e = System.currentTimeMillis();
-                    LogUtil.info("导出成功,耗时:" + ((e - s) / 1000.0d) + " (秒s)!硬盘路径： " + contentVO.getOutPath());
+                    LogUtil.infoAndHide("导出成功,耗时:" + ((e - s) / 1000.0d) + " (秒s)!硬盘路径： " + contentVO.getOutPath());
 
                     File dirToOpen = new File(contentVO.getOutPath());
 
@@ -830,7 +830,7 @@ public class PatcherDialog
                             desktop.open(opendir);
                         } catch (Throwable ioException) {
                             ioException.printStackTrace();
-                            LogUtil.info("导出成功！路径: " + opendir.getPath());
+                            LogUtil.infoAndHide("导出成功！路径: " + opendir.getPath());
                         }
                     }
                 } catch (Throwable iae) {
@@ -857,7 +857,7 @@ public class PatcherDialog
                         indicator.setText("npm building:" + StrUtil.removeAllLineBreaks(line));
                     }
             );
-            LogUtil.info("前端 npm run build: " + cm);
+            LogUtil.infoAndHide("前端 npm run build: " + cm);
         }
     }
 
@@ -873,7 +873,7 @@ public class PatcherDialog
             File src = ZipUtil.zip(dirToOpen.getParentFile());
             zip = new File(dirToOpen.getParentFile().getParentFile(), dirToOpen.getParentFile().getName() + ".zip");
         }
-        LogUtil.info("自动打包成补丁zip压缩包的硬盘路径： " + zip.getPath());
+        LogUtil.infoAndHide("自动打包成补丁zip压缩包的硬盘路径： " + zip.getPath());
     }
 
     @Nullable

@@ -3,6 +3,7 @@ package com.air.nc5dev.nccrequstsearch;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.NCCActionRefreshUtil;
 import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.vo.NCCActionInfoVO;
 import com.intellij.ide.util.gotoByName.ChooseByNameBase;
 import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider;
@@ -65,7 +66,8 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             chooseByNameBase.getProject().putUserData(ChooseByNamePopup.CURRENT_SEARCH_PATTERN, inputStr);
         }
 
-       /* GlobalSearchScope searchScope = FindSymbolParameters.searchScopeFor(chooseByNameBase.getProject(), everywhere);
+       /* GlobalSearchScope searchScope = FindSymbolParameters.searchScopeFor(chooseByNameBase.getProject(),
+       everywhere);
         FindSymbolParameters parameters = new FindSymbolParameters(inputStr, inputStr, searchScope, null);*/
 
         List<NCCActionInfoVO> vos = search(chooseByNameBase, inputStr, everywhere, cancelled, processor);
@@ -100,13 +102,13 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
      *
      * @param chooseByNameBase
      * @param inputStr
-     * @param everywhere
+     * @param everwhere
      * @param cancelled
      * @param processor
      * @return
      */
     private List<NCCActionInfoVO> search(Project project, String inputStr
-            , boolean everywhere, ProgressIndicator cancelled, Processor<Object> processor) {
+            , boolean everwhere, ProgressIndicator cancelled, Processor<Object> processor) {
         initScan(project);
 
         if (StringUtil.isBlank(inputStr)) {
@@ -117,15 +119,42 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             return EMPTY_LIST;
         }
 
-        Map<String, Map<String, NCCActionInfoVO>> all = ALL_ACTIONS;
+        Map<String, Map<String, NCCActionInfoVO>> all = new HashMap<>();
+        Map<String, NCCActionInfoVO> map = ALL_ACTIONS.get(project.getBasePath());
+        all.put(project.getBasePath(), map);
 
-        if (!everywhere) {
+        if (CollUtil.isEmpty(map)) {
+            return EMPTY_LIST;
+        }
+
+        inputStr = inputStr.trim();
+        if (inputStr.charAt(0) == '!') {
+            everwhere = false;
+            inputStr = inputStr.substring(1);
+        }
+
+        if (StringUtil.isBlank(inputStr)) {
+            return EMPTY_LIST;
+        }
+
+        if (!everwhere) {
             if (project == null) {
                 return EMPTY_LIST;
             }
+            Map<String, NCCActionInfoVO> map2 = new HashMap<>();
 
-            all = new HashMap<>();
-            all.put(project.getBasePath(), ALL_ACTIONS.get(project.getBasePath()));
+            Set<String> keys = map.keySet();
+            for (String key : keys) {
+                if (map.get(key).getFrom() == NCCActionInfoVO.FROM_SRC) {
+                    map2.put(key, map.get(key));
+                }
+            }
+
+            if (CollUtil.isEmpty(map2)) {
+                return EMPTY_LIST;
+            }
+
+            all.put(project.getBasePath(), map2);
         }
 
         //匹配
@@ -206,6 +235,8 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             }
         }
 
+        score += vo.getFrom();
+
         vo.setScore(score);
         return score;
     }
@@ -221,13 +252,22 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         }
 
         if (inited) {
+            //载入项目的，放最后，优先级最高
+            requestMappingModel.setInfo("正在扫描项目src源码的action列表...");
+            NCCActionRefreshUtil.reloadProjectAction(p);
+            requestMappingModel.setInfo("搜索完成");
             return;
         }
 
         inited = true;
         //没有搜索过 NCHOME，那么搜索一次，此后不搜索
+        requestMappingModel.setInfo("正在扫描整个NCHOME的action列表...");
+        LogUtil.infoAndHide("正在初始化扫描整个NCHOME(hotwebs下nccloud的,请不要移动jar到modules里面!)的action列表...");
         NCCActionRefreshUtil.loadNCHome(p);
         //载入项目的，放最后，优先级最高
+        requestMappingModel.setInfo("正在扫描项目src源码的action列表...");
         NCCActionRefreshUtil.reloadProjectAction(p);
+
+        requestMappingModel.setInfo("搜索完成");
     }
 }

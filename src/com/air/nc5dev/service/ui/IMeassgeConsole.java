@@ -23,6 +23,8 @@ public interface IMeassgeConsole {
 
     public void info(String msg);
 
+    public void infoAndHide(String msg);
+
     public void error(String msg);
 
     public void error(String msg, Throwable t, boolean showDig);

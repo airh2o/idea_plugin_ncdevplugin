@@ -199,6 +199,12 @@ public class NCCActionRefreshUtil {
                     vo.setAppcode(action2AppcodeMap.get(vo.getName()));
                     vo.setXmlPath(actionXml.getPath());
                     vo.setProject(project != null ? project.getBasePath() : null);
+
+                    if (project != null
+                            && actionXml.getPath().startsWith(new File(project.getBasePath()).getPath())) {
+                        vo.setFrom(NCCActionInfoVO.FROM_SRC);
+                    }
+
                     vos.add(vo);
                 }
             } catch (Exception e) {

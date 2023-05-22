@@ -93,7 +93,22 @@ public class ProjectUtil {
         notification.setSubtitle("提醒:");
         Notifications.Bus.notify(notification, project == null ? getDefaultProject() : project);
     }
-
+    /**
+     * 显示一个 正常消息提醒的 非模态提醒      </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/2/20 0020 17:05
+     * @Param [msg]
+     */
+    public static void notifyAndHide(String msg, Project project) {
+        Notification notification = NOTIFICATION_GROUP.createNotification(msg, NotificationType.INFORMATION);
+        notification.setSubtitle("提醒:");
+        Notifications.Bus.notifyAndHide(notification, project == null ? getDefaultProject() : project);
+    }
     /* *
      *     获取默认的项目      </br>
      *           </br>

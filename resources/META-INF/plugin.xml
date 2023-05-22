@@ -169,11 +169,11 @@
             <reference ref="nc5dev.export.RestNcUserPassWordAction"/>
             <separator/>
             <!-- 方便使用的小功能 -->
-            <group id="nc5devtoolRemind" text="久坐定时提醒"
-                   popup="true" description="一个简单的定时提醒弹框">
-                <reference ref="nc5dev.info.SetRemind"/>
-                <reference ref="nc5dev.info.ClearRemind"/>
-            </group>
+            <!-- <group id="nc5devtoolRemind" text="久坐定时提醒"
+                    popup="true" description="一个简单的定时提醒弹框">
+                 <reference ref="nc5dev.info.SetRemind"/>
+                 <reference ref="nc5dev.info.ClearRemind"/>
+             </group>-->
             <separator/>
 
             <reference ref="nc5dev.info.deletenclogs"/>
@@ -359,6 +359,8 @@
             <!--            加入 右键菜单-->
             <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
             <add-to-group group-id="MainMenu" anchor="before" relative-to-action="HelpMenu"/>
+            <add-to-group group-id="ToolbarRunGroup" anchor="last"/>
+            <add-to-group group-id="MainToolBarSettings" anchor="last"/>
         </group>
     </actions>
 

@@ -20,6 +20,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NCCActionInfoVO {
+    public static final int FROM_SRC = 1000;
+
     String name;
     String label;
     String clazz;
@@ -32,6 +34,7 @@ public class NCCActionInfoVO {
      * 项目路径
      */
     String project;
+    int from;
 
     transient int score;
 

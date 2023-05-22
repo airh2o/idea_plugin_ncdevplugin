@@ -14,6 +14,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import lombok.Data;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,10 +31,11 @@ import java.util.List;
  * @project
  * @Version
  */
-@Getter
+@Data
 public class RequestMappingModel extends FilteringGotoByModel implements DumbAware {
     volatile boolean onlySearchPorjectUrl;
     AnActionEvent e;
+    volatile String info;
 
     public RequestMappingModel(@NotNull Project project, @NotNull List list, AnActionEvent e) {
         super(project, list);
@@ -54,13 +56,13 @@ public class RequestMappingModel extends FilteringGotoByModel implements DumbAwa
 
     @Override
     public String getPromptText() {
-        return "输入请求地址nccloud/aim/acceptance/querylist.do或acceptance.querylist等";
+        return "输入请求地址nccloud/aim/acceptance/querylist.do或acceptance.querylist等(输入!开头意思是 只查询项目src源码的action)";
     }
 
     @NotNull
     @Override
     public String getNotInMessage() {
-        return "没有匹配器";
+        return StringUtil.isBlank(info) ?  "搜索完成" : info;
     }
 
     @NotNull
@@ -72,7 +74,7 @@ public class RequestMappingModel extends FilteringGotoByModel implements DumbAwa
     @Nullable
     @Override
     public String getCheckBoxName() {
-        return "只搜索项目内URL映射(不包含HOME)";
+        return "只搜索项目内URL映射(不包含HOME,输入搜索内容用!开头一个意思)";
     }
 
     @Override
