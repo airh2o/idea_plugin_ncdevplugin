@@ -359,8 +359,7 @@
             <!--            加入 右键菜单-->
             <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
             <add-to-group group-id="MainMenu" anchor="before" relative-to-action="HelpMenu"/>
-            <add-to-group group-id="ToolbarRunGroup" anchor="last"/>
-            <add-to-group group-id="MainToolBarSettings" anchor="last"/>
+            <add-to-group group-id="MainToolBar" anchor="last"/>
         </group>
     </actions>
 
