@@ -108,7 +108,7 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
             File resourceTemplates = ProjectUtil.getResourceTemplates("packmetadata.xml");
             if (resourceTemplates != null) {
                 lines = FileUtil.readUtf8Lines(resourceTemplates);
-                LogUtil.info("云管家信息文件:packmetadata.xml,模板路径： " + resourceTemplates.getPath());
+                LogUtil.infoAndHide("云管家信息文件:packmetadata.xml,模板路径： " + resourceTemplates.getPath());
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -164,7 +164,7 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
         File out = new File(dir, "packmetadata.xml");
 
         contentVO.indicator.setText("云管家信息文件:packmetadata.xml..." + out.getPath() + " , " + lines.size());
-        LogUtil.info("云管家信息文件:packmetadata.xml,输出路径： " + out.getPath() + "   , " + lines.size());
+        LogUtil.infoAndHide("云管家信息文件:packmetadata.xml,输出路径： " + out.getPath() + "   , " + lines.size());
 
         outputString2File(out, builderString(lines));
     }
@@ -179,7 +179,7 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
             File resourceTemplates = ProjectUtil.getResourceTemplates("readme.template");
             if (resourceTemplates != null) {
                 lines = FileUtil.readUtf8Lines(resourceTemplates);
-                LogUtil.info("云管家信息文件:readme.txt,模板路径： " + resourceTemplates.getPath());
+                LogUtil.infoAndHide("云管家信息文件:readme.txt,模板路径： " + resourceTemplates.getPath());
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -289,7 +289,7 @@ public class AutoGenerPathcherInfo4YunGuanJiaUtil {
         File out = new File(dir, "readme.txt");
 
         contentVO.indicator.setText("云管家信息文件:raedme.txt..." + out.getPath() + " , " + lines.size());
-        LogUtil.info("云管家信息文件:raedme.txt,输出路径： " + out.getPath() + "   , " + lines.size());
+        LogUtil.infoAndHide("云管家信息文件:raedme.txt,输出路径： " + out.getPath() + "   , " + lines.size());
 
         outputString2File(out, builderString(lines));
     }

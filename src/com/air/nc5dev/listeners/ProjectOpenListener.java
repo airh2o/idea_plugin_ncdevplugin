@@ -38,7 +38,7 @@ public class ProjectOpenListener implements StartupActivity.DumbAware {
         } catch (Throwable e) {
             //不要弹框报错！
             try {
-                IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class);
+                IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class, project);
                 service.getConsoleView().print(ExceptionUtil.getExcptionDetall(e) + "\n", ConsoleViewContentType.ERROR_OUTPUT);
             } catch (Throwable ex) {
             }

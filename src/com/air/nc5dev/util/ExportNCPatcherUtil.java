@@ -337,41 +337,52 @@ public class ExportNCPatcherUtil {
         }
 
         File[] fs = dir.listFiles();
-        if (fs == null) {
-            return ;
+        if (fs != null) {
+            for (File f : fs) {
+                if (!f.isDirectory()) {
+                    continue;
+                }
+
+                File client = new File(f, "client");
+                if (!client.isDirectory()) {
+                    continue;
+                }
+
+                File classes = new File(client, "classes");
+                if (classes.isDirectory()) {
+                    File[] fs2 = classes.listFiles();
+                    if (fs2 != null) {
+                        for (File f2 : fs2) {
+                            FileUtil.move(f2, new File(outTop, "classes"), true);
+                        }
+                    }
+                }
+
+                File lib = new File(client, "lib");
+                if (lib.isDirectory()) {
+                    File[] fs2 = lib.listFiles();
+                    if (fs2 != null) {
+                        for (File f2 : fs2) {
+                            FileUtil.move(f2, new File(outTop, "lib"), true);
+                        }
+                    }
+                }
+
+                FileUtil.del(client);
+            }
         }
 
-        for (File f : fs) {
-            if (!f.isDirectory()) {
-                continue;
-            }
-
-            File client = new File(f, "client");
-            if (!client.isDirectory()) {
-                continue;
-            }
-
-            File classes = new File(client, "classes");
-            if (classes.isDirectory()) {
-                File[] fs2 = classes.listFiles();
-                if (fs2 != null) {
-                    for (File f2 : fs2) {
-                        FileUtil.move(f2, new File(outTop, "classes"), true);
+        if (contentVO.exportResources) {
+            outTop = new File(outTop.getParentFile(), "resources");
+            File dist = new File(new File(contentVO.getHotwebsResourcePath()), "dist");
+            if (dist.isDirectory()) {
+                fs = dist.listFiles();
+                if (fs != null) {
+                    for (File f : fs) {
+                        FileUtil.move(f, outTop, true);
                     }
                 }
             }
-
-            File lib = new File(client, "lib");
-            if (lib.isDirectory()) {
-                File[] fs2 = lib.listFiles();
-                if (fs2 != null) {
-                    for (File f2 : fs2) {
-                        FileUtil.move(f2, new File(outTop, "lib"), true);
-                    }
-                }
-            }
-
-            FileUtil.del(client);
         }
     }
 
@@ -824,7 +835,7 @@ public class ExportNCPatcherUtil {
         File exportDirF = new File(exportDir);
         File[] fs = new File[]{new File(exportDir, module.getName())};
         if (fs == null) {
-            LogUtil.info(exportDir + " 文件夹为空，不执行 processNCCPatchersWhenFinash !");
+            LogUtil.infoAndHide(exportDir + " 文件夹为空，不执行 processNCCPatchersWhenFinash !");
             fs = new File[0];
         }
 

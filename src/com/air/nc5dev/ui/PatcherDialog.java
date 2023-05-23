@@ -772,7 +772,9 @@ public class PatcherDialog
             return;
         }
 
-        ExportNCPatcherUtil.saveConfig(event.getProject(), contentVO);
+        if (contentVO.saveConfig) {
+            ExportNCPatcherUtil.saveConfig(event.getProject(), contentVO);
+        }
 
         Task.Backgroundable backgroundable = new Task.Backgroundable(event.getProject(), "导出中...请等待...") {
             @Override

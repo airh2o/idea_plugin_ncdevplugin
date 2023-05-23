@@ -28,6 +28,7 @@ import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.project.Project;
 
 /**
  * Creates and keeps a single instance of actions used by SonarLint.
@@ -65,9 +66,9 @@ public class Actions {
                 AllIcons.Actions.Resume);
     }
 
-    public static Actions getInstance() {
+    public static Actions getInstance(Project project) {
         try {
-            return ProjectUtil.getService(Actions.class);
+            return ProjectUtil.getService(Actions.class, project);
         } catch (Exception e) {
             LogUtil.error(e.toString(), e);
         }

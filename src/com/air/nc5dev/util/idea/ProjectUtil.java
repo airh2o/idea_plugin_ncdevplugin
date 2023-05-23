@@ -7,6 +7,7 @@ import com.air.nc5dev.util.XmlUtil;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.google.common.collect.Lists;
 import com.intellij.notification.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -21,6 +22,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 项目 工具类</br>
@@ -35,7 +38,7 @@ import java.util.List;
  */
 public class ProjectUtil {
     private static final Logger LOG = Logger.getInstance(ProjectUtil.class);
-    private static Project project;
+    private static volatile Project project;
     /**
      * 本插件 默认的 非模态提醒的 统一 组id
      */
@@ -93,6 +96,7 @@ public class ProjectUtil {
         notification.setSubtitle("提醒:");
         Notifications.Bus.notify(notification, project == null ? getDefaultProject() : project);
     }
+
     /**
      * 显示一个 正常消息提醒的 非模态提醒      </br>
      * </br>
@@ -109,6 +113,7 @@ public class ProjectUtil {
         notification.setSubtitle("提醒:");
         Notifications.Bus.notifyAndHide(notification, project == null ? getDefaultProject() : project);
     }
+
     /* *
      *     获取默认的项目      </br>
      *           </br>
@@ -181,23 +186,46 @@ public class ProjectUtil {
         return project;
     }
 
+
+    static Map<Project, Map<Class, Object>> cacheMap = new ConcurrentHashMap<>();
+
     public static <T> T getService(Project project, Class<T> clazz) {
-        T t = null;
-        try {
-            t = ServiceManager.getService(project, clazz);
-        } catch (Throwable e) {
-            return null;
+        Map<Class, Object> map = cacheMap.get(project);
+        if (map == null) {
+            synchronized (cacheMap) {
+                map = cacheMap.get(project);
+                if (map == null) {
+                    cacheMap.put(project, new ConcurrentHashMap<>());
+                    map = cacheMap.get(project);
+                }
+            }
         }
-        if (t == null) {
-            return null;
+
+        T t = null;
+        if (map.get(clazz) == null) {
+            synchronized (cacheMap) {
+                if (map.get(clazz) != null) {
+                    return (T) map.get(clazz);
+                }
+
+                try {
+                  //  ApplicationManager.getApplication().getComponent(EditorFactory.class);
+                    t = ServiceManager.getService(project, clazz);
+                    if (t != null) {
+                        map.put(clazz, t);
+                    }
+                } catch (Throwable e) {
+                    return null;
+                }
+            }
         }
 
         return t;
     }
 
-    public static <T> T getService(Class<T> clazz) {
+    public static <T> T getService(Class<T> clazz, Project project) {
         try {
-            return getService(getDefaultProject(), clazz);
+            return getService(project, clazz);
         } catch (Throwable e) {
             return null;
         }

@@ -379,7 +379,7 @@
         <!-- 日志输出窗口界面注册 -->
         <toolWindow id="NC插件日志" anchor="bottom" factoryClass="com.air.nc5dev.ui.ToolWindowFactory"/>
 
-        <applicationService serviceImplementation="com.air.nc5dev.util.Actions"/>
+        <projectService serviceImplementation="com.air.nc5dev.util.Actions"/>
 
         <!-- 生成对象所有的set方法调用 -->
         <!--        <intentionAction>-->

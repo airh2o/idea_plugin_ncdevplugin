@@ -44,7 +44,7 @@ public class LogPanel extends SimpleToolWindowPanel {
 
   private void addToolbar() {
     try {
-      ActionGroup actionGroup = createActionGroup();
+      ActionGroup actionGroup = createActionGroup(project);
       mainToolbar = ActionManager.getInstance().createActionToolbar(ID, actionGroup, false);
       mainToolbar.setTargetComponent(this);
       Box toolBarBox = Box.createHorizontalBox();
@@ -56,8 +56,8 @@ public class LogPanel extends SimpleToolWindowPanel {
     }
   }
 
-  private static ActionGroup createActionGroup() {
-    Actions actions = Actions.getInstance();
+  private static ActionGroup createActionGroup(Project project) {
+    Actions actions = Actions.getInstance(project);
     SimpleActionGroup actionGroup = new SimpleActionGroup();
     actionGroup.add(actions.cleanConsole());
     actionGroup.add(actions.getTopLineAction());

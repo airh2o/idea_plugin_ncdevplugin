@@ -27,7 +27,7 @@ public class LogWinAutoTail implements ISubscriber {
     @Override
     public void accept(Object msg) {
         if (msg instanceof Throwable && LogMoveDownAction.isAuto()) {
-            ConsoleView consoleView = ProjectUtil.getService(IMeassgeConsole.class).getConsoleView();
+            ConsoleView consoleView = ProjectUtil.getService(IMeassgeConsole.class, ProjectUtil.getDefaultProject()).getConsoleView();
             ConsoleViewImpl c = (ConsoleViewImpl) consoleView;
             c.scrollToEnd();
         }

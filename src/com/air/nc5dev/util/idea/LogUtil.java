@@ -19,7 +19,7 @@ public class LogUtil {
 
 
     public static void debug(String msg) {
-        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class);
+        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class, ProjectUtil.getDefaultProject());
         if (service == null) {
             LOGGER.debug("com.air.nc5dev.util.idea.ProjectUtil.getService(java.lang.Class<T>) null for msg: " + msg);
             return;
@@ -29,7 +29,7 @@ public class LogUtil {
     }
 
     public static boolean debugEnabled() {
-        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class);
+        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class, ProjectUtil.getDefaultProject());
         if (service == null) {
             LOGGER.debug("com.air.nc5dev.util.idea.ProjectUtil.getService(java.lang.Class<T>) null for debugEnabled ");
             return true;
@@ -39,7 +39,7 @@ public class LogUtil {
     }
 
     public static void info(String msg) {
-        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class);
+        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class, ProjectUtil.getDefaultProject());
         if (service == null) {
             LOGGER.info("com.air.nc5dev.util.idea.ProjectUtil.getService(java.lang.Class<T>) null for msg: " + msg);
             return;
@@ -49,7 +49,7 @@ public class LogUtil {
     }
 
     public static void infoAndHide(String msg) {
-        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class);
+        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class, ProjectUtil.getDefaultProject());
         if (service == null) {
             LOGGER.info("com.air.nc5dev.util.idea.ProjectUtil.getService(java.lang.Class<T>) null for msg: " + msg);
             return;
@@ -59,7 +59,7 @@ public class LogUtil {
     }
 
     public static void error(String msg) {
-        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class);
+        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class, ProjectUtil.getDefaultProject());
         if (service == null) {
             LOGGER.error("com.air.nc5dev.util.idea.ProjectUtil.getService(java.lang.Class<T>) null for msg: " + msg);
             return;
@@ -73,7 +73,7 @@ public class LogUtil {
     }
 
     public static void error(String msg, Throwable t, boolean showDig) {
-        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class);
+        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class, ProjectUtil.getDefaultProject());
         if (service == null) {
             LOGGER.debug("com.air.nc5dev.util.idea.ProjectUtil.getService(java.lang.Class<T>) null for msg: " + msg, t);
             return;
@@ -83,7 +83,7 @@ public class LogUtil {
     }
 
     public static void clear() {
-        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class);
+        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class, ProjectUtil.getDefaultProject());
         if (service == null) {
             LOGGER.debug("com.air.nc5dev.util.idea.ProjectUtil.getService(java.lang.Class<T>) null for clear");
             return;
@@ -99,7 +99,7 @@ public class LogUtil {
      */
     public static void tryInfo(String info) {
         try {
-            IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class);
+            IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class, ProjectUtil.getDefaultProject());
             service.getConsoleView().print(info + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
         } catch (Throwable e) {
         }
