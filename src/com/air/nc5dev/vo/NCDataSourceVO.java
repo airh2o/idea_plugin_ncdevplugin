@@ -1,6 +1,12 @@
 package com.air.nc5dev.vo;
 
+import com.air.nc5dev.enums.NcVersionEnum;
+import com.air.nc5dev.util.NCPropXmlUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.util.ncutils.AESEncode;
 import com.air.nc5dev.util.ncutils.NC5xEncode;
+import com.air.nc5dev.util.ncutils.NC6xEncode;
 import lombok.Data;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -35,15 +41,12 @@ public class NCDataSourceVO {
     private String conIdle;
     private String isBase;
 
-    public NCDataSourceVO() {
-    }
-
-    public NCDataSourceVO(Element e) {
+    public NCDataSourceVO(Element e, Element root) {
         this.element = e;
-        read(this.element);
+        read(this.element, root);
     }
 
-    private void read(Element element) {
+    private void read(Element element, Element root) {
         dataSourceName = getSonElementTextContent(element, "dataSourceName", 0);
         oidMark = getSonElementTextContent(element, "oidMark", 0);
         databaseUrl = getSonElementTextContent(element, "databaseUrl", 0);
@@ -51,6 +54,18 @@ public class NCDataSourceVO {
         password = getSonElementTextContent(element, "password", 0);
         passwordOrgin = password;
         password = new NC5xEncode().decode(password);
+        if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+            if (root.getElementsByTagName("isEncode").getLength() > 0) {
+                String isEncode = root.getElementsByTagName("isEncode").item(0).getTextContent();
+                if ("true".equalsIgnoreCase(StringUtil.trim(isEncode))) {
+                    password = AESEncode.decrypt(passwordOrgin);
+                    if (password.equals("ufnull")) {
+                        password = "";
+                    }
+                }
+            }
+
+        }
         driverClassName = getSonElementTextContent(element, "driverClassName", 0);
         databaseType = getSonElementTextContent(element, "databaseType", 0);
         maxCon = getSonElementTextContent(element, "maxCon", 0);
@@ -114,6 +129,7 @@ public class NCDataSourceVO {
     public int hashCode() {
 
         return Objects.hash(element, dataSourceName, oidMark, databaseUrl, user, password, driverClassName
-                , databaseType, maxCon, minCon, dataSourceClassName, xaDataSourceClassName, conIncrement, conInUse, conIdle, isBase);
+                , databaseType, maxCon, minCon, dataSourceClassName, xaDataSourceClassName, conIncrement, conInUse,
+                conIdle, isBase);
     }
 }

@@ -62,8 +62,7 @@ import java.util.stream.Collectors;
  * @return
  */
 @Data
-public class PatcherDialog
-        extends DialogWrapper {
+public class PatcherDialog extends DialogWrapper {
     //全局标识， 是否有导出任务未处理完
     private static boolean isRuning = false;
     private JComponent contentPane;
@@ -103,6 +102,7 @@ public class PatcherDialog
                                 : "(Tools菜单点击的导出:导出全部项目。如果不想这样 可以点击 左侧项目树 选中要导出的模块或具体文件)"
                 )*/
         );
+        setOKButtonText("执行导出");
     }
 
     @Nullable
@@ -435,18 +435,18 @@ public class PatcherDialog
             this.selectExport.addItemListener((e) -> updateSelectFileTable());
             JBPanel panel10 = new JBPanel();
             panel10.setLayout(new BoxLayout(panel10, BoxLayout.X_AXIS));
-            panel10.setBounds(x, y = y + height + 5, 200, height);
+            panel10.setBounds(x, y = y + height + 5, 220, height);
             panel10.add(label_8);
             panel10.add(selectExport);
             jgp.add(panel10);
 
-            label_8 = new JBLabel("只导出右键选择的只导出的文件:");
+            label_8 = new JBLabel("只导出右键选择的文件:");
             selectExport2 = new JBCheckBox();
             selectExport2.setSelected(ExportContentVO.EVENT_POPUP_CLICK.equals(event.getPlace()));
             selectExport2.addItemListener((e) -> updateSelectFileTable2());
             panel10 = new JBPanel();
             panel10.setLayout(new BoxLayout(panel10, BoxLayout.X_AXIS));
-            panel10.setBounds(x + 210, y, 200, height);
+            panel10.setBounds(x + 230, y, 220, height);
             panel10.add(label_8);
             panel10.add(selectExport2);
             jgp.add(panel10);

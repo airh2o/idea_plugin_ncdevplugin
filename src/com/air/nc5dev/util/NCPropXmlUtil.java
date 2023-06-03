@@ -32,48 +32,51 @@ import java.util.stream.Stream;
  */
 public class NCPropXmlUtil {
     /***** prop.xml 默认的相对NC HOME位置 ***/
-    public static final String DEFUAL_NC_PROP_PATH = File.separatorChar + "ierp" + File.separatorChar + "bin" + File.separatorChar + "prop.xml";
-   /****  配置的 数据源列表 ****/
+    public static final String DEFUAL_NC_PROP_PATH =
+            File.separatorChar + "ierp" + File.separatorChar + "bin" + File.separatorChar + "prop.xml";
+    /****  配置的 数据源列表 ****/
     private static List<NCDataSourceVO> dataSourceVOS;
 
-    static{
+    static {
         loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
     }
 
     /***
-      *    是否 数据源为空，true空！       </br>
-      *     1.还没有读取数据源       </br>
-      *     2.读取了 但是xml里是空的     </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com
-      * @date 2019/12/25 0025 9:36
-      * @Param []
-      * @return boolean
+     *    是否 数据源为空，true空！       </br>
+     *     1.还没有读取数据源       </br>
+     *     2.读取了 但是xml里是空的     </br>
+     *           </br>
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 9:36
+     * @Param []
+     * @return boolean
      */
-    public static final boolean isDataSourceEmpty(){
+    public static final boolean isDataSourceEmpty() {
         return null == dataSourceVOS || dataSourceVOS.isEmpty();
     }
+
     /***
-      *    获取第几个 数据源       </br>
-      *           </br>
-      *           </br>
-      *           </br>
-      * @author air Email: 209308343@qq.com
-      * @date 2019/12/25 0025 9:38
-      * @Param [index]
-      * @return com.air.nc5dev.vo.NCDataSourceVO 获取不到返回null
+     *    获取第几个 数据源       </br>
+     *           </br>
+     *           </br>
+     *           </br>
+     * @author air Email: 209308343@qq.com
+     * @date 2019/12/25 0025 9:38
+     * @Param [index]
+     * @return com.air.nc5dev.vo.NCDataSourceVO 获取不到返回null
      */
-    public static final NCDataSourceVO get(final int index){
-        if(isDataSourceEmpty()){
+    public static final NCDataSourceVO get(final int index) {
+        if (isDataSourceEmpty()) {
             return null;
         }
 
-        if(index > dataSourceVOS.size() - 1){
+        if (index > dataSourceVOS.size() - 1) {
             return null;
         }
 
         return dataSourceVOS.get(index);
     }
+
     /***
      *    获取 指定数据源名字的 数据源       </br>
      *           </br>
@@ -84,8 +87,8 @@ public class NCPropXmlUtil {
      * @Param [dataSourceName]
      * @return com.air.nc5dev.vo.NCDataSourceVO 获取不到返回null
      */
-    public static final NCDataSourceVO get(final String dataSourceName){
-        if(isDataSourceEmpty()){
+    public static final NCDataSourceVO get(final String dataSourceName) {
+        if (isDataSourceEmpty()) {
             return null;
         }
 
@@ -93,6 +96,7 @@ public class NCPropXmlUtil {
             return e.getDataSourceName().equals(dataSourceName);
         }).findFirst().get();
     }
+
     /***
      *    获得数据源操作流       </br>
      *           </br>
@@ -106,6 +110,7 @@ public class NCPropXmlUtil {
     public static final Stream<NCDataSourceVO> stream() {
         return dataSourceVOS.stream();
     }
+
     /***
      *     增加一个数据源      </br>
      *           </br>
@@ -117,38 +122,42 @@ public class NCPropXmlUtil {
      * @return void
      */
     public static void add(NCDataSourceVO ds) {
-        if(null == dataSourceVOS){
+        if (null == dataSourceVOS) {
             dataSourceVOS = new ArrayList<>();
         }
 
         dataSourceVOS.add(ds);
     }
+
     /**
      * 获得 NC HOME中 prop.xml 文件路径
      *
      * @return 没设置NCHOME或者文件不存在返回null
      */
-    public static final  File getPropFile(@Nullable String ncHome) {
+    public static final File getPropFile(@Nullable String ncHome) {
         if (StringUtil.isEmpty(ProjectNCConfigUtil.getNCHomePath())) {
             return null;
         }
         File ncHomeFile = null;
 
-        if(StringUtil.notEmpty(ncHome)){
+        if (StringUtil.notEmpty(ncHome)) {
             ncHomeFile = new File(ncHome);
-        }else{
+        } else {
             ncHomeFile = ProjectNCConfigUtil.getNCHome();
         }
 
-        if(!ncHomeFile.exists() || !ncHomeFile.isDirectory()){
-            Messages.showErrorDialog(ProjectUtil.getDefaultProject(), ncHomeFile.getPath() + " NC Home不存在！", "读取NC数据配置错误");
+        if (!ncHomeFile.exists() || !ncHomeFile.isDirectory()) {
+            Messages.showErrorDialog(ProjectUtil.getDefaultProject(), ncHomeFile.getPath() + " NC Home不存在！", "读取NC" +
+                    "数据配置错误");
             return null;
         }
 
-        final String propPath = StringUtil.isEmpty(ProjectNCConfigUtil.getConfigValue(ProjectNCConfigUtil.KEY_PROJECT_NC_CONFIG_PROP_PATH))
-                ? DEFUAL_NC_PROP_PATH : ProjectNCConfigUtil.getConfigValue(ProjectNCConfigUtil.KEY_PROJECT_NC_CONFIG_PROP_PATH);
+        final String propPath =
+                StringUtil.isEmpty(ProjectNCConfigUtil.getConfigValue(ProjectNCConfigUtil.KEY_PROJECT_NC_CONFIG_PROP_PATH))
+                ? DEFUAL_NC_PROP_PATH :
+                        ProjectNCConfigUtil.getConfigValue(ProjectNCConfigUtil.KEY_PROJECT_NC_CONFIG_PROP_PATH);
 
-        File prop = new File(ncHomeFile  , propPath);
+        File prop = new File(ncHomeFile, propPath);
         if (!prop.exists() && !prop.isFile()) {
             Messages.showErrorDialog(ProjectUtil.getDefaultProject(), prop.getPath() + " 配置文件不存在！", "读取NC数据配置错误");
             return null;
@@ -156,15 +165,16 @@ public class NCPropXmlUtil {
 
         return prop;
     }
+
     /**
      * 从prop文件中 重新读取数据源信息
      */
-    public static final void loadConfFromFile(@Nullable  String ncHome) {
+    public static final void loadConfFromFile(@Nullable String ncHome) {
         NCPropXmlUtil.dataSourceVOS = new ArrayList<>();
         final File propFile = getPropFile(ncHome);
 
-        if(null == propFile || !propFile.exists()){
-            return ;
+        if (null == propFile || !propFile.exists()) {
+            return;
         }
 
         Document document = XmlUtil.xmlFile2Document2(propFile);
@@ -173,16 +183,15 @@ public class NCPropXmlUtil {
         Element element;
         for (int i = 0; i < dataSources.getLength(); i++) {
             element = (Element) dataSources.item(i);
-            dataSourceVOS.add(new NCDataSourceVO(element));
+            dataSourceVOS.add(new NCDataSourceVO(element, root));
         }
     }
 
     /**
      * 把数据源信息最新的情况 写入到 prop.xml
-     *
      */
-    public static final  void saveDataSources() {
-        final  File propFile = getPropFile(ProjectNCConfigUtil.getNCHomePath());
+    public static final void saveDataSources() {
+        final File propFile = getPropFile(ProjectNCConfigUtil.getNCHomePath());
         final Document document = XmlUtil.xmlFile2Document2(propFile);
         final Element root = document.getDocumentElement();
         NodeList dataSources = root.getElementsByTagName("dataSource");

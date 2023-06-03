@@ -1,5 +1,6 @@
 package com.air.nc5dev.ui;
 
+import com.intellij.openapi.ui.DialogWrapper;
 import lombok.Data;
 
 import javax.swing.*;
@@ -11,7 +12,7 @@ import java.util.EventObject;
 
 @Data
 public class MyTableCellEditor extends AbstractCellEditor implements TableCellEditor {
-    PatcherDialog patcherDialog;
+    DialogWrapper dialogWrapper;
     protected JComponent editorComponent; // 编辑组件
     protected EditorDelegate delegate;    // 编辑代表
     protected int clickCountToStart = 1;
@@ -31,8 +32,8 @@ public class MyTableCellEditor extends AbstractCellEditor implements TableCellEd
         textField.addActionListener(delegate);
     }
 
-    public MyTableCellEditor(PatcherDialog patcherDialog, final JCheckBox checkBox) {
-        this.patcherDialog = patcherDialog;
+    public MyTableCellEditor(DialogWrapper dialogWrapper, final JCheckBox checkBox) {
+        this.dialogWrapper = dialogWrapper;
         editorComponent = checkBox;
         checkBox.setSelected(false);
         checkBox.setHorizontalAlignment(JCheckBox.CENTER);
