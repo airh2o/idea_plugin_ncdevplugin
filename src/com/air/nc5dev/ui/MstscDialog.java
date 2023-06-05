@@ -622,7 +622,7 @@ public class MstscDialog extends DialogWrapper {
         textField_search.setText(null);
         textField_user.setText(m.getUser());
         textField_width.setText(m.getDesktopwidth());
-        checkBox_full.setSelected("1".equals(m.getWinposstr()));
+      //  checkBox_full.setSelected("1".equals(m.getWinposstr()));
         checkBox_wapper.setSelected(!"0".equals(m.getDisable_wallpaper()));
         checkBox_relink.setSelected("1".equals(m.getAutoreconnection()));
         checkBox_disk.setSelected(true);
