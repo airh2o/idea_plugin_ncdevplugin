@@ -11,13 +11,7 @@ public class MstscManggerUIAction extends AbstractIdeaAction {
     @Override
     protected void doHandler(AnActionEvent e) {
         MstscDialog dialog = new MstscDialog(e);
-        dialog.showAndGet();
-
-        try {
-            dialog.getMstscEntitService().getDao().submit();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            LogUtil.error(ex.getMessage(), ex);
-        }
+        dialog.setModal(false);
+        dialog.show();
     }
 }

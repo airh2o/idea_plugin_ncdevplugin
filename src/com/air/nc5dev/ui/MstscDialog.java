@@ -112,6 +112,27 @@ public class MstscDialog extends DialogWrapper {
     }
 
     @Override
+    public void doCancelAction() {
+        onClose();
+        super.doCancelAction();
+    }
+
+    private void onClose() {
+        try {
+            getMstscEntitService().getDao().submit();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            LogUtil.error(ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    protected void doOKAction() {
+        onClose();
+        super.doOKAction();
+    }
+
+    @Override
     protected JComponent createCenterPanel() {
         if (contentPane == null) {
             try {
@@ -622,7 +643,7 @@ public class MstscDialog extends DialogWrapper {
         textField_search.setText(null);
         textField_user.setText(m.getUser());
         textField_width.setText(m.getDesktopwidth());
-      //  checkBox_full.setSelected("1".equals(m.getWinposstr()));
+        //  checkBox_full.setSelected("1".equals(m.getWinposstr()));
         checkBox_wapper.setSelected(!"0".equals(m.getDisable_wallpaper()));
         checkBox_relink.setSelected("1".equals(m.getAutoreconnection()));
         checkBox_disk.setSelected(true);

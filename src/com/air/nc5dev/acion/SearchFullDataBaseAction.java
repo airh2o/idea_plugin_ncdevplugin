@@ -17,6 +17,7 @@ public class SearchFullDataBaseAction extends AbstractIdeaAction {
             dialog.getButton_Search().setEnabled(true);
         }
 
+        dialog.setModal(false);
         dialog.show();
     }
 }
