@@ -1,6 +1,7 @@
 package org.tangsu.mstsc.rdp;
 
 import cn.hutool.core.io.FileUtil;
+import com.air.nc5dev.util.StringUtil;
 import com.sun.jna.platform.win32.Crypt32;
 import com.sun.jna.platform.win32.Crypt32Util;
 import com.sun.jna.platform.win32.WinCrypt;
@@ -88,7 +89,12 @@ public class RDPCompile {
         s.append("displayconnectionbar:i:").append(e.getDisplayconnectionbar()).append('\n');
         s.append("disable wallpaper:i:").append(e.getDisable_wallpaper()).append('\n');
         s.append("disable themes:i:").append(e.getDisable_themes()).append('\n');
-        s.append("full address:s:").append(e.getIp()).append(':').append(e.getPort()).append('\n');
+        s.append("full address:s:").append(e.getIp());
+        if (StringUtil.isNotBlank(e.getPort())) {
+            s.append(':').append(e.getPort());
+        }
+        s.append('\n');
+
         s.append("autoreconnection enabled:i:").append(e.getAutoreconnection()).append('\n');
         s.append("username:s:").append(e.getUser()).append('\n');
         s.append("password 51:b:").append(RDPCompile.cryptRdpPassword(e.getPass())).append('\n');
