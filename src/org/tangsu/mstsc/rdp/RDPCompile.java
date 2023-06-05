@@ -88,7 +88,7 @@ public class RDPCompile {
         s.append("displayconnectionbar:i:").append(e.getDisplayconnectionbar()).append('\n');
         s.append("disable wallpaper:i:").append(e.getDisable_wallpaper()).append('\n');
         s.append("disable themes:i:").append(e.getDisable_themes()).append('\n');
-        s.append("full address:s:").append(e.getIp()).append('\n');
+        s.append("full address:s:").append(e.getIp()).append(':').append(e.getPort()).append('\n');
         s.append("autoreconnection enabled:i:").append(e.getAutoreconnection()).append('\n');
         s.append("username:s:").append(e.getUser()).append('\n');
         s.append("password 51:b:").append(RDPCompile.cryptRdpPassword(e.getPass())).append('\n');

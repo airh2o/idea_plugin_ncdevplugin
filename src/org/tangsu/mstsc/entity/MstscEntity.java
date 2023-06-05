@@ -20,7 +20,7 @@ public class MstscEntity implements IEntity {
     String desktopheight;
     String screen_mode_id;
     String session_bpp;
-    String winposstr;
+    String winposstr = "1";
     String compression;
     String displayconnectionbar;
     String disable_wallpaper;
