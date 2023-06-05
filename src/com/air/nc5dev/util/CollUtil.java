@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.tangsu.mstsc.entity.MstscEntity;
 
 import java.util.*;
 import java.util.function.Function;
@@ -334,5 +335,13 @@ public class CollUtil extends cn.hutool.core.collection.CollUtil {
         }
         result.add(subList);
         return result;
+    }
+
+    public static int size(Collection c) {
+        if (c == null) {
+            return 0;
+        }
+
+        return c.size();
     }
 }

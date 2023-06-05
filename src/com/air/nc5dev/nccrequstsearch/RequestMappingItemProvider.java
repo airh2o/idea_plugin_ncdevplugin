@@ -8,6 +8,7 @@ import com.air.nc5dev.vo.NCCActionInfoVO;
 import com.intellij.ide.util.gotoByName.ChooseByNameBase;
 import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider;
 import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
+import com.intellij.ide.util.gotoByName.ChooseByNameViewModel;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.Processor;
@@ -95,6 +96,11 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         }
 
         return vos.isEmpty();
+    }
+
+    public List<String> filterNames(ChooseByNameViewModel chooseByNameViewModel
+            , String[] names, String pattern) {
+        return new ArrayList<>();
     }
 
     /**
@@ -270,4 +276,6 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
 
         requestMappingModel.setInfo("搜索完成");
     }
+
+
 }

@@ -8,6 +8,8 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Method;
+
 /**
  * Idea - 运行配置的工具类</br>
  * </br>
@@ -42,7 +44,21 @@ public class RunConfigurationUtil {
         } catch (Throwable e) {
         }
         try {
-            runnerAndConfigurationSettings.setShared(share);
+            Method setShared = null;
+            try {
+                setShared = RunnerAndConfigurationSettingsImpl.class.getMethod("setShared", boolean.class);
+            } catch (Throwable e) {
+            }
+            if (setShared == null) {
+                try {
+                    setShared = RunnerAndConfigurationSettingsImpl.class.getMethod("setShared", Boolean.class);
+                } catch (Throwable e) {
+                }
+            }
+
+            if (setShared != null) {
+                setShared.invoke(runnerAndConfigurationSettings, share);
+            }
         } catch (Throwable e) {
         }
         runManagerImpl.addConfiguration(runnerAndConfigurationSettings);

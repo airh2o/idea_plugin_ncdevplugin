@@ -297,7 +297,7 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
         textField_selectAllTableSql.setText(" select table_name from user_tables ");
         textField_threadNum.setText("100");
         checkBox_fastQuery.setSelected(true);
-        textField_skipColumns.setText("size,");
+        textField_skipColumns.setText("size,ts,dr,version,");
     }
 
     public void set2UI(SearchFullDatabaseConfigVO c) {
