@@ -1,6 +1,7 @@
 package com.air.nc5dev.acion;
 
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
+import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
@@ -22,7 +23,7 @@ public class OpenNCLogConfigFileAction extends AbstractIdeaAction {
         File dirToOpen = new File(ProjectNCConfigUtil.getNCHomePath() + File.separatorChar
                 + "ierp" + File.separatorChar + "bin"
                 + File.separatorChar + "logger-config.properties");
-        desktop.open(dirToOpen);
+        IoUtil.tryOpenFileExpolor(dirToOpen);
 
     }
 }

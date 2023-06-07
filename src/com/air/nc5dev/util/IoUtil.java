@@ -23,12 +23,20 @@ import java.util.zip.ZipOutputStream;
  */
 public final class IoUtil extends cn.hutool.core.io.IoUtil {
     public static void tryOpenFileExpolor(File f) {
-        try {
-            Runtime.getRuntime().exec("explorer /select, " + f.getPath());
-        } catch (Throwable e) {
+        if (f.isFile()) {
+            try {
+                Runtime.getRuntime().exec("explorer /select, " + f.getPath());
+            } catch (Throwable e) {
+                try {
+                    Desktop desktop = Desktop.getDesktop();
+                    desktop.open(f.getParentFile());
+                } catch (Throwable ioException) {
+                }
+            }
+        } else {
             try {
                 Desktop desktop = Desktop.getDesktop();
-                desktop.open(f.getParentFile());
+                desktop.open(f);
             } catch (Throwable ioException) {
             }
         }
