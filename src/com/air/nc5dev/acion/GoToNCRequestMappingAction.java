@@ -46,6 +46,10 @@ public class GoToNCRequestMappingAction extends GotoActionBase implements DumbAw
     }
 
     public static void init(Project p) {
+        if (p == null) {
+            return ;
+        }
+
         //设置默认项目
         ProjectUtil.setProject(p);
         try {

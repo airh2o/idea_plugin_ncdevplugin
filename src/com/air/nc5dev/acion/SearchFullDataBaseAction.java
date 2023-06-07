@@ -1,8 +1,7 @@
 package com.air.nc5dev.acion;
 
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
-import com.air.nc5dev.ui.PatcherDialog;
-import com.air.nc5dev.ui.SearchFullDataBaseDialog;
+import com.air.nc5dev.ui.searchdatabasefull.SearchFullDataBaseDialog;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 
 public class SearchFullDataBaseAction extends AbstractIdeaAction {

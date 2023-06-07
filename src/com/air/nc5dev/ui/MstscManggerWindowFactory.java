@@ -1,8 +1,5 @@
 package com.air.nc5dev.ui;
 
-import com.air.nc5dev.ui.MstscDialog;
-import com.air.nc5dev.ui.SearchFullDataBaseDialog;
-import com.air.nc5dev.ui.ToolWindowFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.content.Content;

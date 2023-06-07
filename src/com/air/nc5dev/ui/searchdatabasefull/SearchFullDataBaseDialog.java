@@ -1,5 +1,7 @@
-package com.air.nc5dev.ui;
+package com.air.nc5dev.ui.searchdatabasefull;
 
+import com.air.nc5dev.ui.MyTableCellEditor;
+import com.air.nc5dev.ui.MyTableRenderer;
 import com.air.nc5dev.util.*;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.util.searchfulldatabase.DbConnectionFactory;
@@ -10,7 +12,6 @@ import com.air.nc5dev.vo.NCDataSourceVO;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;

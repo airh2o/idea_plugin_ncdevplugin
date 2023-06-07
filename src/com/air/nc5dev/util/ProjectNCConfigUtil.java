@@ -230,6 +230,10 @@ public class ProjectNCConfigUtil {
      * @Param [key]
      */
     public static final String getConfigValue(Project project, @NotNull String key) {
+        if (project == null) {
+            return null;
+        }
+
         if (!isInited(project)) {
             initConfigFile(project);
         }
@@ -356,7 +360,7 @@ public class ProjectNCConfigUtil {
      */
     public static void initConfigFile(Project project) {
         if (project == null) {
-            throw new RuntimeException("project not finish yet, try restart idea!");
+            return;
         }
 
         File configFile = new File("");

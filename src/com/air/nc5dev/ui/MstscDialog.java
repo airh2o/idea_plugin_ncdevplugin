@@ -5,6 +5,7 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.alibaba.fastjson.JSON;
@@ -435,8 +436,7 @@ public class MstscDialog extends DialogWrapper {
             openDir.setBounds(x, y += height + 5, 150, height);
             openDir.addActionListener(e -> {
                 try {
-                    File dir = new File(textField_dbfile.getText()).getParentFile();
-                    Desktop.getDesktop().open(dir);
+                    IoUtil.tryOpenFileExpolor(new File(textField_dbfile.getText()));
                 } catch (Exception ex) {
                     LogUtil.error(ex.getMessage(), ex);
                 }

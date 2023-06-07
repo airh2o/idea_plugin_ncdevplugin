@@ -402,7 +402,7 @@
 
         &lt;!&ndash;  数据库全局搜索   &ndash;&gt;
         <toolWindow id="数据库全局搜索" secondary="false" anchor="bottom"
-                    factoryClass="com.air.nc5dev.ui.SearchFullDataBaseWindowFactory"/>
+                    factoryClass="com.air.nc5dev.ui.searchdatabasefull.SearchFullDataBaseWindowFactory"/>
 
         &lt;!&ndash;  MSTSC远程管理   &ndash;&gt;
         <toolWindow id="MSTSC远程管理" secondary="false" anchor="bottom"

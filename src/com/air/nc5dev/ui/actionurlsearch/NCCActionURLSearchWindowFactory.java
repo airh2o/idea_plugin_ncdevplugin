@@ -33,6 +33,10 @@ public class NCCActionURLSearchWindowFactory extends ToolWindowFactory {
 
     //这种会 显示 右下角 非模态 进度条
     public static void init2(Project project) {
+        if (project == null) {
+            return ;
+        }
+
         Task.Backgroundable backgroundable = new Task.Backgroundable(project, "初始化NC Action列表中...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {

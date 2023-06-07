@@ -1,6 +1,6 @@
 package com.air.nc5dev.util.searchfulldatabase;
 
-import com.air.nc5dev.ui.SearchFullDataBaseDialog;
+import com.air.nc5dev.ui.searchdatabasefull.SearchFullDataBaseDialog;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.intellij.openapi.progress.ProgressIndicator;
 import lombok.Builder;
