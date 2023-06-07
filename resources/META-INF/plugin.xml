@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>Yonyou NC Dev Tool</name>
-    <version>v3.5</version>
+    <version>v3.6</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com 微信: yongyourj 欢迎私活联系</vendor>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
@@ -48,7 +48,6 @@
         </action>
         <action id="nc5dev.info.deletenclogs" class="com.air.nc5dev.acion.DeleteNCLogsAction"
                 text="清理NC 日志文件" description="删除NC HOME中nclogs下的日志文件">
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift l"/>
         </action>
         <action id="nc5dev.info.openncconfigwindow" class="com.air.nc5dev.acion.OpenNCConfigWindowAction"
                 text="打开NC 配置窗口" description="打开NCHOME bin中NC服务器的配置脚本">
@@ -77,6 +76,10 @@
         </action>
         <action id="nc5dev.info.MstscManggerUIAction" class="com.air.nc5dev.acion.MstscManggerUIAction"
                 text="Mstsc远程桌面管理" description="Mstsc远程桌面管理">
+        </action>
+        <action id="nc5dev.info.MstscOpenLastAction" class="com.air.nc5dev.acion.MstscOpenLastAction"
+                text="打开最后一次MSTSC连接" description="打开最后一次MSTSC连接">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift l"/>
         </action>
         <action id="nc5dev.info.openjconsole" class="com.air.nc5dev.acion.OpenJconsoleAction"
                 text="打开 Jconsole" description="打开Jconsole">
@@ -135,6 +138,9 @@
         </action>
         <action id="nc5dev.info.ReConfigModuleAction" class="com.air.nc5dev.acion.ReConfigModuleAction"
                 text="重新配置模块结构(对模块右键 只配置此模块，否则配置整个所有模块)" description="立即重新自动设置模块的依赖结构和源文件夹等配置(对模块右键 只配置此模块，否则配置整个所有模块)">
+        </action>
+        <action id="nc5dev.info.ReConfigProjectAction" class="com.air.nc5dev.acion.ReConfigProjectAction"
+                text="重新配置整个项目NC结构" description="自动生成所有NC文件夹和模块配置文件以及配置源码文件夹等">
         </action>
 
         <action id="nc5dev.info.JavadocGenerateAction" class="com.air.nc5dev.acion.JavadocGenerateAction"
@@ -223,6 +229,7 @@
             <reference ref="nc5dev.info.OpenYonbipDevWebAction"/>
             <reference ref="nc5dev.info.SearchFullDataBaseAction"/>
             <reference ref="nc5dev.info.MstscManggerUIAction"/>
+            <reference ref="nc5dev.info.MstscOpenLastAction"/>
 
             <separator/>
             <reference ref="nc5dev.info.JavadocGenerateAction"/>
@@ -252,6 +259,7 @@
             <separator/>
 
             <reference ref="nc5dev.info.ReConfigModuleAction"/>
+            <reference ref="nc5dev.info.ReConfigProjectAction"/>
             <separator/>
 
             <!--            代码检查-->
@@ -385,8 +393,25 @@
         <!-- 日志输出窗口服务注册 -->
         <projectService serviceInterface="com.air.nc5dev.service.ui.IMeassgeConsole"
                         serviceImplementation="com.air.nc5dev.service.ui.impl.MeassgeConsoleImpl"/>
-        <!-- 日志输出窗口界面注册 -->
+      <!--  &lt;!&ndash; 日志输出窗口界面注册 &ndash;&gt;
         <toolWindow id="NC插件日志" anchor="bottom" factoryClass="com.air.nc5dev.ui.ToolWindowFactory"/>
+
+        &lt;!&ndash;        action搜索窗口    &ndash;&gt;
+        <toolWindow id="NCC Action URL搜索" secondary="false" anchor="bottom"
+                    factoryClass="com.air.nc5dev.ui.actionurlsearch.NCCActionURLSearchWindowFactory"/>
+
+        &lt;!&ndash;  数据库全局搜索   &ndash;&gt;
+        <toolWindow id="数据库全局搜索" secondary="false" anchor="bottom"
+                    factoryClass="com.air.nc5dev.ui.SearchFullDataBaseWindowFactory"/>
+
+        &lt;!&ndash;  MSTSC远程管理   &ndash;&gt;
+        <toolWindow id="MSTSC远程管理" secondary="false" anchor="bottom"
+                    factoryClass="com.air.nc5dev.ui.MstscManggerWindowFactory"/>
+        -->
+        <!--  开发常用工具窗口   -->
+        <toolWindow id="NC 开发常用工具窗口" secondary="false" anchor="bottom"
+                    factoryClass="com.air.nc5dev.ui.MyGroupWindowFactory"/>
+
 
         <projectService serviceImplementation="com.air.nc5dev.util.Actions"/>
 
@@ -397,9 +422,10 @@
 
         <!--      <searchEverywhereContributor implementation="com.air.nc5dev.nccrequstsearch.RequestMappingGoToContributor"/>-->
 
+        <!--        日志-->
+        <notificationGroup id="com.air.nc5dev.tool.plugin.nc5devtool" displayType="STICKY_BALLOON"/>
         <!--        监听项目打开操作-->
         <postStartupActivity implementation="com.air.nc5dev.listeners.ProjectOpenListener"/>
-
 
         <!--        搜索NCC URL路径的窗口注册
         <toolWindow id="NCCloud Action请求地址映射搜索" anchor="right"

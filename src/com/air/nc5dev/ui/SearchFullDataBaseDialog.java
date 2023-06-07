@@ -14,6 +14,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.components.*;
@@ -57,7 +58,7 @@ import java.util.stream.Collectors;
 @Data
 public class SearchFullDataBaseDialog extends DialogWrapper {
     JComponent contentPane;
-    AnActionEvent event;
+    Project project;
     JTextField textField_selectAllTableSql;
     JTextField textField_key;
     JTextArea textArea_msg;
@@ -77,11 +78,15 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
 
     public static volatile SearchFullDataBaseDialog me = null;
 
-    public SearchFullDataBaseDialog(AnActionEvent event) {
-        super(event.getProject());
-        this.event = event;
+    public SearchFullDataBaseDialog(Project project) {
+        super(project);
+        this.project = project;
         init();
         setTitle("数据库表内容全局模糊搜索");
+    }
+
+    public JComponent getContentPane() {
+        return createCenterPanel();
     }
 
     @Nullable
@@ -184,7 +189,7 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
                     Integer i = comboBox_dataSourceIndex.getSelectedIndex();
                     NCDataSourceVO ds = NCPropXmlUtil.get(i);
                     if (ds == null) {
-                        Messages.showErrorDialog(event.getProject(), "数据源索引不存在: " + i + " ,数据源数量: "
+                        Messages.showErrorDialog(project, "数据源索引不存在: " + i + " ,数据源数量: "
                                         + (NCPropXmlUtil.getDataSourceVOS() == null ? 0 :
                                         NCPropXmlUtil.getDataSourceVOS().size())
                                 , "错误:");
@@ -193,10 +198,10 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
                     Connection conn = null;
                     try {
                         conn = ConnectionUtil.getConn(ds);
-                        Messages.showInfoMessage(event.getProject(), JSON.toJSONString(ds, true), "恭喜!测试成功:");
+                        Messages.showInfoMessage(project, JSON.toJSONString(ds, true), "恭喜!测试成功:");
                     } catch (Throwable ex) {
                         ex.printStackTrace();
-                        Messages.showErrorDialog(event.getProject(), "连接失败: " + JSON.toJSONString(ds, true)
+                        Messages.showErrorDialog(project, "连接失败: " + JSON.toJSONString(ds, true)
                                 + " !错误原因:\n" + ExceptionUtil.toStringLines(ex, 5), "错误");
                     } finally {
                         IoUtil.close(conn);
@@ -395,7 +400,7 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
         }
 
         button_Search.setText("停止搜索");
-        Task.Backgroundable backgroundable = new Task.Backgroundable(event.getProject(), "导出中...请等待...") {
+        Task.Backgroundable backgroundable = new Task.Backgroundable(project, "导出中...请等待...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setText("正在搜索数据库...");

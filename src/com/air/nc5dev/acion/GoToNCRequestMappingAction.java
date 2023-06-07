@@ -1,5 +1,6 @@
 package com.air.nc5dev.acion;
 
+import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
 import com.air.nc5dev.nccrequstsearch.RequestMappingModel;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.idea.LogUtil;
@@ -37,19 +38,21 @@ public class GoToNCRequestMappingAction extends GotoActionBase implements DumbAw
             return;
         }
 
-        init(e);
+        init(e.getProject());
 
         RequestMappingModel requestMappingModel = new RequestMappingModel(project, new ArrayList(), e);
         showNavigationPopup(e, requestMappingModel, new MyGotoActionCallback()
                 , null, true, false);
     }
 
-    private void init(AnActionEvent e) {
+    public static void init(Project p) {
         //设置默认项目
-        ProjectUtil.setProject(e.getProject());
+        ProjectUtil.setProject(p);
         try {
             // 自动重新加载一次 插件配置文件
-            ProjectNCConfigUtil.initConfigFile(e.getProject());
+            ProjectNCConfigUtil.initConfigFile(p);
+
+            RequestMappingItemProvider.getMe().initScan(p);
         } catch (Exception e1) {
             LogUtil.error("emmmmm 出现异常,淡定不要惊慌,如果影响使用请QQ209308343通知我: ", e1);
         }

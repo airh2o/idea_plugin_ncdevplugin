@@ -57,57 +57,58 @@ public class NCCActionRefreshUtil {
             if (!client.isDirectory()) {
                 continue;
             }
-            File yyconfigModules = new File(yyconfig, "modules");
-            if (!yyconfigModules.isDirectory()) {
-                continue;
-            }
 
-            File[] cdirs = yyconfigModules.listFiles();
-            if (CollUtil.isEmpty(cdirs)) {
-                continue;
-            }
-
-            for (File cdir : cdirs) {
-                loadYyconfigmodulesDir(project, cdir);
-            }
+            //yyconfig/modules/
+            loadSrcDir4yyconfig(project, yyconfig);
         }
     }
 
-    /**
-     * 分析 src/client/yyconfig/modules/ 文件夹根目录下某个文件夹 <br>
-     * 比如:   src/client/yyconfig/modules/pu/    <br>
-     *
-     * @param project
-     * @param dir
-     */
-    public static void loadYyconfigmodulesDir(Project project, File dir) {
-        File[] fs = dir.listFiles();
-        if (CollUtil.isEmpty(fs)) {
+    private static void loadSrcDir4yyconfig(Project project, File yyconfig) {
+        File yyconfigModules = new File(yyconfig, "modules");
+        if (!yyconfigModules.isDirectory()) {
             return;
         }
 
-        for (File f : fs) {
-            if (!f.isDirectory()) {
+        //yyconfig/modules/pu/
+        File[] m1s = yyconfigModules.listFiles();
+        if (CollUtil.isEmpty(m1s)) {
+            return;
+        }
+
+        for (File m1 : m1s) {
+            //yyconfig/modules/pu/poorder/
+            File[] m2s = m1.listFiles();
+            if (CollUtil.isEmpty(m2s)) {
                 continue;
             }
 
-            if ("aggbusi".equals(f.getName())) {
-                loadAggbusi(dir, f, project);
-            } else {
-                loadYyconfigmodulesDir(project, f);
+            for (File m2 : m2s) {
+                //yyconfig/modules/pu/poorder/config/
+                loadYyconfigmodulesDir(project, m1, m2);
             }
         }
     }
 
     /**
-     * 分析 比如: src/client/yyconfig/modules/pu/order/aggbusi 文件夹 <br>
+     * 分析 yyconfig/modules/pu/poorder/config/   <br>
+     * 下的 action 和 authorize  <br>
+     *
+     * @param project
+     * @param configParentDir
+     */
+    public static void loadYyconfigmodulesDir(Project project, File dir, File configParentDir) {
+        loadConfigDir(dir, configParentDir, project);
+    }
+
+    /**
+     * 分析 比如: src/client/yyconfig/modules/pu/order/config 文件夹 <br>
      *
      * @param dir
-     * @param aggbusi
+     * @param configDir
      * @param project
      */
-    public static void loadAggbusi(File dir, File aggbusi, Project project) {
-        File config = new File(aggbusi, "config");
+    public static void loadConfigDir(File dir, File configDir, Project project) {
+        File config = new File(configDir, "config");
         if (!config.isDirectory()) {
             return;
         }
@@ -119,10 +120,10 @@ public class NCCActionRefreshUtil {
 
         File authorize = new File(config, "authorize");
 
-        load(action, authorize, dir, aggbusi, project);
+        load(action, authorize, dir, configDir, project);
     }
 
-    private static void load(File action, File authorize, File dir, File aggbusi, Project project) {
+    private static void load(File action, File authorize, File dir, File configDir, Project project) {
         File[] actionFiles = action.listFiles();
         if (CollUtil.isEmpty(actionFiles)) {
             return;
@@ -258,20 +259,9 @@ public class NCCActionRefreshUtil {
 
         //最后载入 yyconfigDir ，优先级比lib里的jar高
         File yyconfigDir = new File(webinf, "extend" + File.separatorChar + "yyconfig");
+
         if (yyconfigDir.isDirectory()) {
-            File yyconfigModules = new File(yyconfigDir, "modules");
-            if (!yyconfigModules.isDirectory()) {
-                return;
-            }
-
-            File[] cdirs = yyconfigModules.listFiles();
-            if (CollUtil.isEmpty(cdirs)) {
-                return;
-            }
-
-            for (File cdir : cdirs) {
-                loadYyconfigmodulesDir(project, cdir);
-            }
+            loadSrcDir4yyconfig(project, yyconfigDir);
         }
     }
 
@@ -377,32 +367,6 @@ public class NCCActionRefreshUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * 分析 src/client/yyconfig/modules/ 文件夹根目录下某个文件夹 <br>
-     * 比如:   src/client/yyconfig/modules/pu/    <br>
-     *
-     * @param project
-     * @param dir
-     */
-    public static void loadYyconfigmodulesDir(Project project, ZipEntry dir) {
-        File[] fs = null;
-        if (CollUtil.isEmpty(fs)) {
-            return;
-        }
-
-        for (File f : fs) {
-            if (!f.isDirectory()) {
-                continue;
-            }
-
-            if ("aggbusi".equals(f.getName())) {
-                loadAggbusi(null, f, project);
-            } else {
-                loadYyconfigmodulesDir(project, f);
-            }
         }
     }
 }

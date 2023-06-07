@@ -7,11 +7,14 @@ import com.air.nc5dev.util.XmlUtil;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.google.common.collect.Lists;
 import com.intellij.notification.*;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.util.Disposer;
+import com.intellij.util.Alarm;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.XMLWriter;
@@ -24,6 +27,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 项目 工具类</br>
@@ -42,9 +46,9 @@ public class ProjectUtil {
     /**
      * 本插件 默认的 非模态提醒的 统一 组id
      */
-    public static final NotificationGroup NOTIFICATION_GROUP = new NotificationGroup("com.air.nc5dev.tool.plugin" +
-            ".nc5devtool",
-            NotificationDisplayType.STICKY_BALLOON, false);
+  /*  public static final NotificationGroup NOTIFICATION_GROUP = new NotificationGroup(
+            "com.air.nc5dev.tool.plugin.nc5devtool"
+            , NotificationDisplayType.STICKY_BALLOON, false);*/
 
     /**
      * 显示一个 错误的 非模态提醒      </br>
@@ -58,9 +62,16 @@ public class ProjectUtil {
      * @Param [msg]
      */
     public static void errorNotification(String msg, Project project) {
-        Notification notification = NOTIFICATION_GROUP.createNotification(msg, NotificationType.ERROR);
+        Notification notification = createNotification(msg, NotificationType.ERROR);
         notification.setSubtitle("错误:");
         Notifications.Bus.notify(notification, project == null ? getDefaultProject() : project);
+    }
+
+    private static Notification createNotification(String msg, NotificationType notificationType) {
+        return NotificationGroupManager.getInstance()
+                .getNotificationGroup("com.air.nc5dev.tool.plugin.nc5devtool")
+                .createNotification(msg, notificationType)
+                ;
     }
 
     /**
@@ -75,7 +86,7 @@ public class ProjectUtil {
      * @Param [msg]
      */
     public static void warnNotification(String msg, Project project) {
-        Notification notification = NOTIFICATION_GROUP.createNotification(msg, NotificationType.WARNING);
+        Notification notification = createNotification(msg, NotificationType.WARNING);
         notification.setSubtitle("警告:");
         Notifications.Bus.notify(notification, project == null ? getDefaultProject() : project);
     }
@@ -92,7 +103,7 @@ public class ProjectUtil {
      * @Param [msg]
      */
     public static void infoNotification(String msg, Project project) {
-        Notification notification = NOTIFICATION_GROUP.createNotification(msg, NotificationType.INFORMATION);
+        Notification notification = createNotification(msg, NotificationType.INFORMATION);
         notification.setSubtitle("提醒:");
         Notifications.Bus.notify(notification, project == null ? getDefaultProject() : project);
     }
@@ -109,9 +120,36 @@ public class ProjectUtil {
      * @Param [msg]
      */
     public static void notifyAndHide(String msg, Project project) {
-        Notification notification = NOTIFICATION_GROUP.createNotification(msg, NotificationType.INFORMATION);
+        Notification notification = createNotification(msg, NotificationType.INFORMATION);
         notification.setSubtitle("提醒:");
         Notifications.Bus.notifyAndHide(notification, project == null ? getDefaultProject() : project);
+    }
+
+    /**
+     * 显示一个 正常消息提醒的 非模态提醒      </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/2/20 0020 17:05
+     * @Param [msg]
+     */
+    public static void notifyAndHide(String msg, Project project, int delayMillis) {
+        if (delayMillis < 500) {
+            delayMillis = (int) TimeUnit.SECONDS.toMillis(5L);
+        }
+
+        Notification notification = createNotification(msg, NotificationType.INFORMATION);
+        notification.setSubtitle("提醒:");
+        Notifications.Bus.notify(notification, project == null ? getDefaultProject() : project);
+
+        Alarm alarm = new Alarm((Disposable)(project == null ? ApplicationManager.getApplication() : project));
+        alarm.addRequest(() -> {
+            notification.expire();
+            Disposer.dispose(alarm);
+        }, delayMillis);
     }
 
     /* *
@@ -209,7 +247,7 @@ public class ProjectUtil {
                 }
 
                 try {
-                  //  ApplicationManager.getApplication().getComponent(EditorFactory.class);
+                    //  ApplicationManager.getApplication().getComponent(EditorFactory.class);
                     t = ServiceManager.getService(project, clazz);
                     if (t != null) {
                         map.put(clazz, t);

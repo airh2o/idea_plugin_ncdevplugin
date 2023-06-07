@@ -9,6 +9,7 @@ import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.alibaba.fastjson.JSON;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.components.*;
@@ -64,7 +65,6 @@ public class MstscDialog extends DialogWrapper {
             , "user", "memo", "pk"
     };
 
-    AnActionEvent event;
     JBTabbedPane contentPane;
     JBPanel panel_mstsc;
     JBTextField textField_dbfile;
@@ -102,10 +102,11 @@ public class MstscDialog extends DialogWrapper {
     int height = 800;
     int width = 1200;
     JBPanel panel_info;
+    Project project;
 
-    public MstscDialog(AnActionEvent event) {
-        super(event.getProject());
-        this.event = event;
+    public MstscDialog(Project project) {
+        super(project);
+        this.project = project;
         createCenterPanel();
         init();
         setTitle("Mstsc远程桌面管理");
@@ -115,6 +116,10 @@ public class MstscDialog extends DialogWrapper {
     public void doCancelAction() {
         onClose();
         super.doCancelAction();
+    }
+
+    public JComponent getContentPane() {
+        return createCenterPanel();
     }
 
     private void onClose() {
@@ -526,7 +531,7 @@ public class MstscDialog extends DialogWrapper {
 
     public void imports() {
         try {
-            String json = getFromClipboard();
+            String json = StringUtil.getFromClipboard();
             if (StrUtil.isBlank(json)) {
                 return;
             }
@@ -548,24 +553,7 @@ public class MstscDialog extends DialogWrapper {
     }
 
     public void export() {
-        setIntoClipboard(JSON.toJSONString(es));
-    }
-
-    public void setIntoClipboard(String data) {
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(new StringSelection(data), null);
-    }
-
-    public String getFromClipboard() {
-        Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-        if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-            try {
-                return (String) transferable.getTransferData(DataFlavor.stringFlavor);
-            } catch (Exception e) {
-                return "";
-            }
-        }
-        return "";
+        StringUtil.setIntoClipboard(JSON.toJSONString(es));
     }
 
     public void link(ActionEvent actionEvent) {

@@ -72,7 +72,7 @@ public class CopyMateFile2NewFileAction extends AbstractIdeaAction {
             LogUtil.info("生成成功： " + newFile.getPath());
 
             Desktop desktop = Desktop.getDesktop();
-            desktop.open(newFile.getParentFile());
+            IoUtil.tryOpenFileExpolor(newFile);
         } catch (Throwable iae) {
             iae.printStackTrace();
             LogUtil.error(iae.toString() + newFile.getParentFile().getPath(), iae);

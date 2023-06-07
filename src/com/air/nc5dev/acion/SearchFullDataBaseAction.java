@@ -10,7 +10,7 @@ public class SearchFullDataBaseAction extends AbstractIdeaAction {
     protected void doHandler(AnActionEvent e) {
         SearchFullDataBaseDialog dialog = null;
         if (SearchFullDataBaseDialog.me == null) {
-            dialog = new SearchFullDataBaseDialog(e);
+            dialog = new SearchFullDataBaseDialog(e.getProject());
           //  SearchFullDataBaseDialog.me = dialog;
         } else {
             dialog = SearchFullDataBaseDialog.me;

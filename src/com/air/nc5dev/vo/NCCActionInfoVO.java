@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * </br>
  * </br>
@@ -19,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NCCActionInfoVO {
+public class NCCActionInfoVO implements Serializable,Cloneable {
     public static final int FROM_SRC = 1000;
 
     String name;

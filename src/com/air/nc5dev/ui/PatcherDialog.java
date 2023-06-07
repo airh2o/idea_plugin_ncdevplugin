@@ -828,8 +828,7 @@ public class PatcherDialog extends DialogWrapper {
 
                     if (opendir != null) {
                         try {
-                            Desktop desktop = Desktop.getDesktop();
-                            desktop.open(opendir);
+                            IoUtil.tryOpenFileExpolor(opendir);
                         } catch (Throwable ioException) {
                             ioException.printStackTrace();
                             LogUtil.infoAndHide("导出成功！路径: " + opendir.getPath());

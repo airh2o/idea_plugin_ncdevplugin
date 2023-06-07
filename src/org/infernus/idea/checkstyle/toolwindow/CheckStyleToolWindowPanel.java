@@ -321,6 +321,7 @@ public class CheckStyleToolWindowPanel extends JPanel implements ConfigurationLi
             return;
         }
 
+        // 直接 打开 文件 编辑
         final FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
         ApplicationManager.getApplication().invokeLater(() -> {
             final FileEditor[] editor = fileEditorManager.openFile(virtualFile, true);

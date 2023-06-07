@@ -106,8 +106,7 @@ public class MakeNcModuleJarAction extends AbstractIdeaAction {
         LogUtil.info("生成成功： " + dir.getPath());
 
         try {
-            Desktop desktop = Desktop.getDesktop();
-            desktop.open(dir);
+            IoUtil.tryOpenFileExpolor(dir);
         } catch (Throwable iae) {
             LogUtil.error("自动打开路径失败: " + dir.getPath(), iae);
         }

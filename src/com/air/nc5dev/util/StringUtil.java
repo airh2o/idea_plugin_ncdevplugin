@@ -3,6 +3,11 @@ package com.air.nc5dev.util;
 
 import cn.hutool.core.util.StrUtil;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
@@ -21,6 +26,23 @@ import java.util.regex.Pattern;
  * @date 2019年8月9日 下午9:14:26
  */
 public final class StringUtil extends StrUtil {
+    public static void setIntoClipboard(String data) {
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(new StringSelection(data), null);
+    }
+
+    public static String getFromClipboard() {
+        Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            try {
+                return (String) transferable.getTransferData(DataFlavor.stringFlavor);
+            } catch (Exception e) {
+                return "";
+            }
+        }
+        return "";
+    }
+
     /**
      * 字符串 == null 或者 trim后是空 <br>
      * <br>

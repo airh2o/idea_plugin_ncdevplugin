@@ -2,6 +2,7 @@ package com.air.nc5dev.acion;
 
 import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
+import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.NCPropXmlUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.idea.LogUtil;
@@ -65,8 +66,8 @@ public class ExportBillAllAction extends AbstractIdeaAction {
                 LogUtil.info("脚本保存路径： " + outdir.getPath());
                 Desktop desktop = Desktop.getDesktop();
                 try {
-                    desktop.open(outdir.getParentFile());
-                } catch (IOException e1) {
+                    IoUtil.tryOpenFileExpolor(outdir);
+                } catch (Throwable e1) {
                     e1.printStackTrace();
                     LogUtil.error(e1.toString() + outdir.getParentFile().getPath(), e1);
                 }

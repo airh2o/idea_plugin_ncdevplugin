@@ -34,7 +34,7 @@ import com.intellij.ui.content.Content;
  * Nothing can be injected as it runs in the root pico container.
  */
 public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFactory {
-    public static final String TOOL_WINDOW_ID = "NC插件日志";
+    public static final String TOOL_WINDOW_ID = "NC插件日志(QQ209308343 微信yongyourj 有业务可联系 感谢支持)";
     public static final String TAB_LOGS = "Log";
     public static LogPanel logPanel;
 
@@ -42,13 +42,12 @@ public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFact
     public void createToolWindowContent(Project project, final ToolWindow toolWindow) {
         addLogTab(project, toolWindow);
         toolWindow.setType(ToolWindowType.DOCKED, null);
-        toolWindow.setTitle("(QQ 209308343 有业务可联系 感谢支持)");
         try {
             toolWindow.setIcon(AllIcons.General.Information);
         } catch (Throwable e) {
         }
         toolWindow.setToHideOnEmptyContent(true);
-        toolWindow.setStripeTitle(TOOL_WINDOW_ID);
+       // toolWindow.setStripeTitle(TOOL_WINDOW_ID);
 
         PubSubUtil.subscribe(MeassgeConsoleImpl.KEY, new LogWinAutoShowWhenErr(toolWindow));
     }
@@ -56,7 +55,7 @@ public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFact
     private static void addLogTab(Project project, ToolWindow toolWindow) {
         try {
             logPanel = new LogPanel(toolWindow, project);
-            Content logContent = toolWindow.getContentManager().getFactory().createContent(logPanel, TAB_LOGS, false);
+            Content logContent = toolWindow.getContentManager().getFactory().createContent(logPanel, TOOL_WINDOW_ID, false);
             toolWindow.getContentManager().addContent(logContent);
         } catch (Throwable e) {
             LogUtil.error(e.toString(), e);

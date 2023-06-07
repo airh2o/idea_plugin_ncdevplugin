@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class MstscManggerUIAction extends AbstractIdeaAction {
     @Override
     protected void doHandler(AnActionEvent e) {
-        MstscDialog dialog = new MstscDialog(e);
+        MstscDialog dialog = new MstscDialog(e.getProject());
         dialog.setModal(false);
         dialog.show();
     }

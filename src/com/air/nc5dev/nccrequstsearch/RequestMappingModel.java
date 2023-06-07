@@ -98,6 +98,7 @@ public class RequestMappingModel extends FilteringGotoByModel implements DumbAwa
     public String getFullName(@NotNull Object o) {
         String name = o instanceof NCCActionInfoVO ? ((NCCActionInfoVO) o).getClazz().trim() : getElementName(o);
         if (StringUtil.isNotBlank(name)) {
+            //打开 class文件
             Project project = ProjectUtil.getDefaultProject();
             SearchEverywhereManager seManager = SearchEverywhereManager.getInstance(project);
 

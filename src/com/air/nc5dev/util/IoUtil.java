@@ -5,9 +5,11 @@ import com.air.nc5dev.util.idea.LogUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.io.*;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.List;
 import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -20,6 +22,18 @@ import java.util.zip.ZipOutputStream;
  * IO tool
  */
 public final class IoUtil extends cn.hutool.core.io.IoUtil {
+    public static void tryOpenFileExpolor(File f) {
+        try {
+            Runtime.getRuntime().exec("explorer /select, " + f.getPath());
+        } catch (Throwable e) {
+            try {
+                Desktop desktop = Desktop.getDesktop();
+                desktop.open(f.getParentFile());
+            } catch (Throwable ioException) {
+            }
+        }
+    }
+
     /**
      * 把一个 java的 Properties 输出成文件
      *
@@ -340,7 +354,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      */
     public static final ArrayList<File> serachAllNcPublicClass(File ncHome) {
         return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
-                        , "classes", false)
+                , "classes", false)
                 , serachAllNcClass(new File(ncHome, "modules")
                         , "hyext" + File.separatorChar + "classes", false)
         );
@@ -369,7 +383,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      */
     public static final ArrayList<File> serachAllNcPrivateClass(File ncHome) {
         return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
-                        , "META-INF" + File.separatorChar + "classes", false)
+                , "META-INF" + File.separatorChar + "classes", false)
                 , serachAllNcClass(new File(ncHome, "modules")
                         , "META-INF" + File.separatorChar + "hyext" + File.separatorChar + "classes", false)
         );
@@ -383,7 +397,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      */
     public static final ArrayList<File> serachAllNcPublicJars(File ncHome) {
         return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
-                        , "lib", true)
+                , "lib", true)
                 , serachAllNcClass(new File(ncHome, "modules")
                         , "hyext" + File.separatorChar + "lib", true)
         );
@@ -412,7 +426,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      */
     public static final ArrayList<File> serachAllNcPrivateJars(File ncHome) {
         return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
-                        , "META-INF" + File.separatorChar + "lib", true)
+                , "META-INF" + File.separatorChar + "lib", true)
                 , serachAllNcClass(new File(ncHome, "modules")
                         , "META-INF" + File.separatorChar + "hyext" + File.separatorChar + "lib", true)
         );

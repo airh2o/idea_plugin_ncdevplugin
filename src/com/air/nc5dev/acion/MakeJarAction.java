@@ -76,8 +76,7 @@ public class MakeJarAction extends AbstractIdeaAction {
         LogUtil.info("生成成功： " + outJarFile.getPath());
 
         try {
-            Desktop desktop = Desktop.getDesktop();
-            desktop.open(outJarFile.getParentFile());
+            IoUtil.tryOpenFileExpolor(outJarFile);
         } catch (Throwable iae) {
             LogUtil.error("自动打开路径失败: " + outJarFile.getParentFile().getPath(), iae);
         }

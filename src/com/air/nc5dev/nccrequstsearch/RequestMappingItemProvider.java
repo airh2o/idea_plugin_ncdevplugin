@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -32,18 +33,34 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Version
  */
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
 public class RequestMappingItemProvider implements ChooseByNameItemProvider {
     /**
      * 所有的 url信息, key=project getBasePath(),value={key=url完整地址，value=url信息}
      */
     public static final Map<String, Map<String, NCCActionInfoVO>> ALL_ACTIONS = new ConcurrentHashMap<>(3_0000);
-    //是否已经扫描了 nchome信息
-    private static volatile boolean inited = false;
+    /**
+     * 所有的 url信息, key=project getBasePath(),value=是否已经扫描了 nchome信息
+     */
+    private static Map<String, AtomicBoolean> INITED_MAP = new ConcurrentHashMap<>();
     private static final List<NCCActionInfoVO> EMPTY_LIST = Collections.unmodifiableList(CollUtil.emptyList());
-
+    static volatile RequestMappingItemProvider me;
     RequestMappingModel requestMappingModel;
+
+    public RequestMappingItemProvider(RequestMappingModel requestMappingModel) {
+        this.requestMappingModel = requestMappingModel;
+        me = this;
+    }
+
+    public RequestMappingItemProvider() {
+        me = this;
+    }
+
+    public static RequestMappingItemProvider getMe() {
+        if (me == null) {
+            me = new RequestMappingItemProvider();
+        }
+        return me;
+    }
 
     public List<String> filterNames(@NotNull ChooseByNameBase chooseByNameBase
             , @NotNull String[] names, @NotNull String inputStr) {
@@ -115,6 +132,21 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
      */
     private List<NCCActionInfoVO> search(Project project, String inputStr
             , boolean everwhere, ProgressIndicator cancelled, Processor<Object> processor) {
+        return search(project, inputStr, everwhere);
+    }
+
+
+    /**
+     * 搜索
+     *
+     * @param chooseByNameBase
+     * @param inputStr
+     * @param everwhere
+     * @param cancelled
+     * @param processor
+     * @return
+     */
+    public List<NCCActionInfoVO> search(Project project, String inputStr, boolean everwhere) {
         initScan(project);
 
         if (StringUtil.isBlank(inputStr)) {
@@ -183,6 +215,7 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         return matchs;
     }
 
+
     /**
      * 搜索
      *
@@ -207,7 +240,8 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
      * @return
      */
     private int like(String name, NCCActionInfoVO vo, String str) {
-        if (requestMappingModel.onlySearchPorjectUrl && vo.getProject().startsWith("NCHOME")) {
+        if ((requestMappingModel != null && requestMappingModel.onlySearchPorjectUrl)
+                && vo.getProject().startsWith("NCHOME")) {
             return -1;
         }
 
@@ -241,7 +275,9 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             }
         }
 
-        score += vo.getFrom();
+        if (score > 0) {
+            score += vo.getFrom();
+        }
 
         vo.setScore(score);
         return score;
@@ -252,30 +288,46 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
      *
      * @param chooseByNameBase
      */
-    private void initScan(Project p) {
+    public void initScan(Project p) {
         if (p == null) {
             return;
         }
 
-        if (inited) {
+        synchronized (p) {
+            AtomicBoolean inited = INITED_MAP.get(p.getBasePath());
+            if (inited == null) {
+                inited = new AtomicBoolean(false);
+                INITED_MAP.put(p.getBasePath(), inited);
+            }
+
+            if (inited.get()) {
+                //载入项目的，放最后，优先级最高
+                info("正在扫描项目src源码的action列表...");
+                NCCActionRefreshUtil.reloadProjectAction(p);
+                info("项目本身扫描完成");
+                return;
+            }
+
+            //没有搜索过 NCHOME，那么搜索一次，此后不搜索
+            info("正在初始化扫描整个NCHOME(hotwebs下nccloud的,请不要移动jar到modules里面!)的action列表...");
+
+            NCCActionRefreshUtil.loadNCHome(p);
+
             //载入项目的，放最后，优先级最高
-            requestMappingModel.setInfo("正在扫描项目src源码的action列表...");
+            info("正在扫描项目src源码的action列表...");
+
             NCCActionRefreshUtil.reloadProjectAction(p);
-            requestMappingModel.setInfo("搜索完成");
-            return;
+
+            info("初始化扫描完成");
+
+            inited.compareAndSet(false, true);
         }
-
-        inited = true;
-        //没有搜索过 NCHOME，那么搜索一次，此后不搜索
-        requestMappingModel.setInfo("正在扫描整个NCHOME的action列表...");
-        LogUtil.infoAndHide("正在初始化扫描整个NCHOME(hotwebs下nccloud的,请不要移动jar到modules里面!)的action列表...");
-        NCCActionRefreshUtil.loadNCHome(p);
-        //载入项目的，放最后，优先级最高
-        requestMappingModel.setInfo("正在扫描项目src源码的action列表...");
-        NCCActionRefreshUtil.reloadProjectAction(p);
-
-        requestMappingModel.setInfo("搜索完成");
     }
 
-
+    public void info(String msg) {
+        if (requestMappingModel != null) {
+            requestMappingModel.setInfo(msg);
+        }
+        LogUtil.infoAndHide(msg);
+    }
 }
