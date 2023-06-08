@@ -14,17 +14,17 @@ public class ActionResultDTO extends NCCActionInfoVO {
 
     public String displayText() {
         return
-                "URL 名称=" + name + "\n" +
-                        "label 描述=" + label + "\n" +
-                        "clazz 类名称=" + clazz + "\n" +
-                        "from 来源=" + getFromName() + "\n" +
-                        "type 类型=" + getTypeName() + "\n" +
-                        "appcode 应用编码=" + appcode + "\n" +
-                        "xmlPath 配置文件路径=" + xmlPath + "\n" +
-                        "column 配置文件所在列=" + column + "\n" +
-                        "row 配置文件所在行=" + row + "\n" +
-                        "score 匹配度得分=" + score + "\n" +
-                        "project 工程路径=" + project + "\n"
+                "URL 名称:\n" + name + "\n\n" +
+                        "label 描述:\n" + label + "\n\n" +
+                        "clazz 类名称:\n" + clazz + "\n\n" +
+                        "from 来源:\n" + getFromName() + "\n\n" +
+                        "type 类型:\n" + getTypeName() + "\n\n" +
+                        "appcode 应用编码:\n" + appcode + "\n\n" +
+                        "xmlPath 配置文件路径:\n" + xmlPath + "\n\n" +
+                        "column 配置文件所在列:\n" + column + "\n\n" +
+                        "row 配置文件所在行:\n" + row + "\n\n" +
+                        "score 匹配度得分:\n" + score + "\n\n" +
+                        "project 工程路径:\n" + project + "\n\n"
                 ;
     }
 

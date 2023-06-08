@@ -174,8 +174,9 @@ public class NCCActionURLSearchUI {
             textArea_detail = new JBTextArea();
             textArea_detail.setEditable(true);
             textArea_detail.setAutoscrolls(true);
-            textArea_detail.setLineWrap(true);
+           // textArea_detail.setLineWrap(true);
             JBScrollPane sc = new JBScrollPane(textArea_detail);
+            sc.setAutoscrolls(true);
             sc.setBounds(x += panel_table.getWidth() + 5, y, 200, 300);
             panel_main.add(sc);
 
@@ -189,14 +190,26 @@ public class NCCActionURLSearchUI {
         btnNewButton_searchProject.addActionListener(e -> search(0));
     }
 
+    AtomicBoolean runing = new AtomicBoolean(false);
+
     public void search(int type) {
+        if (runing.get()) {
+            label_error.setText("请等待上一次搜索完成...再试");
+            return;
+        }
+
+        runing.set(true);
         Task.Backgroundable backgroundable = new Task.Backgroundable(project, "正在搜索匹配的NC Action中...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
-                if (1 == type) {
-                    searchAll();
-                } else if (0 == type) {
-                    searchProject();
+                try {
+                    if (1 == type) {
+                        searchAll();
+                    } else if (0 == type) {
+                        searchProject();
+                    }
+                } finally {
+                    runing.set(false);
                 }
             }
         };
@@ -220,24 +233,26 @@ public class NCCActionURLSearchUI {
     }
 
     private void setResult(List<NCCActionInfoVO> res) {
-        if (CollUtil.isEmpty(res)) {
-            label_error.setText("未搜索到任何内容");
-            textArea_detail.setText("");
-            table.removeAll();
-            return;
-        }
+        SwingUtilities.invokeLater(()->{
+            if (CollUtil.isEmpty(res)) {
+                label_error.setText("未搜索到任何内容");
+                textArea_detail.setText("");
+                table.removeAll();
+                return;
+            }
 
-        ArrayList<ActionResultDTO> vos = new ArrayList(res.size() << 1);
-        int i = 1;
-        for (NCCActionInfoVO re : res) {
-            ActionResultDTO v = ReflectUtil.copy2VO(re, ActionResultDTO.class);
-            v.setOrder1(i++);
-            vos.add(v);
-        }
+            ArrayList<ActionResultDTO> vos = new ArrayList(res.size() << 1);
+            int i = 1;
+            for (NCCActionInfoVO re : res) {
+                ActionResultDTO v = ReflectUtil.copy2VO(re, ActionResultDTO.class);
+                v.setOrder1(i++);
+                vos.add(v);
+            }
 
-        textArea_detail.setText(vos.get(0).displayText());
+            textArea_detail.setText(vos.get(0).displayText());
 
-        getTable().setRows(vos);
+            getTable().setRows(vos);
+        });
     }
 
     public String getKey() {
