@@ -12,6 +12,10 @@ import java.io.Serializable;
 public class ActionResultDTO extends NCCActionInfoVO {
     int order1;
 
+    public int auth_column;
+    public int auth_row;
+
+
     public String displayText() {
         return
                 "URL 名称:\n" + name + "\n\n" +
@@ -23,6 +27,7 @@ public class ActionResultDTO extends NCCActionInfoVO {
                         "xmlPath 配置文件路径:\n" + xmlPath + "\n\n" +
                         "column 配置文件所在列:\n" + column + "\n\n" +
                         "row 配置文件所在行:\n" + row + "\n\n" +
+                        "auth 配置文件路径:\n" + authPath + "\n\n" +
                         "score 匹配度得分:\n" + score + "\n\n" +
                         "project 工程路径:\n" + project + "\n\n"
                 ;

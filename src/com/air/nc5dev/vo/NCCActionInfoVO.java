@@ -47,6 +47,7 @@ public class NCCActionInfoVO implements Serializable, Cloneable {
      * xml 注册文件
      */
     public String xmlPath;
+    public String authPath;
     /**
      * 项目路径
      */

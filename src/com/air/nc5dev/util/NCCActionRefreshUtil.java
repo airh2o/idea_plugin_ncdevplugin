@@ -8,7 +8,6 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.plexus.util.StringInputStream;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -17,8 +16,6 @@ import org.w3c.dom.NodeList;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
@@ -60,7 +57,7 @@ public class NCCActionRefreshUtil {
             File yyconfig = new File(client, "yyconfig");
             if (client.isDirectory()) {
                 //yyconfig/modules/
-                loadSrcDir4yyconfig(project, yyconfig, NCCActionInfoVO.FROM_SRC);
+                loadDir4yyconfig(project, yyconfig, NCCActionInfoVO.FROM_SRC);
             }
 
             File metainf = new File(moduleDir, "META-INF");
@@ -103,7 +100,7 @@ public class NCCActionRefreshUtil {
         Document document = XmlUtil.xmlFile2Document2(f);
         Element rootElement = XmlUtil.getRootElement(document);
         if (rootElement == null) {
-            return ;
+            return;
         }
 
         List<Element> es = new LinkedList<>();
@@ -147,13 +144,7 @@ public class NCCActionRefreshUtil {
                 vo.setFrom(from);
                 vo.setType(NCCActionInfoVO.TYPE_UPM);
 
-                for (int i = 0; i < lines.size(); i++) {
-                    if(lines.get(i).contains(vo.getClazz())){
-                        vo.setRow(i);
-                        vo.setColumn(lines.get(i).indexOf(vo.getClazz()));
-                        break;
-                    }
-                }
+                matchRowColumn(lines, vo);
 
                 vos.add(vo);
             }
@@ -164,7 +155,7 @@ public class NCCActionRefreshUtil {
         }
     }
 
-    public static void loadSrcDir4yyconfig(Project project, File yyconfig, int from) {
+    public static void loadDir4yyconfig(Project project, File yyconfig, int from) {
         File yyconfigModules = new File(yyconfig, "modules");
         if (!yyconfigModules.isDirectory()) {
             return;
@@ -250,6 +241,7 @@ public class NCCActionRefreshUtil {
                 .collect(Collectors.toList());
 
         Map<String, String> action2AppcodeMap = new HashMap<>(100);
+        Map<String, String> action2AuthXmlPathMap = new HashMap<>(100);
         for (File authorizeXml : authorizeXmls) {
             try {
                 Document document = XmlUtil.xmlFile2Document2(authorizeXml);
@@ -275,6 +267,7 @@ public class NCCActionRefreshUtil {
                     }
 
                     action2AppcodeMap.put(textContent, appcode);
+                    action2AuthXmlPathMap.put(textContent, authorizeXml.getPath());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -299,19 +292,14 @@ public class NCCActionRefreshUtil {
                         continue;
                     }
                     vo.setAppcode(action2AppcodeMap.get(vo.getName()));
+                    vo.setAuthPath(action2AuthXmlPathMap.get(vo.getName()));
                     vo.setXmlPath(actionXml.getPath());
                     vo.setProject(project != null ? project.getBasePath() : null);
                     vo.setType(NCCActionInfoVO.TYPE_ACTION);
                     vo.setFrom(from);
 
                     List<String> lines = FileUtil.readUtf8Lines(actionXml);
-                    for (int x = 0; x < lines.size(); x++) {
-                        if(lines.get(x).contains(vo.getClazz())){
-                            vo.setRow(x);
-                            vo.setColumn(lines.get(x).indexOf(vo.getClazz()));
-                            break;
-                        }
-                    }
+                    matchRowColumn(lines, vo);
 
                     vos.add(vo);
                 }
@@ -371,7 +359,7 @@ public class NCCActionRefreshUtil {
         File yyconfigDir = new File(webinf, "extend" + File.separatorChar + "yyconfig");
 
         if (yyconfigDir.isDirectory()) {
-            loadSrcDir4yyconfig(project, yyconfigDir, NCCActionInfoVO.FROM_HOME);
+            loadDir4yyconfig(project, yyconfigDir, NCCActionInfoVO.FROM_HOME);
         }
 
         //载入UPM
@@ -407,7 +395,7 @@ public class NCCActionRefreshUtil {
             }
 
             Map<JarEntry, InputStream> actions = new HashMap<>(100);
-            List<InputStream> authorizes = new ArrayList<>(100);
+            Map<InputStream, JarEntry> input2JarEntityMap = new HashMap<>(100);
             while (es.hasMoreElements()) {
                 JarEntry e = es.nextElement();
                 String name = e.getName().toLowerCase();
@@ -415,7 +403,7 @@ public class NCCActionRefreshUtil {
                     if (StringUtil.contains(name, "/action/")) {
                         actions.put(e, jf.getInputStream(e));
                     } else if (StringUtil.contains(name, "/authorize/")) {
-                        authorizes.add(jf.getInputStream(e));
+                        input2JarEntityMap.put(jf.getInputStream(e), e);
                     }
                 }
             }
@@ -425,7 +413,8 @@ public class NCCActionRefreshUtil {
             }
 
             Map<String, String> action2AppcodeMap = new HashMap<>(100);
-            for (InputStream authorizeXml : authorizes) {
+            Map<String, String> action2AuthXmlPathMap = new HashMap<>(100);
+            for (InputStream authorizeXml : input2JarEntityMap.keySet()) {
                 try {
                     Document document = XmlUtil.xmlFile2Document2(authorizeXml);
                     Element rootElement = XmlUtil.getRootElement(document);
@@ -453,6 +442,9 @@ public class NCCActionRefreshUtil {
                         }
 
                         action2AppcodeMap.put(textContent, appcode);
+                        action2AuthXmlPathMap.put(textContent, jar.getPath()
+                                + File.separatorChar
+                                + input2JarEntityMap.get(authorizeXml).getName());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -464,11 +456,11 @@ public class NCCActionRefreshUtil {
                 try {
                     byte[] bytes = IoUtil.readBytes(input);
 
-                    List<String> lines = IoUtil.readUtf8Lines(new ByteArrayInputStream(bytes),new ArrayList<>());
+                    List<String> lines = IoUtil.readUtf8Lines(new ByteArrayInputStream(bytes), new ArrayList<>());
 
                     Document document = XmlUtil.xmlFile2Document2(new ByteArrayInputStream(
-                          //  lines.stream().collect(Collectors.joining("")).getBytes(StandardCharsets.UTF_8)
-                             bytes
+                            //  lines.stream().collect(Collectors.joining("")).getBytes(StandardCharsets.UTF_8)
+                            bytes
                     ));
                     Element rootElement = XmlUtil.getRootElement(document);
                     NodeList actionList = rootElement.getElementsByTagName("action");
@@ -484,16 +476,11 @@ public class NCCActionRefreshUtil {
                             continue;
                         }
                         vo.setAppcode(action2AppcodeMap.get(vo.getName()));
+                        vo.setAuthPath(action2AuthXmlPathMap.get(vo.getName()));
                         vo.setXmlPath(jar.getPath() + File.separatorChar + jarEntity.getName());
                         vo.setProject("NCHOME:" + (project != null ? project.getBasePath() : null));
 
-                        for (int x = 0; x < lines.size(); x++) {
-                            if(lines.get(x).contains(vo.getClazz())){
-                                vo.setRow(x);
-                                vo.setColumn(lines.get(x).indexOf(vo.getClazz()));
-                                break;
-                            }
-                        }
+                        matchRowColumn(lines, vo);
 
                         vos.add(vo);
                     }
@@ -508,4 +495,16 @@ public class NCCActionRefreshUtil {
             e.printStackTrace();
         }
     }
+
+    private static void matchRowColumn(List<String> lines, NCCActionInfoVO vo) {
+        for (int x = 0; x < lines.size(); x++) {
+            if (lines.get(x).contains(vo.getClazz())) {
+                vo.setRow(x);
+                vo.setColumn(lines.get(x).indexOf(vo.getClazz()));
+                break;
+            }
+        }
+    }
+
+
 }

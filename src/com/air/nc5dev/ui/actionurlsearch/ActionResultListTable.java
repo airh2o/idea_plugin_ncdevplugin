@@ -1,9 +1,11 @@
 package com.air.nc5dev.ui.actionurlsearch;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.vo.NCCActionInfoVO;
 import com.intellij.featureStatistics.FeatureUsageTracker;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.IdeEventQueue;
@@ -109,9 +111,98 @@ public class ActionResultListTable extends JBTable {
         }*/
     }
 
-    public void open() {
-        int row = getSelectedRow();
-        ActionResultDTO vo = getDataOfRow(row);
+    public void openXml(ActionResultDTO vo) {
+        ActionResultDTO re = vo;
+        if (re == null) {
+            return;
+        }
+
+        // 直接 打开 文件 编辑
+        final FileEditorManager fileEditorManager = FileEditorManager.getInstance(
+                getNccActionURLSearchUI().getProject());
+        String xml = re.getXmlPath();
+        if (xml.contains(".jar" + File.separatorChar)) {
+            xml = xml.substring(0, xml.indexOf(".jar" + File.separatorChar) + 4);
+        }
+
+        VirtualFile virtualFile =
+                VirtualFileManager.getInstance().findFileByNioPath(new File(xml).toPath());
+        if (virtualFile == null || xml.toLowerCase().endsWith(".jar")) {
+            IoUtil.tryOpenFileExpolor(new File(xml));
+            return;
+        }
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            final FileEditor[] editor = fileEditorManager.openFile(virtualFile, true);
+
+            if (editor.length > 0 && editor[0] instanceof TextEditor) {
+                final LogicalPosition problemPos = new LogicalPosition(
+                        re.getRow() < 0 ? 0 : re.getRow()
+                        , re.getColumn() < 0 ? 0 : re.getColumn()
+                );
+
+                final Editor textEditor = ((TextEditor) editor[0]).getEditor();
+                textEditor.getCaretModel().moveToLogicalPosition(problemPos);
+                textEditor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
+                textEditor.getCaretModel().getCurrentCaret().selectLineAtCaret();
+            }
+        }, ModalityState.NON_MODAL);
+    }
+
+    private static void matchAutlRowColumn(List<String> lines, ActionResultDTO vo) {
+        for (int x = 0; x < lines.size(); x++) {
+            if (lines.get(x).contains(vo.getName())) {
+                vo.setAuth_row(x);
+                vo.setAuth_column(lines.get(x).indexOf(vo.getName()));
+                return;
+            }
+        }
+    }
+
+    public void openAuthXml(ActionResultDTO vo) {
+        ActionResultDTO re = vo;
+        if (re == null || StringUtil.isBlank(re.getAuthPath())) {
+            return;
+        }
+
+        // 直接 打开 文件 编辑
+        final FileEditorManager fileEditorManager = FileEditorManager.getInstance(
+                getNccActionURLSearchUI().getProject());
+        String xml = re.getAuthPath();
+        if (xml.contains(".jar" + File.separatorChar)) {
+            xml = xml.substring(0, xml.indexOf(".jar" + File.separatorChar) + 4);
+        }
+
+        VirtualFile virtualFile =
+                VirtualFileManager.getInstance().findFileByNioPath(new File(xml).toPath());
+        if (virtualFile == null || xml.toLowerCase().endsWith(".jar")) {
+            IoUtil.tryOpenFileExpolor(new File(xml));
+            return;
+        }
+
+        if (re.getAuth_column() < 1) {
+            List<String> lines = FileUtil.readUtf8Lines(virtualFile.toNioPath().toFile());
+            matchAutlRowColumn(lines, vo);
+        }
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            final FileEditor[] editor = fileEditorManager.openFile(virtualFile, true);
+
+            if (editor.length > 0 && editor[0] instanceof TextEditor) {
+                final LogicalPosition problemPos = new LogicalPosition(
+                        re.getAuth_row() < 0 ? 0 : re.getAuth_row()
+                        , re.getAuth_column() < 0 ? 0 : re.getAuth_column()
+                );
+
+                final Editor textEditor = ((TextEditor) editor[0]).getEditor();
+                textEditor.getCaretModel().moveToLogicalPosition(problemPos);
+                textEditor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
+                textEditor.getCaretModel().getCurrentCaret().selectLineAtCaret();
+            }
+        }, ModalityState.NON_MODAL);
+    }
+
+    public void open(ActionResultDTO vo) {
         if (vo == null) {
             return;
         }
@@ -172,15 +263,15 @@ public class ActionResultListTable extends JBTable {
                     return;
                 }
 
+                final ActionResultDTO vo = table.getDataOfRow(row);
                 final int column = table.columnAtPoint(me.getPoint());
-
                 final JPopupMenu popup = new JPopupMenu();
 
                 JMenuItem openClass = new JMenuItem("定位Class文件");
                 popup.add(openClass);
                 openClass.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        table.open();
+                        table.open(vo);
                     }
                 });
 
@@ -188,44 +279,19 @@ public class ActionResultListTable extends JBTable {
 
                 JMenuItem openXml = new JMenuItem("打开XML");
                 popup.add(openXml);
-                final ActionResultDTO vo = table.getDataOfRow(row);
                 openXml.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        ActionResultDTO re = vo;
-                        if (re == null) {
-                            return;
-                        }
+                        table.openXml(vo);
+                    }
+                });
 
-                        // 直接 打开 文件 编辑
-                        final FileEditorManager fileEditorManager = FileEditorManager.getInstance(
-                                table.getNccActionURLSearchUI().getProject());
-                        String xml = re.getXmlPath();
-                        if (xml.contains(".jar" + File.separatorChar)) {
-                            xml = xml.substring(0, xml.indexOf(".jar" + File.separatorChar) + 4);
-                        }
+                popup.add(new JSeparator());
 
-                        VirtualFile virtualFile =
-                                VirtualFileManager.getInstance().findFileByNioPath(new File(xml).toPath());
-                        if (virtualFile == null || xml.toLowerCase().endsWith(".jar")) {
-                            IoUtil.tryOpenFileExpolor(new File(xml));
-                            return;
-                        }
-
-                        ApplicationManager.getApplication().invokeLater(() -> {
-                            final FileEditor[] editor = fileEditorManager.openFile(virtualFile, true);
-
-                            if (editor.length > 0 && editor[0] instanceof TextEditor) {
-                                final LogicalPosition problemPos = new LogicalPosition(
-                                        re.getRow()  < 0 ? 0 : re.getRow()
-                                        , re.getColumn() < 0 ? 0 : re.getColumn()
-                                );
-
-                                final Editor textEditor = ((TextEditor) editor[0]).getEditor();
-                                textEditor.getCaretModel().moveToLogicalPosition(problemPos);
-                                textEditor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
-                                textEditor.getCaretModel().getCurrentCaret().selectLineAtCaret();
-                            }
-                        }, ModalityState.NON_MODAL);
+                JMenuItem openAuthXml = new JMenuItem("打开鉴权XML");
+                popup.add(openAuthXml);
+                openAuthXml.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        table.openAuthXml(vo);
                     }
                 });
 
@@ -258,6 +324,8 @@ public class ActionResultListTable extends JBTable {
                 popup.show(me.getComponent(), me.getX(), me.getY());
             }
         }
+
+
     }
 
     public ActionResultDTO getDataOfRow(int row) {
