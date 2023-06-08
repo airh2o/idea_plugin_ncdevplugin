@@ -269,26 +269,25 @@ public class ActionResultListTable extends JBTable {
 
                 JMenuItem openClass = new JMenuItem("定位Class文件");
                 popup.add(openClass);
+                openClass.setEnabled(vo != null && StringUtil.isNotBlank(vo.getClazz()));
                 openClass.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         table.open(vo);
                     }
                 });
 
-                popup.add(new JSeparator());
-
                 JMenuItem openXml = new JMenuItem("打开XML");
                 popup.add(openXml);
+                openXml.setEnabled(vo != null && StringUtil.isNotBlank(vo.getXmlPath()));
                 openXml.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         table.openXml(vo);
                     }
                 });
 
-                popup.add(new JSeparator());
-
                 JMenuItem openAuthXml = new JMenuItem("打开鉴权XML");
                 popup.add(openAuthXml);
+                openAuthXml.setEnabled(vo != null && StringUtil.isNotBlank(vo.getAuthPath()));
                 openAuthXml.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         table.openAuthXml(vo);
@@ -299,6 +298,7 @@ public class ActionResultListTable extends JBTable {
 
                 openClass = new JMenuItem("复制类名称");
                 popup.add(openClass);
+                openClass.setEnabled(vo != null && StringUtil.isNotBlank(vo.getClazz()));
                 openClass.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         ActionResultDTO v = vo;
@@ -308,15 +308,26 @@ public class ActionResultListTable extends JBTable {
                     }
                 });
 
-                popup.add(new JSeparator());
-
                 openClass = new JMenuItem("复制XML路径");
                 popup.add(openClass);
+                openClass.setEnabled(vo != null && StringUtil.isNotBlank(vo.getXmlPath()));
                 openClass.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         ActionResultDTO v = vo;
                         if (v != null) {
                             StringUtil.setIntoClipboard(v.getXmlPath());
+                        }
+                    }
+                });
+
+                openClass = new JMenuItem("复制鉴权XML路径");
+                popup.add(openClass);
+                openClass.setEnabled(vo != null && StringUtil.isNotBlank(vo.getAuthPath()));
+                openClass.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        ActionResultDTO v = vo;
+                        if (v != null) {
+                            StringUtil.setIntoClipboard(v.getAuthPath());
                         }
                     }
                 });
