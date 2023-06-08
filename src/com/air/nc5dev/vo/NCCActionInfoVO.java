@@ -64,7 +64,8 @@ public class NCCActionInfoVO implements Serializable, Cloneable {
     public int row;
 
     public transient int score;
-
+    public int auth_column;
+    public int auth_row;
     @Override
     public String toString() {
         return "NCCActionInfoVO{" +

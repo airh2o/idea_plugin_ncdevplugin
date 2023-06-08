@@ -12,10 +12,6 @@ import java.io.Serializable;
 public class ActionResultDTO extends NCCActionInfoVO {
     int order1;
 
-    public int auth_column;
-    public int auth_row;
-
-
     public String displayText() {
         return
                 "URL 名称:\n" + name + "\n\n" +
