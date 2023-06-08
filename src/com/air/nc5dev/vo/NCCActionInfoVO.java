@@ -21,32 +21,63 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NCCActionInfoVO implements Serializable,Cloneable {
+public class NCCActionInfoVO implements Serializable, Cloneable {
+    /**
+     * 来自NC的home
+     */
+    public static final int FROM_HOME = 0;
+    /**
+     * 来自 工程源码里
+     */
     public static final int FROM_SRC = 1000;
+    /**
+     * upm
+     */
+    public static final int TYPE_UPM = 1;
+    /**
+     * action
+     */
+    public static final int TYPE_ACTION = 0;
 
-    String name;
-    String label;
-    String clazz;
-    String appcode;
+    public String name;
+    public String label;
+    public String clazz;
+    public String appcode;
     /**
      * xml 注册文件
      */
-    String xmlPath;
+    public String xmlPath;
     /**
      * 项目路径
      */
-    String project;
-    int from;
+    public String project;
+    public int from;
+    public int type;
+    /**
+     * 文件列数
+     */
+    public int column;
+    /**
+     * 文件行数量
+     */
+    public int row;
 
-    transient int score;
+    public transient int score;
 
     @Override
     public String toString() {
-        return "name=" + name +
-                ", label=" + label +
-                ", clazz=" + clazz +
-                ", appcode=" + appcode +
-                ", xmlPath=" + xmlPath
-                ;
+        return "NCCActionInfoVO{" +
+                "name='" + name + '\'' +
+                ", label='" + label + '\'' +
+                ", clazz='" + clazz + '\'' +
+                ", appcode='" + appcode + '\'' +
+                ", xmlPath='" + xmlPath + '\'' +
+                ", project='" + project + '\'' +
+                ", from=" + from +
+                ", type=" + type +
+                ", column=" + column +
+                ", row=" + row +
+                ", score=" + score +
+                '}';
     }
 }

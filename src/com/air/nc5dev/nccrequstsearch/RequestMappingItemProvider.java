@@ -175,9 +175,32 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             return EMPTY_LIST;
         }
 
+        if (filterProjectUrls(project, everwhere, all, map)) {
+            return EMPTY_LIST;
+        }
+
+        //匹配
+        final String str = warpKey(inputStr);
+
+        final List<NCCActionInfoVO> matchs = new ArrayList<>(1000);
+        all.forEach((k, v) -> {
+            v.forEach((name, vo) -> {
+                String matchStr = like(name, vo, str);
+                if (matchStr != null) {
+                    matchs.add(vo);
+                }
+            });
+        });
+
+        matchs.sort((c1, c2) -> c2.getScore() - c1.getScore());
+        return matchs;
+    }
+
+    private boolean filterProjectUrls(Project project, boolean everwhere,
+                                      Map<String, Map<String, NCCActionInfoVO>> all, Map<String, NCCActionInfoVO> map) {
         if (!everwhere) {
             if (project == null) {
-                return EMPTY_LIST;
+                return true;
             }
             Map<String, NCCActionInfoVO> map2 = new HashMap<>();
 
@@ -189,30 +212,12 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             }
 
             if (CollUtil.isEmpty(map2)) {
-                return EMPTY_LIST;
+                return true;
             }
 
             all.put(project.getBasePath(), map2);
         }
-
-        //匹配
-        String txt = StringUtil.replaceChars(inputStr, "/", ".");
-        txt = StringUtil.replaceAll(txt, " ", ".");
-        txt = StringUtil.replaceChars(txt, "\\", ".");
-        txt = txt.toLowerCase();
-        final String str = txt;
-
-        final List<NCCActionInfoVO> matchs = new ArrayList<>(1000);
-        all.forEach((k, v) -> {
-            v.forEach((name, vo) -> {
-                if (like(name, vo, str) > 0) {
-                    matchs.add(vo);
-                }
-            });
-        });
-
-        matchs.sort((c1, c2) -> c1.getScore() - c2.getScore());
-        return matchs;
+        return false;
     }
 
 
@@ -239,10 +244,10 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
      * @param str
      * @return
      */
-    private int like(String name, NCCActionInfoVO vo, String str) {
+    private String like(String name, NCCActionInfoVO vo, String str) {
         if ((requestMappingModel != null && requestMappingModel.onlySearchPorjectUrl)
                 && vo.getProject().startsWith("NCHOME")) {
-            return -1;
+            return null;
         }
 
         if (StringUtil.startsWith(str, "nccloud")) {
@@ -257,16 +262,27 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         String className = vo.getClazz().toLowerCase();
         String label = vo.getLabel() == null ? "" : vo.getLabel().toLowerCase();
 
-        if (urlName.equals(str) || className.equals(str) || label.equals(str)) {
+        String match = null;
+        if (urlName.equals(str)) {
             score = 10000;
+            match = urlName;
+        } else if (className.equals(str)) {
+            score = 10000;
+            match = className;
+        } else if (label.equals(str)) {
+            score = 10000;
+            match = label;
         } else {
             String[] inputStrs = StringUtil.split(str, ".");
             for (String input : inputStrs) {
                 if (StringUtil.contains(urlName, input)) {
+                    match = urlName;
                     score += 10;
                 } else if (StringUtil.contains(className, input)) {
+                    match = className;
                     ++score;
                 } else if (StringUtil.contains(label, input)) {
+                    match = label;
                     ++score;
                 } else {
                     score = 0;
@@ -280,7 +296,7 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         }
 
         vo.setScore(score);
-        return score;
+        return match;
     }
 
     /**
@@ -329,5 +345,71 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             requestMappingModel.setInfo(msg);
         }
         LogUtil.infoAndHide(msg);
+    }
+
+    public Collection<String> suggest(String inputStr, Project project, boolean everwhere, int size) {
+        HashSet<String> re = new HashSet(size << 1);
+
+        if (StringUtil.isBlank(inputStr)) {
+            return re;
+        }
+
+        if (ALL_ACTIONS.isEmpty()) {
+            return re;
+        }
+
+        Map<String, Map<String, NCCActionInfoVO>> all = new HashMap<>();
+        Map<String, NCCActionInfoVO> map = ALL_ACTIONS.get(project.getBasePath());
+        all.put(project.getBasePath(), map);
+
+        if (CollUtil.isEmpty(map)) {
+            return re;
+        }
+
+        inputStr = inputStr.trim();
+        if (inputStr.charAt(0) == '!') {
+            everwhere = false;
+            inputStr = inputStr.substring(1);
+        }
+
+        if (filterProjectUrls(project, everwhere, all, map)) {
+            return re;
+        }
+
+        //匹配
+        final String str = warpKey(inputStr);
+
+        final List<NCCActionInfoVO> matchs = new ArrayList<>(size << 1);
+        Set<String> keys = all.keySet();
+        Map<String, NCCActionInfoVO> v;
+        int i = 0;
+        for (String k : keys) {
+            v = all.get(k);
+            Set<String> keys2 = v.keySet();
+            for (String k2 : keys2) {
+                String matchStr = like(k2, v.get(k2), str);
+                if (matchStr != null) {
+                    re.add(matchStr);
+
+                    if (re.size() >= size) {
+                        break;
+                    }
+                }
+            }
+
+            if (re.size() >= size) {
+                break;
+            }
+        }
+
+        return re;
+    }
+
+    private String warpKey(String inputStr) {
+        String txt = StringUtil.replaceChars(inputStr, "/", ".");
+        txt = StringUtil.replaceAll(txt, " ", ".");
+        txt = StringUtil.replaceChars(txt, "\\", ".");
+        txt = txt.toLowerCase();
+        return txt;
     }
 }

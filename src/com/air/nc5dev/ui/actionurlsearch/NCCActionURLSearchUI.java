@@ -9,6 +9,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.*;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class NCCActionURLSearchUI {
     Project project;
     public static String[] tableNames = new String[]{
             "序号"
-            , "来源(1000=项目本身)"
+            , "来源(1000=工程源码)"
             // , "模块"
             , "URL"
             , "标签"
@@ -55,14 +56,14 @@ public class NCCActionURLSearchUI {
     JBTextField textField_dbfile;
     ActionResultListTable table;
     JTextField textField_search;
-    JTextField textField_key;
+    TextFieldWithAutoCompletion textField_key;
     JTextField textField_name;
     JTextField textField_ip;
     JTextField textField_port;
     JTextField textField_user;
     JTextField textField_pass;
     JTextField textField_order;
-    JTextField textField_memo;
+    JBTextArea textArea_detail;
     JTextField textField_width;
     JTextField textField_higth;
     JTextField textField_id;
@@ -131,10 +132,11 @@ public class NCCActionURLSearchUI {
 
             x += w + 2;
             w = 460;
-            textField_key = new JBTextField();
+            textField_key = new TextFieldWithAutoCompletion(project
+                    , new NCCActionCompletionProvider(30, this)
+                    , true, "");
             textField_key.setBounds(x, y, w, h);
             panel_main.add(textField_key);
-            textField_key.setColumns(10);
 
             btnNewButton_search = new JButton("搜索全部");
             btnNewButton_search.setBounds(x += w + 5, y, w = 80, h);
@@ -145,11 +147,11 @@ public class NCCActionURLSearchUI {
             panel_main.add(btnNewButton_searchProject);
 
             checkBox_AutoColumnSize = new JBCheckBox("自动适应列宽");
-            checkBox_AutoColumnSize.setBounds(x += w + 5, y, 120, h);
+            checkBox_AutoColumnSize.setBounds(x += w + 5, y, w = 100, h);
             panel_main.add(checkBox_AutoColumnSize);
 
             label_error = new JBLabel("");
-            label_error.setBounds(x += w + 5, y, w = 700, h);
+            label_error.setBounds(x += w + 5, y, w = 600, h);
             label_error.setFontColor(UIUtil.FontColor.BRIGHTER);
             panel_main.add(label_error);
 
@@ -159,7 +161,7 @@ public class NCCActionURLSearchUI {
             table = new ActionResultListTable(tableModel, this);
             panel_table = new JBScrollPane(table);
             panel_table.setAutoscrolls(true);
-            panel_table.setBounds(x, y, getWidth() - 50, 450);
+            panel_table.setBounds(x, y, getWidth() - 100, 450);
             panel_main.add(panel_table);
 
             TableColumn firsetColumn = table.getColumnModel().getColumn(0);
@@ -168,6 +170,14 @@ public class NCCActionURLSearchUI {
             firsetColumn = table.getColumnModel().getColumn(1);
             firsetColumn.setPreferredWidth(50);
             firsetColumn.setMaxWidth(50);
+
+            textArea_detail = new JBTextArea();
+            textArea_detail.setEditable(true);
+            textArea_detail.setAutoscrolls(true);
+            textArea_detail.setLineWrap(true);
+            JBScrollPane sc = new JBScrollPane(textArea_detail);
+            sc.setBounds(x += panel_table.getWidth() + 5, y, 200, 300);
+            panel_main.add(sc);
 
             initListeners();
         }
@@ -212,6 +222,7 @@ public class NCCActionURLSearchUI {
     private void setResult(List<NCCActionInfoVO> res) {
         if (CollUtil.isEmpty(res)) {
             label_error.setText("未搜索到任何内容");
+            textArea_detail.setText("");
             table.removeAll();
             return;
         }
@@ -223,6 +234,8 @@ public class NCCActionURLSearchUI {
             v.setOrder1(i++);
             vos.add(v);
         }
+
+        textArea_detail.setText(vos.get(0).displayText());
 
         getTable().setRows(vos);
     }
