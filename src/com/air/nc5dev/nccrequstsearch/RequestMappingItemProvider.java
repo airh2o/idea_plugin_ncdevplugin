@@ -66,6 +66,14 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             , @NotNull String[] names, @NotNull String inputStr) {
         return new ArrayList<>();
     }
+    
+    public static String getKey(Project project){
+        if (project == null) {
+            return "";
+        }
+        
+        return project.getBasePath();
+    }
 
     /**
      * 用户输入文本后，执行搜索！
@@ -158,8 +166,8 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         }
 
         Map<String, Map<String, NCCActionInfoVO>> all = new HashMap<>();
-        Map<String, NCCActionInfoVO> map = ALL_ACTIONS.get(project.getBasePath());
-        all.put(project.getBasePath(), map);
+        Map<String, NCCActionInfoVO> map = ALL_ACTIONS.get(getKey(project));
+        all.put(getKey(project), map);
 
         if (CollUtil.isEmpty(map)) {
             return EMPTY_LIST;
@@ -215,7 +223,7 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
                 return true;
             }
 
-            all.put(project.getBasePath(), map2);
+            all.put(getKey(project), map2);
         }
         return false;
     }
@@ -359,8 +367,8 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         }
 
         Map<String, Map<String, NCCActionInfoVO>> all = new HashMap<>();
-        Map<String, NCCActionInfoVO> map = ALL_ACTIONS.get(project.getBasePath());
-        all.put(project.getBasePath(), map);
+        Map<String, NCCActionInfoVO> map = ALL_ACTIONS.get(getKey(project));
+        all.put(getKey(project), map);
 
         if (CollUtil.isEmpty(map)) {
             return re;

@@ -1,9 +1,13 @@
 package com.air.nc5dev.ui.actionurlsearch;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.IoUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.vo.NCCActionInfoVO;
 import com.intellij.featureStatistics.FeatureUsageTracker;
@@ -37,9 +41,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Vector;
+import java.io.InputStream;
+import java.util.*;
 
 @Getter
 public class ActionResultListTable extends JBTable {
@@ -121,19 +124,24 @@ public class ActionResultListTable extends JBTable {
         final FileEditorManager fileEditorManager = FileEditorManager.getInstance(
                 getNccActionURLSearchUI().getProject());
         String xml = re.getXmlPath();
-        if (xml.contains(".jar" + File.separatorChar)) {
-            xml = xml.substring(0, xml.indexOf(".jar" + File.separatorChar) + 4);
+
+        VirtualFile virtualFile = null;
+
+        String jar = "jar://" + StrUtil.replace(StrUtil.replace(xml, "\\", "/"), ".jar/", ".jar!/");
+        if (jar.toLowerCase().contains(".jar!/")) {
+            virtualFile = VirtualFileManager.getInstance().findFileByUrl(jar);
+        } else {
+            virtualFile = VirtualFileManager.getInstance().findFileByNioPath(new File(xml).toPath());
         }
 
-        VirtualFile virtualFile =
-                VirtualFileManager.getInstance().findFileByNioPath(new File(xml).toPath());
-        if (virtualFile == null || xml.toLowerCase().endsWith(".jar")) {
+        if (virtualFile == null) {
             IoUtil.tryOpenFileExpolor(new File(xml));
             return;
         }
 
+        final VirtualFile vf = virtualFile;
         ApplicationManager.getApplication().invokeLater(() -> {
-            final FileEditor[] editor = fileEditorManager.openFile(virtualFile, true);
+            final FileEditor[] editor = fileEditorManager.openFile(vf, true);
 
             if (editor.length > 0 && editor[0] instanceof TextEditor) {
                 final LogicalPosition problemPos = new LogicalPosition(
@@ -169,24 +177,35 @@ public class ActionResultListTable extends JBTable {
         final FileEditorManager fileEditorManager = FileEditorManager.getInstance(
                 getNccActionURLSearchUI().getProject());
         String xml = re.getAuthPath();
-        if (xml.contains(".jar" + File.separatorChar)) {
-            xml = xml.substring(0, xml.indexOf(".jar" + File.separatorChar) + 4);
+        VirtualFile virtualFile = null;
+        String jar = "jar://" + StrUtil.replace(StrUtil.replace(xml, "\\", "/"), ".jar/", ".jar!/");
+        if (jar.toLowerCase().contains(".jar!/")) {
+            virtualFile = VirtualFileManager.getInstance().findFileByUrl(jar);
+        } else {
+            virtualFile = VirtualFileManager.getInstance().findFileByNioPath(new File(xml).toPath());
         }
 
-        VirtualFile virtualFile =
-                VirtualFileManager.getInstance().findFileByNioPath(new File(xml).toPath());
-        if (virtualFile == null || xml.toLowerCase().endsWith(".jar")) {
+        if (virtualFile == null) {
             IoUtil.tryOpenFileExpolor(new File(xml));
             return;
         }
 
+        final VirtualFile vf = virtualFile;
+
         if (re.getAuth_column() < 1) {
-            List<String> lines = FileUtil.readUtf8Lines(virtualFile.toNioPath().toFile());
-            matchAutlRowColumn(lines, vo);
+            try {
+                InputStream in = virtualFile.getInputStream();
+                List<String> lines = cn.hutool.core.io.IoUtil.readUtf8Lines(in,
+                        new ArrayList<>());
+                IoUtil.close(in);
+                matchAutlRowColumn(lines, vo);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
         }
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            final FileEditor[] editor = fileEditorManager.openFile(virtualFile, true);
+            final FileEditor[] editor = fileEditorManager.openFile(vf, true);
 
             if (editor.length > 0 && editor[0] instanceof TextEditor) {
                 final LogicalPosition problemPos = new LogicalPosition(
@@ -202,7 +221,7 @@ public class ActionResultListTable extends JBTable {
         }, ModalityState.NON_MODAL);
     }
 
-    public void open(ActionResultDTO vo) {
+    public void searchClass(ActionResultDTO vo) {
         if (vo == null) {
             return;
         }
@@ -267,12 +286,21 @@ public class ActionResultListTable extends JBTable {
                 final int column = table.columnAtPoint(me.getPoint());
                 final JPopupMenu popup = new JPopupMenu();
 
-                JMenuItem openClass = new JMenuItem("定位Class文件");
+                JMenuItem openClass = new JMenuItem("打开Class");
                 popup.add(openClass);
                 openClass.setEnabled(vo != null && StringUtil.isNotBlank(vo.getClazz()));
                 openClass.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        table.open(vo);
+                        table.openClass(vo);
+                    }
+                });
+
+                JMenuItem searchClass = new JMenuItem("搜索Class");
+                popup.add(searchClass);
+                searchClass.setEnabled(vo != null && StringUtil.isNotBlank(vo.getClazz()));
+                searchClass.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        table.searchClass(vo);
                     }
                 });
 
@@ -339,6 +367,94 @@ public class ActionResultListTable extends JBTable {
 
     }
 
+    public void openClass(ActionResultDTO vo) {
+        if (vo == null) {
+            return;
+        }
+
+        // 直接 打开 文件 编辑
+        final FileEditorManager fileEditorManager = FileEditorManager.getInstance(
+                getNccActionURLSearchUI().getProject());
+
+        String path = null;
+        File hotwebs = new File(ProjectNCConfigUtil.getNCHome(), "hotwebs");
+        File nccloud = new File(hotwebs, "nccloud");
+        File webinf = new File(nccloud, "WEB-INF");
+        File classes = new File(webinf, "classes");
+        File cz = new File(classes, StrUtil.replace(vo.getClazz(), ".", File.separator));
+        String clz = vo.getClazz().substring(vo.getClazz().lastIndexOf('.') + 1);
+        if (cz.isDirectory()) {
+            File[] fs = cz.listFiles();
+            for (File file : fs) {
+                if (!file.isFile()) {
+                    continue;
+                }
+
+                if (file.getName().equalsIgnoreCase(clz + ".class")
+                        || file.getName().toLowerCase().endsWith("$" + clz.toLowerCase() + ".class")) {
+                    path = file.getPath();
+                    break;
+                }
+            }
+        }
+
+        if (path == null) {
+            path = findClzPath(vo, vo.getClazz());
+        }
+
+        if (path == null) {
+            //我要是用大招了， 全局拉一边jar
+            Map<String, NCCActionInfoVO> map =
+                    RequestMappingItemProvider.ALL_ACTIONS.get(RequestMappingItemProvider.getKey(getNccActionURLSearchUI().getProject()));
+            if (CollUtil.isNotEmpty(map)) {
+                Collection<NCCActionInfoVO> vs = map.values();
+                for (NCCActionInfoVO v : vs) {
+                    path = findClzPath(v, vo.getClazz());
+                    if (path != null) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (path == null) {
+            searchClass(vo);
+            return;
+        }
+
+        VirtualFile virtualFile = null;
+
+        if (path.startsWith("jar://")) {
+            virtualFile = VirtualFileManager.getInstance().findFileByUrl(path);
+        } else {
+            virtualFile = VirtualFileManager.getInstance().findFileByNioPath(new File(path).toPath());
+        }
+
+        if (virtualFile == null) {
+            searchClass(vo);
+            return;
+        }
+
+        final VirtualFile vf = virtualFile;
+        ApplicationManager.getApplication().invokeLater(() -> {
+            final FileEditor[] editor = fileEditorManager.openFile(vf, true);
+
+            if (editor.length > 0 && editor[0] instanceof TextEditor) {
+                final Editor textEditor = ((TextEditor) editor[0]).getEditor();
+
+                /*final LogicalPosition problemPos = new LogicalPosition(
+                        0
+                        , 0
+                );
+                textEditor.getCaretModel().moveToLogicalPosition(problemPos);*/
+
+                textEditor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
+                textEditor.getCaretModel().getCurrentCaret().selectLineAtCaret();
+            }
+        }, ModalityState.NON_MODAL);
+
+    }
+
     public ActionResultDTO getDataOfRow(int row) {
         if (row < 0) return null;
 
@@ -347,5 +463,30 @@ public class ActionResultListTable extends JBTable {
         }
 
         return getDatas().get(row);
+    }
+
+    public static String findClzPath(NCCActionInfoVO vo, String classz) {
+        String path = null;
+        //可能是jar
+        String jar = null;
+        if (vo.getXmlPath() != null && vo.getXmlPath().toLowerCase().contains(".jar" + File.separatorChar)) {
+            jar =
+                    vo.getXmlPath().substring(0,
+                            vo.getXmlPath().toLowerCase().lastIndexOf(".jar" + File.separatorChar) + 4);
+        } else if (vo.getAuthPath() != null && vo.getAuthPath().toLowerCase().contains(".jar" + File.separatorChar)) {
+            jar =
+                    vo.getAuthPath().substring(0,
+                            vo.getAuthPath().toLowerCase().lastIndexOf(".jar" + File.separatorChar) + 4);
+        }
+
+        if (jar != null) {
+            path = "jar://" + jar + "!/" + StrUtil.replace(classz, ".", "/") + ".class";
+
+            if (VirtualFileManager.getInstance().findFileByUrl(path) != null) {
+                return path;
+            }
+        }
+
+        return null;
     }
 }

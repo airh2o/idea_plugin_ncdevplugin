@@ -798,15 +798,15 @@ public class PatcherDialog extends DialogWrapper {
 
                     File dirToOpen = new File(contentVO.getOutPath());
 
+                    File opendir = null;
                     try {
                         if (contentVO.zip) {
-                            zipPathcers(contentVO, dirToOpen);
+                            opendir = zipPathcers(contentVO, dirToOpen);
                         }
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
 
-                    File opendir = null;
                     if (contentVO.isFormat4Ygj()) {
                         if (contentVO.isDeleteDir()) {
                             try {
@@ -814,8 +814,6 @@ public class PatcherDialog extends DialogWrapper {
                             } catch (Throwable ex) {
                             }
                         }
-
-                        opendir = dirToOpen.getParentFile();
                     } else {
                         if (contentVO.isDeleteDir()) {
                             try {
@@ -823,11 +821,17 @@ public class PatcherDialog extends DialogWrapper {
                             } catch (Throwable ex) {
                             }
                         }
-                        opendir = dirToOpen.getParentFile().getParentFile();
                     }
 
                     if (opendir != null) {
                         try {
+                            if (!opendir.exists()) {
+                                opendir = opendir.getParentFile();
+                                if (!opendir.exists()) {
+                                    opendir = opendir.getParentFile();
+                                }
+                            }
+
                             IoUtil.tryOpenFileExpolor(opendir);
                         } catch (Throwable ioException) {
                             ioException.printStackTrace();
@@ -862,7 +866,7 @@ public class PatcherDialog extends DialogWrapper {
         }
     }
 
-    private void zipPathcers(ExportContentVO contentVO, File dirToOpen) {
+    private File zipPathcers(ExportContentVO contentVO, File dirToOpen) {
         File zip = null;
         if (contentVO.isFormat4Ygj()) {
             zip = new File(dirToOpen.getParentFile(), dirToOpen.getName() + ".zip");
@@ -875,6 +879,8 @@ public class PatcherDialog extends DialogWrapper {
             zip = new File(dirToOpen.getParentFile().getParentFile(), dirToOpen.getParentFile().getName() + ".zip");
         }
         LogUtil.infoAndHide("自动打包成补丁zip压缩包的硬盘路径： " + zip.getPath());
+
+        return zip;
     }
 
     @Nullable

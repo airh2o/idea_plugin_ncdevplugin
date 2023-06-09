@@ -3,6 +3,7 @@ package com.puppycrawl.tools.checkstyle.api;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
@@ -52,7 +53,7 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
     LibraryTable.ModifiableModel modifiableModel;
     Map<Project, Cecha> projectCechaMap = new ConcurrentHashMap<>();
     public static volatile AtomicReference<Cecha> PROJECT_SOURCE_CECHA = new AtomicReference<>();
-    
+
     //1 public 2 client 3 private 4 test
     public static final int FROM_PUBLIC = 1;
     public static final int FROM_CLIENT = 2;
@@ -136,13 +137,17 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
         }
         initMap0(cecha, FROM_PUBLIC,
                 (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_Product_Common_Library));
-        initMap0(cecha, FROM_PUBLIC, (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_Middleware_Library));
-        initMap0(cecha, FROM_PUBLIC, (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_Framework_Library));
+        initMap0(cecha, FROM_PUBLIC,
+                (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_Middleware_Library));
+        initMap0(cecha, FROM_PUBLIC,
+                (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_Framework_Library));
         initMap0(cecha, FROM_PUBLIC,
                 (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_NC_Module_Public_Library));
 
-        initMap0(cecha, FROM_CLIENT, (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_Module_Client_Library));
-        initMap0(cecha, FROM_CLIENT, (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_NCCloud_Library));
+        initMap0(cecha, FROM_CLIENT,
+                (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_Module_Client_Library));
+        initMap0(cecha, FROM_CLIENT,
+                (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_NCCloud_Library));
 
         initMap0(cecha, FROM_PRIVATE,
                 (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_Module_Private_Library));
@@ -210,9 +215,9 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
         if (!file.isFile()) {
             return;
         }
-
+        JarFile jar = null;
         try {
-            JarFile jar = new JarFile(file);
+            jar = new JarFile(file);
             Enumeration<JarEntry> entries = jar.entries();
             String clz;
             String name;
@@ -235,6 +240,8 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
             }
         } catch (IOException e) {
             LogUtil.error(e.getMessage(), e);
+        }finally {
+            IoUtil.close(jar);
         }
     }
 

@@ -129,6 +129,14 @@ onleyFullSql=true
 # 版本更新
 
 ``` 
+<em>3.7 版本 更新:</em> <br>
+      <ul>
+          <li>1. 新增数据库全局搜索</li>
+          <li>2. 新增MSTSC远程桌面管理</li>
+          <li>3. 重写优化NCC的Action类和UPM的servlet搜索功能</li>
+          <li>4. 大量弹框增加IDEA侧边栏界面，方便不想要弹框的用户</li>
+      </ul>
+      
 <em>3.3 版本 更新:</em> <br>
       <ul>
           <li>1. 新增NC代码规范检查功能，可支持检查是否client private public 导包存在错误.</li>

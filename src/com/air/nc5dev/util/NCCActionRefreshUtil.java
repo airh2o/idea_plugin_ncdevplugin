@@ -387,8 +387,9 @@ public class NCCActionRefreshUtil {
      * @param file
      */
     public static void loadYyconfigmodulesDir4Jar(Project project, File jar) {
+        JarFile jf = null;
         try {
-            JarFile jf = new JarFile(jar);
+            jf = new JarFile(jar);
             Enumeration<JarEntry> es = jf.entries();
             if (es == null) {
                 return;
@@ -493,6 +494,8 @@ public class NCCActionRefreshUtil {
             set2Cache(project, vos);
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            IoUtil.close(jf);
         }
     }
 
