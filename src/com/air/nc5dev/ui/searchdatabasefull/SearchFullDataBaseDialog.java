@@ -170,8 +170,10 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
                             .map(v -> v.getDataSourceName() + '/' + v.getUser())
                             .collect(Collectors.toList())
             ));
-            comboBox_dataSourceIndex.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue(
-                    "data_source_index"), 0));
+            if (comboBox_dataSourceIndex.getModel().getSize() > 0) {
+                comboBox_dataSourceIndex.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue(
+                        "data_source_index"), 0));
+            }
             comboBox_dataSourceIndex.addActionListener(e -> {
                 NCDataSourceVO dataSourceVO = dataSourceVOS.get(comboBox_dataSourceIndex.getSelectedIndex());
                 if (dataSourceVO.getDatabaseType().toLowerCase().contains("oracle")) {
