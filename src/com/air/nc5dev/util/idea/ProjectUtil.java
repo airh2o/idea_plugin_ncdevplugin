@@ -9,11 +9,17 @@ import com.google.common.collect.Lists;
 import com.intellij.notification.*;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.LogicalPosition;
+import com.intellij.openapi.editor.ScrollType;
+import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.Alarm;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -145,7 +151,7 @@ public class ProjectUtil {
         notification.setSubtitle("提醒:");
         Notifications.Bus.notify(notification, project == null ? getDefaultProject() : project);
 
-        Alarm alarm = new Alarm((Disposable)(project == null ? ApplicationManager.getApplication() : project));
+        Alarm alarm = new Alarm((Disposable) (project == null ? ApplicationManager.getApplication() : project));
         alarm.addRequest(() -> {
             notification.expire();
             Disposer.dispose(alarm);
@@ -392,5 +398,40 @@ public class ProjectUtil {
 
     private static String getDsName(NCDataSourceVO d) {
         return d.getDataSourceName() + '_' + d.getDatabaseUrl();
+    }
+
+    /**
+     * @param project
+     * @param vf
+     * @param row
+     * @param column
+     */
+    public static void openFile(Project project, VirtualFile vf, int row, int column) {
+        FileNavigator fileNavigator = FileNavigator.getInstance();
+        if (row < 1 && column < 1 && fileNavigator.canNavigate(vf)) {
+            fileNavigator.navigate(new OpenFileDescriptor(project, vf), true);
+            return;
+        }
+
+        final FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+        ApplicationManager.getApplication().invokeLater(() -> {
+            final FileEditor[] editor = fileEditorManager.openFile(vf, true);
+
+            if (editor.length < 1) {
+                return;
+            }
+
+            for (FileEditor e : editor) {
+                if (e instanceof TextEditor) {
+                    final Editor textEditor = ((TextEditor) e).getEditor();
+
+                    final LogicalPosition problemPos = new LogicalPosition(row < 0 ? 0 : row, column < 0 ? 0 : column);
+                    textEditor.getCaretModel().moveToLogicalPosition(problemPos);
+
+                    textEditor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
+                    textEditor.getCaretModel().getCurrentCaret().selectLineAtCaret();
+                }
+            }
+        }, ModalityState.NON_MODAL);
     }
 }

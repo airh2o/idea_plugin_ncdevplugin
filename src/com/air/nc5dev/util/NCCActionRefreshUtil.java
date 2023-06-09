@@ -1,6 +1,7 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.NCCActionInfoVO;
@@ -143,6 +144,7 @@ public class NCCActionRefreshUtil {
                 vo.setProject(project != null ? project.getBasePath() : null);
                 vo.setFrom(from);
                 vo.setType(NCCActionInfoVO.TYPE_UPM);
+                vo.setClazz(StrUtil.trim(vo.getClazz()));
 
                 matchRowColumn(lines, vo);
 
@@ -297,6 +299,7 @@ public class NCCActionRefreshUtil {
                     vo.setProject(project != null ? project.getBasePath() : null);
                     vo.setType(NCCActionInfoVO.TYPE_ACTION);
                     vo.setFrom(from);
+                    vo.setClazz(StrUtil.trim(vo.getClazz()));
 
                     List<String> lines = FileUtil.readUtf8Lines(actionXml);
                     matchRowColumn(lines, vo);

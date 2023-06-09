@@ -66,12 +66,12 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             , @NotNull String[] names, @NotNull String inputStr) {
         return new ArrayList<>();
     }
-    
-    public static String getKey(Project project){
+
+    public static String getKey(Project project) {
         if (project == null) {
             return "";
         }
-        
+
         return project.getBasePath();
     }
 
@@ -282,20 +282,18 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             match = label;
         } else {
             String[] inputStrs = StringUtil.split(str, ".");
-            for (String input : inputStrs) {
-                if (StringUtil.contains(urlName, input)) {
-                    match = urlName;
-                    score += 10;
-                } else if (StringUtil.contains(className, input)) {
-                    match = className;
-                    ++score;
-                } else if (StringUtil.contains(label, input)) {
-                    match = label;
-                    ++score;
-                } else {
-                    score = 0;
-                    break;
-                }
+            if (like(urlName, inputStrs)) {
+                match = urlName;
+                score += 10;
+            }
+            if (like(className, inputStrs)) {
+                match = className;
+                ++score;
+            }
+            if (like(label, inputStrs)) {
+                match = label;
+                ++score;
+            } else {
             }
         }
 
@@ -303,8 +301,27 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             score += vo.getFrom();
         }
 
-        vo.setScore(score);
+        if (match != null) {
+            vo.setScore(score);
+        }else{
+            vo.setScore(0);
+        }
+
         return match;
+    }
+
+    public boolean like(String match, String[] ss) {
+        if (ss == null || StringUtil.isBlank(match)) {
+            return false;
+        }
+
+        for (String s : ss) {
+            if (!StringUtil.contains(match,s)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

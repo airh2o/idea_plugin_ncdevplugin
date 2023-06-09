@@ -9,6 +9,7 @@ import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.NCCActionInfoVO;
 import com.intellij.featureStatistics.FeatureUsageTracker;
 import com.intellij.ide.DataManager;
@@ -23,15 +24,18 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
-import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.fileEditor.*;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.ui.table.JBTable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.tangsu.mstsc.ui.MainPanel;
 
 import javax.swing.*;
@@ -139,22 +143,7 @@ public class ActionResultListTable extends JBTable {
             return;
         }
 
-        final VirtualFile vf = virtualFile;
-        ApplicationManager.getApplication().invokeLater(() -> {
-            final FileEditor[] editor = fileEditorManager.openFile(vf, true);
-
-            if (editor.length > 0 && editor[0] instanceof TextEditor) {
-                final LogicalPosition problemPos = new LogicalPosition(
-                        re.getRow() < 0 ? 0 : re.getRow()
-                        , re.getColumn() < 0 ? 0 : re.getColumn()
-                );
-
-                final Editor textEditor = ((TextEditor) editor[0]).getEditor();
-                textEditor.getCaretModel().moveToLogicalPosition(problemPos);
-                textEditor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
-                textEditor.getCaretModel().getCurrentCaret().selectLineAtCaret();
-            }
-        }, ModalityState.NON_MODAL);
+        openFile(getNccActionURLSearchUI().getProject(), virtualFile, re.getRow(), re.getColumn());
     }
 
     private static void matchAutlRowColumn(List<String> lines, ActionResultDTO vo) {
@@ -190,8 +179,6 @@ public class ActionResultListTable extends JBTable {
             return;
         }
 
-        final VirtualFile vf = virtualFile;
-
         if (re.getAuth_column() < 1) {
             try {
                 InputStream in = virtualFile.getInputStream();
@@ -204,21 +191,7 @@ public class ActionResultListTable extends JBTable {
             }
         }
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-            final FileEditor[] editor = fileEditorManager.openFile(vf, true);
-
-            if (editor.length > 0 && editor[0] instanceof TextEditor) {
-                final LogicalPosition problemPos = new LogicalPosition(
-                        re.getAuth_row() < 0 ? 0 : re.getAuth_row()
-                        , re.getAuth_column() < 0 ? 0 : re.getAuth_column()
-                );
-
-                final Editor textEditor = ((TextEditor) editor[0]).getEditor();
-                textEditor.getCaretModel().moveToLogicalPosition(problemPos);
-                textEditor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
-                textEditor.getCaretModel().getCurrentCaret().selectLineAtCaret();
-            }
-        }, ModalityState.NON_MODAL);
+        openFile(getNccActionURLSearchUI().getProject(), virtualFile, re.getAuth_row(), re.getAuth_column());
     }
 
     public void searchClass(ActionResultDTO vo) {
@@ -372,28 +345,54 @@ public class ActionResultListTable extends JBTable {
             return;
         }
 
-        // 直接 打开 文件 编辑
-        final FileEditorManager fileEditorManager = FileEditorManager.getInstance(
-                getNccActionURLSearchUI().getProject());
-
         String path = null;
-        File hotwebs = new File(ProjectNCConfigUtil.getNCHome(), "hotwebs");
-        File nccloud = new File(hotwebs, "nccloud");
-        File webinf = new File(nccloud, "WEB-INF");
-        File classes = new File(webinf, "classes");
-        File cz = new File(classes, StrUtil.replace(vo.getClazz(), ".", File.separator));
+        vo.setClazz(StrUtil.trim(vo.getClazz()));
+        //搜索 工程里的Java文件!
         String clz = vo.getClazz().substring(vo.getClazz().lastIndexOf('.') + 1);
-        if (cz.isDirectory()) {
-            File[] fs = cz.listFiles();
-            for (File file : fs) {
-                if (!file.isFile()) {
+        String classPt = StrUtil.replace(vo.getClazz(), ".", File.separator);
+        String classPtDir = classPt.substring(0, classPt.lastIndexOf(File.separator));
+        Module[] modules = ModuleManager.getInstance(getNccActionURLSearchUI().getProject()).getModules();
+        for (Module module : modules) {
+            VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
+            for (VirtualFile sourceRoot : sourceRoots) {
+                File f = new File(sourceRoot.getPath(), classPtDir);
+                File[] fs = f.listFiles();
+                if (fs == null) {
                     continue;
                 }
+                for (File file : fs) {
+                    if (!file.isFile()) {
+                        continue;
+                    }
 
-                if (file.getName().equalsIgnoreCase(clz + ".class")
-                        || file.getName().toLowerCase().endsWith("$" + clz.toLowerCase() + ".class")) {
-                    path = file.getPath();
-                    break;
+                    if (file.getName().equalsIgnoreCase(clz + ".java")
+                            || file.getName().toLowerCase().endsWith("$" + clz.toLowerCase() + ".java")) {
+                        path = file.getPath();
+                        break;
+                    }
+                }
+            }
+        }
+
+        //搜索HOME里的class文件
+        if (path == null) {
+            File hotwebs = new File(ProjectNCConfigUtil.getNCHome(), "hotwebs");
+            File nccloud = new File(hotwebs, "nccloud");
+            File webinf = new File(nccloud, "WEB-INF");
+            File classes = new File(webinf, "classes");
+            File cz = new File(classes, classPt);
+            if (cz.isDirectory()) {
+                File[] fs = cz.listFiles();
+                for (File file : fs) {
+                    if (!file.isFile()) {
+                        continue;
+                    }
+
+                    if (file.getName().equalsIgnoreCase(clz + ".class")
+                            || file.getName().toLowerCase().endsWith("$" + clz.toLowerCase() + ".class")) {
+                        path = file.getPath();
+                        break;
+                    }
                 }
             }
         }
@@ -435,24 +434,11 @@ public class ActionResultListTable extends JBTable {
             return;
         }
 
-        final VirtualFile vf = virtualFile;
-        ApplicationManager.getApplication().invokeLater(() -> {
-            final FileEditor[] editor = fileEditorManager.openFile(vf, true);
+        openFile(getNccActionURLSearchUI().getProject(), virtualFile, 0, 0);
+    }
 
-            if (editor.length > 0 && editor[0] instanceof TextEditor) {
-                final Editor textEditor = ((TextEditor) editor[0]).getEditor();
-
-                /*final LogicalPosition problemPos = new LogicalPosition(
-                        0
-                        , 0
-                );
-                textEditor.getCaretModel().moveToLogicalPosition(problemPos);*/
-
-                textEditor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
-                textEditor.getCaretModel().getCurrentCaret().selectLineAtCaret();
-            }
-        }, ModalityState.NON_MODAL);
-
+    public static void openFile(Project project, VirtualFile vf, int row, int column) {
+        ProjectUtil.openFile(project, vf, row, column);
     }
 
     public ActionResultDTO getDataOfRow(int row) {
