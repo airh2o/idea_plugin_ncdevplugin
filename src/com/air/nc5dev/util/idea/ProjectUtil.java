@@ -408,9 +408,12 @@ public class ProjectUtil {
      */
     public static void openFile(Project project, VirtualFile vf, int row, int column) {
         FileNavigator fileNavigator = FileNavigator.getInstance();
-        if (row < 1 && column < 1 && fileNavigator.canNavigate(vf)) {
-            fileNavigator.navigate(new OpenFileDescriptor(project, vf), true);
-            return;
+        try {
+            if (row < 1 && column < 1) {
+                fileNavigator.navigate(new OpenFileDescriptor(project, vf), true);
+                return;
+            }
+        } catch (Throwable exception) {
         }
 
         final FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
