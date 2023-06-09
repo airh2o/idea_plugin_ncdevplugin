@@ -484,6 +484,14 @@ public class ExportNCPatcherUtil {
         File packmetadata = new File(base, "packmetadata.xml");
         File installpatch = new File(base, "installpatch.xml");*/
 
+        if (!pather.isDirectory()) {
+            LogUtil.error(String.format("转换成云管家补丁格式出错: 路径不存在: %s , orginDir: %s"
+                    , pather.getPath()
+                    , orginDir.getParent()
+            ));
+            return;
+        }
+
         for (File src : pather.listFiles()) {
             FileUtil.move(src, replacement, true);
         }

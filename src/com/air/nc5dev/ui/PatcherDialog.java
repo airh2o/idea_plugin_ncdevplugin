@@ -673,8 +673,10 @@ public class PatcherDialog extends DialogWrapper {
         ArrayList<SelectDTO> rows = Lists.newArrayList();
         selectExport2.setSelected(false);
         if (selectExport.isSelected()) {
-            VirtualFile[] selects = LangDataKeys.VIRTUAL_FILE_ARRAY.getData(event.getDataContext());
-            List<VirtualFile> vs = FORCEADDSELECTFILES.getOrDefault(event.getProject(), new CopyOnWriteArrayList<>());
+            VirtualFile[] selects = V.get(LangDataKeys.VIRTUAL_FILE_ARRAY.getData(event.getDataContext()),
+                    new VirtualFile[0]);
+            List<VirtualFile> vs = V.get(FORCEADDSELECTFILES.getOrDefault(event.getProject(),
+                    new CopyOnWriteArrayList<>()), new ArrayList<>());
             for (VirtualFile select : selects) {
                 rows.add(SelectDTO.builder()
                         .select(true)
@@ -763,93 +765,101 @@ public class PatcherDialog extends DialogWrapper {
     public void onOK() {
         if (isRuning) {
             LogUtil.error("上一次导出任务还未处理完，请稍后再试!");
-            isRuning = false;
             return;
         }
 
-        ExportContentVO contentVO = getFromUI();
-        if (contentVO == null) {
-            return;
-        }
+        try {
+            ExportContentVO contentVO = getFromUI();
+            if (contentVO == null) {
+                return;
+            }
 
-        if (contentVO.saveConfig) {
-            ExportNCPatcherUtil.saveConfig(event.getProject(), contentVO);
-        }
+            if (contentVO.saveConfig) {
+                ExportNCPatcherUtil.saveConfig(event.getProject(), contentVO);
+            }
 
-        Task.Backgroundable backgroundable = new Task.Backgroundable(event.getProject(), "导出中...请等待...") {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                isRuning = true;
-                indicator.setText("正在玩命导出NC补丁包中...");
-                indicator.setText2("导出成功后会自动打开文件夹： " + contentVO.outPath);
-                indicator.setIndeterminate(true);
-                long s = System.currentTimeMillis();
-                contentVO.indicator = indicator;
-
-                try {
-                    if (contentVO.exportResources && contentVO.reNpmBuild) {
-                        //你懂得！
-                        reBuildNpmPatcther(contentVO, indicator);
-                    }
-
-                    ExportNCPatcherUtil.export(contentVO);
-                    long e = System.currentTimeMillis();
-                    LogUtil.infoAndHide("导出成功,耗时:" + ((e - s) / 1000.0d) + " (秒s)!硬盘路径： " + contentVO.getOutPath());
-
-                    File dirToOpen = new File(contentVO.getOutPath());
-
+            Task.Backgroundable backgroundable = new Task.Backgroundable(event.getProject(), "导出中...请等待...") {
+                @Override
+                public void run(@NotNull ProgressIndicator indicator) {
+                    isRuning = true;
+                    indicator.setText("正在玩命导出NC补丁包中...");
+                    indicator.setText2("导出成功后会自动打开文件夹： " + contentVO.outPath);
+                    indicator.setIndeterminate(true);
+                    long s = System.currentTimeMillis();
+                    contentVO.indicator = indicator;
                     File opendir = null;
                     try {
-                        if (contentVO.zip) {
-                            opendir = zipPathcers(contentVO, dirToOpen);
+                        if (contentVO.exportResources && contentVO.reNpmBuild) {
+                            //你懂得！
+                            reBuildNpmPatcther(contentVO, indicator);
                         }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
 
-                    if (contentVO.isFormat4Ygj()) {
-                        if (contentVO.isDeleteDir()) {
-                            try {
-                                FileUtil.del(dirToOpen);
-                            } catch (Throwable ex) {
-                            }
-                        }
-                    } else {
-                        if (contentVO.isDeleteDir()) {
-                            try {
-                                FileUtil.del(dirToOpen.getParentFile());
-                            } catch (Throwable ex) {
-                            }
-                        }
-                    }
+                        ExportNCPatcherUtil.export(contentVO);
+                        long e = System.currentTimeMillis();
+                        LogUtil.infoAndHide("导出成功,耗时:" + ((e - s) / 1000.0d) + " (秒s)!硬盘路径： " + contentVO.getOutPath());
 
-                    if (opendir != null) {
+                        File dirToOpen = new File(contentVO.getOutPath());
+
+                        LogUtil.infoAndHide("导出补丁原始目录： " + dirToOpen.getPath());
+
                         try {
-                            if (!opendir.exists()) {
-                                opendir = opendir.getParentFile();
-                                if (!opendir.exists()) {
-                                    opendir = opendir.getParentFile();
+                            if (contentVO.zip) {
+                                opendir = zipPathcers(contentVO, dirToOpen);
+                            }
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
+                        if (contentVO.isFormat4Ygj()) {
+                            if (contentVO.isDeleteDir()) {
+                                try {
+                                    FileUtil.del(dirToOpen);
+                                } catch (Throwable ex) {
                                 }
                             }
-
-                            IoUtil.tryOpenFileExpolor(opendir);
-                        } catch (Throwable ioException) {
-                            ioException.printStackTrace();
-                            LogUtil.infoAndHide("导出成功！路径: " + opendir.getPath());
+                        } else {
+                            if (contentVO.isDeleteDir()) {
+                                try {
+                                    FileUtil.del(dirToOpen.getParentFile());
+                                } catch (Throwable ex) {
+                                }
+                            }
                         }
+
+                        if (opendir != null) {
+                            try {
+                                if (!opendir.exists()) {
+                                    opendir = opendir.getParentFile();
+                                    if (!opendir.exists()) {
+                                        opendir = opendir.getParentFile();
+                                    }
+                                }
+
+                                IoUtil.tryOpenFileExpolor(opendir);
+                            } catch (Throwable ioException) {
+                                ioException.printStackTrace();
+                                LogUtil.infoAndHide("导出成功！路径: " + opendir.getPath());
+                            }
+                        }
+                    } catch (Throwable iae) {
+                        LogUtil.error("自动打开路径失败: " + ExceptionUtil.getExcptionDetall(iae)
+                                + " ,路径: " + (opendir == null ? null : opendir.getPath()));
+                    } finally {
+                        isRuning = false;
                     }
-                } catch (Throwable iae) {
-                    LogUtil.error("自动打开路径失败: " + ExceptionUtil.getExcptionDetall(iae));
-                } finally {
                     isRuning = false;
                 }
-            }
-        };
-        backgroundable.setCancelText("放弃吧,没有卵用的按钮");
-        backgroundable.setCancelTooltipText("这是一个没有卵用的按钮");
-        ProgressManager.getInstance().run(backgroundable);
+            };
+            backgroundable.setCancelText("放弃吧,没有卵用的按钮");
+            backgroundable.setCancelTooltipText("这是一个没有卵用的按钮");
+            ProgressManager.getInstance().run(backgroundable);
 
-        dispose();
+            dispose();
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+            LogUtil.error(ex.toString(), ex);
+            isRuning = false;
+        }
     }
 
     private void reBuildNpmPatcther(ExportContentVO contentVO, @NotNull ProgressIndicator indicator) throws IOException {
@@ -875,10 +885,10 @@ public class PatcherDialog extends DialogWrapper {
         } else {
             zip = new File(dirToOpen.getParentFile().getParentFile(), dirToOpen.getParentFile().getName() + ".zip");
             contentVO.indicator.setText("自动打包成zip压缩包中..." + zip.getPath());
-            File src = ZipUtil.zip(dirToOpen.getParentFile());
-            zip = new File(dirToOpen.getParentFile().getParentFile(), dirToOpen.getParentFile().getName() + ".zip");
+            zip = ZipUtil.zip(dirToOpen.getParentFile());
         }
-        LogUtil.infoAndHide("自动打包成补丁zip压缩包的硬盘路径： " + zip.getPath());
+
+        LogUtil.infoAndHide("自动打包成补丁zip压缩包的硬盘路径： " + zip.getPath() + " ,文件夹: " + dirToOpen.getPath());
 
         return zip;
     }

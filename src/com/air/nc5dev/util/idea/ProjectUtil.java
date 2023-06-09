@@ -239,8 +239,8 @@ public class ProjectUtil {
             }
         }
 
-        T t = null;
-        if (map.get(clazz) == null) {
+        T t = (T) map.get(clazz);
+        if (t == null) {
             synchronized (cacheMap) {
                 if (map.get(clazz) != null) {
                     return (T) map.get(clazz);

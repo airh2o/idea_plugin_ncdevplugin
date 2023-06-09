@@ -13,13 +13,11 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.containers.ArrayListSet;
 import lombok.Data;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -166,15 +164,22 @@ public class ExportContentVO {
 
     public void initSelectModules() {
         Module[] ms = ModuleManager.getInstance(project).getModules();
-        HashMap<String, Module> path2ModuleMap = Arrays.stream(ms).collect(Collectors.toMap(
-                o -> o.getModuleFile().getParent().getPath()
-                , o -> o
-                , (o1, o2) -> o2
-                , HashMap::new
-        ));
+        HashMap<String, Module> path2ModuleMap = Arrays.stream(ms)
+                .filter(m -> m.getModuleFile() != null)
+                .collect(Collectors.toMap(
+                        o -> o.getModuleFile().getParent().getPath()
+                        , o -> o
+                        , (o1, o2) -> o2
+                        , HashMap::new
+                ));
+
+        //排序， 路径最长 放最前面！
+        ArrayList<String> modulesPathList = new ArrayList();
+        modulesPathList.addAll(path2ModuleMap.keySet());
+        modulesPathList.sort((s1, s2) -> s2.length() - s1.length());
 
         for (String select : getSelectFiles()) {
-            for (String modulesPath : path2ModuleMap.keySet()) {
+            for (String modulesPath : modulesPathList) {
                 String path = StringUtil.replaceChars(modulesPath, "/", File.separator);
                 path = StringUtil.replaceChars(path, "\\", File.separator);
                 if (StringUtil.startsWith(select, path)) {

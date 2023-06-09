@@ -12,6 +12,8 @@ import com.intellij.openapi.util.Disposer;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 默认的消息console实现 <br/>
@@ -25,7 +27,7 @@ import java.io.StringWriter;
  */
 public class MeassgeConsoleImpl implements IMeassgeConsole, Disposable {
     public static final String KEY = "ERROR_LOG";
-    private ConsoleView consoleView;
+    public static Map<Project, ConsoleView> consoleView = new ConcurrentHashMap<>();
     private final Project myProject;
 
     public MeassgeConsoleImpl(Project project) {
@@ -36,7 +38,7 @@ public class MeassgeConsoleImpl implements IMeassgeConsole, Disposable {
     public void debug(String msg) {
         if (debugEnabled()) {
             getConsoleView().print(msg + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
-            ProjectUtil.infoNotification(msg, ProjectUtil.getProject());
+            ProjectUtil.infoNotification(msg, ProjectUtil.getDefaultProject());
         }
     }
 
@@ -48,19 +50,20 @@ public class MeassgeConsoleImpl implements IMeassgeConsole, Disposable {
     @Override
     public void info(String msg) {
         getConsoleView().print(msg + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
-        ProjectUtil.infoNotification(msg, ProjectUtil.getProject());
+        ProjectUtil.infoNotification(msg, ProjectUtil.getDefaultProject());
     }
+
     @Override
     public void infoAndHide(String msg) {
         getConsoleView().print(msg + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
-        ProjectUtil.notifyAndHide(msg, ProjectUtil.getProject());
+        ProjectUtil.notifyAndHide(msg, ProjectUtil.getDefaultProject());
     }
 
     @Override
     public void error(String msg) {
         getConsoleView().print(msg + "\n", ConsoleViewContentType.ERROR_OUTPUT);
         PubSubUtil.publishAsync(KEY, new RuntimeException());
-        ProjectUtil.errorNotification(msg, ProjectUtil.getProject());
+        ProjectUtil.errorNotification(msg, ProjectUtil.getDefaultProject());
     }
 
     @Override
@@ -72,7 +75,7 @@ public class MeassgeConsoleImpl implements IMeassgeConsole, Disposable {
             StringWriter errors = new StringWriter();
             t.printStackTrace(new PrintWriter(errors));
             error(errors.toString());
-        }else{
+        } else {
             getConsoleView().print(msg + "\n", ConsoleViewContentType.ERROR_OUTPUT);
             StringWriter errors = new StringWriter();
             t.printStackTrace(new PrintWriter(errors));
@@ -91,16 +94,17 @@ public class MeassgeConsoleImpl implements IMeassgeConsole, Disposable {
 
     @Override
     public ConsoleView getConsoleView() {
-        if (consoleView == null) {
-            consoleView = TextConsoleBuilderFactory.getInstance().createBuilder(myProject).getConsole();
+        if (consoleView.get(ProjectUtil.getDefaultProject()) == null) {
+            consoleView.put(ProjectUtil.getDefaultProject(),
+                    TextConsoleBuilderFactory.getInstance().createBuilder(ProjectUtil.getDefaultProject()).getConsole());
         }
-        return this.consoleView;
+        return consoleView.get(ProjectUtil.getDefaultProject());
     }
 
     @Override
     public void dispose() {
         if (consoleView != null) {
-            Disposer.dispose(consoleView);
+            Disposer.dispose(consoleView.get(ProjectUtil.getDefaultProject()));
         }
     }
 }
