@@ -81,6 +81,9 @@
                 text="打开最后一次MSTSC连接" description="打开最后一次MSTSC连接">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift l"/>
         </action>
+        <action id="nc5dev.info.NCCJsonDecodeAction" class="com.air.nc5dev.acion.NCCJsonDecodeAction"
+                text="NCC(BIP)前端请求解码" description="NCC(BIP)前端请求解码">
+        </action>
         <action id="nc5dev.info.openjconsole" class="com.air.nc5dev.acion.OpenJconsoleAction"
                 text="打开 Jconsole" description="打开Jconsole">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift j"/>
@@ -230,6 +233,7 @@
             <reference ref="nc5dev.info.SearchFullDataBaseAction"/>
             <reference ref="nc5dev.info.MstscManggerUIAction"/>
             <reference ref="nc5dev.info.MstscOpenLastAction"/>
+            <reference ref="nc5dev.info.NCCJsonDecodeAction"/>
 
             <separator/>
             <reference ref="nc5dev.info.JavadocGenerateAction"/>
@@ -393,21 +397,21 @@
         <!-- 日志输出窗口服务注册 -->
         <projectService serviceInterface="com.air.nc5dev.service.ui.IMeassgeConsole"
                         serviceImplementation="com.air.nc5dev.service.ui.impl.MeassgeConsoleImpl"/>
-      <!--  &lt;!&ndash; 日志输出窗口界面注册 &ndash;&gt;
-        <toolWindow id="NC插件日志" anchor="bottom" factoryClass="com.air.nc5dev.ui.ToolWindowFactory"/>
+        <!--  &lt;!&ndash; 日志输出窗口界面注册 &ndash;&gt;
+          <toolWindow id="NC插件日志" anchor="bottom" factoryClass="com.air.nc5dev.ui.ToolWindowFactory"/>
 
-        &lt;!&ndash;        action搜索窗口    &ndash;&gt;
-        <toolWindow id="NCC Action URL搜索" secondary="false" anchor="bottom"
-                    factoryClass="com.air.nc5dev.ui.actionurlsearch.NCCActionURLSearchWindowFactory"/>
+          &lt;!&ndash;        action搜索窗口    &ndash;&gt;
+          <toolWindow id="NCC Action URL搜索" secondary="false" anchor="bottom"
+                      factoryClass="com.air.nc5dev.ui.actionurlsearch.NCCActionURLSearchWindowFactory"/>
 
-        &lt;!&ndash;  数据库全局搜索   &ndash;&gt;
-        <toolWindow id="数据库全局搜索" secondary="false" anchor="bottom"
-                    factoryClass="com.air.nc5dev.ui.searchdatabasefull.SearchFullDataBaseWindowFactory"/>
+          &lt;!&ndash;  数据库全局搜索   &ndash;&gt;
+          <toolWindow id="数据库全局搜索" secondary="false" anchor="bottom"
+                      factoryClass="com.air.nc5dev.ui.searchdatabasefull.SearchFullDataBaseWindowFactory"/>
 
-        &lt;!&ndash;  MSTSC远程管理   &ndash;&gt;
-        <toolWindow id="MSTSC远程管理" secondary="false" anchor="bottom"
-                    factoryClass="com.air.nc5dev.ui.MstscManggerWindowFactory"/>
-        -->
+          &lt;!&ndash;  MSTSC远程管理   &ndash;&gt;
+          <toolWindow id="MSTSC远程管理" secondary="false" anchor="bottom"
+                      factoryClass="com.air.nc5dev.ui.MstscManggerWindowFactory"/>
+          -->
         <!--  开发常用工具窗口   -->
         <toolWindow id="NC 开发常用工具窗口" secondary="false" anchor="bottom"
                     factoryClass="com.air.nc5dev.ui.MyGroupWindowFactory"/>
