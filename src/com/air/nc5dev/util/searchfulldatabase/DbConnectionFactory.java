@@ -50,7 +50,10 @@ public class DbConnectionFactory {
                 cs = new ArrayList<>();
                 dbConnectionPool.put(url + user, cs);
             }
-            LogUtil.tryInfo(String.format("数据库连接数量: %s - %s ", dbConnectionPool.size(), cs.size()));
+            LogUtil.tryInfo(String.format("数据库连接数量: 类别数量:%s - 类别:%s - 池大小:%s "
+                    , dbConnectionPool.size()
+                    , url + user
+                    , cs.size()));
             if (cs.size() >= max) {
                 return cs.get(0);
             }

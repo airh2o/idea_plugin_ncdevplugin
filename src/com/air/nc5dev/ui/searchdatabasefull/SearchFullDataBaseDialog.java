@@ -403,7 +403,7 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
         }
 
         button_Search.setText("停止搜索");
-        Task.Backgroundable backgroundable = new Task.Backgroundable(project, "导出中...请等待...") {
+        Task.Backgroundable backgroundable = new Task.Backgroundable(project, "数据库全局搜索中...请稍后...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setText("正在搜索数据库...");
