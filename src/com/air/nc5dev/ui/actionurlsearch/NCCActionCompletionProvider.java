@@ -1,7 +1,6 @@
 package com.air.nc5dev.ui.actionurlsearch;
 
 import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
-import com.air.nc5dev.util.StringUtil;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.ui.TextFieldWithAutoCompletionListProvider;
@@ -30,7 +29,7 @@ public class NCCActionCompletionProvider extends TextFieldWithAutoCompletionList
 
         return pr.suggest(prefix
                 , nccActionURLSearchUI.getProject()
-                , !nccActionURLSearchUI.getBtnNewButton_searchProject().isSelected()
+                , !nccActionURLSearchUI.getCheckBox_onlyProject().isSelected()
                 , size);
     }
 

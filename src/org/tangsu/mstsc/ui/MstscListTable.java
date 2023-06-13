@@ -1,11 +1,17 @@
 package org.tangsu.mstsc.ui;
 
+import com.air.nc5dev.util.StringUtil;
+import com.intellij.lang.java.JavaDocumentationProvider;
+import com.intellij.psi.impl.compiled.ClsClassImpl;
+import com.intellij.psi.impl.java.stubs.JavaStubElementTypes;
+import com.intellij.psi.impl.java.stubs.impl.PsiClassStubImpl;
 import com.intellij.ui.table.JBTable;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.table.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 
 public class MstscListTable extends JBTable {
@@ -16,6 +22,20 @@ public class MstscListTable extends JBTable {
     @Override
     public boolean isCellEditable(int row, int column) {
         return false;
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        int row = rowAtPoint(event.getPoint());
+        int column = columnAtPoint(event.getPoint());
+
+        String txt = "";
+
+        if (row > -1 && column > -1) {
+            txt = StringUtil.getSafeString(getValueAt(row, column));
+        }
+
+        return txt;
     }
 
     public void fitTableColumns() {

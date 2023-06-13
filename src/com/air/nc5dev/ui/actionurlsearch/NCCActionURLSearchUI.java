@@ -9,25 +9,29 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.*;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.jdesktop.swingx.JXComboBox;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.tangsu.mstsc.service.MstscEntitServiceImpl;
 import org.tangsu.mstsc.vo.WindowSizeVO;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Getter
 @Setter
-public class NCCActionURLSearchUI {
+public class NCCActionURLSearchUI extends DialogWrapper {
     Project project;
     public static String[] tableNames = new String[]{
             "序号"
@@ -67,12 +71,12 @@ public class NCCActionURLSearchUI {
     JTextField textField_width;
     JTextField textField_higth;
     JTextField textField_id;
-    DefaultComboBoxModel<WindowSizeVO> comboBoxSizeModel;
-    JComboBox comboBox_size;
+    DefaultComboBoxModel<WindowSizeVO> comboBoxModel_type;
+    JComboBox comboBox_type;
     JScrollPane panel_table;
-    JCheckBox checkBox_full;
+    JCheckBox checkBox_onlyProject;
     JCheckBox checkBox_AutoColumnSize;
-    JCheckBox checkBox_relink;
+    JCheckBox checkBox_jar2last;
     JButton btnNewButton_link;
     JButton btnNewButton_search;
     JButton btnNewButton_searchProject;
@@ -92,7 +96,20 @@ public class NCCActionURLSearchUI {
     JBLabel label_error;
 
     public NCCActionURLSearchUI(Project project) {
+        super(project);
         this.project = project;
+        init();
+        setTitle("NCC(BIP) Action和UPM URL搜索(双击行 打开Class,或对表格行点击右键)");
+    }
+
+    @Override
+    protected @Nullable
+    JComponent createCenterPanel() {
+        return createUI();
+    }
+
+    public Container getContentPane() {
+        return createCenterPanel();
     }
 
     public JBScrollPane createUI() {
@@ -138,20 +155,37 @@ public class NCCActionURLSearchUI {
             textField_key.setBounds(x, y, w, h);
             panel_main.add(textField_key);
 
-            btnNewButton_search = new JButton("搜索全部");
+            btnNewButton_search = new JButton("搜索");
             btnNewButton_search.setBounds(x += w + 5, y, w = 80, h);
             panel_main.add(btnNewButton_search);
 
-            btnNewButton_searchProject = new JButton("搜索本项目");
+/*            btnNewButton_searchProject = new JButton("搜索本项目");
             btnNewButton_searchProject.setBounds(x += w + 5, y, w, h);
-            panel_main.add(btnNewButton_searchProject);
+            panel_main.add(btnNewButton_searchProject);*/
 
             checkBox_AutoColumnSize = new JBCheckBox("自动适应列宽");
             checkBox_AutoColumnSize.setBounds(x += w + 5, y, w = 100, h);
             panel_main.add(checkBox_AutoColumnSize);
 
-            label_error = new JBLabel("");
-            label_error.setBounds(x += w + 5, y, w = 600, h);
+            checkBox_onlyProject = new JBCheckBox("只搜索本工程");
+            checkBox_onlyProject.setBounds(x += w + 5, y, w = 100, h);
+            panel_main.add(checkBox_onlyProject);
+
+            checkBox_jar2last = new JBCheckBox("排序优先非Jar文件");
+            checkBox_jar2last.setBounds(x += w + 5, y, w = 140, h);
+            panel_main.add(checkBox_jar2last);
+
+            label = new JBLabel("搜索类型:");
+            label.setBounds(x += w + 10, y, w = 60, h);
+            panel_main.add(label);
+            comboBoxModel_type = new DefaultComboBoxModel(new String[]{"全部", "Action", "UPM的Servlet"});
+            comboBox_type = new JXComboBox(comboBoxModel_type);
+            comboBox_type.setBounds(x += w + 1, y, w = 150, h);
+            panel_main.add(comboBox_type);
+
+            label_error = new JBLabel("请输入搜索关键词!nccloud/aim/acceptance/querylist.do 或 aim/acceptance/querylist 或 " +
+                    "acceptance.querylist 或 采购订单 查询 等");
+            label_error.setBounds(x = 1, y += h + 5, 900, h);
             label_error.setFontColor(UIUtil.FontColor.BRIGHTER);
             panel_main.add(label_error);
 
@@ -161,7 +195,7 @@ public class NCCActionURLSearchUI {
             table = new ActionResultListTable(tableModel, this);
             panel_table = new JBScrollPane(table);
             panel_table.setAutoscrolls(true);
-            panel_table.setBounds(x, y, getWidth() - 100, 450);
+            panel_table.setBounds(x, y, getWidth() - 100, 300);
             panel_main.add(panel_table);
 
             TableColumn firsetColumn = table.getColumnModel().getColumn(0);
@@ -174,11 +208,11 @@ public class NCCActionURLSearchUI {
             textArea_detail = new JBTextArea();
             textArea_detail.setEditable(true);
             textArea_detail.setAutoscrolls(true);
-           // textArea_detail.setLineWrap(true);
+            // textArea_detail.setLineWrap(true);
             JBScrollPane sc = new JBScrollPane(textArea_detail);
             sc.setAutoscrolls(true);
-            sc.setBounds(x += panel_table.getWidth() + 5, y, 200, 300);
-            panel_main.add(sc);
+            sc.setBounds(x += panel_table.getWidth() + 5, y, 200, 200);
+           // panel_main.add(sc);
 
             initListeners();
         }
@@ -186,8 +220,10 @@ public class NCCActionURLSearchUI {
     }
 
     private void initListeners() {
-        btnNewButton_search.addActionListener(e -> search(1));
-        btnNewButton_searchProject.addActionListener(e -> search(0));
+        btnNewButton_search.addActionListener(e -> search(checkBox_onlyProject.isSelected() ? 0 : 1));
+        if (btnNewButton_searchProject != null) {
+            btnNewButton_searchProject.addActionListener(e -> search(0));
+        }
     }
 
     AtomicBoolean runing = new AtomicBoolean(false);
@@ -226,14 +262,47 @@ public class NCCActionURLSearchUI {
 
         label_error.setText("搜索中...请稍后...");
 
-        List<NCCActionInfoVO> res = RequestMappingItemProvider.getMe().search(project, key, true);
+        List<NCCActionInfoVO> res = fileter(RequestMappingItemProvider.getMe().search(project, key, true));
         setResult(res);
 
         label_error.setText("搜索完成!匹配数: " + CollUtil.size(res));
     }
 
+    private List<NCCActionInfoVO> fileter(List<NCCActionInfoVO> res) {
+        List<NCCActionInfoVO> vs = filter0(res);
+
+        if (checkBox_jar2last.isSelected()) {
+            for (NCCActionInfoVO v : vs) {
+                if (!v.getXmlPath().toLowerCase().contains(".jar")) {
+                    v.setScore(v.getScore() + 100);
+                }
+            }
+            vs.sort((a, b) -> b.getScore() - a.getScore());
+        }
+
+        return vs;
+    }
+
+    @Nullable
+    private List<NCCActionInfoVO> filter0(List<NCCActionInfoVO> res) {
+        if (comboBox_type.getSelectedIndex() < 1 || CollUtil.isEmpty(res)) {
+            return res;
+        }
+
+        ArrayList<NCCActionInfoVO> vs = new ArrayList();
+        for (NCCActionInfoVO r : res) {
+            if (comboBox_type.getSelectedIndex() == 1 && r.getType() == NCCActionInfoVO.TYPE_ACTION) {
+                vs.add(r);
+            } else if (comboBox_type.getSelectedIndex() == 2 && r.getType() == NCCActionInfoVO.TYPE_UPM) {
+                vs.add(r);
+            }
+        }
+
+        return vs;
+    }
+
     private void setResult(List<NCCActionInfoVO> res) {
-        SwingUtilities.invokeLater(()->{
+        SwingUtilities.invokeLater(() -> {
             if (CollUtil.isEmpty(res)) {
                 label_error.setText("未搜索到任何内容");
                 textArea_detail.setText("");
@@ -259,7 +328,7 @@ public class NCCActionURLSearchUI {
         String key = StringUtil.trim(textField_key.getText());
         if (StringUtil.isBlank(key)) {
             label_error.setText("请输入搜索关键词!nccloud/aim/acceptance/querylist.do 或 aim/acceptance/querylist 或 acceptance" +
-                    ".querylist等");
+                    ".querylist 或 采购订单 查询 等");
             return null;
         }
 
@@ -273,7 +342,7 @@ public class NCCActionURLSearchUI {
         }
         label_error.setText("搜索中...请稍后...");
 
-        List<NCCActionInfoVO> res = RequestMappingItemProvider.getMe().search(project, key, false);
+        List<NCCActionInfoVO> res = fileter(RequestMappingItemProvider.getMe().search(project, key, false));
 
         setResult(res);
 

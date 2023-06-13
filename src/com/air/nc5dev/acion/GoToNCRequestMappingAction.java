@@ -10,9 +10,41 @@ import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.extensions.ExtensionPointName;
+import com.intellij.openapi.project.Project;
+
+import java.util.ArrayList;
+
+
+import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
+import com.air.nc5dev.nccrequstsearch.RequestMappingModel;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.idea.LogUtil;
+import com.air.nc5dev.util.idea.ProjectUtil;
+import com.intellij.ide.actions.GotoActionBase;
+import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+
+import com.air.nc5dev.acion.base.AbstractIdeaAction;
+import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
+import com.air.nc5dev.nccrequstsearch.RequestMappingModel;
+import com.air.nc5dev.ui.actionurlsearch.NCCActionURLSearchUI;
+import com.air.nc5dev.ui.actionurlsearch.NCCActionURLSearchView;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.idea.LogUtil;
+import com.air.nc5dev.util.idea.ProjectUtil;
+import com.intellij.ide.actions.GotoActionBase;
+import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.extensions.ExtensionPointName;
+import com.intellij.openapi.project.Project;
 
 import java.util.ArrayList;
 
@@ -26,7 +58,24 @@ import java.util.ArrayList;
  * @project
  * @Version
  */
-public class GoToNCRequestMappingAction extends GotoActionBase implements DumbAware {
+public class GoToNCRequestMappingAction
+/*
+
+        extends AbstractIdeaAction {
+    @Override
+    protected void doHandler(AnActionEvent e) throws Exception {
+        init(e.getProject());
+        NCCActionURLSearchUI dialog = new NCCActionURLSearchUI(e.getProject());
+        dialog.setModal(false);
+        dialog.show();
+    }
+*/
+
+
+
+
+
+        extends GotoActionBase implements DumbAware {
     public static final ExtensionPointName EXTENSION_NAME = ExtensionPointName
             .create("com.air.nc5dev.acion.GoToNCRequestMappingAction.EXTENSION_NAME")
             ;
@@ -45,9 +94,18 @@ public class GoToNCRequestMappingAction extends GotoActionBase implements DumbAw
                 , null, true, false);
     }
 
+
+
+    class MyGotoActionCallback extends GotoActionBase.GotoActionCallback{
+        @Override
+        public void elementChosen(ChooseByNamePopup chooseByNamePopup, Object element) {
+
+        }
+    }
+
     public static void init(Project p) {
         if (p == null) {
-            return ;
+            return;
         }
 
         //设置默认项目
@@ -59,13 +117,6 @@ public class GoToNCRequestMappingAction extends GotoActionBase implements DumbAw
             RequestMappingItemProvider.getMe().initScan(p);
         } catch (Exception e1) {
             LogUtil.error("emmmmm 出现异常,淡定不要惊慌,如果影响使用请QQ209308343通知我: ", e1);
-        }
-    }
-
-    class MyGotoActionCallback extends GotoActionBase.GotoActionCallback{
-        @Override
-        public void elementChosen(ChooseByNamePopup chooseByNamePopup, Object element) {
-
         }
     }
 }

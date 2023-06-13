@@ -25,7 +25,8 @@ public class ActionResultDTO extends NCCActionInfoVO {
                         "row 配置文件所在行:\n" + row + "\n\n" +
                         "auth 配置文件路径:\n" + authPath + "\n\n" +
                         "score 匹配度得分:\n" + score + "\n\n" +
-                        "project 工程路径:\n" + project + "\n\n"
+                        "project 工程路径:\n" + project + "\n\n"+
+                        (type == TYPE_ACTION ? "/nccloud/" + name.replace('.', '/') + ".do" : "")
                 ;
     }
 

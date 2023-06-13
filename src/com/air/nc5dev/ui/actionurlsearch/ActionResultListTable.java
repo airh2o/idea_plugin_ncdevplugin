@@ -15,6 +15,7 @@ import com.intellij.featureStatistics.FeatureUsageTracker;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.IdeEventQueue;
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereManager;
+import com.intellij.lang.java.JavaDocumentationProvider;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -31,6 +32,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.pom.java.LanguageLevel;
+import com.intellij.psi.ClassFileViewProvider;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.impl.compiled.ClsClassImpl;
+import com.intellij.psi.impl.java.stubs.JavaClassElementType;
+import com.intellij.psi.impl.java.stubs.JavaStubElementTypes;
+import com.intellij.psi.impl.java.stubs.impl.PsiClassStubImpl;
+import com.intellij.psi.impl.java.stubs.impl.PsiJavaFileStubImpl;
+import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.ui.table.JBTable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -60,6 +70,47 @@ public class ActionResultListTable extends JBTable {
         this.nccActionURLSearchUI = nccActionURLSearchUI;
         addMouseListener(new NccActionTableMouseListenerImpl(this));
         addMouseListener(new MySelectFileTableMouseAdpaterImpl(this));
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        int row = rowAtPoint(event.getPoint());
+        int column = columnAtPoint(event.getPoint());
+
+        String txt = "";
+
+        if (row > -1 && column > -1) {
+            txt = StringUtil.getSafeString(getValueAt(row, column));
+        }
+
+        ActionResultDTO vo = getDataOfRow(row);
+        if (column == -111115) {
+            try {
+                VirtualFile file = findClassFile(vo);
+                if (file == null) {
+                    return txt;
+                }
+
+                JavaDocumentationProvider jdp = new JavaDocumentationProvider();
+                String simpleName = txt.substring(txt.lastIndexOf('.') + 1);
+                String packge = txt.substring(0, txt.lastIndexOf('.'));
+                PsiJavaFileStubImpl parent = new PsiJavaFileStubImpl(new PsiJavaFileImpl(
+                        new ClassFileViewProvider(PsiManager.getInstance(getNccActionURLSearchUI().getProject()), file))
+                        , packge, null, true);
+                PsiClassStubImpl pcs = new PsiClassStubImpl(JavaStubElementTypes.CLASS, parent, txt, simpleName
+                        , null, (short) 0);
+                return jdp.generateHoverDoc(new ClsClassImpl(pcs), null);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                return txt;
+            }
+        } else if (column == -1000000 && vo != null && vo.getType() == NCCActionInfoVO.TYPE_ACTION) {
+            return "/nccloud/" + txt.replace('.', '/') + ".do";
+        } else if (vo != null) {
+            return vo.displayText().replace("\n", "<br>");
+        }
+
+        return txt;
     }
 
     @Override
@@ -333,6 +384,17 @@ public class ActionResultListTable extends JBTable {
                     }
                 });
 
+                openClass = new JMenuItem("复制完整信息");
+                popup.add(openClass);
+                openClass.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        ActionResultDTO v = vo;
+                        if (v != null) {
+                            StringUtil.setIntoClipboard(v.displayText());
+                        }
+                    }
+                });
+
                 popup.show(me.getComponent(), me.getX(), me.getY());
             }
         }
@@ -340,11 +402,7 @@ public class ActionResultListTable extends JBTable {
 
     }
 
-    public void openClass(ActionResultDTO vo) {
-        if (vo == null) {
-            return;
-        }
-
+    public VirtualFile findClassFile(ActionResultDTO vo) {
         String path = null;
         vo.setClazz(StrUtil.trim(vo.getClazz()));
         //搜索 工程里的Java文件!
@@ -417,8 +475,7 @@ public class ActionResultListTable extends JBTable {
         }
 
         if (path == null) {
-            searchClass(vo);
-            return;
+            return null;
         }
 
         VirtualFile virtualFile = null;
@@ -428,6 +485,16 @@ public class ActionResultListTable extends JBTable {
         } else {
             virtualFile = VirtualFileManager.getInstance().findFileByNioPath(new File(path).toPath());
         }
+
+        return virtualFile;
+    }
+
+    public void openClass(ActionResultDTO vo) {
+        if (vo == null) {
+            return;
+        }
+
+        VirtualFile virtualFile = findClassFile(vo);
 
         if (virtualFile == null) {
             searchClass(vo);

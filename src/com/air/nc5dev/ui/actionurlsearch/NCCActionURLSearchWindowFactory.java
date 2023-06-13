@@ -25,7 +25,7 @@ public class NCCActionURLSearchWindowFactory extends ToolWindowFactory {
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
         NCCActionURLSearchView view = new NCCActionURLSearchView(project);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(view, "NCC Action和UPM URL搜索(双击行 打开Class,或对表格行点击右键)", true);
+        Content content = contentFactory.createContent(view, "NCC(BIP) Action和UPM URL搜索(双击行 打开Class,或对表格行点击右键)", true);
         toolWindow.getContentManager().addContent(content);
 
         init2(project);
