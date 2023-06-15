@@ -322,13 +322,10 @@ public class ExportNCPatcherUtil {
     }
 
     public static void processNCCPatchersWhenFinashLeft(ExportContentVO contentVO) {
-        File outTop = new File(contentVO.getOutPath());
-        if (contentVO.isFormat4Ygj()) {
-            outTop = new File(outTop, "replacement");
-        }
-        File webinf = new File(outTop, "hotwebs" + File.separatorChar + "nccloud" + File.separatorChar + "WEB-INF");
+        File base = new File(contentVO.getOutPath()).getParentFile();
+        File webinf = new File(base, "hotwebs" + File.separatorChar + "nccloud" + File.separatorChar + "WEB-INF");
 
-        File modules = new File(outTop, "modules");
+        File modules = new File(base, "modules");
 
         File[] moduleDirs = modules.listFiles();
         if (moduleDirs != null) {
@@ -373,7 +370,7 @@ public class ExportNCPatcherUtil {
                 moduleDirs = dist.listFiles();
                 if (moduleDirs != null) {
                     for (File f : moduleDirs) {
-                        FileUtil.move(f, resources, true);
+                        FileUtil.copy(f, resources, true);
                     }
                 }
             }
@@ -465,8 +462,8 @@ public class ExportNCPatcherUtil {
      */
     public static void toYgjFormatExportStract(ExportContentVO contentVO) {
         File orginDir = new File(contentVO.getOutPath());
-        File pather = orginDir.getParentFile();
-        File base = new File(pather.getParentFile(), pather.getName() + "-云管家补丁");
+        File patcherDir = orginDir.getParentFile();
+        File base = new File(patcherDir.getParentFile(), patcherDir.getName() + "-云管家补丁");
         contentVO.indicator.setText("转换成云管家补丁格式..." + base.getPath());
         if (base.exists()) {
             IoUtil.deleteFileAll(base);
@@ -478,15 +475,15 @@ public class ExportNCPatcherUtil {
         File packmetadata = new File(base, "packmetadata.xml");
         File installpatch = new File(base, "installpatch.xml");*/
 
-        if (!pather.isDirectory()) {
+        if (!patcherDir.isDirectory()) {
             LogUtil.error(String.format("转换成云管家补丁格式出错: 路径不存在: %s , orginDir: %s"
-                    , pather.getPath()
+                    , patcherDir.getPath()
                     , orginDir.getParent()
             ));
             return;
         }
 
-        for (File src : pather.listFiles()) {
+        for (File src : patcherDir.listFiles()) {
             FileUtil.move(src, replacement, true);
         }
 
@@ -507,7 +504,7 @@ public class ExportNCPatcherUtil {
         }
 
         try {
-            FileUtil.del(pather);
+            FileUtil.del(patcherDir);
         } catch (Exception e) {
         }
     }
