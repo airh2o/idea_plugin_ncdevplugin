@@ -326,24 +326,18 @@ public class ExportNCPatcherUtil {
         if (contentVO.isFormat4Ygj()) {
             outTop = new File(outTop, "replacement");
         }
-        outTop = new File(outTop, "hotwebs");
-        outTop = new File(outTop, "nccloud");
-        outTop = new File(outTop, "WEB-INF");
+        File webinf = new File(outTop, "hotwebs" + File.separatorChar + "nccloud" + File.separatorChar + "WEB-INF");
 
-        File dir = new File(contentVO.getOutPath());
-        if (contentVO.isFormat4Ygj()) {
-            dir = new File(dir, "replacement");
-            dir = new File(dir, "modules");
-        }
+        File modules = new File(outTop, "modules");
 
-        File[] fs = dir.listFiles();
-        if (fs != null) {
-            for (File f : fs) {
-                if (!f.isDirectory()) {
+        File[] moduleDirs = modules.listFiles();
+        if (moduleDirs != null) {
+            for (File moduleDir : moduleDirs) {
+                if (!moduleDir.isDirectory()) {
                     continue;
                 }
 
-                File client = new File(f, "client");
+                File client = new File(moduleDir, "client");
                 if (!client.isDirectory()) {
                     continue;
                 }
@@ -353,7 +347,7 @@ public class ExportNCPatcherUtil {
                     File[] fs2 = classes.listFiles();
                     if (fs2 != null) {
                         for (File f2 : fs2) {
-                            FileUtil.move(f2, new File(outTop, "classes"), true);
+                            FileUtil.move(f2, new File(webinf, "classes"), true);
                         }
                     }
                 }
@@ -363,7 +357,7 @@ public class ExportNCPatcherUtil {
                     File[] fs2 = lib.listFiles();
                     if (fs2 != null) {
                         for (File f2 : fs2) {
-                            FileUtil.move(f2, new File(outTop, "lib"), true);
+                            FileUtil.move(f2, new File(webinf, "lib"), true);
                         }
                     }
                 }
@@ -373,13 +367,13 @@ public class ExportNCPatcherUtil {
         }
 
         if (contentVO.exportResources) {
-            outTop = new File(outTop.getParentFile(), "resources");
+            File resources = new File(webinf.getParentFile(), "resources");
             File dist = new File(new File(contentVO.getHotwebsResourcePath()), "dist");
             if (dist.isDirectory()) {
-                fs = dist.listFiles();
-                if (fs != null) {
-                    for (File f : fs) {
-                        FileUtil.move(f, outTop, true);
+                moduleDirs = dist.listFiles();
+                if (moduleDirs != null) {
+                    for (File f : moduleDirs) {
+                        FileUtil.move(f, resources, true);
                     }
                 }
             }
