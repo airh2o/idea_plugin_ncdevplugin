@@ -17,6 +17,7 @@ import com.intellij.psi.impl.compiled.ClsFileImpl;
 import com.intellij.psi.impl.compiled.ClsJavaCodeReferenceElementImpl;
 import com.intellij.psi.impl.java.stubs.index.JavaAnnotationIndex;
 import com.intellij.psi.impl.java.stubs.index.JavaSuperClassNameOccurenceIndex;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
@@ -454,11 +455,24 @@ public class NCCActionRefreshUtil {
             }
         }
 
-        ProjectAndLibrariesScope projectAndLibrariesScope = new ProjectAndLibrariesScope(project, true);
+        GlobalSearchScope scope = null;
+        if (from == NCCActionInfoVO.FROM_HOME) {
+            try {
+                scope = new ProjectAndLibrariesScope(project, true);
+            } catch (Throwable exception) {
+            }
+        } else {
+            scope = module.getModuleScope(false);
+        }
+
+        if (scope == null) {
+            scope = module.getModuleWithLibrariesScope();
+        }
+
         Collection<PsiReferenceList> refList = JavaSuperClassNameOccurenceIndex.getInstance()
                 .get("IHttpServletAdaptor"
                         , project
-                        , from == NCCActionInfoVO.FROM_HOME ? projectAndLibrariesScope : module.getModuleScope(false)
+                        , scope
                 );
 
         if (CollUtil.isEmpty(refList)) {
@@ -619,11 +633,24 @@ public class NCCActionRefreshUtil {
             }
         }
 
-        ProjectAndLibrariesScope projectAndLibrariesScope = new ProjectAndLibrariesScope(project, true);
+        GlobalSearchScope scope = null;
+        if (from == NCCActionInfoVO.FROM_HOME) {
+            try {
+                scope = new ProjectAndLibrariesScope(project, true);
+            } catch (Throwable exception) {
+            }
+        } else {
+            scope = module.getModuleScope(false);
+        }
+
+        if (scope == null) {
+            scope = module.getModuleWithLibrariesScope();
+        }
+
         Collection<PsiAnnotation> refList = JavaAnnotationIndex.getInstance().get(
                 "Path"
                 , project
-                , from == NCCActionInfoVO.FROM_HOME ? projectAndLibrariesScope : module.getModuleScope(false)
+                , scope
         );
 
         if (CollUtil.isEmpty(refList)) {
@@ -709,11 +736,24 @@ public class NCCActionRefreshUtil {
             }
         }
 
-        ProjectAndLibrariesScope projectAndLibrariesScope = new ProjectAndLibrariesScope(project, true);
+        GlobalSearchScope scope = null;
+        if (from == NCCActionInfoVO.FROM_HOME) {
+            try {
+                scope = new ProjectAndLibrariesScope(project, true);
+            } catch (Throwable exception) {
+            }
+        }else{
+            scope = module.getModuleScope(false);
+        }
+
+        if (scope == null) {
+            scope = module.getModuleWithLibrariesScope();
+        }
+
         Collection<PsiReferenceList> refList = JavaSuperClassNameOccurenceIndex.getInstance()
                 .get("IHttpServletAdaptor"
                         , project
-                        , from == NCCActionInfoVO.FROM_HOME ? projectAndLibrariesScope : module.getModuleScope(false)
+                        , scope
                 );
 
         if (CollUtil.isEmpty(refList)) {
