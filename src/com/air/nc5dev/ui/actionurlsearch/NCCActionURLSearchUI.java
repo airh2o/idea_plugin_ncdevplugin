@@ -32,7 +32,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Getter
 @Setter
 public class NCCActionURLSearchUI extends DialogWrapper {
-    Project project;
+    public static String[] TYPE_DESC = new String[]{"全部", "Action", "UPM的Servlet"
+            , "非UPM的Servlet", "SpringMVC注解接口", "Jaxrs(javax.ws.rs.Path)"};
     public static String[] tableNames = new String[]{
             "序号"
             , "来源(1000=工程源码)"
@@ -55,6 +56,7 @@ public class NCCActionURLSearchUI extends DialogWrapper {
     };
 
     public static int pk_index = 7;
+    Project project;
     JBTabbedPane contentPane;
     JBPanel panel_main;
     JBTextField textField_dbfile;
@@ -178,8 +180,29 @@ public class NCCActionURLSearchUI extends DialogWrapper {
             label = new JBLabel("搜索类型:");
             label.setBounds(x += w + 10, y, w = 60, h);
             panel_main.add(label);
-            comboBoxModel_type = new DefaultComboBoxModel(new String[]{"全部", "Action", "UPM的Servlet"});
-            comboBox_type = new JXComboBox(comboBoxModel_type);
+            comboBoxModel_type = new DefaultComboBoxModel(TYPE_DESC);
+            comboBox_type = new JXComboBox(comboBoxModel_type) {
+                @Override
+                public String getToolTipText() {
+                    switch (getSelectedIndex()) {
+                        case 0:
+                            return "搜索全部类型";
+                        case 1:
+                            return "只搜索配置的前端Action(实现 nccloud.framework.web.action.itf.ICommonAction )";
+                        case 2:
+                            return "只搜索UPM文件配置的实现了nc.bs.framework.adaptor.IHttpServletAdaptor的接口";
+                        case 3:
+                            return "只搜索未配置UPM但实现nc.bs.framework.adaptor" +
+                                    ".IHttpServletAdaptor的通过http://IP:端口/servlet/~模块名/完整类名 访问的接口";
+                        case 4:
+                            return "只搜索 SpringMVC注解的接口";
+                        case 5:
+                            return "只搜索 Java RS标准注解(javax.ws.rs.Path)的接口";
+                    }
+
+                    return "";
+                }
+            };
             comboBox_type.setBounds(x += w + 1, y, w = 150, h);
             panel_main.add(comboBox_type);
 
@@ -212,7 +235,7 @@ public class NCCActionURLSearchUI extends DialogWrapper {
             JBScrollPane sc = new JBScrollPane(textArea_detail);
             sc.setAutoscrolls(true);
             sc.setBounds(x += panel_table.getWidth() + 5, y, 200, 200);
-           // panel_main.add(sc);
+            // panel_main.add(sc);
 
             initListeners();
         }
@@ -291,9 +314,20 @@ public class NCCActionURLSearchUI extends DialogWrapper {
 
         ArrayList<NCCActionInfoVO> vs = new ArrayList();
         for (NCCActionInfoVO r : res) {
-            if (comboBox_type.getSelectedIndex() == 1 && r.getType() == NCCActionInfoVO.TYPE_ACTION) {
+            if (comboBox_type.getSelectedIndex() == 1
+                    && r.getType() == NCCActionInfoVO.TYPE_ACTION) {
                 vs.add(r);
-            } else if (comboBox_type.getSelectedIndex() == 2 && r.getType() == NCCActionInfoVO.TYPE_UPM) {
+            } else if (comboBox_type.getSelectedIndex() == 2
+                    && r.getType() == NCCActionInfoVO.TYPE_UPM) {
+                vs.add(r);
+            }else if (comboBox_type.getSelectedIndex() == 3
+                    && r.getType() == NCCActionInfoVO.TYPE_SERVLET) {
+                vs.add(r);
+            }else if (comboBox_type.getSelectedIndex() == 4
+                    && r.getType() == NCCActionInfoVO.TYPE_SPRINTMVC) {
+                vs.add(r);
+            }else if (comboBox_type.getSelectedIndex() == 5
+                    && r.getType() == NCCActionInfoVO.TYPE_JAXRS) {
                 vs.add(r);
             }
         }

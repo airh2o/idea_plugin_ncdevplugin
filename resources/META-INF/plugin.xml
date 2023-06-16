@@ -503,6 +503,7 @@
 
     </extensions>
 
+    <depends optional="true">com.jetbrains.restClient</depends>
 
     <description><![CDATA[
       <p>Yonyou U8Cloud, NC5 NC6 NCCloud YonBip and other series of software development tools</p>

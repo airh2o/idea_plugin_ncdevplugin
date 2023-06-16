@@ -407,6 +407,11 @@ public class ProjectUtil {
      * @param column
      */
     public static void openFile(Project project, VirtualFile vf, int row, int column) {
+        com.intellij.openapi.application.ApplicationManager.getApplication()
+                .runReadAction(() -> openFile0(project, vf, row, column));
+    }
+
+    private static void openFile0(Project project, VirtualFile vf, int row, int column) {
         FileNavigator fileNavigator = FileNavigator.getInstance();
         try {
             if (row < 1 && column < 1) {

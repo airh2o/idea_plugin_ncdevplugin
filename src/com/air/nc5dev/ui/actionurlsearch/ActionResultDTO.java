@@ -13,23 +13,26 @@ public class ActionResultDTO extends NCCActionInfoVO {
     int order1;
 
     public String displayText() {
+        return displayText("\n");
+    }
+    public String displayText(String warp) {
         return
-                "URL 名称:\n" + name + "\n\n" +
-                        "label 描述:\n" + label + "\n\n" +
-                        "clazz 类名称:\n" + clazz + "\n\n" +
-                        "from 来源:\n" + getFromName() + "\n\n" +
-                        "type 类型:\n" + getTypeName() + "\n\n" +
-                        "appcode 应用编码:\n" + appcode + "\n\n" +
-                        "xmlPath 配置文件路径:\n" + xmlPath + "\n\n" +
-                        "column 配置文件所在列:\n" + column + "\n\n" +
-                        "row 配置文件所在行:\n" + row + "\n\n" +
-                        "auth 配置文件路径:\n" + authPath + "\n\n" +
-                        "score 匹配度得分:\n" + score + "\n\n" +
-                        "project 工程路径:\n" + project + "\n\n"+
+                "URL 名称:"+warp + name + ""+ warp +
+                        "label 描述:"+warp + label + ""+warp +
+                        "clazz 类名称:"+warp + clazz + ""+warp +
+                        "from 来源:"+warp + getFromName() + ""+warp +
+                        "type 类型:"+warp + getTypeName() + ""+warp +
+                        "appcode 应用编码:"+warp + appcode + ""+warp +
+                        "xmlPath 配置文件路径:"+warp + xmlPath + ""+warp +
+                        "column 配置文件所在列:"+warp + column + ""+warp +
+                        "row 配置文件所在行:"+warp + row + ""+warp +
+                        "auth 配置文件路径:"+warp + authPath + ""+warp +
+                        "score 匹配度得分:"+warp + score + ""+warp +
+                        "project 工程路径:"+warp + project + ""+warp+
                         (type == TYPE_ACTION ? "/nccloud/" + name.replace('.', '/') + ".do" : "")
                 ;
     }
-
+    
     public String getTypeName() {
         if (TYPE_ACTION == getType()) {
             return "NCC(BIP) Action类";

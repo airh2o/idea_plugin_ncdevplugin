@@ -44,6 +44,7 @@ public class NCCJsonDecodeDialog extends DialogWrapper {
     JBCheckBox checkBox_gzip;
     JBCheckBox checkBox_format;
     JButton button_decode;
+    JButton button_encode;
     JBTextField textField_aesKey;
     JBTextField textField_cowboy;
     JBTextField textField_cowboyAesKey;
@@ -90,7 +91,7 @@ public class NCCJsonDecodeDialog extends DialogWrapper {
             jbxxp.setLayout(null);
             JBScrollPane jbxx = new JBScrollPane(jbxxp);
             jbxx.setAutoscrolls(true);
-            jtab.addTab("前端请求解码", jbxx);
+            jtab.addTab("前端请求解密&加密", jbxx);
 
             checkBox_format = new JBCheckBox("是否格式化JSON");
             checkBox_format.setBounds(x = 1, y, w, height);
@@ -137,11 +138,18 @@ public class NCCJsonDecodeDialog extends DialogWrapper {
             jbxxp.add(textField_crux);
 
             button_decode = new JButton("执行解码");
+            button_decode.setToolTipText("把密文解密成明文");
             button_decode.addActionListener(e -> SwingUtilities.invokeLater(() -> decode()));
             button_decode.setBounds(x + w + 500 + 20, y, 100, height + 15);
             jbxxp.add(button_decode);
 
-            label = new JBLabel("请求文本:");
+            button_encode = new JButton("执行加码");
+            button_encode.setToolTipText("把明文加密成密文");
+            button_encode.addActionListener(e -> SwingUtilities.invokeLater(() -> encode()));
+            button_encode.setBounds(x + w + 500 + 20 + 100 + 20, y, 100, height + 15);
+            jbxxp.add(button_encode);
+
+            label = new JBLabel("原始文本:");
             label.setBounds(x = 1, y += height + 5 + 15, w, height);
             jbxxp.add(label);
             textArea_requst = new JBTextArea();
@@ -153,7 +161,7 @@ public class NCCJsonDecodeDialog extends DialogWrapper {
             textArea_requst.setLineWrap(true);
             jbxxp.add(jbScrollPane);
 
-            label = new JBLabel("解码结果:");
+            label = new JBLabel("结果:");
             label.setBounds(x = 1, y += 200 + 5, 180, height);
             jbxxp.add(label);
             textArea_result = new JBTextArea();
@@ -168,6 +176,64 @@ public class NCCJsonDecodeDialog extends DialogWrapper {
 
         //设置点默认值
         initDefualtValues();
+    }
+
+    public void encode() {
+        String txt = StringUtil.trim(textArea_requst.getText());
+
+        if (StringUtil.isBlank(txt) || StringUtil.isNotBlank(txt)) {
+            textArea_result.setText("这个功能还没有实现哦!");
+            return;
+        }
+
+        if (StringUtil.isBlank(txt)) {
+            textArea_result.setText("请输入请求内容!");
+            return;
+        }
+        textArea_result.setText("");
+       /* if (checkBox_mark.isSelected()) {
+            textArea_result.setText("mark 是否启用数据加签 未勾选!应该不需要解密!");
+            return;
+        }*/
+        String aeskey = StringUtil.get(StringUtil.trim(textField_aesKey.getText()), "");
+        String crux = StringUtil.get(StringUtil.trim(textField_crux.getText()), "");
+        String cowboy = StringUtil.get(StringUtil.trim(textField_cowboy.getText()), "");
+        String cowboyAeskey = StringUtil.get(StringUtil.trim(textField_cowboyAesKey.getText()), "");
+        TEMP_AESKEY = aeskey;
+        TEMP_CRUX = crux;
+        TEMP_COWBODY = cowboy;
+        TEMP_COWBODYAESKEY = cowboyAeskey;
+
+        if (checkBox_aes.isSelected()) {
+            try {
+                if (StringUtil.isBlank(aeskey) && StringUtil.isNotBlank(cowboy)) {
+                    cowboy = unAes(cowboy, cowboyAeskey, null);
+                    aeskey = unAes(cowboy, aeskey, crux);
+
+                    apendResult(String.format("根据cowboy解密aeskey结果: %s", aeskey));
+                    //textField_aesKey.setText("9b645baa78cf41e180e4751abc46d6c2");
+                }
+
+                txt = unAes(txt, aeskey, crux);
+            } catch (Throwable e) {
+                apendResult("AES解码失败:" + ExceptionUtil.toStringLines(e, 40));
+            }
+        }
+
+        if (checkBox_gzip.isSelected()) {
+            try {
+                txt = unGZip(txt);
+            } catch (Throwable e) {
+                apendResult("GZIP解压缩失败:" + ExceptionUtil.toStringLines(e, 40));
+            }
+        }
+
+        if (checkBox_format.isSelected()) {
+            txt = JSON.toJSONString(JSON.parse(txt), SerializerFeature.PrettyFormat,
+                    SerializerFeature.WriteMapNullValue);
+        }
+
+        textArea_result.setText(txt);
     }
 
     public void decode() {

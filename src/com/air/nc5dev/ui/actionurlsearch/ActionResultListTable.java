@@ -1,9 +1,13 @@
 package com.air.nc5dev.ui.actionurlsearch;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.air.nc5dev.acion.GoToNCRequestMappingAction;
 import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.IoUtil;
@@ -15,6 +19,11 @@ import com.intellij.featureStatistics.FeatureUsageTracker;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.IdeEventQueue;
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereManager;
+import com.intellij.ide.scratch.ScratchFileActions;
+import com.intellij.ide.scratch.ScratchFileCreationHelper;
+import com.intellij.ide.scratch.ScratchFileService;
+import com.intellij.ide.scratch.ScratchRootType;
+import com.intellij.lang.Language;
 import com.intellij.lang.java.JavaDocumentationProvider;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -28,19 +37,28 @@ import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.vcs.changes.ignore.lang.IgnoreLanguage;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.ClassFileViewProvider;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.compiled.ClsClassImpl;
 import com.intellij.psi.impl.java.stubs.JavaClassElementType;
 import com.intellij.psi.impl.java.stubs.JavaStubElementTypes;
+import com.intellij.psi.impl.java.stubs.PsiClassStub;
+import com.intellij.psi.impl.java.stubs.PsiJavaFileStub;
 import com.intellij.psi.impl.java.stubs.impl.PsiClassStubImpl;
 import com.intellij.psi.impl.java.stubs.impl.PsiJavaFileStubImpl;
+import com.intellij.psi.impl.java.stubs.index.JavaFullClassNameIndex;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
+import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.ui.table.JBTable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -319,6 +337,16 @@ public class ActionResultListTable extends JBTable {
                     }
                 });
 
+                JMenuItem testHttp = new JMenuItem("测试HTTP请求");
+                popup.add(testHttp);
+                testHttp.setToolTipText("立即测试HTTP调用(利用IDEA HTTP文件测试)");
+                testHttp.setEnabled(vo != null && StringUtil.isNotBlank(vo.getClazz()));
+                testHttp.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        table.testHttp(vo);
+                    }
+                });
+
                 JMenuItem searchClass = new JMenuItem("搜索Class");
                 popup.add(searchClass);
                 searchClass.setEnabled(vo != null && StringUtil.isNotBlank(vo.getClazz()));
@@ -400,6 +428,81 @@ public class ActionResultListTable extends JBTable {
         }
 
 
+    }
+
+    public void testHttp(ActionResultDTO vo) {
+        if (vo == null) {
+            return;
+        }
+
+        if (StringUtil.isBlank(vo.getName())) {
+            return;
+        }
+
+        final Project project = getNccActionURLSearchUI().getProject();
+        ProgressManager.getInstance().run((Task) new Task.Modal(project
+                , "生成临时HTTP调用文件中...如果是Action 且开启了请求加密的可以使用NC常用工具页签里的解密加密工具", true) {
+            @Override
+            public void run(@NotNull ProgressIndicator progressIndicator) {
+                StringBuilder txt = new StringBuilder(1000);
+                txt.append('#').append(vo.getLabel()).append('\n');
+                txt.append('#').append(vo.displayText("\n#")).append('\n');
+                txt.append('#').append(LocalDateTimeUtil.formatNormal(LocalDateTimeUtil.now())).append('\n');
+
+                txt.append("POST ").append(vo.getName()).append('\n');
+
+                txt.append("Content-Type: application/json\n");
+                txt.append("Cookie: name=value; nccloudsessionid=; JSESSIONID=; PPA_CI=\n");
+                txt.append("cookiets: 1686882160047\n");
+                txt.append("crux: 1686882161188\n\n");
+
+
+                if (NCCActionInfoVO.TYPE_ACTION == vo.getType()) {
+                    txt.append("{\n" +
+                            "  \"busiParamJson\": \"{\\\"relateid\\\":\\\"\\\",\\\"isuser\\\":\\\"1\\\"}\",\n" +
+                            "  \"sysParamJson\": {\n" +
+                            "    \"appcode\": \"10228888\",\n" +
+                            "    \"pagecs\": \"1686882160047\"\n" +
+                            "  }\n" +
+                            "}\n\n");
+                } else {
+                    txt.append("{\n" +
+                            "}\n\n");
+                }
+
+                txt.append("###############\n");
+//                File http = new File(project.getBasePath(), ".idea" + File.separatorChar
+//                        + "nc_itf_test" + File.separatorChar
+//                        + "nc_test_tif_" + System.currentTimeMillis() + ".http");
+//                while (http.exists()) {
+//                    http = new File(project.getBasePath(), ".idea" + File.separatorChar
+//                            + "nc_itf_test" + File.separatorChar
+//                            + "nc_test_tif_" + System.currentTimeMillis() + ".http");
+//                }
+//
+//                if (!http.getParentFile().isDirectory()) {
+//                    http.getParentFile().mkdirs();
+//                }
+//
+//                FileUtil.writeUtf8String(txt.toString(), http);
+//
+//                VirtualFile vf = VirtualFileManager.getInstance().findFileByNioPath(http.toPath());
+                Language language = IgnoreLanguage.INSTANCE;
+                try {
+                    Class hlc = Class.forName("com.intellij.httpClient.http.request.HttpRequestLanguage");
+                    language = (Language) ReflectUtil.getStaticFieldValue(ReflectUtil.getField(hlc, "INSTANCE"));
+                } catch (Throwable e) {
+                }
+
+                VirtualFile vf = ScratchRootType.getInstance().createScratchFile(project
+                        , "scratch_nc_test_tif_" + System.currentTimeMillis() + ".http"
+                        , language
+                        , txt.toString()
+                        , ScratchFileService.Option.create_new_always);
+
+                openFile(project, vf, 0, 0);
+            }
+        });
     }
 
     public VirtualFile findClassFile(ActionResultDTO vo) {
@@ -489,9 +592,60 @@ public class ActionResultListTable extends JBTable {
         return virtualFile;
     }
 
+    public static VirtualFile getPsiClassFile(PsiClass pc) {
+        if (pc == null) {
+            return null;
+        }
+
+        ClsClassImpl cc = (ClsClassImpl) pc;
+        PsiClassStub pst = (PsiClassStub) cc.getStub();
+        if (pst.getParentStub() instanceof PsiJavaFileStub) {
+
+            PsiJavaFileStub pjava = (PsiJavaFileStub) pst.getParentStub();
+            return pjava.getPsi().getVirtualFile();
+        }
+
+        return null;
+    }
+
     public void openClass(ActionResultDTO vo) {
         if (vo == null) {
             return;
+        }
+
+        if (CollUtil.isNotEmpty(vo.getNavigatables())) {
+            vo.getNavigatables().get(0).navigate(true);
+            return;
+        }
+
+        ProjectAndLibrariesScope projectAndLibrariesScope = new ProjectAndLibrariesScope(
+                getNccActionURLSearchUI().getProject(), true);
+        Collection<PsiClass> pcs = JavaFullClassNameIndex.getInstance().get(vo.getClazz().hashCode()
+                , getNccActionURLSearchUI().getProject()
+                , projectAndLibrariesScope);
+        if (CollUtil.isNotEmpty(pcs)) {
+            ClsClassImpl notJar = null;
+            ClsClassImpl jar = null;
+            for (PsiClass pc : pcs) {
+                VirtualFile f = getPsiClassFile(pc);
+                if (f != null) {
+                    if (f.getPath().contains(".jar!")) {
+                        jar = (ClsClassImpl) pc;
+                    } else {
+                        notJar = (ClsClassImpl) pc;
+                        break;
+                    }
+                }
+            }
+
+            if (notJar != null) {
+                notJar.navigate(true);
+                vo.getNavigatables().add(notJar);
+                return;
+            } else if (jar != null) {
+                jar.navigate(true);
+                return;
+            }
         }
 
         VirtualFile virtualFile = findClassFile(vo);

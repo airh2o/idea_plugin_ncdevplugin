@@ -3,11 +3,21 @@ package com.air.nc5dev.util;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
+import com.air.nc5dev.ui.actionurlsearch.ActionResultListTable;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.NCCActionInfoVO;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.impl.libraries.LibraryEx;
+import com.intellij.openapi.roots.libraries.LibraryTable;
+import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
+import com.intellij.psi.*;
+import com.intellij.psi.impl.compiled.ClsFileImpl;
+import com.intellij.psi.impl.compiled.ClsJavaCodeReferenceElementImpl;
+import com.intellij.psi.impl.java.stubs.index.JavaAnnotationIndex;
+import com.intellij.psi.impl.java.stubs.index.JavaSuperClassNameOccurenceIndex;
+import com.intellij.psi.search.ProjectAndLibrariesScope;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -65,7 +75,23 @@ public class NCCActionRefreshUtil {
             if (metainf.isDirectory()) {
                 loadDir4upm(project, metainf, NCCActionInfoVO.FROM_SRC);
             }
+
+            loadServletNoUpm4Src(project, module);
+            loadSpringmvc4Src(project, module);
+            loadJaxrs4Src(project, module);
         }
+    }
+
+    public static void loadJaxrs4Src(Project project, Module module) {
+        loadJaxrs(project, module);
+    }
+
+    public static void loadSpringmvc4Src(Project project, Module module) {
+        loadSpringmvc(project, module);
+    }
+
+    public static void loadServletNoUpm4Src(Project project, Module module) {
+        loadServletNoUpm(project, module);
     }
 
     private static void loadDir4upm(Project project, File metainf, int from) {
@@ -138,9 +164,11 @@ public class NCCActionRefreshUtil {
                 NCCActionInfoVO vo = new NCCActionInfoVO();
                 vo.setXmlPath(f.getPath());
                 vo.setClazz((String) map.get("implementation"));
-                vo.setName("/service/" + c.getAttribute("name"));
+                vo.setName(ProjectNCConfigUtil.getNCClientIP() + ":"
+                        + StringUtil.get(ProjectNCConfigUtil.getNCClientPort(), "80")
+                        + "/service/" + c.getAttribute("name"));
                 vo.setLabel(StringUtil.get(c.getAttribute("label")) + "  -UPM文件配置的Servlet");
-                vo.setAppcode("UPM文件配置的Servlet");
+                vo.setAppcode("UPM配置的Servlet");
                 vo.setProject(project != null ? project.getBasePath() : null);
                 vo.setFrom(from);
                 vo.setType(NCCActionInfoVO.TYPE_UPM);
@@ -300,6 +328,8 @@ public class NCCActionRefreshUtil {
                     vo.setType(NCCActionInfoVO.TYPE_ACTION);
                     vo.setFrom(from);
                     vo.setClazz(StrUtil.trim(vo.getClazz()));
+                    vo.setName(ProjectNCConfigUtil.getNCClientIP() + ":" + StringUtil.get(ProjectNCConfigUtil.getNCClientPort(), "80") +
+                            "/nccloud/" + vo.getName().replace('.', '/') + ".do");
 
                     List<String> lines = FileUtil.readUtf8Lines(actionXml);
                     matchRowColumn(lines, vo);
@@ -379,6 +409,367 @@ public class NCCActionRefreshUtil {
             File metainf = new File(m, "META-INF");
             if (metainf.isDirectory()) {
                 loadDir4upm(project, metainf, NCCActionInfoVO.FROM_HOME);
+            }
+        }
+
+        loadServletNoUpm4NCHOME(project);
+        loadSpringmvc4NCHOME(project);
+        loadJaxrs4NCHOME(project);
+    }
+
+    public static void loadJaxrs4NCHOME(Project project) {
+        loadJaxrs(project, null);
+    }
+
+    public static void loadSpringmvc4NCHOME(Project project) {
+        loadSpringmvc(project, null);
+    }
+
+    public static void loadServletNoUpm4NCHOME(Project project) {
+        loadServletNoUpm(project, null);
+    }
+
+    /**
+     * @param project
+     * @param module  可空
+     * @param from    {@link NCCActionInfoVO#FROM_SRC 等}
+     */
+    public static void loadServletNoUpm(Project project, Module module) {
+        com.intellij.openapi.application.ApplicationManager.getApplication()
+                .runReadAction(() -> loadServletNoUpm0(project, module));
+    }
+
+    private static void loadServletNoUpm0(Project project, Module module) {
+        int from = module == null ? NCCActionInfoVO.FROM_HOME : NCCActionInfoVO.FROM_SRC;
+        if (module == null) {
+            Module[] ms = ModuleManager.getInstance(project).getModules();
+            final LibraryTable.ModifiableModel model =
+                    LibraryTablesRegistrar.getInstance().getLibraryTable(project).getModifiableModel();
+            for (Module m : ms) {
+                LibraryEx library = (LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Middleware_Library);
+                if (library != null) {
+                    module = m;
+                    break;
+                }
+            }
+        }
+
+        ProjectAndLibrariesScope projectAndLibrariesScope = new ProjectAndLibrariesScope(project, true);
+        Collection<PsiReferenceList> refList = JavaSuperClassNameOccurenceIndex.getInstance()
+                .get("IHttpServletAdaptor"
+                        , project
+                        , from == NCCActionInfoVO.FROM_HOME ? projectAndLibrariesScope : module.getModuleScope(false)
+                );
+
+        if (CollUtil.isEmpty(refList)) {
+            return;
+        }
+
+        RequestMappingItemProvider.ALL_ACTIONS.putIfAbsent(RequestMappingItemProvider.getKey(project)
+                , new ConcurrentHashMap<>(30000));
+        Map<String, NCCActionInfoVO> actionInfoVOMap =
+                RequestMappingItemProvider.ALL_ACTIONS.get(RequestMappingItemProvider.getKey(project));
+        for (PsiReferenceList ref : refList) {
+            PsiElement pe = ref.getParent().getParent();
+            if (!(pe instanceof ClsFileImpl)) {
+                continue;
+            }
+
+            ClsFileImpl pclz = (ClsFileImpl) pe;
+            PsiElement[] cs = pclz.getChildren();
+            if (CollUtil.isEmpty(cs)) {
+                continue;
+            }
+
+            String moduleName = from == NCCActionInfoVO.FROM_SRC ? module.getName() : getNCModule(pclz);
+
+            for (PsiElement pce : cs) {
+                if (!(pce instanceof PsiClass)) {
+                    continue;
+                }
+
+                PsiClass clz = (PsiClass) pce;
+
+                if (!hasInterface(clz, "nc.bs.framework.adaptor.IHttpServletAdaptor")) {
+                    continue;
+                }
+
+                NCCActionInfoVO v = actionInfoVOMap.values().stream()
+                        .filter(vo -> clz.getQualifiedName().equals(vo.getClazz())).findAny().orElse(null);
+                if (v != null && v.getType() == NCCActionInfoVO.TYPE_UPM) {
+                    continue;
+                }
+
+                if (v == null) {
+                    v = new NCCActionInfoVO();
+                    v.setClazz(clz.getQualifiedName());
+                    v.setType(NCCActionInfoVO.TYPE_SERVLET);
+                    v.setFrom(from);
+                    v.setName(ProjectNCConfigUtil.getNCClientIP() + ":"
+                            + StringUtil.get(ProjectNCConfigUtil.getNCClientPort(), "80")
+                            + "/servlet/~" + moduleName + "/" + v.getClazz());
+                    v.setLabel("非UPM配置的Servlet");
+                    v.setXmlPath("");
+                    actionInfoVOMap.put(v.getName(), v);
+                }
+
+                v.setXmlPath(v.getXmlPath() + " " + pclz.getVirtualFile().getPath());
+                v.getNavigatables().add(clz);
+            }
+        }
+    }
+
+    public static String getNCModule(ClsFileImpl pclz) {
+        String name = "未知模块";
+        if (pclz == null) {
+            return name;
+        }
+
+        if (pclz.getVirtualFile() == null) {
+            return name;
+        }
+
+        name = pclz.getVirtualFile().getPath();
+        name = StringUtil.replaceAll(name, "/", ".");
+        name = StringUtil.replaceAll(name, "\\", ".");
+        name = name.substring(2);
+
+        String nchome = ProjectNCConfigUtil.getNCHomePath();
+        nchome = StringUtil.replaceAll(nchome, "/", ".");
+        nchome = StringUtil.replaceAll(nchome, "\\", ".");
+        nchome = nchome.substring(2);
+
+        name = StringUtil.removeStart(name, nchome).trim();
+        if (name.charAt(0) == '.') {
+            name = name.substring(1);
+        }
+
+        return StringUtil.splitToArray(name, '.')[1];
+    }
+
+    public static PsiAnnotation getClassAnnotation(PsiClass psiClass, String... qualifiedName) {
+        if (qualifiedName.length < 1) {
+            return null;
+        }
+        PsiAnnotation annotation;
+        for (String name : qualifiedName) {
+            annotation = psiClass.getAnnotation(name);
+            if (annotation != null) {
+                return annotation;
+            }
+        }
+        List<PsiClass> classes = new ArrayList<>();
+        classes.add(psiClass.getSuperClass());
+        classes.addAll(Arrays.asList(psiClass.getInterfaces()));
+        for (PsiClass superPsiClass : classes) {
+            if (superPsiClass == null) {
+                continue;
+            }
+            PsiAnnotation classAnnotation = getClassAnnotation(superPsiClass, qualifiedName);
+            if (classAnnotation != null) {
+                return classAnnotation;
+            }
+        }
+        return null;
+    }
+
+    public static boolean hasInterface(PsiClass clz, String interfacename) {
+        if (clz == null) {
+            return false;
+        }
+
+        PsiClassType[] is = clz.getImplementsListTypes();
+        if (is == null) {
+            return false;
+        }
+
+        for (PsiClassType it : is) {
+            if (it.getPsiContext() instanceof ClsJavaCodeReferenceElementImpl) {
+                if (interfacename.equals(((ClsJavaCodeReferenceElementImpl) it.getPsiContext()).getCanonicalText())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static void loadJaxrs(Project project, Module module) {
+        com.intellij.openapi.application.ApplicationManager.getApplication()
+                .runReadAction(() -> loadJaxrs0(project, module));
+    }
+
+    //TODO
+    private static void loadJaxrs0(Project project, Module module) {
+        if (project != null) {
+            return;
+        }
+
+        int from = module == null ? NCCActionInfoVO.FROM_HOME : NCCActionInfoVO.FROM_SRC;
+        if (module == null) {
+            Module[] ms = ModuleManager.getInstance(project).getModules();
+            final LibraryTable.ModifiableModel model =
+                    LibraryTablesRegistrar.getInstance().getLibraryTable(project).getModifiableModel();
+            for (Module m : ms) {
+                LibraryEx library = (LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Middleware_Library);
+                if (library != null) {
+                    module = m;
+                    break;
+                }
+            }
+        }
+
+        ProjectAndLibrariesScope projectAndLibrariesScope = new ProjectAndLibrariesScope(project, true);
+        Collection<PsiAnnotation> refList = JavaAnnotationIndex.getInstance().get(
+                "Path"
+                , project
+                , from == NCCActionInfoVO.FROM_HOME ? projectAndLibrariesScope : module.getModuleScope(false)
+        );
+
+        if (CollUtil.isEmpty(refList)) {
+            return;
+        }
+
+        RequestMappingItemProvider.ALL_ACTIONS.putIfAbsent(RequestMappingItemProvider.getKey(project)
+                , new ConcurrentHashMap<>(30000));
+        Map<String, NCCActionInfoVO> actionInfoVOMap =
+                RequestMappingItemProvider.ALL_ACTIONS.get(RequestMappingItemProvider.getKey(project));
+        for (PsiAnnotation ref : refList) {
+            PsiElement pe = ref.getParent().getParent();
+            if (!(pe instanceof PsiClass)) {
+                continue;
+            }
+
+            PsiClass pclz = (PsiClass) pe;
+            PsiElement[] cs = pclz.getChildren();
+            if (CollUtil.isEmpty(cs)) {
+                continue;
+            }
+
+            String moduleName = from == NCCActionInfoVO.FROM_SRC ? module.getName() : getNCModule((ClsFileImpl) pclz);
+
+            for (PsiElement pce : cs) {
+                if (!(pce instanceof PsiClass)) {
+                    continue;
+                }
+
+                PsiClass clz = (PsiClass) pce;
+
+                if (!hasInterface(clz, "nc.bs.framework.adaptor.IHttpServletAdaptor")) {
+                    continue;
+                }
+
+                NCCActionInfoVO v = actionInfoVOMap.values().stream()
+                        .filter(vo -> clz.getQualifiedName().equals(vo.getClazz())).findAny().orElse(null);
+                if (v != null && v.getType() == NCCActionInfoVO.TYPE_UPM) {
+                    continue;
+                }
+
+                if (v == null) {
+                    v = new NCCActionInfoVO();
+                    v.setClazz(clz.getQualifiedName());
+                    v.setType(NCCActionInfoVO.TYPE_JAXRS);
+                    v.setFrom(from);
+                    v.setName(ProjectNCConfigUtil.getNCClientIP() + ":"
+                            + StringUtil.get(ProjectNCConfigUtil.getNCClientPort(), "80")
+                            + "/servlet/~" + moduleName + "/" + v.getClazz());
+                    v.setLabel("非UPM配置的Servlet");
+                    v.setXmlPath("");
+                    actionInfoVOMap.put(v.getName(), v);
+                }
+
+                v.setXmlPath(v.getXmlPath() + " " + ActionResultListTable.getPsiClassFile(pclz).getPath());
+                v.getNavigatables().add(clz);
+            }
+        }
+    }
+
+    public static void loadSpringmvc(Project project, Module module) {
+        com.intellij.openapi.application.ApplicationManager.getApplication()
+                .runReadAction(() -> loadSpringmvc0(project, module));
+    }
+
+    //TODO
+    private static void loadSpringmvc0(Project project, Module module) {
+        if (project != null) {
+            return;
+        }
+
+        int from = module == null ? NCCActionInfoVO.FROM_HOME : NCCActionInfoVO.FROM_SRC;
+        if (module == null) {
+            Module[] ms = ModuleManager.getInstance(project).getModules();
+            final LibraryTable.ModifiableModel model =
+                    LibraryTablesRegistrar.getInstance().getLibraryTable(project).getModifiableModel();
+            for (Module m : ms) {
+                LibraryEx library = (LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Middleware_Library);
+                if (library != null) {
+                    module = m;
+                    break;
+                }
+            }
+        }
+
+        ProjectAndLibrariesScope projectAndLibrariesScope = new ProjectAndLibrariesScope(project, true);
+        Collection<PsiReferenceList> refList = JavaSuperClassNameOccurenceIndex.getInstance()
+                .get("IHttpServletAdaptor"
+                        , project
+                        , from == NCCActionInfoVO.FROM_HOME ? projectAndLibrariesScope : module.getModuleScope(false)
+                );
+
+        if (CollUtil.isEmpty(refList)) {
+            return;
+        }
+
+        RequestMappingItemProvider.ALL_ACTIONS.putIfAbsent(RequestMappingItemProvider.getKey(project)
+                , new ConcurrentHashMap<>(30000));
+        Map<String, NCCActionInfoVO> actionInfoVOMap =
+                RequestMappingItemProvider.ALL_ACTIONS.get(RequestMappingItemProvider.getKey(project));
+        for (PsiReferenceList ref : refList) {
+            PsiElement pe = ref.getParent().getParent();
+            if (!(pe instanceof ClsFileImpl)) {
+                continue;
+            }
+
+            ClsFileImpl pclz = (ClsFileImpl) pe;
+            PsiElement[] cs = pclz.getChildren();
+            if (CollUtil.isEmpty(cs)) {
+                continue;
+            }
+
+            String moduleName = from == NCCActionInfoVO.FROM_SRC ? module.getName() : getNCModule(pclz);
+
+            for (PsiElement pce : cs) {
+                if (!(pce instanceof PsiClass)) {
+                    continue;
+                }
+
+                PsiClass clz = (PsiClass) pce;
+
+                if (!hasInterface(clz, "nc.bs.framework.adaptor.IHttpServletAdaptor")) {
+                    continue;
+                }
+
+                NCCActionInfoVO v = actionInfoVOMap.values().stream()
+                        .filter(vo -> clz.getQualifiedName().equals(vo.getClazz())).findAny().orElse(null);
+                if (v != null && v.getType() == NCCActionInfoVO.TYPE_UPM) {
+                    continue;
+                }
+
+                if (v == null) {
+                    v = new NCCActionInfoVO();
+                    v.setClazz(clz.getQualifiedName());
+                    v.setType(NCCActionInfoVO.TYPE_SERVLET);
+                    v.setFrom(from);
+                    v.setName(ProjectNCConfigUtil.getNCClientIP() + ":"
+                            + StringUtil.get(ProjectNCConfigUtil.getNCClientPort(), "80")
+                            + "/servlet/~" + moduleName + "/" + v.getClazz());
+                    v.setLabel("非UPM配置的Servlet");
+                    v.setXmlPath("");
+                    actionInfoVOMap.put(v.getName(), v);
+                }
+
+                v.setXmlPath(v.getXmlPath() + " " + pclz.getVirtualFile().getPath());
+                v.getNavigatables().add(clz);
             }
         }
     }
@@ -482,7 +873,10 @@ public class NCCActionRefreshUtil {
                         vo.setAppcode(action2AppcodeMap.get(vo.getName()));
                         vo.setAuthPath(action2AuthXmlPathMap.get(vo.getName()));
                         vo.setXmlPath(jar.getPath() + File.separatorChar + jarEntity.getName());
-                        vo.setProject("NCHOME:" + (project != null ? project.getBasePath() : null));
+                        vo.setProject((project != null ? project.getBasePath() : null));
+                        vo.setName(ProjectNCConfigUtil.getNCClientIP() + ":"
+                                + StringUtil.get(ProjectNCConfigUtil.getNCClientPort(), "80")
+                                + "/nccloud/" + vo.getName().replace('.', '/') + ".do");
 
                         matchRowColumn(lines, vo);
 

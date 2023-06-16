@@ -12,7 +12,7 @@ public class NCCJsonDecodeWindowFactory extends ToolWindowFactory {
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
         NCCJsonDecodeDialog view = new NCCJsonDecodeDialog(project);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(view.getContentPane(), "NCC(BIP)请求json解码", true);
+        Content content = contentFactory.createContent(view.getContentPane(), "NCC(BIP)Action请求参数解密&加密", true);
         toolWindow.getContentManager().addContent(content);
     }
 }

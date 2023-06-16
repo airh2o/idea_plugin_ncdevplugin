@@ -1,11 +1,14 @@
 package com.air.nc5dev.vo;
 
+import com.intellij.pom.Navigatable;
+import com.intellij.psi.PsiClass;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * </br>
@@ -30,14 +33,28 @@ public class NCCActionInfoVO implements Serializable, Cloneable {
      * 来自 工程源码里
      */
     public static final int FROM_SRC = 1000;
+
+    /**
+     * action
+     */
+    public static final int TYPE_ACTION = 0;
     /**
      * upm
      */
     public static final int TYPE_UPM = 1;
     /**
-     * action
+     * 非UPM的Servlet
      */
-    public static final int TYPE_ACTION = 0;
+    public static final int TYPE_SERVLET = 2;
+    /**
+     * SpringMVC注解接口
+     */
+    public static final int TYPE_SPRINTMVC = 3;
+    /**
+     * Jaxrs注解接口
+     */
+    public static final int TYPE_JAXRS = 4;
+
 
     public String name;
     public String label;
@@ -66,6 +83,11 @@ public class NCCActionInfoVO implements Serializable, Cloneable {
     public int score;
     public int auth_column;
     public int auth_row;
+
+
+    @Builder.Default
+    public ArrayList<Navigatable> navigatables = new ArrayList<>();
+
 
     @Override
     public String toString() {
