@@ -48,7 +48,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param properties
      * @param file
      */
-    public static final void wirtePropertis(Properties properties, File file) {
+    public static void wirtePropertis(Properties properties, File file) {
         try {
             FileOutputStream outputStream = new FileOutputStream(file);
             properties.store(outputStream, "update file");
@@ -66,7 +66,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param dir
      * @return
      */
-    public static final File replaceDir(File f, File base, File dir) {
+    public static File replaceDir(File f, File base, File dir) {
         String p = f.getPath();
         String bp = base.getPath();
         String np = dir.getPath();
@@ -80,7 +80,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachAllNcAntJars(File ncHome) {
+    public static ArrayList<File> serachAllNcAntJars(File ncHome) {
         ArrayList<File> all = new ArrayList<File>();
 
         File f = new File(ncHome, File.separatorChar + "ant");
@@ -97,7 +97,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachProduct_Common_LibraryJars(File ncHome) {
+    public static ArrayList<File> serachProduct_Common_LibraryJars(File ncHome) {
         ArrayList<File> all = new ArrayList<>();
 
         File f = new File(ncHome, "external" + File.separatorChar + "classes");
@@ -123,7 +123,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachMiddleware_LibraryJars(File ncHome) {
+    public static ArrayList<File> serachMiddleware_LibraryJars(File ncHome) {
         ArrayList<File> all = new ArrayList<>();
 
         File f = new File(ncHome, "middleware");
@@ -140,7 +140,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachFramework_LibraryJars(File ncHome) {
+    public static ArrayList<File> serachFramework_LibraryJars(File ncHome) {
         ArrayList<File> all = new ArrayList<>();
 
         File f = new File(ncHome, "framework");
@@ -158,8 +158,8 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @return
      */
     @Deprecated
-    public static final ArrayList<File> serachAllNcLibsJars(File ncHome) {
-        ArrayList<File> all = new ArrayList<File>();
+    public static ArrayList<File> serachAllNcLibsJars(File ncHome) {
+        ArrayList<File> all = new ArrayList<>();
 
         File f = new File(ncHome, "\\lib");
         if (f.exists()) {
@@ -194,27 +194,60 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
     }
 
     /**
+     * 获取NC的 所有 模块的 所有    NC_Module_Public_Hyext_Library
+     *
+     * @param ncHome
+     * @return
+     */
+    public static ArrayList<File> serachNC_Module_Public_Hyext_Library(File ncHome) {
+        ArrayList<File> all = serachAllNcPublicHyextClass(ncHome);
+        all.addAll(serachAllNcPublicHyextJars(ncHome));
+        return all;
+    }
+
+    /**
      * 获取NC的 所有 模块的 所有    NC_Module_Public_Library
      *
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachNC_Module_Public_Library(File ncHome) {
+    public static ArrayList<File> serachNC_Module_Public_Library(File ncHome) {
         ArrayList<File> all = serachAllNcPublicClass(ncHome);
         all.addAll(serachAllNcPublicJars(ncHome));
         return all;
     }
 
     /**
+     * 获取NC的 所有 模块的 所有    Module_Client_Hyext_Library
+     *
+     * @param ncHome
+     * @return
+     */
+    public static ArrayList<File> serachModule_Client_Hyext_Library(File ncHome) {
+        ArrayList<File> all = serachAllNcClientHyextClass(ncHome);
+        all.addAll(serachAllNcClientHyextJars(ncHome));
+
+        return (ArrayList<File>) CollUtil.addAllColls(
+                all
+                //增加数据交换支持 eg:
+                //D:\runtimes\U8Cloud_HEXIN\modules\dm\client\extension\classes\
+                , serachAllNcClass(new File(ncHome, "modules")
+                        , "client" + File.separatorChar + "hyext" + File.separatorChar + "extension"
+                                + File.separatorChar + "classes"
+                        , false)
+        );
+    }
+    
+    /**
      * 获取NC的 所有 模块的 所有    Module_Client_Library
      *
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachModule_Client_Library(File ncHome) {
+    public static ArrayList<File> serachModule_Client_Library(File ncHome) {
         ArrayList<File> all = serachAllNcClientClass(ncHome);
         all.addAll(serachAllNcClientJars(ncHome));
-
+        
         return (ArrayList<File>) CollUtil.addAllColls(
                 all
                 //增加数据交换支持 eg:
@@ -223,11 +256,29 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
                         , "client" + File.separatorChar + "extension"
                                 + File.separatorChar + "classes"
                         , false)
-                , serachAllNcClass(new File(ncHome, "modules")
-                        , "client" + File.separatorChar + "hyext" + File.separatorChar + "extension"
-                                + File.separatorChar + "classes"
-                        , false)
         );
+    }
+
+    /**
+     * 获取NC的 所有 模块的 所有    Module_Private_Extra_Library
+     *
+     * @param ncHome
+     * @return
+     */
+    public static ArrayList<File> serachModule_Private_Extra_Library(File ncHome) {
+        return serachAllNcPrivateExtraJars(ncHome);
+    }
+
+    /**
+     * 获取NC的 所有 模块的 所有    Module_Private_Hyext_Library
+     *
+     * @param ncHome
+     * @return
+     */
+    public static ArrayList<File> serachModule_Private_Hyext_Library(File ncHome) {
+        ArrayList<File> all = serachAllNcPrivateHyextClass(ncHome);
+        all.addAll(serachAllNcPrivateHyextJars(ncHome));
+        return all;
     }
 
     /**
@@ -236,22 +287,25 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachModule_Private_Library(File ncHome) {
+    public static ArrayList<File> serachModule_Private_Library(File ncHome) {
         ArrayList<File> all = serachAllNcPrivateClass(ncHome);
         all.addAll(serachAllNcPrivateJars(ncHome));
         return all;
     }
 
     /**
-     * 获取NC的 所有 模块的 所有  NCC class文件夹
+     * 获取NC的 所有 模块的 所有 NCCHR jar文件
      *
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachAllNCCClass(File ncHome) {
-        return serachAllNcClass(new File(ncHome
-                        , "hotwebs" + File.separatorChar + "nccloud" + File.separatorChar + "WEB-INF")
-                , "classes", false);
+    public static ArrayList<File> serachAllNCCHRJars(File ncHome) {
+        return new ArrayList<>(getAllJarFiles(new File(ncHome
+                , "hotwebs"
+                + File.separatorChar + "ncchr"
+                + File.separatorChar + "WEB-INF"
+                + File.separatorChar + "lib"
+        ), true));
     }
 
     /**
@@ -260,7 +314,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachAllNCCJars(File ncHome) {
+    public static ArrayList<File> serachAllNCCJars(File ncHome) {
         return new ArrayList<>(getAllJarFiles(new File(ncHome
                 , "hotwebs"
                 + File.separatorChar + "nccloud"
@@ -270,13 +324,33 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
     }
 
     /**
+     * 获取NC的 所有 模块的 所有    NCCHR_Library
+     *
+     * @param ncHome
+     * @return
+     */
+    public static ArrayList<File> serachNCCHR_Library(File ncHome) {
+        ArrayList<File> all = serachAllNCCHRJars(ncHome);
+
+        File f = new File(ncHome, "hotwebs"
+                + File.separatorChar + "ncchr"
+                + File.separatorChar + "WEB-INF"
+                + File.separatorChar + "classes"
+        );
+        if (f.isDirectory()) {
+            all.add(f);
+        }
+
+        return all;
+    }
+    
+    /**
      * 获取NC的 所有 模块的 所有    NCCloud_Library
      *
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachNCCloud_Library(File ncHome) {
-        //I:\runtime\NCCHOME202005_DONGGUANZHENGJUAN\hotwebs\nccloud\WEB-INF
+    public static ArrayList<File> serachNCCloud_Library(File ncHome) {
         ArrayList<File> all = serachAllNCCJars(ncHome);
 
         File f = new File(ncHome, "hotwebs"
@@ -307,7 +381,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachModule_Lang_Library(File ncHome) {
+    public static ArrayList<File> serachModule_Lang_Library(File ncHome) {
         ArrayList<File> all = new ArrayList<>();
 
         File f = new File(ncHome, "langlib");
@@ -324,7 +398,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachResources(File ncHome) {
+    public static ArrayList<File> serachResources(File ncHome) {
         ArrayList<File> all = new ArrayList<>();
 
         File f = new File(ncHome, "resources");
@@ -342,7 +416,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachGenerated_EJB(File ncHome) {
+    public static ArrayList<File> serachGenerated_EJB(File ncHome) {
         ArrayList<File> all = new ArrayList<>();
 
         File f = new File(ncHome, "ejb");
@@ -355,17 +429,33 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
 
 
     /**
+     * 获取NC的 所有 模块的 所有 public hyext class文件夹
+     *
+     * @param ncHome
+     * @return
+     */
+    public static ArrayList<File> serachAllNcPublicHyextClass(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules") , "hyext" + File.separatorChar + "classes", false);
+    }
+
+    /**
      * 获取NC的 所有 模块的 所有 public class文件夹
      *
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachAllNcPublicClass(File ncHome) {
-        return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
-                , "classes", false)
-                , serachAllNcClass(new File(ncHome, "modules")
-                        , "hyext" + File.separatorChar + "classes", false)
-        );
+    public static ArrayList<File> serachAllNcPublicClass(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules"), "classes", false);
+    }
+
+    /**
+     * 获取NC的 所有 模块的 所有 client hyext class文件夹
+     *
+     * @param ncHome
+     * @return
+     */
+    public static ArrayList<File> serachAllNcClientHyextClass(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules"), "client" + File.separatorChar + "hyext" + File.separatorChar + "classes", false);
     }
 
     /**
@@ -374,13 +464,18 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachAllNcClientClass(File ncHome) {
-        return (ArrayList<File>) CollUtil.addAllColls(
-                serachAllNcClass(new File(ncHome, "modules")
-                        , "client" + File.separatorChar + "classes", false)
-                , serachAllNcClass(new File(ncHome, "modules")
-                        , "client" + File.separatorChar + "hyext" + File.separatorChar + "classes", false)
-        );
+    public static ArrayList<File> serachAllNcClientClass(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules"), "client" + File.separatorChar + "classes", false);
+    }
+
+    /**
+     * 获取NC的 所有 模块的 所有 private hyext class文件夹
+     *
+     * @param ncHome
+     * @return
+     */
+    public static ArrayList<File> serachAllNcPrivateHyextClass(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules"), "META-INF" + File.separatorChar + "hyext" + File.separatorChar + "classes", false);
     }
 
     /**
@@ -389,12 +484,18 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachAllNcPrivateClass(File ncHome) {
-        return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
-                , "META-INF" + File.separatorChar + "classes", false)
-                , serachAllNcClass(new File(ncHome, "modules")
-                        , "META-INF" + File.separatorChar + "hyext" + File.separatorChar + "classes", false)
-        );
+    public static ArrayList<File> serachAllNcPrivateClass(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules"), "META-INF" + File.separatorChar + "classes", false);
+    }
+
+    /**
+     * 获取NC的 所有 模块的 所有 public hyext jar文件
+     *
+     * @param ncHome
+     * @return
+     */
+    public static ArrayList<File> serachAllNcPublicHyextJars(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules"), "hyext" + File.separatorChar + "lib", true);
     }
 
     /**
@@ -403,12 +504,18 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachAllNcPublicJars(File ncHome) {
-        return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
-                , "lib", true)
-                , serachAllNcClass(new File(ncHome, "modules")
-                        , "hyext" + File.separatorChar + "lib", true)
-        );
+    public static ArrayList<File> serachAllNcPublicJars(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules"), "lib", true);
+    }
+
+    /**
+     * 获取NC的 所有 模块的 所有 client hyext jar文件
+     *
+     * @param ncHome
+     * @return
+     */
+    public static ArrayList<File> serachAllNcClientHyextJars(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules") , "client" + File.separatorChar + "hyext" + File.separatorChar + "lib", true);
     }
 
     /**
@@ -417,13 +524,28 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachAllNcClientJars(File ncHome) {
-        return (ArrayList<File>) CollUtil.addAllColls(
-                serachAllNcClass(new File(ncHome, "modules")
-                        , "client" + File.separatorChar + "lib", true)
-                , serachAllNcClass(new File(ncHome, "modules")
-                        , "client" + File.separatorChar + "hyext" + File.separatorChar + "lib", true)
-        );
+    public static ArrayList<File> serachAllNcClientJars(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules"), "client" + File.separatorChar + "lib", true);
+    }
+
+    /**
+     * 获取NC的 所有 模块的 所有 private extra jar文件
+     *
+     * @param ncHome
+     * @return
+     */
+    public static ArrayList<File> serachAllNcPrivateExtraJars(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules"), "META-INF" + File.separatorChar + "extra", true);
+    }
+
+    /**
+     * 获取NC的 所有 模块的 所有 private hyext jar文件
+     *
+     * @param ncHome
+     * @return
+     */
+    public static ArrayList<File> serachAllNcPrivateHyextJars(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules"), "META-INF" + File.separatorChar + "hyext" + File.separatorChar + "lib", true);
     }
 
     /**
@@ -432,12 +554,8 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static final ArrayList<File> serachAllNcPrivateJars(File ncHome) {
-        return (ArrayList<File>) CollUtil.addAllColls(serachAllNcClass(new File(ncHome, "modules")
-                , "META-INF" + File.separatorChar + "lib", true)
-                , serachAllNcClass(new File(ncHome, "modules")
-                        , "META-INF" + File.separatorChar + "hyext" + File.separatorChar + "lib", true)
-        );
+    public static ArrayList<File> serachAllNcPrivateJars(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules"), "META-INF" + File.separatorChar + "lib", true);
     }
 
     /**
@@ -448,7 +566,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param isJarDir  是否是jar文件文件夹，true会搜索所有jar，不然认为是class文件 直接返回这个文件夹
      * @return
      */
-    public static final ArrayList<File> serachAllNcClass(File ncModules, String dirName, boolean isJarDir) {
+    public static ArrayList<File> serachAllNcClass(File ncModules, String dirName, boolean isJarDir) {
         ArrayList<File> all = new ArrayList<>();
 
         if (!ncModules.isDirectory()) {
@@ -586,7 +704,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @date 2020/1/16 0016 20:07
      * @Param [fromDir, toDir]
      */
-    public static final void copyAllFile(@NotNull File fromDir, @NotNull final File toDir,
+    public static void copyAllFile(@NotNull File fromDir, @NotNull final File toDir,
                                          Function<File, Boolean> filter) {
         if (fromDir.isFile()) {
             copyFile(fromDir, toDir);
@@ -616,7 +734,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @date 2020/1/16 0016 20:07
      * @Param [fromDir, toDir]
      */
-    public static final void copyAllFile(@NotNull File fromDir, @NotNull final File toDir) {
+    public static void copyAllFile(@NotNull File fromDir, @NotNull final File toDir) {
         if (fromDir.isFile()) {
             copyFile(fromDir, toDir);
             return;
@@ -641,7 +759,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @date 2020/1/16 0016 20:07
      * @Param [fromDir, toDir]
      */
-    public static final void copyFile(@NotNull File from, @NotNull final File to, List<String> packges) {
+    public static void copyFile(@NotNull File from, @NotNull final File to, List<String> packges) {
         /*if (!from.isFile()) {
             return;
         }
@@ -728,7 +846,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @date 2020/1/16 0016 20:07
      * @Param [fromDir, toDir]
      */
-    public static final void copyFile(@NotNull File from, @NotNull final File to) {
+    public static void copyFile(@NotNull File from, @NotNull final File to) {
         try {
             if (!from.exists()) {
                 return;
@@ -1132,7 +1250,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
     /**
      * 删除所有空文件夹
      *
-     * @param cf
+     * @param dir
      */
     public static void deleteAllEmptyDirs(File dir) {
         File[] fs = dir.listFiles();

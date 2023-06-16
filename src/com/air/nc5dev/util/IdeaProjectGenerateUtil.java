@@ -28,6 +28,7 @@ import com.intellij.openapi.roots.impl.ModifiableModelCommitter;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx;
 import com.intellij.openapi.roots.ui.configuration.ModuleEditor;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
+import com.intellij.openapi.roots.ui.configuration.ProjectStructureConfigurable;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -59,7 +60,7 @@ public class IdeaProjectGenerateUtil {
      *
      * @param project
      */
-    public static final void generateSrcDir(@Nullable Project project) {
+    public static void generateSrcDir(@Nullable Project project) {
         Project project1 = project == null ? ProjectUtil.getDefaultProject() : project;
 
         Module[] modules = ModuleManager.getInstance(project1).getModules();
@@ -72,9 +73,9 @@ public class IdeaProjectGenerateUtil {
     /**
      * 生成NC默认 几个个文件夹 src和META-INF 等文件夹 到项目
      *
-     * @param project
+     * @param module
      */
-    public static final void generateSrcDir4Modules(Module module) {
+    public static void generateSrcDir4Modules(Module module) {
         generateSrcDir(module);
         generatePatherConfigFile(module);
     }
@@ -179,7 +180,7 @@ public class IdeaProjectGenerateUtil {
      *
      * @param project
      */
-    public static final void generateRunMenu(@NotNull Project project) {
+    public static void generateRunMenu(@NotNull Project project) {
         if (!checkNCHomeSetPass()) {
             return;
         }
@@ -302,7 +303,7 @@ public class IdeaProjectGenerateUtil {
         }
     }
 
-    public static final boolean checkNCHomeSetPass() {
+    public static boolean checkNCHomeSetPass() {
         if (StringUtil.isEmpty(ProjectNCConfigUtil.getNCHomePath())) {
             Messages.showInfoMessage("未配置NC HOME，请在 Tools 菜单下 配置NC HOME 菜单进行配置！", "警告");
             return false;
@@ -314,7 +315,7 @@ public class IdeaProjectGenerateUtil {
     /**
      * 更新用户配置的 项目的NC 路径更新 NC的库依赖
      */
-    public static final void updateApplicationNCLibrarys(@Nullable Project theProject) {
+    public static void updateApplicationNCLibrarys(@Nullable Project theProject) {
         if (!checkNCHomeSetPass()) {
             return;
         }
@@ -335,6 +336,9 @@ public class IdeaProjectGenerateUtil {
                         , CollUtil.toList(jar)));
             }
         }
+        
+        // 是否为行业版
+        boolean hyVersion = ProjectNCConfigUtil.isHyVersion();
 
         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Ant_Library
                 , IoUtil.serachAllNcAntJars(ncHome)));
@@ -348,25 +352,51 @@ public class IdeaProjectGenerateUtil {
         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Product_Common_Library
                 , IoUtil.serachProduct_Common_LibraryJars(ncHome)));
 
+        if (hyVersion) {
+            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NC_Module_Public_Hyext_Library
+                    , IoUtil.serachNC_Module_Public_Hyext_Library(ncHome)));
+        }
+
         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NC_Module_Public_Library
                 , IoUtil.serachNC_Module_Public_Library(ncHome)));
+
+        if (hyVersion) {
+            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Client_Hyext_Library
+                    , IoUtil.serachModule_Client_Hyext_Library(ncHome)));
+        }
 
         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Client_Library
                 , IoUtil.serachModule_Client_Library(ncHome)));
 
+        ArrayList<File> extraJars = IoUtil.serachModule_Private_Extra_Library(ncHome);
+        if (!extraJars.isEmpty()) {
+            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Private_Extra_Library
+                    , extraJars));
+        }
+
+        if (hyVersion) {
+            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Private_Hyext_Library
+                    , IoUtil.serachModule_Private_Hyext_Library(ncHome)));
+        }
+
         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Private_Library
                 , IoUtil.serachModule_Private_Library(ncHome)));
+
+        if (new File(ProjectNCConfigUtil.getNCHome(), "hotwebs" + File.separatorChar + "ncchr").isDirectory()) {
+            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NCCHR_Library
+                    , IoUtil.serachNCCHR_Library(ncHome)));
+        }
+
+        if (new File(ProjectNCConfigUtil.getNCHome(), "hotwebs" + File.separatorChar + "nccloud").isDirectory()) {
+            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NCCloud_Library
+                    , IoUtil.serachNCCloud_Library(ncHome)));
+        }
 
         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Lang_Library
                 , IoUtil.serachModule_Lang_Library(ncHome)));
 
         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Generated_EJB
                 , IoUtil.serachGenerated_EJB(ncHome)));
-
-        if (new File(ProjectNCConfigUtil.getNCHome(), "hotwebs" + File.separatorChar + "nccloud").isDirectory()) {
-            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NCCloud_Library
-                    , IoUtil.serachNCCloud_Library(ncHome)));
-        }
 
         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_RESOURCES
                 , IoUtil.serachResources(ncHome)));
@@ -394,7 +424,7 @@ public class IdeaProjectGenerateUtil {
      * @date 2019/12/25 0025 15:04
      * @Param []
      */
-    public static final void copyProjectMetaInfFiles2NCHomeModules() {
+    public static void copyProjectMetaInfFiles2NCHomeModules() {
         Project project = ProjectUtil.getDefaultProject();
         Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules) {
@@ -417,7 +447,7 @@ public class IdeaProjectGenerateUtil {
      * @date 2019/12/25 0025 15:04
      * @Param []
      */
-    public static final void copyProjectMetaInfFiles2NCHomeModules(@NotNull Module module) {
+    public static void copyProjectMetaInfFiles2NCHomeModules(@NotNull Module module) {
         try {
             copyModuleMetainfoDir2NChome(module);
 
@@ -649,7 +679,7 @@ public class IdeaProjectGenerateUtil {
         VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
 
         ModifiableModuleModel modifiableModel = ModuleManager.getInstance(module.getProject()).getModifiableModel();
-        ModulesConfigurator modulesConfigurator = new ModulesConfigurator(module.getProject());
+        ModulesConfigurator modulesConfigurator = new ModulesConfigurator(module.getProject(), ProjectStructureConfigurable.getInstance(module.getProject()));
         ModuleEditor editor = modulesConfigurator.getOrCreateModuleEditor(module);
         ContentEntry[] contentEntries = editor.getModifiableRootModel().getContentEntries();
         ContentEntry contentEntry = contentEntries[0];
