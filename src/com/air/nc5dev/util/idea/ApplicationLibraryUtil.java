@@ -39,24 +39,20 @@ public class ApplicationLibraryUtil {
      * @param files
      * @return
      */
-    public static final LibraryEx addApplicationLibrary(@Nullable Project theProject, @NotNull String libraryName, @NotNull List<File> files) {
+    public static LibraryEx addApplicationLibrary(@Nullable Project theProject, @NotNull String libraryName, @NotNull List<File> files) {
         Project project = null == theProject ? ProjectUtil.getDefaultProject() : theProject;
-        final LibraryTable.ModifiableModel model = LibraryTablesRegistrar.getInstance().getLibraryTable(project).getModifiableModel();
+        LibraryTable.ModifiableModel model = LibraryTablesRegistrar.getInstance().getLibraryTable(project).getModifiableModel();
 
         LibraryEx library = (LibraryEx) model.getLibraryByName(libraryName);
-        LibraryEx.ModifiableModelEx libraryModel = null;
         if (library != null) {
-            //已经存在库的，删除库里的东西
+            // 已经存在库的，删除库里的东西
             model.removeLibrary(library);
-            library = (LibraryEx) model.createLibrary(libraryName);
-            libraryModel = library.getModifiableModel();
-        } else {
-            library = (LibraryEx) model.createLibrary(libraryName);
-            libraryModel = library.getModifiableModel();
         }
+        library = (LibraryEx) model.createLibrary(libraryName);
+        LibraryEx.ModifiableModelEx libraryModel = library.getModifiableModel();
 
-        //参数转换成路径集合
-        List<String> classesRoots = files.stream().map(file -> file.getPath()).collect(Collectors.toList());
+        // 参数转换成路径集合
+        List<String> classesRoots = files.stream().map(File::getPath).collect(Collectors.toList());
 
         // 加入新的依赖路径
         for (String root : classesRoots) {
@@ -67,21 +63,15 @@ public class ApplicationLibraryUtil {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("jar", root + "!/"), OrderRootType.CLASSES);
             } else if (root.toLowerCase().endsWith(".class")) {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
-                libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);
             } else {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
-                libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);
             }
         }
 
         // 提交库变更
-        final LibraryEx.ModifiableModelEx libraryModelFinal = libraryModel;
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
-            @Override
-            public void run() {
-                libraryModelFinal.commit();
-                model.commit();
-            }
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            libraryModel.commit();
+            model.commit();
         });
 
         return library;

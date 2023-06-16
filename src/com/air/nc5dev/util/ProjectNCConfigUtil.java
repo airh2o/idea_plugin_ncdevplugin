@@ -11,6 +11,7 @@ import com.intellij.openapi.ui.Messages;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Document;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -418,16 +419,26 @@ public class ProjectNCConfigUtil {
     public static final String LIB_Framework_Library = "NC_LIBS/Framework_Library";
     /*****    NC 依赖库： NC模块  Module_Public_Library     ****/
     public static final String LIB_NC_Module_Public_Library = "NC_LIBS/Module_Public_Library";
+    /*****    NC 依赖库： NC模块  Module_Public_Hyext_Library     ****/
+    public static final String LIB_NC_Module_Public_Hyext_Library = "NC_LIBS/Module_Public_Hyext_Library";
     /*****    NC 依赖库： NC模块  Module_Client_Library     ****/
     public static final String LIB_Module_Client_Library = "NC_LIBS/Module_Client_Library";
+    /*****    NC 依赖库： NC模块  Module_Client_Hyext_Library     ****/
+    public static final String LIB_Module_Client_Hyext_Library = "NC_LIBS/Module_Client_Hyext_Library";
     /*****    NC 依赖库： NC模块  Module_Private_Library     ****/
     public static final String LIB_Module_Private_Library = "NC_LIBS/Module_Private_Library";
+    /*****    NC 依赖库： NC模块  Module_Private_Hyext_Library     ****/
+    public static final String LIB_Module_Private_Hyext_Library = "NC_LIBS/Module_Private_Hyext_Library";
+    /*****    NC 依赖库： NC模块  Module_Private_Extra_Library     ****/
+    public static final String LIB_Module_Private_Extra_Library = "NC_LIBS/Module_Private_Extra_Library";
     /*****    NC 依赖库： NC模块  Module_Lang_Library     ****/
     public static final String LIB_Module_Lang_Library = "NC_LIBS/Module_Lang_Library";
     /*****    NC 依赖库： NC模块  Generated_EJB     ****/
     public static final String LIB_Generated_EJB = "NC_LIBS/Generated_EJB";
     /*****    NC 依赖库： NC模块  NCC     ****/
     public static final String LIB_NCCloud_Library = "NC_LIBS/Module_NCCloud_Library";
+    /*****    NC 依赖库： NC模块  NCCHR     ****/
+    public static final String LIB_NCCHR_Library = "NC_LIBS/Module_NCCHR_Library";
     /*****    NC 依赖库： Resources     ****/
     public static final String LIB_RESOURCES = "NC_LIBS/Resources";
 
@@ -527,6 +538,28 @@ public class ProjectNCConfigUtil {
         }
 
         return NcVersionEnum.NC6;
+    }
+
+    /**
+     * NC是否为行业版
+     * 
+     * @return
+     */
+    public static boolean isHyVersion() {
+        // 读取配置文件
+        File f = new File(getNCHome(), "ierp"
+                + File.separatorChar + "bin"
+                + File.separatorChar + "industry_config.xml"
+        );
+        if (!f.isFile()) {
+            return false;
+        }
+        // 解析配置文件
+        Document document = XmlUtil.xmlFile2Document2(f);
+        // 产品编码
+        String industryCode = document.getDocumentElement().getElementsByTagName("entry").item(0).getTextContent();
+        // 非0，为行业版
+        return !"0".equals(industryCode);
     }
 
 }
