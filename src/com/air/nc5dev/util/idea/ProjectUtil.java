@@ -3,6 +3,7 @@ package com.air.nc5dev.util.idea;
 import cn.hutool.core.lang.UUID;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.IoUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.XmlUtil;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.google.common.collect.Lists;
@@ -16,10 +17,19 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.fileEditor.*;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.roots.impl.libraries.LibraryEx;
+import com.intellij.openapi.roots.libraries.LibraryTable;
+import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.impl.java.stubs.index.JavaFullClassNameIndex;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.util.Alarm;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -30,6 +40,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -401,6 +414,8 @@ public class ProjectUtil {
     }
 
     /**
+     * 获取整个项目依赖库
+     *
      * @param project
      * @param vf
      * @param row
@@ -409,6 +424,79 @@ public class ProjectUtil {
     public static void openFile(Project project, VirtualFile vf, int row, int column) {
         com.intellij.openapi.application.ApplicationManager.getApplication()
                 .runReadAction(() -> openFile0(project, vf, row, column));
+    }
+
+    /**
+     * 获取某个 类的psi
+     *
+     * @param className
+     * @param project
+     * @param scope
+     * @return
+     */
+    public static Collection<PsiClass> findClassByFullName(String className, Project project, GlobalSearchScope scope) {
+        if (scope == null) {
+            scope = getGlobalSearchScope(project);
+        }
+
+        JavaFullClassNameIndex nameIndex = JavaFullClassNameIndex.getInstance();
+        Collection<PsiClass> pcs = null;
+
+        try {
+            pcs = nameIndex.get(className.hashCode()
+                    , project
+                    , scope);
+        } catch (Throwable exception) {
+            //兼容版本
+            Method m = null;
+            try {
+                m = JavaFullClassNameIndex.class.getMethod("get", CharSequence.class, Project.class,
+                        GlobalSearchScope.class);
+            } catch (Throwable e) {
+                Method[] ms = JavaFullClassNameIndex.class.getMethods();
+                for (Method m1 : ms) {
+                    if (m1.getName().equals("get")) {
+                        m = m1;
+                        break;
+                    }
+                }
+            }
+
+            if (m != null) {
+                try {
+                    pcs = (Collection<PsiClass>) m.invoke(nameIndex, className, project, scope);
+                } catch (Throwable e1) {
+                }
+            }
+        }
+
+        return pcs;
+    }
+
+    public static GlobalSearchScope getGlobalSearchScope(Project project) {
+        GlobalSearchScope scope = null;
+        try {
+            scope = new ProjectAndLibrariesScope(project, true);
+        } catch (Throwable exception) {
+            try {
+                scope = new ProjectAndLibrariesScope(project);
+            } catch (Throwable e) {
+                Module[] ms = ModuleManager.getInstance(project).getModules();
+                Module module = ms[0];
+                final LibraryTable.ModifiableModel model =
+                        LibraryTablesRegistrar.getInstance().getLibraryTable(project).getModifiableModel();
+                for (Module m : ms) {
+                    LibraryEx library = (LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Middleware_Library);
+                    if (library != null) {
+                        module = m;
+                        break;
+                    }
+                }
+                scope = module.getModuleWithLibrariesScope();
+            }
+        }
+
+        return scope;
     }
 
     private static void openFile0(Project project, VirtualFile vf, int row, int column) {

@@ -460,6 +460,7 @@ public class NCCActionRefreshUtil {
             try {
                 scope = new ProjectAndLibrariesScope(project, true);
             } catch (Throwable exception) {
+                scope = new ProjectAndLibrariesScope(project);
             }
         } else {
             scope = module.getModuleScope(false);
@@ -638,6 +639,7 @@ public class NCCActionRefreshUtil {
             try {
                 scope = new ProjectAndLibrariesScope(project, true);
             } catch (Throwable exception) {
+                scope = new ProjectAndLibrariesScope(project);
             }
         } else {
             scope = module.getModuleScope(false);
@@ -741,6 +743,7 @@ public class NCCActionRefreshUtil {
             try {
                 scope = new ProjectAndLibrariesScope(project, true);
             } catch (Throwable exception) {
+                scope = new ProjectAndLibrariesScope(project);
             }
         }else{
             scope = module.getModuleScope(false);

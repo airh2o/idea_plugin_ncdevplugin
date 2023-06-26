@@ -42,6 +42,9 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.impl.libraries.LibraryEx;
+import com.intellij.openapi.roots.libraries.LibraryTable;
+import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 import com.intellij.openapi.vcs.changes.ignore.lang.IgnoreLanguage;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -58,6 +61,7 @@ import com.intellij.psi.impl.java.stubs.impl.PsiClassStubImpl;
 import com.intellij.psi.impl.java.stubs.impl.PsiJavaFileStubImpl;
 import com.intellij.psi.impl.java.stubs.index.JavaFullClassNameIndex;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.ui.table.JBTable;
 import lombok.AllArgsConstructor;
@@ -618,34 +622,36 @@ public class ActionResultListTable extends JBTable {
             return;
         }
 
-        ProjectAndLibrariesScope projectAndLibrariesScope = new ProjectAndLibrariesScope(
-                getNccActionURLSearchUI().getProject(), true);
-        Collection<PsiClass> pcs = JavaFullClassNameIndex.getInstance().get(vo.getClazz().hashCode()
-                , getNccActionURLSearchUI().getProject()
-                , projectAndLibrariesScope);
-        if (CollUtil.isNotEmpty(pcs)) {
-            ClsClassImpl notJar = null;
-            ClsClassImpl jar = null;
-            for (PsiClass pc : pcs) {
-                VirtualFile f = getPsiClassFile(pc);
-                if (f != null) {
-                    if (f.getPath().contains(".jar!")) {
-                        jar = (ClsClassImpl) pc;
-                    } else {
-                        notJar = (ClsClassImpl) pc;
-                        break;
+        Project project = getNccActionURLSearchUI().getProject();
+        GlobalSearchScope scope = ProjectUtil.getGlobalSearchScope(project);
+        try {
+            Collection<PsiClass> pcs = ProjectUtil.findClassByFullName(vo.getClazz(), project, scope);
+
+            if (CollUtil.isNotEmpty(pcs)) {
+                ClsClassImpl notJar = null;
+                ClsClassImpl jar = null;
+                for (PsiClass pc : pcs) {
+                    VirtualFile f = getPsiClassFile(pc);
+                    if (f != null) {
+                        if (f.getPath().contains(".jar!")) {
+                            jar = (ClsClassImpl) pc;
+                        } else {
+                            notJar = (ClsClassImpl) pc;
+                            break;
+                        }
                     }
                 }
-            }
 
-            if (notJar != null) {
-                notJar.navigate(true);
-                vo.getNavigatables().add(notJar);
-                return;
-            } else if (jar != null) {
-                jar.navigate(true);
-                return;
+                if (notJar != null) {
+                    notJar.navigate(true);
+                    vo.getNavigatables().add(notJar);
+                    return;
+                } else if (jar != null) {
+                    jar.navigate(true);
+                    return;
+                }
             }
+        } catch (Throwable exception) {
         }
 
         VirtualFile virtualFile = findClassFile(vo);
@@ -655,7 +661,7 @@ public class ActionResultListTable extends JBTable {
             return;
         }
 
-        openFile(getNccActionURLSearchUI().getProject(), virtualFile, 0, 0);
+        openFile(project, virtualFile, 0, 0);
     }
 
     public static void openFile(Project project, VirtualFile vf, int row, int column) {
