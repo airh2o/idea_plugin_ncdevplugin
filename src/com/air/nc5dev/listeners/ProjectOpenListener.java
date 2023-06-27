@@ -1,5 +1,6 @@
 package com.air.nc5dev.listeners;
 
+import com.air.nc5dev.acion.HelpMeAction;
 import com.air.nc5dev.component.SubscribeEventAutoCopyNccClientFilesComponent;
 import com.air.nc5dev.service.ui.IMeassgeConsole;
 import com.air.nc5dev.util.ExceptionUtil;
@@ -9,6 +10,7 @@ import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.execution.ui.ConsoleViewContentType;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.project.Project;
@@ -16,6 +18,8 @@ import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,6 +43,15 @@ public class ProjectOpenListener implements StartupActivity.DumbAware {
                         "\n当前项目配置的NCHOME路径:" + ProjectNCConfigUtil.getNCHomePath(), project
                 , (int) TimeUnit.SECONDS.toMillis(15L));
 
+
+        if (!"Y".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue(project, "what_new_showed"))) {
+            try {
+                BrowserUtil.browse(new URL(HelpMeAction.URL));
+            } catch (Exception e) {
+            }
+            ProjectNCConfigUtil.setNCConfigPropertice("what_new_showed", "Y");
+            ProjectNCConfigUtil.saveConfig2File(project);
+        }
 //        try {
 //
 //            ProjectUtil.setProject(project);

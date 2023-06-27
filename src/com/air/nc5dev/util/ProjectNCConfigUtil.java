@@ -11,6 +11,7 @@ import com.intellij.openapi.ui.Messages;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 
 import java.io.File;
@@ -554,12 +555,16 @@ public class ProjectNCConfigUtil {
         if (!f.isFile()) {
             return false;
         }
-        // 解析配置文件
-        Document document = XmlUtil.xmlFile2Document2(f);
-        // 产品编码
-        String industryCode = document.getDocumentElement().getElementsByTagName("entry").item(0).getTextContent();
-        // 非0，为行业版
-        return !"0".equals(industryCode);
+        try {
+            // 解析配置文件
+            Document document = XmlUtil.xmlFile2Document2(f);
+            // 产品编码
+            String industryCode = document.getDocumentElement().getElementsByTagName("entry").item(0).getTextContent();
+            // 非0，为行业版
+            return !"0".equals(industryCode);
+        } catch (Throwable e) {
+            return true;
+        }
     }
 
 }
