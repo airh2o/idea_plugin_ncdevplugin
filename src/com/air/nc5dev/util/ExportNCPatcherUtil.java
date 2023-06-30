@@ -3,6 +3,7 @@ package com.air.nc5dev.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
+import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.LogUtil;
@@ -600,37 +601,42 @@ public class ExportNCPatcherUtil {
                 }
 
                 File moduleSqlDir = new File(sqldir, moduleHomeDir2ModuleMap.get(modulePath).getName());
-                //根据模块 合并SQL文件们
-                File moduleSqlOne = new File(moduleSqlDir, moduleHomeDir2ModuleMap.get(modulePath).getName() + "_模块汇总" +
-                        ".sql");
-
-                moduleSqlOne.deleteOnExit();
-                moduleOneSqls.add(moduleSqlOne);
                 StringBuilder txt = new StringBuilder(80_0000);
 
+                //根据模块 合并SQL文件们
+                File moduleSqlOne;
+
                 //读取items.xml文件
-                List<ItemsItemVO> itemVOs = new LinkedList<>();
                 File[] fs = initdata.listFiles();
                 if (com.air.nc5dev.util.CollUtil.isNotEmpty(fs)) {
-                    for (File f :fs){
+                    for (File f : fs) {
                         if (f.isFile() && f.getName().toLowerCase().endsWith(".xml")) {
                             List<ItemsItemVO> vs = ItemsItemVO.read(f);
                             if (com.air.nc5dev.util.CollUtil.isNotEmpty(vs)) {
-                                itemVOs.addAll(vs);
+                                if (txt.length() > 0) {
+                                    txt.delete(0, txt.length());
+                                }
+
+                                moduleSqlOne = new File(moduleSqlDir
+                                        , moduleHomeDir2ModuleMap.get(modulePath).getName() + '_'
+                                        + StringUtil.removeAll(FileNameUtil.getName(f), ".xml")
+                                        + ".sql");
+                                moduleSqlOne.deleteOnExit();
+                                moduleOneSqls.add(moduleSqlOne);
+
+                                for (ItemsItemVO itemVO : vs) {
+                                    if (StringUtil.isBlank(itemVO.getItemKey())) {
+                                        continue;
+                                    }
+
+                                    ConnectionUtil.toInserts(con, itemVO, txt, exsitSqlSet, contentVO);
+                                }
+
+                                FileUtil.writeUtf8String(txt.toString(), moduleSqlOne);
                             }
                         }
                     }
                 }
-
-                for (ItemsItemVO itemVO : itemVOs) {
-                    if (StringUtil.isBlank(itemVO.getItemKey())) {
-                        continue;
-                    }
-
-                    ConnectionUtil.toInserts(con, itemVO, txt, exsitSqlSet, contentVO);
-                }
-
-                FileUtil.writeUtf8String(txt.toString(), moduleSqlOne);
             }
 
             //合并成完全一个文件
