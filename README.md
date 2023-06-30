@@ -129,6 +129,12 @@ onleyFullSql=true
 # 版本更新
 
 ``` 
+<em>3.8 版本 更新:</em> <br>
+      <ul>
+          <li>1. 优化和修复部分功能</li>
+          <li>2. IDEA强制连接数据库导出脚本SQL功能 新增 支持 模块\script\conf\initdata\ 下所有的.xml都会读取导出，而不是只导出items.xml和items_idea.xml</li>
+      </ul>
+
 <em>3.7 版本 更新:</em> <br>
       <ul>
           <li>1. 新增数据库全局搜索</li>

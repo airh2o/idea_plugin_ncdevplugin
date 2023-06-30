@@ -595,8 +595,7 @@ public class ExportNCPatcherUtil {
                 }
                 File conf = new File(script, "conf");
                 File initdata = new File(conf, "initdata");
-                File itemXml = new File(initdata, "items.xml");
-                if (!itemXml.isFile()) {
+                if (!initdata.isDirectory()) {
                     continue;
                 }
 
@@ -610,7 +609,19 @@ public class ExportNCPatcherUtil {
                 StringBuilder txt = new StringBuilder(80_0000);
 
                 //读取items.xml文件
-                List<ItemsItemVO> itemVOs = ItemsItemVO.read(itemXml);
+                List<ItemsItemVO> itemVOs = new LinkedList<>();
+                File[] fs = initdata.listFiles();
+                if (com.air.nc5dev.util.CollUtil.isNotEmpty(fs)) {
+                    for (File f :fs){
+                        if (f.isFile() && f.getName().toLowerCase().endsWith(".xml")) {
+                            List<ItemsItemVO> vs = ItemsItemVO.read(f);
+                            if (com.air.nc5dev.util.CollUtil.isNotEmpty(vs)) {
+                                itemVOs.addAll(vs);
+                            }
+                        }
+                    }
+                }
+
                 for (ItemsItemVO itemVO : itemVOs) {
                     if (StringUtil.isBlank(itemVO.getItemKey())) {
                         continue;

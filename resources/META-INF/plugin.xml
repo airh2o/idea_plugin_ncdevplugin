@@ -524,11 +524,11 @@
       因为idea有时候有bug打不开eclipse项目 可以老项目文件夹改革个名称 然后idea新建一个同路径的，然后吧文件夹文件复制进来(机智不)。 <br>
            <ul>
               <li>第一次打开项目-必须步骤：</li>
-                <li>1. Tools -> 配置NC HOME   进行NC HOME配置！</li>
-                <li>2. Tools -> 更新NC 库依赖 执行依赖更新!</li>
-                <li>3. Tools -> 生成默认NC运行配置!(如果重启IDEA后丢失了运行配置 可以再次执行这个)</li>
-                <li>4. 第一次执行上面步骤以后，会生成项目默认的client public private test 几个源文件夹 请手工在 项目结构修改几个文件夹的IDEA属性为正确值</li>
-                <li>5. 请注意 模块的编译输出路径要选 use module path 分别设置test和非test class输出路径。</li>
+                    <li>1. Tools -> 配置NC HOME   进行NC HOME配置！ </li>
+                    <li>2. Tools -> 更新NC 库依赖 执行依赖更新! (第一步如果自动配置了 就不用再点，如果切换了home或者home里代码文件变动了 要在点一下更新)</li>
+                    <li>3. Tools -> 生成默认NC运行配置!(如果重启IDEA后丢失了运行配置或者改了HOME 再次执行这个)    </li>
+                    <li>4. 如果不想自己配置项目结构和新建src这些文件夹，可以在模块上右键 点击 重新配置模块结构</li>
+                    <li>5. 如果有特殊需求可以直接修改 .idea文件夹里的 nc.properties 文件里配置内容，重启idea生效。</li>
          </ul>
 
     ]]></description>
