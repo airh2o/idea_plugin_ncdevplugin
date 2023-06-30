@@ -617,10 +617,10 @@ public class ActionResultListTable extends JBTable {
             return;
         }
 
-        if (CollUtil.isNotEmpty(vo.getNavigatables())) {
-            vo.getNavigatables().get(0).navigate(true);
-            return;
-        }
+//        if (CollUtil.isNotEmpty(vo.getNavigatables())) {
+//            vo.getNavigatables().get(0).navigate(true);
+//            return;
+//        }
 
         Project project = getNccActionURLSearchUI().getProject();
         GlobalSearchScope scope = ProjectUtil.getGlobalSearchScope(project);
@@ -644,7 +644,7 @@ public class ActionResultListTable extends JBTable {
 
                 if (notJar != null) {
                     notJar.navigate(true);
-                    vo.getNavigatables().add(notJar);
+                   // vo.getNavigatables().add(notJar);
                     return;
                 } else if (jar != null) {
                     jar.navigate(true);
