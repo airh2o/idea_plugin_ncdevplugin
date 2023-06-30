@@ -51,7 +51,7 @@ public class ReConfigModuleAction extends AbstractIdeaAction {
         }
     }
 
-    private void setModuel(Module module) {
+    public static void setModuel(Module module) {
         IdeaProjectGenerateUtil.generateSrcDir4Modules(module);
         ApplicationLibraryUtil.addLibs2Module(module);
         //设置模块 源文件结构 ModulesStructureConfigurable

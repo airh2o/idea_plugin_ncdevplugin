@@ -46,9 +46,11 @@ public class ApplicationLibraryUtil {
         LibraryEx library = (LibraryEx) model.getLibraryByName(libraryName);
         if (library != null) {
             // 已经存在库的，删除库里的东西
-            model.removeLibrary(library);
+         //   model.removeLibrary(library);
+        }else{
+            library = (LibraryEx) model.createLibrary(libraryName);
         }
-        library = (LibraryEx) model.createLibrary(libraryName);
+
         LibraryEx.ModifiableModelEx libraryModel = library.getModifiableModel();
 
         // 参数转换成路径集合
@@ -65,6 +67,7 @@ public class ApplicationLibraryUtil {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
             } else {
                 libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.CLASSES);
+                libraryModel.addRoot(VirtualFileManager.constructUrl("file", root), OrderRootType.SOURCES);
             }
         }
 

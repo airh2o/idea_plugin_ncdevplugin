@@ -37,6 +37,9 @@ public class ReConfigProjectAction extends AbstractIdeaAction {
             return;
         }
 
-        ProjectOpenListener.run(project);
+        Module[] modules = ModuleManager.getInstance(project).getModules();
+        for (Module module1 : modules) {
+            ReConfigModuleAction.setModuel(module1);
+        }
     }
 }

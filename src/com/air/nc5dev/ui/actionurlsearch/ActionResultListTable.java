@@ -627,6 +627,12 @@ public class ActionResultListTable extends JBTable {
         try {
             Collection<PsiClass> pcs = ProjectUtil.findClassByFullName(vo.getClazz(), project, scope);
 
+            for (int i = 0; i < 3; i++) {
+                if (CollUtil.isEmpty(pcs)) {
+                    pcs = ProjectUtil.findClassByFullName(vo.getClazz(), project, scope);
+                }
+            }
+
             if (CollUtil.isNotEmpty(pcs)) {
                 ClsClassImpl notJar = null;
                 ClsClassImpl jar = null;

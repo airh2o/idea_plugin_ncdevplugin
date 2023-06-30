@@ -43,6 +43,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Stream;
 
 /***
@@ -329,87 +330,125 @@ public class IdeaProjectGenerateUtil {
         }
         ArrayList<LibraryEx> LibraryExList = new ArrayList<>();
 
-        if (NcVersionEnum.U8Cloud.equals(ProjectNCConfigUtil.getNCVerSIon())) {
-            File jar = new File(ncHome, "external" + File.separatorChar + "lib" + File.separatorChar + "xerces.jar");
-            if (jar.isFile()) {
-                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.U8C_RUN_FIRST_DEPEND
-                        , CollUtil.toList(jar)));
-            }
-        }
-        
-        // 是否为行业版
-        boolean hyVersion = ProjectNCConfigUtil.isHyVersion();
+        CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Ant_Library
-                , IoUtil.serachAllNcAntJars(ncHome)));
-
-        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Middleware_Library
-                , IoUtil.serachMiddleware_LibraryJars(ncHome)));
-
-        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Framework_Library
-                , IoUtil.serachFramework_LibraryJars(ncHome)));
-
-        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Product_Common_Library
-                , IoUtil.serachProduct_Common_LibraryJars(ncHome)));
-
-        if (hyVersion) {
-            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NC_Module_Public_Hyext_Library
-                    , IoUtil.serachNC_Module_Public_Hyext_Library(ncHome)));
-        }
-
-        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NC_Module_Public_Library
-                , IoUtil.serachNC_Module_Public_Library(ncHome)));
-
-        if (hyVersion) {
-            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Client_Hyext_Library
-                    , IoUtil.serachModule_Client_Hyext_Library(ncHome)));
-        }
-
-        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Client_Library
-                , IoUtil.serachModule_Client_Library(ncHome)));
-
-        ArrayList<File> extraJars = IoUtil.serachModule_Private_Extra_Library(ncHome);
-        if (!extraJars.isEmpty()) {
-            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Private_Extra_Library
-                    , extraJars));
-        }
-
-        if (hyVersion) {
-            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Private_Hyext_Library
-                    , IoUtil.serachModule_Private_Hyext_Library(ncHome)));
-        }
-
-        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Private_Library
-                , IoUtil.serachModule_Private_Library(ncHome)));
-
-        if (new File(ProjectNCConfigUtil.getNCHome(), "hotwebs" + File.separatorChar + "ncchr").isDirectory()) {
-            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NCCHR_Library
-                    , IoUtil.serachNCCHR_Library(ncHome)));
-        }
-
-        if (new File(ProjectNCConfigUtil.getNCHome(), "hotwebs" + File.separatorChar + "nccloud").isDirectory()) {
-            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_NCCloud_Library
-                    , IoUtil.serachNCCloud_Library(ncHome)));
-        }
-
-        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Module_Lang_Library
-                , IoUtil.serachModule_Lang_Library(ncHome)));
-
-        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Generated_EJB
-                , IoUtil.serachGenerated_EJB(ncHome)));
-
-        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_RESOURCES
-                , IoUtil.serachResources(ncHome)));
-
-        // 向项目模块依赖中增加新增的库
-        Module[] modules = ModuleManager.getInstance(project).getModules();
-        for (Module module : modules) {
-            for (LibraryEx library : LibraryExList) {
-                if (ApplicationLibraryUtil.notHas(ModuleRootManager.getInstance(module).getModifiableModel(), library.getName())) {
-                    ModuleRootModificationUtil.addDependency(module, library);
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            try {
+                if (NcVersionEnum.U8Cloud.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+                    File jar = new File(ncHome, "external" + File.separatorChar + "lib" + File.separatorChar + "xerces.jar");
+                    if (jar.isFile()) {
+                        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                                ProjectNCConfigUtil.U8C_RUN_FIRST_DEPEND
+                                , CollUtil.toList(jar)));
+                    }
                 }
+
+                // 是否为行业版
+                boolean hyVersion = ProjectNCConfigUtil.isHyVersion();
+
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Ant_Library
+                        , IoUtil.serachAllNcAntJars(ncHome)));
+
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                        ProjectNCConfigUtil.LIB_Middleware_Library
+                        , IoUtil.serachMiddleware_LibraryJars(ncHome)));
+
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                        ProjectNCConfigUtil.LIB_Framework_Library
+                        , IoUtil.serachFramework_LibraryJars(ncHome)));
+
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                        ProjectNCConfigUtil.LIB_Product_Common_Library
+                        , IoUtil.serachProduct_Common_LibraryJars(ncHome)));
+
+                if (hyVersion) {
+                    LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                            ProjectNCConfigUtil.LIB_NC_Module_Public_Hyext_Library
+                            , IoUtil.serachNC_Module_Public_Hyext_Library(ncHome)));
+                }
+
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                        ProjectNCConfigUtil.LIB_NC_Module_Public_Library
+                        , IoUtil.serachNC_Module_Public_Library(ncHome)));
+
+                if (hyVersion) {
+                    LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                            ProjectNCConfigUtil.LIB_Module_Client_Hyext_Library
+                            , IoUtil.serachModule_Client_Hyext_Library(ncHome)));
+                }
+
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                        ProjectNCConfigUtil.LIB_Module_Client_Library
+                        , IoUtil.serachModule_Client_Library(ncHome)));
+
+                ArrayList<File> extraJars = IoUtil.serachModule_Private_Extra_Library(ncHome);
+                if (!extraJars.isEmpty()) {
+                    LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                            ProjectNCConfigUtil.LIB_Module_Private_Extra_Library
+                            , extraJars));
+                }
+
+                if (hyVersion) {
+                    LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                            ProjectNCConfigUtil.LIB_Module_Private_Hyext_Library
+                            , IoUtil.serachModule_Private_Hyext_Library(ncHome)));
+                }
+
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                        ProjectNCConfigUtil.LIB_Module_Private_Library
+                        , IoUtil.serachModule_Private_Library(ncHome)));
+
+                if (new File(ProjectNCConfigUtil.getNCHome(), "hotwebs" + File.separatorChar + "ncchr").isDirectory()) {
+                    LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                            ProjectNCConfigUtil.LIB_NCCHR_Library
+                            , IoUtil.serachNCCHR_Library(ncHome)));
+                }
+
+                if (new File(ProjectNCConfigUtil.getNCHome(), "hotwebs" + File.separatorChar + "nccloud").isDirectory()) {
+                    LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                            ProjectNCConfigUtil.LIB_NCCloud_Library
+                            , IoUtil.serachNCCloud_Library(ncHome)));
+                }
+
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                        ProjectNCConfigUtil.LIB_Module_Lang_Library
+                        , IoUtil.serachModule_Lang_Library(ncHome)));
+
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Generated_EJB
+                        , IoUtil.serachGenerated_EJB(ncHome)));
+
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_RESOURCES
+                        , IoUtil.serachResources(ncHome)));
+            } catch (Exception e) {
+                e.printStackTrace();
+                LogUtil.error("更新NC依赖库失败:" + e.getMessage(), e);
+            }finally {
+                countDownLatch.countDown();
             }
+        });
+
+        try {
+            countDownLatch.wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            try {
+                // 向项目模块依赖中增加新增的库
+                Module[] modules = ModuleManager.getInstance(project).getModules();
+                for (Module module : modules) {
+                    for (LibraryEx library : LibraryExList) {
+                        if (ApplicationLibraryUtil.notHas(ModuleRootManager.getInstance(module).getModifiableModel(),
+                                library.getName())) {
+                            ModuleRootModificationUtil.addDependency(module, library);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                LogUtil.error("更新NC依赖库失败:" + e.getMessage(), e);
+            }
+        });
     }
 
     /**
@@ -635,7 +674,8 @@ public class IdeaProjectGenerateUtil {
                         , contentVO, outPathRoot.getPath(), module
                         , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, classFileDir);
 
-                if (!StringUtil.replaceAll(StringUtil.replaceAll(sourcePackge.getPath(), File.separator, "/"), "\\", "/").contains("client/yyconfig/")) {
+                if (!StringUtil.replaceAll(StringUtil.replaceAll(sourcePackge.getPath(), File.separator, "/"), "\\",
+                        "/").contains("client/yyconfig/")) {
                     ExportNCPatcherUtil.copyClassPathOtherFile(sourcePackge, outPathRoot.getPath(), module
                             , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, contentVO);
                 }
@@ -679,7 +719,8 @@ public class IdeaProjectGenerateUtil {
         VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
 
         ModifiableModuleModel modifiableModel = ModuleManager.getInstance(module.getProject()).getModifiableModel();
-        ModulesConfigurator modulesConfigurator = new ModulesConfigurator(module.getProject(), ProjectStructureConfigurable.getInstance(module.getProject()));
+        ModulesConfigurator modulesConfigurator = new ModulesConfigurator(module.getProject(),
+                ProjectStructureConfigurable.getInstance(module.getProject()));
         ModuleEditor editor = modulesConfigurator.getOrCreateModuleEditor(module);
         ContentEntry[] contentEntries = editor.getModifiableRootModel().getContentEntries();
         ContentEntry contentEntry = contentEntries[0];
