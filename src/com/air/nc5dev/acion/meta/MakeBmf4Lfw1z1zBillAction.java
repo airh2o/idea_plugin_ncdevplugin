@@ -11,8 +11,7 @@ import java.io.File;
 public class MakeBmf4Lfw1z1zBillAction extends AbstractMakeBmfAction {
     @Override
     public String getBmfTemplateStr() {
-        File resourceTemplates = ProjectUtil.getResourceTemplates("lfwdemo.bmf");
-        return FileUtil.readUtf8String(resourceTemplates);
+       return getResourceTemplates("lfwdemo.bmf");
     }
 
     @Override

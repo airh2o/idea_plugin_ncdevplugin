@@ -25,8 +25,7 @@ import java.io.File;
 public class MakeBmf4OneHeadOneBodyBillAction extends AbstractMakeBmfAction {
     @Override
     public String getBmfTemplateStr() {
-        File resourceTemplates = ProjectUtil.getResourceTemplates("demo.bmf");
-        return FileUtil.readUtf8String(resourceTemplates);
+      return getResourceTemplates("demo.bmf");
     }
 
     @Override

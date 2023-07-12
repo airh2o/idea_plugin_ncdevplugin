@@ -291,11 +291,12 @@ public class ProjectUtil {
     }
 
     public static String getResourceTemplatesUtf8Txt(String name) {
+        InputStream input = ProjectUtil.class.getResourceAsStream("/" + "templates" + "/" + name);
+        if (input == null) {
+            return null;
+        }
+
         try {
-            InputStream input = new FileInputStream(getResourceTemplates(name));
-            if (input == null) {
-                return null;
-            }
             return IoUtil.readUtf8(input);
         } catch (Exception e) {
             return null;

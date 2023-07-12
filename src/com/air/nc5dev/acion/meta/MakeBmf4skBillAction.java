@@ -11,8 +11,7 @@ import java.io.File;
 public class MakeBmf4skBillAction extends AbstractMakeBmfAction {
     @Override
     public String getBmfTemplateStr() {
-        File resourceTemplates = ProjectUtil.getResourceTemplates("treeCard.bmf");
-        return FileUtil.readUtf8String(resourceTemplates);
+      return getResourceTemplates("treeCard.bmf");
     }
 
     @Override

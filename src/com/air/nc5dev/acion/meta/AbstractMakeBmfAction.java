@@ -48,6 +48,10 @@ public abstract class AbstractMakeBmfAction extends AbstractIdeaAction {
         dialog.show();
     }
 
+    public String getResourceTemplates(String name) {
+        return ProjectUtil.getResourceTemplatesUtf8Txt(name);
+    }
+
     public abstract String getBmfTemplateStr();
 
     public abstract int getType();
