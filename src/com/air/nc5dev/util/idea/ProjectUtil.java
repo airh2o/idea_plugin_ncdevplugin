@@ -36,10 +36,7 @@ import org.dom4j.Element;
 import org.dom4j.io.XMLWriter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -294,12 +291,11 @@ public class ProjectUtil {
     }
 
     public static String getResourceTemplatesUtf8Txt(String name) {
-        InputStream input = ProjectUtil.class.getResourceAsStream("/" + "templates" + "/" + name);
-        if (input == null) {
-            return null;
-        }
-
         try {
+            InputStream input = new FileInputStream(getResourceTemplates(name));
+            if (input == null) {
+                return null;
+            }
             return IoUtil.readUtf8(input);
         } catch (Exception e) {
             return null;

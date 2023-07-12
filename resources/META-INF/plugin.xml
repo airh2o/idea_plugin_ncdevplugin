@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>Yonyou NC Dev Tool</name>
-    <version>v3.8</version>
+    <version>v3.9</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx">Air 209308043@qq.com 微信: yongyourj 欢迎私活联系</vendor>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
@@ -147,6 +147,36 @@
                 text="重新配置整个项目NC结构" description="自动生成所有NC文件夹和模块配置文件以及配置源码文件夹等">
         </action>
 
+        <action id="nc5dev.info.meta.MakeBmf4OneHeadOneBodyBillAction"
+                class="com.air.nc5dev.acion.meta.MakeBmf4OneHeadOneBodyBillAction"
+                text="NC主子表单据" description="生成模板元数据文件(参考.感谢www.uapdev.com)">
+        </action>
+        <action id="nc5dev.info.meta.MakeBmf41zBillAction"
+                class="com.air.nc5dev.acion.meta.MakeBmf41zBillAction"
+                text="NC单表单据" description="生成模板元数据文件">
+        </action>
+        <action id="nc5dev.info.meta.MakeBmf41bBillAction"
+                class="com.air.nc5dev.acion.meta.MakeBmf41bBillAction"
+                text="NC单子表单据" description="生成模板元数据文件">
+        </action>
+        <action id="nc5dev.info.meta.MakeBmf4skBillAction"
+                class="com.air.nc5dev.acion.meta.MakeBmf4skBillAction"
+                text="NC树卡单据" description="生成模板元数据文件">
+        </action>
+        <action id="nc5dev.info.meta.MakeBmf4Lfw1z1zBillAction"
+                class="com.air.nc5dev.acion.meta.MakeBmf4Lfw1z1zBillAction"
+                text="LFW主子表单据" description="生成模板元数据文件">
+        </action>
+        <action id="nc5dev.info.meta.MakeBmf4Lfw1z1zBillAction"
+                class="com.air.nc5dev.acion.meta.MakeBmf4Lfw1z1zBillAction"
+                text="LFW主子表单据" description="生成模板元数据文件">
+        </action>
+        <action id="nc5dev.info.meta.TakeBmfFromDatabaseAction"
+                class="com.air.nc5dev.acion.meta.TakeBmfFromDatabaseAction"
+                text="抽取数据库导出BMF文件" description="从数据库里元数据表数据导出BMF元数据文件-主要用做元数据文件不是最新而要从数据库抽取">
+        </action>
+
+
         <action id="nc5dev.info.JavadocGenerateAction" class="com.air.nc5dev.acion.JavadocGenerateAction"
                 text="生成Java Doc注释" description="根据方法名或属性名等翻译后生成注释">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift 1"/>
@@ -216,6 +246,15 @@
 
             <reference ref="nc5dev.info.deletenclogs"/>
             <reference ref="nc5dev.info.copyMateFile2NewFile"/>
+            <group id="nc5devtoolMatabmfEdit" text="快速新增元数据文件"
+                   popup="true" description="快速新增一个全新的元数据文件-根据常用的类型模板">
+                <reference ref="nc5dev.info.meta.MakeBmf4OneHeadOneBodyBillAction"/>
+                <reference ref="nc5dev.info.meta.MakeBmf41zBillAction"/>
+                <reference ref="nc5dev.info.meta.MakeBmf41bBillAction"/>
+                <reference ref="nc5dev.info.meta.MakeBmf4skBillAction"/>
+                <reference ref="nc5dev.info.meta.MakeBmf4Lfw1z1zBillAction"/>
+                <reference ref="nc5dev.info.meta.TakeBmfFromDatabaseAction"/>
+            </group>
             <group id="nc5devtoolExportBillAll" text="导出已有节点单据SQL脚本"
                    popup="true" description="导出已有节点单据SQL脚本">
                 <reference ref="nc5dev.info.exportBillAll"/>
@@ -235,18 +274,14 @@
             <reference ref="nc5dev.info.MstscManggerUIAction"/>
             <reference ref="nc5dev.info.MstscOpenLastAction"/>
             <reference ref="nc5dev.info.NCCJsonDecodeAction"/>
-
-            <separator/>
-            <reference ref="nc5dev.info.JavadocGenerateAction"/>
-            <reference ref="SerializeGenerator"/>
-            <reference ref="GenerateGetSetAction"/>
-            <reference ref="GenerateGetAction"/>
-            <reference ref="GenerateSetAction"/>
-            <!--            <reference ref="NCCodeCheckAction"/>-->
             <separator/>
 
             <reference ref="nc5dev.info.openjconsole"/>
             <reference ref="nc5dev.info.openjvisualvm"/>
+            <separator/>
+
+            <reference ref="nc5dev.info.ReConfigModuleAction"/>
+            <reference ref="nc5dev.info.ReConfigProjectAction"/>
             <separator/>
 
             <reference ref="nc5dev.info.showlocalncjavaexe"/>
@@ -263,8 +298,12 @@
             <reference ref="nc5dev.info.help"/>
             <separator/>
 
-            <reference ref="nc5dev.info.ReConfigModuleAction"/>
-            <reference ref="nc5dev.info.ReConfigProjectAction"/>
+            <reference ref="nc5dev.info.JavadocGenerateAction"/>
+            <reference ref="SerializeGenerator"/>
+            <reference ref="GenerateGetSetAction"/>
+            <reference ref="GenerateGetAction"/>
+            <reference ref="GenerateSetAction"/>
+            <!--            <reference ref="NCCodeCheckAction"/>-->
             <separator/>
 
             <!--            代码检查-->
@@ -534,6 +573,15 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    <em>3.9 版本 更新:</em> <br>
+      <ul>
+          <li>english:</li>
+            <li>1. add metafile futuers </li>
+
+          <li>中文:</li>
+              <li>1. 新增快速新建模板元数据文件</li>
+      </ul>
+
     <em>3.7 版本 更新:</em> <br>
       <ul>
           <li>english:</li>

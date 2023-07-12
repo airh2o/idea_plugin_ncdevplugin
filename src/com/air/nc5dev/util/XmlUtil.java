@@ -205,6 +205,38 @@ public final class XmlUtil extends cn.hutool.core.util.XmlUtil {
                 }
             }
         }
+
+        //>>>>>>>>>>>>>>>>分割线,下面是root 下的另外一个节点集合<<<<<<<<<<<<<<<<<<
+        Element connectlist = root.element("connectlist");//实体与其他接口,实体的关系集合
+        if (connectlist != null) {
+            List<Element> bus = connectlist.elements("busiitfconnection");//实体与接口的连接线
+            if (bus != null && bus.size() > 0) {
+                for (Element element : bus) {
+                    String ID = element.attributeValue("id");
+                    uuid = UUID.randomUUID();
+                    str = str.replace(ID, uuid.toString());//替换实体与接口的连接线ID
+                }
+            }
+            List<Element> Agg = connectlist.elements("AggregationRelation");//实体与实体的连接线
+            if (Agg != null && Agg.size() > 0) {
+                for (Element element : Agg) {
+                    String ID = element.attributeValue("id");
+                    uuid = UUID.randomUUID();
+                    str = str.replace(ID, uuid.toString());//替换实体与实体的连接线ID
+                }
+            }
+
+            List<Element> note = connectlist.elements("noteConnection");//实体与注释的连接线
+            if (note != null && note.size() > 0) {
+                for (Element element : note) {
+                    String ID = element.attributeValue("id");
+                    uuid = UUID.randomUUID();
+                    str = str.replace(ID, uuid.toString());//替换实体与注释的连接线ID
+                }
+            }
+
+        }
+
         return document;
     }
 }
