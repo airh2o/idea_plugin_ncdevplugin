@@ -13,7 +13,6 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.containers.ArrayListSet;
 import lombok.Data;
 
 import java.io.File;
@@ -72,7 +71,7 @@ public class ExportContentVO {
     public boolean rebuildsql = false;
     public boolean reWriteSourceFile = false;
     public int data_source_index = 0;
-    public NcVersionEnum ncVersion = ProjectNCConfigUtil.getNCVerSIon();
+    public NcVersionEnum ncVersion = ProjectNCConfigUtil.getNCVersion();
     public boolean reNpmBuild = true;
     public boolean format4Ygj = true;
     public boolean zip = true;

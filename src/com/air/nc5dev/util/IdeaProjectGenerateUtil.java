@@ -255,7 +255,7 @@ public class IdeaProjectGenerateUtil {
                             + " -Dlog4j.ignoreTCL=true "
                             + " -Duser.timezone=GMT+8 "
                             + (
-                            NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon()) ?
+                            NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion()) ?
                                     " -Dfile.encoding=UTF-8 "
                                     : " -Xmx768m -XX:MaxPermSize=256m "
                                     + " -Dfile.encoding=GBK "
@@ -334,7 +334,7 @@ public class IdeaProjectGenerateUtil {
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
-                if (NcVersionEnum.U8Cloud.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+                if (NcVersionEnum.U8Cloud.equals(ProjectNCConfigUtil.getNCVersion())) {
                     File jar = new File(ncHome, "external" + File.separatorChar + "lib" + File.separatorChar + "xerces.jar");
                     if (jar.isFile()) {
                         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
@@ -490,7 +490,7 @@ public class IdeaProjectGenerateUtil {
         try {
             copyModuleMetainfoDir2NChome(module);
 
-            if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+            if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion())) {
                 copyModuleNccConfigDir2NChome(module);
                 if (!"true".equals(ProjectNCConfigUtil.getConfigValue("close_client_copy"))) {
                     try {

@@ -291,7 +291,7 @@ public class ProjectUtil {
     }
 
     public static String getResourceTemplatesUtf8Txt(String name) {
-        InputStream input = ProjectUtil.class.getResourceAsStream("/" + "templates" + "/" + name);
+        InputStream input = ProjectUtil.class.getResourceAsStream("/templates/" + name);
         if (input == null) {
             return null;
         }

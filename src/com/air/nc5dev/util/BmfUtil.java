@@ -1,6 +1,7 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.util.StrUtil;
+import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,6 +39,7 @@ public class BmfUtil {
     @Builder.Default
     int type = 0;
     String defName;
+    NcVersionEnum versionEnum;
 
     /**
      * String 转 XML
@@ -246,7 +248,7 @@ public class BmfUtil {
         HashMap<String, String> replateMap = new HashMap<>(100);
         UUID uuid = UUID.randomUUID();
         String rootID = uuid.toString();
-        replateMap.put("${rootId}", rootID);  //替换BMF 文件ID
+        replateMap.put(root.attributeValue("id"), rootID);  //替换BMF 文件ID
 
         String mainEntityIdOld = root.attributeValue("mainEntity");
         String[] defNames = StringUtil.split(defName, ",");

@@ -1,12 +1,10 @@
 package com.air.nc5dev.vo;
 
 import com.air.nc5dev.enums.NcVersionEnum;
-import com.air.nc5dev.util.NCPropXmlUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.ncutils.AESEncode;
 import com.air.nc5dev.util.ncutils.NC5xEncode;
-import com.air.nc5dev.util.ncutils.NC6xEncode;
 import lombok.Data;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -54,7 +52,7 @@ public class NCDataSourceVO {
         password = getSonElementTextContent(element, "password", 0);
         passwordOrgin = password;
         password = new NC5xEncode().decode(password);
-        if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+        if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion())) {
             if (root.getElementsByTagName("isEncode").getLength() > 0) {
                 String isEncode = root.getElementsByTagName("isEncode").item(0).getTextContent();
                 if ("true".equalsIgnoreCase(StringUtil.trim(isEncode))) {

@@ -10,8 +10,8 @@ import java.io.File;
  */
 public class MakeBmf4skBillAction extends AbstractMakeBmfAction {
     @Override
-    public String getBmfTemplateStr() {
-      return getResourceTemplates("treeCard.bmf");
+    public String getBmfTemplateName() {
+      return "treeCard.bmf";
     }
 
     @Override

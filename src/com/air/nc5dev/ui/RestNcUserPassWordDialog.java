@@ -166,7 +166,7 @@ public class RestNcUserPassWordDialog
      * 刷新UI界面
      */
     public void refreshUI() {
-        contentPane.textArea_queryUserSql.setText(nc2SmUserSql.get(ProjectNCConfigUtil.getNCVerSIon()));
+        contentPane.textArea_queryUserSql.setText(nc2SmUserSql.get(ProjectNCConfigUtil.getNCVersion()));
         contentPane.listModel_selectUsers.clear();
     }
 
@@ -207,11 +207,11 @@ public class RestNcUserPassWordDialog
 
     public List<String> buildUpdateSqls() {
         List<String> sqls = null;
-        if (NcVersionEnum.NC5.equals(ProjectNCConfigUtil.getNCVerSIon())
-                || NcVersionEnum.U8Cloud.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+        if (NcVersionEnum.NC5.equals(ProjectNCConfigUtil.getNCVersion())
+                || NcVersionEnum.U8Cloud.equals(ProjectNCConfigUtil.getNCVersion())) {
             sqls = buildNc5xUpdateSqls();
-        } else if (NcVersionEnum.NC6.equals(ProjectNCConfigUtil.getNCVerSIon())
-                || NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+        } else if (NcVersionEnum.NC6.equals(ProjectNCConfigUtil.getNCVersion())
+                || NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion())) {
             sqls = buildNc6xUpdateSqls();
         }
 

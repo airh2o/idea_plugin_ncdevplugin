@@ -23,13 +23,13 @@ public class NCPassWordUtil {
      * @return
      */
     public static String decode(String pass, Object... expars) {
-        if (NcVersionEnum.NC5.equals(ProjectNCConfigUtil.getNCVerSIon())
-                || NcVersionEnum.U8Cloud.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+        if (NcVersionEnum.NC5.equals(ProjectNCConfigUtil.getNCVersion())
+                || NcVersionEnum.U8Cloud.equals(ProjectNCConfigUtil.getNCVersion())) {
             return new NC5xEncode().decode(pass);
         }
 
-        if (NcVersionEnum.NC6.equals(ProjectNCConfigUtil.getNCVerSIon())
-                || NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+        if (NcVersionEnum.NC6.equals(ProjectNCConfigUtil.getNCVersion())
+                || NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion())) {
             return new NC6xEncode().decode(pass, expars);
         }
 
@@ -43,13 +43,13 @@ public class NCPassWordUtil {
      * @return
      */
     public static String encode(String pass, Object... expars) {
-        if (NcVersionEnum.NC5.equals(ProjectNCConfigUtil.getNCVerSIon())
-                || NcVersionEnum.U8Cloud.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+        if (NcVersionEnum.NC5.equals(ProjectNCConfigUtil.getNCVersion())
+                || NcVersionEnum.U8Cloud.equals(ProjectNCConfigUtil.getNCVersion())) {
             return new NC5xEncode().encode(pass);
         }
 
-        if (NcVersionEnum.NC6.equals(ProjectNCConfigUtil.getNCVerSIon())
-                || NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+        if (NcVersionEnum.NC6.equals(ProjectNCConfigUtil.getNCVersion())
+                || NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion())) {
             return new NC6xEncode().encode(pass, expars);
         }
 

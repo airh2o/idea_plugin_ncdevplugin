@@ -35,7 +35,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -202,7 +201,7 @@ public class PatcherDialog extends DialogWrapper {
 
             JLabel label_5 = new JBLabel("强制指定导出使用的NC版本:");
             ncVersion = new JComboBox<NcVersionEnum>(NcVersionEnum.values());
-            ncVersion.setSelectedItem(ProjectNCConfigUtil.getNCVerSIon());
+            ncVersion.setSelectedItem(ProjectNCConfigUtil.getNCVersion());
             JBPanel panel4 = new JBPanel();
             //  panel4.setBorder(LineBorder.createGrayLineBorder());
             panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
@@ -326,13 +325,19 @@ public class PatcherDialog extends DialogWrapper {
             qdp.add(panel2);
 
             JLabel label_4 = new JBLabel("强制IDEA连接数据库导出SQL使用NC配置的数据源第几个(0开始):");
-            List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS();
-            dataSourceIndex = new JComboBox(new Vector(
-                    dataSourceVOS.stream()
-                            .map(v -> v.getDataSourceName() + '/' + v.getUser())
-                            .collect(Collectors.toList())
-            ));
-            dataSourceIndex.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue("data_source_index"), 0));
+            try {
+                List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS(event.getProject());
+                dataSourceIndex = new JComboBox(new Vector(
+                        dataSourceVOS.stream()
+                                .map(v -> v.getDataSourceName() + '/' + v.getUser())
+                                .collect(Collectors.toList())
+                ));
+                dataSourceIndex.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue(
+                        "data_source_index"), 0));
+            } catch (Exception e) {
+                e.printStackTrace();
+                LogUtil.error(e.getMessage(), e);
+            }
             qdp.add(dataSourceIndex);
             JButton button_TestDb = new JButton("测试连接");
             button_TestDb.addActionListener(new ActionListener() {

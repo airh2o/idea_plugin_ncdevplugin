@@ -502,7 +502,7 @@ public class ProjectNCConfigUtil {
      *
      * @return
      */
-    public static NcVersionEnum getNCVerSIon() {
+    public static NcVersionEnum getNCVersion() {
         //先看看是否配置文件强行指定了NC版本！
         String version = getConfigValue("nc.version");
         if (StringUtil.isNotEmpty(version)) {

@@ -10,8 +10,8 @@ import java.io.File;
  */
 public class MakeBmf41zBillAction extends AbstractMakeBmfAction {
     @Override
-    public String getBmfTemplateStr() {
-        return getResourceTemplates("singleHdemo.bmf");
+    public String getBmfTemplateName() {
+        return "singleHdemo.bmf";
     }
 
     @Override

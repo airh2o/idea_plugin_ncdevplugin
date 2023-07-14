@@ -22,7 +22,7 @@ public abstract class AbstractMakeBmfAction extends AbstractIdeaAction {
         Module module = LangDataKeys.MODULE.getData(e.getDataContext());
 
         String moduleName = "";
-        String template = getBmfTemplateStr();
+        String template = getBmfTemplateName();
         File path = null;
 
         if (module != null) {
@@ -48,11 +48,7 @@ public abstract class AbstractMakeBmfAction extends AbstractIdeaAction {
         dialog.show();
     }
 
-    public String getResourceTemplates(String name) {
-        return ProjectUtil.getResourceTemplatesUtf8Txt(name);
-    }
-
-    public abstract String getBmfTemplateStr();
+    public abstract String getBmfTemplateName();
 
     public abstract int getType();
 }

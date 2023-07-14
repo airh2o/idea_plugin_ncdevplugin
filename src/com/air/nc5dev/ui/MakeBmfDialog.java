@@ -1,15 +1,19 @@
 package com.air.nc5dev.ui;
 
+import cn.hutool.core.util.StrUtil;
+import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.BmfUtil;
 import com.air.nc5dev.util.ExceptionUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
+import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.components.*;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
-import org.tangsu.mstsc.dao.BaseDao;
 
 import javax.swing.*;
 
@@ -41,7 +45,7 @@ public class MakeBmfDialog extends DialogWrapper {
     JBTextField textField_defnum;
     JBTextField textField_defnumPerfix;
     JBTextField textField_path;
-
+    JComboBox comboBox_version;
 
     public MakeBmfDialog(Project project, int type, String module, String template, String path) {
         super(project);
@@ -56,15 +60,6 @@ public class MakeBmfDialog extends DialogWrapper {
     }
 
     @Override
-    public void doCancelAction() {
-        super.doCancelAction();
-    }
-
-    public JComponent getContentPane() {
-        return createCenterPanel();
-    }
-
-    @Override
     protected void doOKAction() {
         int updateClassPath = Messages.showYesNoDialog(
                 "是否继续?"
@@ -76,6 +71,22 @@ public class MakeBmfDialog extends DialogWrapper {
         Exception ex = null;
 
         try {
+            String templateStr = null;
+            NcVersionEnum ncVersionEnum = (NcVersionEnum) comboBox_version.getSelectedItem();
+            if (NcVersionEnum.NCC.equals(ncVersionEnum)) {
+                templateStr = ProjectUtil.getResourceTemplatesUtf8Txt("meta/ncc/" + template);
+            } else if (NcVersionEnum.NC6.equals(ncVersionEnum)) {
+                templateStr = ProjectUtil.getResourceTemplatesUtf8Txt("meta/6/" + template);
+            }else if (NcVersionEnum.NC5.equals(ncVersionEnum)) {
+                templateStr = ProjectUtil.getResourceTemplatesUtf8Txt("meta/5/" + template);
+            }else if (NcVersionEnum.U8Cloud.equals(ncVersionEnum)) {
+                templateStr = ProjectUtil.getResourceTemplatesUtf8Txt("meta/5/" + template);
+            }
+
+            if (StringUtil.isBlank(templateStr)) {
+                throw new RuntimeException("不支持的NC版本(也许你可以试试用NC6的元数据看看是否通用):" + ncVersionEnum);
+            }
+
             BmfUtil.builder()
                     .billname(textField_billtypename.getText().trim())
                     .billtype(textField_billtype.getText().trim())
@@ -84,8 +95,9 @@ public class MakeBmfDialog extends DialogWrapper {
                     .langcode(textField_langCode.getText().trim())
                     .modulecode(textField_module.getText().trim())
                     .outfilepath(textField_path.getText().trim())
-                    .template(template)
+                    .template(templateStr)
                     .type(type)
+                    .versionEnum(ncVersionEnum)
                     .build().newbmf();
         } catch (Exception e) {
             ex = e;
@@ -129,6 +141,14 @@ public class MakeBmfDialog extends DialogWrapper {
             panel_info = jtab;
             panel_info.setLayout(null);
             panel_info.setBounds(0, 0, width, height);
+
+            label = new JBLabel("NC版本:");
+            label.setBounds(x, y += h + 2, w, h);
+            panel_info.add(label);
+            comboBox_version = new JComboBox<NcVersionEnum>(NcVersionEnum.values());
+            comboBox_version.setSelectedItem(ProjectNCConfigUtil.getNCVersion());
+            comboBox_version.setBounds(x, y += h + 2, w, h);
+            panel_info.add(comboBox_version);
 
             label = new JBLabel("模块:");
             label.setBounds(x, y += h + 2, w, h);
@@ -202,4 +222,12 @@ public class MakeBmfDialog extends DialogWrapper {
         dispose();
     }
 
+    @Override
+    public void doCancelAction() {
+        super.doCancelAction();
+    }
+
+    public JComponent getContentPane() {
+        return createCenterPanel();
+    }
 }

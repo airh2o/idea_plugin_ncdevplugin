@@ -124,7 +124,7 @@ public class NCImportCheckImpl extends AbstarctCheckImpl {
                         continue;
                     }
                 } else if ("nc.bs.framework.common.NCLocator".equals(line)) {
-                    if (FROM_CLIENT == fileFrom && NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVerSIon())) {
+                    if (FROM_CLIENT == fileFrom && NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion())) {
                         violation = new Violation(i + 1
                                 , lines[i].length()
                                 , lines[i].length()

@@ -2,6 +2,7 @@ package com.air.nc5dev.util;
 
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.NCDataSourceVO;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
@@ -37,10 +38,6 @@ public class NCPropXmlUtil {
     /****  配置的 数据源列表 ****/
     private static List<NCDataSourceVO> dataSourceVOS;
 
-    static {
-        loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
-    }
-
     /***
      *    是否 数据源为空，true空！       </br>
      *     1.还没有读取数据源       </br>
@@ -52,7 +49,17 @@ public class NCPropXmlUtil {
      * @return boolean
      */
     public static final boolean isDataSourceEmpty() {
+        init(null);
+
         return null == dataSourceVOS || dataSourceVOS.isEmpty();
+    }
+
+    public static void init(Project project) {
+        if (project != null) {
+            ProjectUtil.setProject(project);
+        }
+
+        loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
     }
 
     /***
@@ -108,6 +115,8 @@ public class NCPropXmlUtil {
      * @return java.util.stream.DoubleStream
      */
     public static final Stream<NCDataSourceVO> stream() {
+        init(null);
+
         return dataSourceVOS.stream();
     }
 
@@ -122,6 +131,8 @@ public class NCPropXmlUtil {
      * @return void
      */
     public static void add(NCDataSourceVO ds) {
+        init(null);
+
         if (null == dataSourceVOS) {
             dataSourceVOS = new ArrayList<>();
         }
@@ -154,7 +165,7 @@ public class NCPropXmlUtil {
 
         final String propPath =
                 StringUtil.isEmpty(ProjectNCConfigUtil.getConfigValue(ProjectNCConfigUtil.KEY_PROJECT_NC_CONFIG_PROP_PATH))
-                ? DEFUAL_NC_PROP_PATH :
+                        ? DEFUAL_NC_PROP_PATH :
                         ProjectNCConfigUtil.getConfigValue(ProjectNCConfigUtil.KEY_PROJECT_NC_CONFIG_PROP_PATH);
 
         File prop = new File(ncHomeFile, propPath);
@@ -280,6 +291,14 @@ public class NCPropXmlUtil {
     }
 
     public static List<NCDataSourceVO> getDataSourceVOS() {
+        init(null);
+
+        return dataSourceVOS;
+    }
+
+    public static List<NCDataSourceVO> getDataSourceVOS(Project project) {
+        init(project);
+
         return dataSourceVOS;
     }
 
