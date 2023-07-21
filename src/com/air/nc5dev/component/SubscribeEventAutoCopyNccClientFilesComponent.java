@@ -4,6 +4,7 @@ import com.air.nc5dev.listeners.NCModuleInitModuleBuilderListenerImpl;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.ProjectTopics;
 import com.intellij.compiler.server.BuildManagerListener;
+import com.intellij.compiler.server.CustomBuilderMessageHandler;
 import com.intellij.debugger.impl.DebuggerManagerListener;
 import com.intellij.execution.ui.RunContentManager;
 import com.intellij.openapi.application.ApplicationManager;
@@ -50,6 +51,7 @@ public class SubscribeEventAutoCopyNccClientFilesComponent implements Applicatio
 
                 //监听编译动作
                 connection.subscribe(BuildManagerListener.TOPIC, manager);
+                connection.subscribe(CustomBuilderMessageHandler.TOPIC, manager);
                 //监听debug run动作
                 connection.subscribe(DebuggerManagerListener.TOPIC, manager);
                 //监听其他 运行

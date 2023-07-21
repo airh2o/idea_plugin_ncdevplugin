@@ -52,31 +52,31 @@ public class ProjectOpenListener implements StartupActivity.DumbAware {
             ProjectNCConfigUtil.setNCConfigPropertice("what_new_showed", "Y");
             ProjectNCConfigUtil.saveConfig2File(project);
         }
-//        try {
-//
-//            ProjectUtil.setProject(project);
-//            ProjectNCConfigUtil.initConfigFile(project);
-//            if (StringUtil.isBlank(ProjectNCConfigUtil.getNCHomePath())) {
-//                //没有配置NC home！
-//                return;
-//            }
-//
+        try {
+            ProjectUtil.setProject(project);
+            ProjectNCConfigUtil.initConfigFile(project);
+            if (StringUtil.isBlank(ProjectNCConfigUtil.getNCHomePath())) {
+                //没有配置NC home！
+            //    return;
+            }
+
 //            int re = Messages.showYesNoDialog("是否自动生成整个项目的结构和NC默认文件夹?"
 //                    , "询问", Messages.getQuestionIcon());
 //            if (re != Messages.OK) {
 //                return;
 //            }
-//
-//            run(project);
-//        } catch (Throwable e) {
-//            //不要弹框报错！
-//            try {
-//                IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class, project);
-//                service.getConsoleView().print(ExceptionUtil.getExcptionDetall(e) + "\n",
-//                        ConsoleViewContentType.ERROR_OUTPUT);
-//            } catch (Throwable ex) {
-//            }
-//        }
+
+            run(project);
+        } catch (Throwable e) {
+            //不要弹框报错！
+            try {
+                IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class, project);
+                service.getConsoleView().print(ExceptionUtil.getExcptionDetall(e) + "\n",
+                        ConsoleViewContentType.ERROR_OUTPUT);
+            } catch (Throwable ex) {
+            }
+        }
+
     }
 
     public static void run(@NotNull Project project) {

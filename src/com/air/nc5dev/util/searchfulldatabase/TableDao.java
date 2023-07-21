@@ -1,5 +1,6 @@
 package com.air.nc5dev.util.searchfulldatabase;
 
+import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.NCPropXmlUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
@@ -45,7 +46,7 @@ public class TableDao {
         Statement st = null;
         ResultSet rs = null;
         ResultSet rsContent = null;
-        String sql;
+        String sql = null;
         try {
             st = conn.createStatement();
             SearchResultVO searchResult;
@@ -86,74 +87,52 @@ public class TableDao {
 
                 allColumNames = tableColumsMap.get(taskFather.getConfig().getDataSource().getDatabaseUrl()
                         + ':' + taskFather.getConfig().getDataSource().getUser() + ':' + tab);
-                if (allColumNames == null) {
-                    allColumNames = new ArrayList<>(500);
-                    tableColumsMap.put(taskFather.getConfig().getDataSource().getDatabaseUrl()
-                            + ':' + taskFather.getConfig().getDataSource().getUser() + ':' + tab, allColumNames);
-                    rs = st.executeQuery(String.format("select * from %s where 1=2 ", tab));
-                    metaData = rs.getMetaData();
-                    int columCount = metaData.getColumnCount();
-                    columNames = new ArrayList<>(columCount);
-                    for (int columIndex = 1; columIndex <= columCount; columIndex++) {
-                        if (!metaData.isSearchable(columIndex)
-                            //    ||
-                        ) {
-                            //跳过 不能对比字符串的类型列
-                            continue;
+                try {
+                    if (allColumNames == null) {
+                        allColumNames = new ArrayList<>(500);
+                        tableColumsMap.put(taskFather.getConfig().getDataSource().getDatabaseUrl()
+                                + ':' + taskFather.getConfig().getDataSource().getUser() + ':' + tab, allColumNames);
+                        rs = st.executeQuery(String.format("select * from %s where 1=2 ", tab));
+                        metaData = rs.getMetaData();
+                        int columCount = metaData.getColumnCount();
+                        columNames = new ArrayList<>(columCount);
+                        for (int columIndex = 1; columIndex <= columCount; columIndex++) {
+                            if (!metaData.isSearchable(columIndex)
+                                //    ||
+                            ) {
+                                //跳过 不能对比字符串的类型列
+                                continue;
+                            }
+                            allColumNames.add(metaData.getColumnName(columIndex));
                         }
-                        allColumNames.add(metaData.getColumnName(columIndex));
+
+                        if (rs != null && !rs.isClosed()) {
+                            rs.close();
+                        }
                     }
 
-                    if (rs != null && !rs.isClosed()) {
-                        rs.close();
+                    columNames.clear();
+                    for (String columnName : allColumNames) {
+                        if (notHas(taskFather.getConfig().getSkipColumns(), columnName)) {
+                            columNames.add(columnName);
+                        }
                     }
-                }
 
-                columNames.clear();
-                for (String columnName : allColumNames) {
-                    if (notHas(taskFather.getConfig().getSkipColumns(), columnName)) {
-                        columNames.add(columnName);
-                    }
-                }
-
-                if (isFast()) {
+                    if (isFast()) {
 //                    System.out.println("快速模式搜索表: " + tab);
-                    if (text.startsWith("{}:")) {
-                        sql = text
-                                .replace("{table}", tab)
-                                .replace("{where}", inSql(whereContent, columNames))
-                        ;
-                    } else {
-                        sql = sql_QueryContent + tab + where + " " + inSql(whereContent, columNames);
-                    }
-
-                    rsContent = st.executeQuery(appendLimitSql(sql));
-                    if (rsContent.next()) {
-                        searchResult = new SearchResultVO();
-                        searchResult.setField("");
-                        searchResult.setTable(tab);
-                        searchResult.setSql("select * " + sql);
-                        searchResult.setRow(re.size() + 1);
-                        re.add(searchResult);
-                        taskFather.addSearchResult(searchResult);
-                    }
-                    rsContent.close();
-                } else {
-                    for (String columName : columNames) {
-//                        System.out.println("搜索表: " + tab + " 中列: " + columName);
                         if (text.startsWith("{}:")) {
                             sql = text
                                     .replace("{table}", tab)
-                                    .replace("{colum}", columName)
+                                    .replace("{where}", inSql(whereContent, columNames))
                             ;
                         } else {
-                            sql = sql_QueryContent + tab + where + columName + whereContent;
+                            sql = sql_QueryContent + tab + where + " " + inSql(whereContent, columNames);
                         }
 
                         rsContent = st.executeQuery(appendLimitSql(sql));
                         if (rsContent.next()) {
                             searchResult = new SearchResultVO();
-                            searchResult.setField(columName);
+                            searchResult.setField("");
                             searchResult.setTable(tab);
                             searchResult.setSql("select * " + sql);
                             searchResult.setRow(re.size() + 1);
@@ -161,17 +140,49 @@ public class TableDao {
                             taskFather.addSearchResult(searchResult);
                         }
                         rsContent.close();
+                    } else {
+                        for (String columName : columNames) {
+//                        System.out.println("搜索表: " + tab + " 中列: " + columName);
+                            if (text.startsWith("{}:")) {
+                                sql = text
+                                        .replace("{table}", tab)
+                                        .replace("{colum}", columName)
+                                ;
+                            } else {
+                                sql = sql_QueryContent + tab + where + columName + whereContent;
+                            }
+
+                            rsContent = st.executeQuery(appendLimitSql(sql));
+                            if (rsContent.next()) {
+                                searchResult = new SearchResultVO();
+                                searchResult.setField(columName);
+                                searchResult.setTable(tab);
+                                searchResult.setSql("select * " + sql);
+                                searchResult.setRow(re.size() + 1);
+                                re.add(searchResult);
+                                taskFather.addSearchResult(searchResult);
+                            }
+                            rsContent.close();
+                        }
                     }
-                }
-                if (rs != null && !rs.isClosed()) {
-                    rs.close();
+                    if (rs != null && !rs.isClosed()) {
+                        rs.close();
+                    }
+                } catch (Throwable e) {
+                    searchResult = new SearchResultVO();
+                    searchResult.setField("执行错误");
+                    searchResult.setTable(tab);
+                    searchResult.setSql(sql + ExceptionUtil.stacktraceToString(e, 25));
+                    searchResult.setRow(re.size() + 1);
+                    re.add(searchResult);
+                    taskFather.addSearchResult(searchResult);
                 }
             }
             if (st != null && !st.isClosed()) {
                 st.close();
             }
         } catch (Throwable e) {
-            taskFather.finalshError("发生错误终止搜索: " + e + (e.getCause() != null ? e.getCause().toString() : ""));
+            taskFather.finalshError("发生错误终止搜索: " + ExceptionUtil.stacktraceToString(e, 25));
             e.printStackTrace();
             return re;
         } finally {
@@ -186,7 +197,7 @@ public class TableDao {
                     rsContent.close();
                 }
             } catch (Throwable e) {
-                taskFather.finalshError("发生错误终止搜索: " + e + (e.getCause() != null ? e.getCause().toString() : ""));
+                taskFather.finalshError("发生错误终止搜索: " + ExceptionUtil.stacktraceToString(e, 25));
                 e.printStackTrace();
             }
         }

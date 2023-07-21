@@ -10,6 +10,7 @@ import com.air.nc5dev.util.idea.ProjectUtil;
 import com.google.common.collect.Lists;
 import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.ex.*;
+import com.intellij.compiler.server.CustomBuilderMessageHandler;
 import com.intellij.debugger.impl.DebuggerManagerListener;
 import com.intellij.debugger.impl.DebuggerSession;
 import com.intellij.execution.Executor;
@@ -41,7 +42,8 @@ import java.util.function.Supplier;
 
 
 public class BuildManagerListenerImpl implements com.intellij.compiler.server.BuildManagerListener
-        , DebuggerManagerListener, RunContentWithExecutorListener, XDebuggerManagerListener {
+        , DebuggerManagerListener, RunContentWithExecutorListener, XDebuggerManagerListener,
+        CustomBuilderMessageHandler {
     private static BuildManagerListenerImpl instance;
 
     public static BuildManagerListenerImpl getInstance() {
@@ -156,6 +158,11 @@ public class BuildManagerListenerImpl implements com.intellij.compiler.server.Bu
         });
     }
 
+    @Override
+    public void messageReceived(String s, String s1, String s2) {
+
+    }
+
     public static class FindChildFiles extends VirtualFileVisitor {
 
         private final VirtualFile virtualFile;
@@ -184,7 +191,8 @@ public class BuildManagerListenerImpl implements com.intellij.compiler.server.Bu
     public static Map<Object, LocalInspectionToolWrapper> localInspectionToolWrapperMap = new ConcurrentHashMap<>();
 
     public static GlobalInspectionContextImpl createGlobalInspectionContextImpl(Project project) {
-        InspectionProfileImpl inspectionProfile = (InspectionProfileImpl) InspectionProjectProfileManager.getInstance(project).getInspectionProfile();
+        InspectionProfileImpl inspectionProfile =
+                (InspectionProfileImpl) InspectionProjectProfileManager.getInstance(project).getInspectionProfile();
 
         InspectionManagerEx inspectionManagerEx = (InspectionManagerEx) InspectionManager.getInstance(project);
         NCInspectionContextImpl ncInspectionContext = new NCInspectionContextImpl(project
@@ -230,7 +238,7 @@ public class BuildManagerListenerImpl implements com.intellij.compiler.server.Bu
 
     @Override
     public void contentRemoved(@Nullable RunContentDescriptor runContentDescriptor, @NotNull Executor executor) {
-
+        doTask(null);
     }
 
     @Override

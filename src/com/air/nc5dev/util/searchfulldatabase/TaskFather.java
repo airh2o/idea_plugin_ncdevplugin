@@ -1,5 +1,6 @@
 package com.air.nc5dev.util.searchfulldatabase;
 
+import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import lombok.Data;
@@ -105,7 +106,7 @@ public class TaskFather {
             threadPool.shutdown();
             setMsg("当前正在搜索中线程数: " + threadPool.getActiveCount());
         } catch (Throwable e) {
-            finalshError("发生错误终止搜索: " + e);
+            finalshError("发生错误终止搜索: "+ ExceptionUtil.stacktraceToString(e, 25));
             e.printStackTrace();
         }
     }
@@ -160,7 +161,7 @@ public class TaskFather {
             stopAll();
             checkState();
         } catch (Throwable e) {
-            finalshError("发生错误终止搜索: " + e);
+            finalshError("发生错误终止搜索: " + ExceptionUtil.stacktraceToString(e, 25));
             e.printStackTrace();
         }
     }
