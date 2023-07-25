@@ -48,7 +48,7 @@ public class BmfUtil {
      * @return thx
      * 2013-3-4
      */
-    public org.dom4j.Document str2Xml(String xmlStr) {// Str是传入的一段XML内容的字符串
+    public static org.dom4j.Document str2Xml(String xmlStr) {// Str是传入的一段XML内容的字符串
         org.dom4j.Document document = null;
         try {
             byte[] b = xmlStr.getBytes("UTF-8");

@@ -239,8 +239,6 @@
              </group>-->
             <separator/>
 
-            <reference ref="nc5dev.info.deletenclogs"/>
-            <reference ref="nc5dev.info.copyMateFile2NewFile"/>
             <group id="nc5devtoolMatabmfEdit" text="快速新增元数据文件"
                    popup="true" description="快速新增一个全新的元数据文件-根据常用的类型模板">
                 <reference ref="nc5dev.info.meta.MakeBmf4OneHeadOneBodyBillAction"/>
@@ -249,6 +247,8 @@
                 <reference ref="nc5dev.info.meta.MakeBmf4skBillAction"/>
                 <reference ref="nc5dev.info.meta.MakeBmf4Lfw1z1zBillAction"/>
                 <reference ref="nc5dev.info.meta.TakeBmfFromDatabaseAction"/>
+
+                <reference ref="nc5dev.info.copyMateFile2NewFile"/>
             </group>
             <group id="nc5devtoolExportBillAll" text="导出已有节点单据SQL脚本"
                    popup="true" description="导出已有节点单据SQL脚本">
@@ -256,19 +256,28 @@
             </group>
             <separator/>
 
-            <reference ref="nc5dev.info.opennchome"/>
-            <reference ref="nc5dev.info.opennchomeierpbin"/>
-            <reference ref="nc5dev.info.openncconfigwindow"/>
-            <reference ref="nc5dev.info.opennclogconfigfile"/>
-            <reference ref="nc5dev.info.openncdataconfigfile"/>
-            <reference ref="nc5dev.info.OpenNCCDevWebAction"/>
-            <reference ref="nc5dev.info.OpenNCCUIWebAction"/>
-            <reference ref="nc5dev.info.OpenCopyWebAction"/>
-            <reference ref="nc5dev.info.OpenYonbipDevWebAction"/>
-            <reference ref="nc5dev.info.SearchFullDataBaseAction"/>
-            <reference ref="nc5dev.info.MstscManggerUIAction"/>
-            <reference ref="nc5dev.info.MstscOpenLastAction"/>
-            <reference ref="nc5dev.info.NCCJsonDecodeAction"/>
+            <group id="nc5devtoolOtherTools" text="其他小功能"
+                   popup="true" description="其他小功能">
+                <reference ref="nc5dev.info.deletenclogs"/>
+                <reference ref="nc5dev.info.opennchome"/>
+                <reference ref="nc5dev.info.opennchomeierpbin"/>
+                <reference ref="nc5dev.info.openncconfigwindow"/>
+                <reference ref="nc5dev.info.opennclogconfigfile"/>
+                <reference ref="nc5dev.info.openncdataconfigfile"/>
+                <reference ref="nc5dev.info.OpenNCCDevWebAction"/>
+                <reference ref="nc5dev.info.OpenNCCUIWebAction"/>
+                <reference ref="nc5dev.info.OpenCopyWebAction"/>
+                <reference ref="nc5dev.info.OpenYonbipDevWebAction"/>
+                <reference ref="nc5dev.info.SearchFullDataBaseAction"/>
+                <reference ref="nc5dev.info.MstscManggerUIAction"/>
+                <reference ref="nc5dev.info.MstscOpenLastAction"/>
+                <reference ref="nc5dev.info.NCCJsonDecodeAction"/>
+
+                <reference ref="nc5dev.info.JavadocGenerateAction"/>
+                <reference ref="GenerateGetSetAction"/>
+                <reference ref="GenerateGetAction"/>
+                <reference ref="GenerateSetAction"/>
+            </group>
             <separator/>
 
             <reference ref="nc5dev.info.openjconsole"/>
@@ -293,11 +302,8 @@
             <reference ref="nc5dev.info.help"/>
             <separator/>
 
-            <reference ref="nc5dev.info.JavadocGenerateAction"/>
             <reference ref="SerializeGenerator"/>
-            <reference ref="GenerateGetSetAction"/>
-            <reference ref="GenerateGetAction"/>
-            <reference ref="GenerateSetAction"/>
+
             <!--            <reference ref="NCCodeCheckAction"/>-->
             <separator/>
 
