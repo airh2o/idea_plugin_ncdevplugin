@@ -1,6 +1,9 @@
 package com.air.nc5dev.nccrequstsearch;
 
 
+import com.air.nc5dev.ui.actionurlsearch.ActionResultDTO;
+import com.air.nc5dev.ui.actionurlsearch.ActionResultListTable;
+import com.air.nc5dev.util.ReflectUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.NCCActionInfoVO;
@@ -9,8 +12,10 @@ import com.intellij.ide.IdeEventQueue;
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereManager;
 import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider;
 import com.intellij.ide.util.gotoByName.FilteringGotoByModel;
+import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -37,7 +42,7 @@ public class RequestMappingModel extends FilteringGotoByModel implements DumbAwa
     AnActionEvent e;
     volatile String info;
 
-    public RequestMappingModel(@NotNull Project project, @NotNull List list, AnActionEvent e) {
+    public RequestMappingModel(@NotNull Project project, @NotNull List<ChooseByNameContributor> list, AnActionEvent e) {
         super(project, list);
         this.e = e;
     }
@@ -62,7 +67,7 @@ public class RequestMappingModel extends FilteringGotoByModel implements DumbAwa
     @NotNull
     @Override
     public String getNotInMessage() {
-        return StringUtil.isBlank(info) ?  "搜索完成" : info;
+        return StringUtil.isBlank(info) ? "搜索完成" : info;
     }
 
     @NotNull
@@ -96,23 +101,9 @@ public class RequestMappingModel extends FilteringGotoByModel implements DumbAwa
     @Nullable
     @Override
     public String getFullName(@NotNull Object o) {
-        String name = o instanceof NCCActionInfoVO ? ((NCCActionInfoVO) o).getClazz().trim() : getElementName(o);
-        if (StringUtil.isNotBlank(name)) {
-            //打开 class文件
-            Project project = ProjectUtil.getDefaultProject();
-            SearchEverywhereManager seManager = SearchEverywhereManager.getInstance(project);
-
-            FeatureUsageTracker.getInstance().triggerFeatureUsed("SearchEverywhere");
-           /* FeatureUsageData data = SearchEverywhereUsageTriggerCollector
-                    .createData("ClassSearchEverywhereContributor")
-                    .addInputEvent(e);
-            SearchEverywhereUsageTriggerCollector.trigger(project, "dialogOpen", data);
-*/
-            IdeEventQueue.getInstance().getPopupManager().closeAllPopups(false);
-            seManager.show("ClassSearchEverywhereContributor", name, e);
-        }
-
-        return null;
+        NCCActionInfoVO v = (NCCActionInfoVO) o;
+        ActionResultListTable.openClass(null, getProject(), ReflectUtil.copy2VO(v, ActionResultDTO.class));
+        return v.getClazz();
     }
 
     @Override

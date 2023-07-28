@@ -13,7 +13,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 public class AddProjectNCRunConfig extends AbstractIdeaAction {
     @Override
     protected void doHandler(AnActionEvent e) {
-        if (!ProjectNCConfigUtil.getNCHome().exists()) {
+        if (!ProjectNCConfigUtil.hasSetNCHOME()) {
             ProjectUtil.warnNotification("未配置NC HOME 无法执行此操作！ ", e.getProject());
             return;
         }

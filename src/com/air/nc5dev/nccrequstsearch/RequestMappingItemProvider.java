@@ -4,6 +4,7 @@ import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.NCCActionRefreshUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
+import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.NCCActionInfoVO;
 import com.intellij.ide.util.gotoByName.ChooseByNameBase;
 import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider;
@@ -97,7 +98,6 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         FindSymbolParameters parameters = new FindSymbolParameters(inputStr, inputStr, searchScope, null);*/
 
         List<NCCActionInfoVO> vos = search(chooseByNameBase, inputStr, everywhere, cancelled, processor);
-
         cancelled.checkCanceled();
         if (!com.intellij.util.containers.ContainerUtil.process(vos, processor)) {
             return false;
@@ -113,6 +113,7 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             chooseByNameBase.getProject().putUserData(ChooseByNamePopup.CURRENT_SEARCH_PATTERN, inputStr);
         }
 
+        ProjectUtil.setProject(chooseByNameBase.getProject());
         List<NCCActionInfoVO> vos = search(chooseByNameBase.getProject(), inputStr, everywhere, cancelled, processor);
 
         cancelled.checkCanceled();

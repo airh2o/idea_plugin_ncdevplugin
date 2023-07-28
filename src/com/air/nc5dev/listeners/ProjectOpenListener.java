@@ -2,6 +2,7 @@ package com.air.nc5dev.listeners;
 
 import com.air.nc5dev.acion.HelpMeAction;
 import com.air.nc5dev.component.SubscribeEventAutoCopyNccClientFilesComponent;
+import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
 import com.air.nc5dev.service.ui.IMeassgeConsole;
 import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.IdeaProjectGenerateUtil;
@@ -52,12 +53,13 @@ public class ProjectOpenListener implements StartupActivity.DumbAware {
             ProjectNCConfigUtil.setNCConfigPropertice("what_new_showed", "Y");
             ProjectNCConfigUtil.saveConfig2File(project);
         }
+
         try {
             ProjectUtil.setProject(project);
             ProjectNCConfigUtil.initConfigFile(project);
             if (StringUtil.isBlank(ProjectNCConfigUtil.getNCHomePath())) {
                 //没有配置NC home！
-            //    return;
+                return;
             }
 
 //            int re = Messages.showYesNoDialog("是否自动生成整个项目的结构和NC默认文件夹?"
@@ -67,6 +69,8 @@ public class ProjectOpenListener implements StartupActivity.DumbAware {
 //            }
 
             run(project);
+
+            RequestMappingItemProvider.getMe().initScan(project);
         } catch (Throwable e) {
             //不要弹框报错！
             try {
@@ -96,6 +100,10 @@ public class ProjectOpenListener implements StartupActivity.DumbAware {
     }
 
     public static void autoCreateNCSrcDirs(Project project) {
+        if (!ProjectNCConfigUtil.hasSetNCHOME(project)) {
+            return;
+        }
+
         IdeaProjectGenerateUtil.generateSrcDir(project);
     }
 }

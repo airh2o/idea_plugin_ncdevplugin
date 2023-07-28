@@ -423,6 +423,7 @@
             <add-to-group group-id="MainMenu" anchor="before" relative-to-action="HelpMenu"/>
             <add-to-group group-id="MainToolBar" anchor="last"/>
         </group>
+
     </actions>
 
     <!-- 已经使用打开项目后初始化监听的方式   <application-components>
@@ -465,7 +466,7 @@
         <!--            <className>com.air.nc5dev.acion.GenerateAllSetterAction</className>-->
         <!--        </intentionAction>-->
 
-        <!--      <searchEverywhereContributor implementation="com.air.nc5dev.nccrequstsearch.RequestMappingGoToContributor"/>-->
+<!--        <searchEverywhereContributor implementation="com.air.nc5dev.nccrequstsearch.RequestMappingGoToContributor"/>-->
 
         <!--        日志-->
         <notificationGroup id="com.air.nc5dev.tool.plugin.nc5devtool" displayType="STICKY_BALLOON"/>
@@ -540,6 +541,7 @@
         <notificationGroup displayType="NONE"
                            id="CheckStyleIDEALogOnlyGroup"
                            key="plugin.notification.logging"/>
+
 
     </extensions>
 

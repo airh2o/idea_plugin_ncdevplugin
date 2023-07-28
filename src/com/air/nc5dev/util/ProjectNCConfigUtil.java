@@ -69,6 +69,26 @@ public class ProjectNCConfigUtil {
         return new File(configValue);
     }
 
+    public static boolean hasSetNCHOME(Project project) {
+        ProjectUtil.setProject(project);
+        initConfigFile(project);
+
+        return hasSetNCHOME();
+    }
+
+    public static boolean hasSetNCHOME() {
+        File f = getNCHome();
+        if (f == null) {
+            return false;
+        }
+
+        if (f.exists()) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * 获取 NC主目录        </br>
      * </br>
@@ -543,7 +563,7 @@ public class ProjectNCConfigUtil {
 
     /**
      * NC是否为行业版
-     * 
+     *
      * @return
      */
     public static boolean isHyVersion() {

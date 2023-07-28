@@ -72,6 +72,7 @@ import org.tangsu.mstsc.ui.MainPanel;
 
 import javax.swing.*;
 import javax.swing.table.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -79,6 +80,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.InputStream;
 import java.util.*;
+import java.util.List;
 
 @Getter
 public class ActionResultListTable extends JBTable {
@@ -108,7 +110,7 @@ public class ActionResultListTable extends JBTable {
         ActionResultDTO vo = getDataOfRow(row);
         if (column == -111115) {
             try {
-                VirtualFile file = findClassFile(vo);
+                VirtualFile file = findClassFile(getNccActionURLSearchUI().project, vo);
                 if (file == null) {
                     return txt;
                 }
@@ -267,17 +269,21 @@ public class ActionResultListTable extends JBTable {
         openFile(getNccActionURLSearchUI().getProject(), virtualFile, re.getAuth_row(), re.getAuth_column());
     }
 
-    public void searchClass(ActionResultDTO vo) {
+    public static void searchClass(ActionResultListTable table, Project project, ActionResultDTO vo) {
         if (vo == null) {
             return;
         }
 
-        SearchEverywhereManager seManager = SearchEverywhereManager.getInstance(nccActionURLSearchUI.getProject());
+        SearchEverywhereManager seManager = SearchEverywhereManager.getInstance(project);
         FeatureUsageTracker.getInstance().triggerFeatureUsed("SearchEverywhere");
         IdeEventQueue.getInstance().getPopupManager().closeAllPopups(false);
-        DataContext dataContext = DataManager.getInstance().getDataContext(nccActionURLSearchUI.createUI());
+        Component c = null;
+        if (table != null) {
+            c = table.getNccActionURLSearchUI().createUI();
+        }
+        DataContext dataContext = DataManager.getInstance().getDataContext(c);
         AnActionEvent anActionEvent = new AnActionEvent(null, dataContext
-                , this.getClass().getSimpleName(), new Presentation()
+                , ActionResultListTable.class.getSimpleName(), new Presentation()
                 , ActionManager.getInstance(), 0);
         seManager.show("ClassSearchEverywhereContributor", vo.getClazz(), anActionEvent);
     }
@@ -337,7 +343,7 @@ public class ActionResultListTable extends JBTable {
                 openClass.setEnabled(vo != null && StringUtil.isNotBlank(vo.getClazz()));
                 openClass.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        table.openClass(vo);
+                        table.openClass(table, table.getNccActionURLSearchUI().project, vo);
                     }
                 });
 
@@ -356,7 +362,7 @@ public class ActionResultListTable extends JBTable {
                 searchClass.setEnabled(vo != null && StringUtil.isNotBlank(vo.getClazz()));
                 searchClass.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        table.searchClass(vo);
+                        table.searchClass(table, table.getNccActionURLSearchUI().project, vo);
                     }
                 });
 
@@ -509,14 +515,14 @@ public class ActionResultListTable extends JBTable {
         });
     }
 
-    public VirtualFile findClassFile(ActionResultDTO vo) {
+    public static VirtualFile findClassFile(Project project, ActionResultDTO vo) {
         String path = null;
         vo.setClazz(StrUtil.trim(vo.getClazz()));
         //搜索 工程里的Java文件!
         String clz = vo.getClazz().substring(vo.getClazz().lastIndexOf('.') + 1);
         String classPt = StrUtil.replace(vo.getClazz(), ".", File.separator);
         String classPtDir = classPt.substring(0, classPt.lastIndexOf(File.separator));
-        Module[] modules = ModuleManager.getInstance(getNccActionURLSearchUI().getProject()).getModules();
+        Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules) {
             VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
             for (VirtualFile sourceRoot : sourceRoots) {
@@ -569,7 +575,7 @@ public class ActionResultListTable extends JBTable {
         if (path == null) {
             //我要是用大招了， 全局拉一边jar
             Map<String, NCCActionInfoVO> map =
-                    RequestMappingItemProvider.ALL_ACTIONS.get(RequestMappingItemProvider.getKey(getNccActionURLSearchUI().getProject()));
+                    RequestMappingItemProvider.ALL_ACTIONS.get(RequestMappingItemProvider.getKey(project));
             if (CollUtil.isNotEmpty(map)) {
                 Collection<NCCActionInfoVO> vs = map.values();
                 for (NCCActionInfoVO v : vs) {
@@ -612,7 +618,7 @@ public class ActionResultListTable extends JBTable {
         return null;
     }
 
-    public void openClass(ActionResultDTO vo) {
+    public static void openClass(ActionResultListTable table, Project project, ActionResultDTO vo) {
         if (vo == null) {
             return;
         }
@@ -622,7 +628,6 @@ public class ActionResultListTable extends JBTable {
 //            return;
 //        }
 
-        Project project = getNccActionURLSearchUI().getProject();
         GlobalSearchScope scope = ProjectUtil.getGlobalSearchScope(project);
         try {
             Collection<PsiClass> pcs = ProjectUtil.findClassByFullName(vo.getClazz(), project, scope);
@@ -650,7 +655,7 @@ public class ActionResultListTable extends JBTable {
 
                 if (notJar != null) {
                     notJar.navigate(true);
-                   // vo.getNavigatables().add(notJar);
+                    // vo.getNavigatables().add(notJar);
                     return;
                 } else if (jar != null) {
                     jar.navigate(true);
@@ -660,10 +665,10 @@ public class ActionResultListTable extends JBTable {
         } catch (Throwable exception) {
         }
 
-        VirtualFile virtualFile = findClassFile(vo);
+        VirtualFile virtualFile = findClassFile(project, vo);
 
         if (virtualFile == null) {
-            searchClass(vo);
+            searchClass(table, project, vo);
             return;
         }
 

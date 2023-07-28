@@ -64,6 +64,10 @@ public class IdeaProjectGenerateUtil {
     public static void generateSrcDir(@Nullable Project project) {
         Project project1 = project == null ? ProjectUtil.getDefaultProject() : project;
 
+        if (!ProjectNCConfigUtil.hasSetNCHOME()) {
+            return;
+        }
+
         Module[] modules = ModuleManager.getInstance(project1).getModules();
         for (Module module : modules) {
             generateSrcDir(module);
@@ -77,6 +81,11 @@ public class IdeaProjectGenerateUtil {
      * @param module
      */
     public static void generateSrcDir4Modules(Module module) {
+        ProjectUtil.setProject(module.getProject());
+        if (ProjectNCConfigUtil.getNCHome() == null) {
+            return ;
+        }
+
         generateSrcDir(module);
         generatePatherConfigFile(module);
     }
@@ -105,6 +114,10 @@ public class IdeaProjectGenerateUtil {
      * @Param [module]
      */
     public static void generateSrcDir(@NotNull Module module) {
+        if (!ProjectNCConfigUtil.hasSetNCHOME(module.getProject())) {
+            return ;
+        }
+
         File homeDir = new File(module.getModuleFilePath()).getParentFile();
         File src = new File(homeDir, "src");
         createDirIfNotExists(src, "public");
@@ -159,6 +172,10 @@ public class IdeaProjectGenerateUtil {
      * @Param [module]
      */
     public static void generatePatherConfigFile(@NotNull Module module) {
+        if (!ProjectNCConfigUtil.hasSetNCHOME(module.getProject())) {
+            return ;
+        }
+
         File homeDir = new File(module.getModuleFilePath()).getParentFile();
         File outFile = new File(homeDir, "patcherconfig.properties");
         if (!outFile.exists()) {
@@ -335,7 +352,8 @@ public class IdeaProjectGenerateUtil {
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 if (NcVersionEnum.U8Cloud.equals(ProjectNCConfigUtil.getNCVersion())) {
-                    File jar = new File(ncHome, "external" + File.separatorChar + "lib" + File.separatorChar + "xerces.jar");
+                    File jar = new File(ncHome, "external" + File.separatorChar + "lib" + File.separatorChar +
+                            "xerces.jar");
                     if (jar.isFile()) {
                         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
                                 ProjectNCConfigUtil.U8C_RUN_FIRST_DEPEND
@@ -346,7 +364,8 @@ public class IdeaProjectGenerateUtil {
                 // 是否为行业版
                 boolean hyVersion = ProjectNCConfigUtil.isHyVersion();
 
-                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Ant_Library
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                        ProjectNCConfigUtil.LIB_Ant_Library
                         , IoUtil.serachAllNcAntJars(ncHome)));
 
                 LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
@@ -414,15 +433,17 @@ public class IdeaProjectGenerateUtil {
                         ProjectNCConfigUtil.LIB_Module_Lang_Library
                         , IoUtil.serachModule_Lang_Library(ncHome)));
 
-                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_Generated_EJB
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                        ProjectNCConfigUtil.LIB_Generated_EJB
                         , IoUtil.serachGenerated_EJB(ncHome)));
 
-                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project, ProjectNCConfigUtil.LIB_RESOURCES
+                LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                        ProjectNCConfigUtil.LIB_RESOURCES
                         , IoUtil.serachResources(ncHome)));
             } catch (Exception e) {
                 e.printStackTrace();
                 LogUtil.error("更新NC依赖库失败:" + e.getMessage(), e);
-            }finally {
+            } finally {
                 countDownLatch.countDown();
             }
         });

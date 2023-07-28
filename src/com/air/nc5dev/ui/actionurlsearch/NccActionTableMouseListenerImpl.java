@@ -17,7 +17,7 @@ public class NccActionTableMouseListenerImpl implements MouseListener {
         if (clickCount > 1) {
             int row = mainPanel.getSelectedRow();
             ActionResultDTO vo = mainPanel.getDataOfRow(row);
-            mainPanel.openClass(vo);
+            mainPanel.openClass(mainPanel, mainPanel.getNccActionURLSearchUI().getProject(),vo);
         }
     }
 
