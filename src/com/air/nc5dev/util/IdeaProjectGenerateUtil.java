@@ -347,7 +347,7 @@ public class IdeaProjectGenerateUtil {
         }
         ArrayList<LibraryEx> LibraryExList = new ArrayList<>();
 
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+//        CountDownLatch countDownLatch = new CountDownLatch(1);
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
@@ -444,15 +444,15 @@ public class IdeaProjectGenerateUtil {
                 e.printStackTrace();
                 LogUtil.error("更新NC依赖库失败:" + e.getMessage(), e);
             } finally {
-                countDownLatch.countDown();
+//                countDownLatch.countDown();
             }
         });
 
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            countDownLatch.await();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
