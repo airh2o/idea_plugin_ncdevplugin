@@ -449,10 +449,11 @@ public class IdeaProjectGenerateUtil {
         });
 
         try {
-            countDownLatch.wait();
+            countDownLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 // 向项目模块依赖中增加新增的库
