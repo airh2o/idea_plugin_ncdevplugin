@@ -12,6 +12,7 @@ import org.tangsu.mstsc.MstscApplication;
 import org.tangsu.mstsc.entity.IEntity;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.*;
 
@@ -71,6 +72,49 @@ public class BaseDao {
         return "select * from {table} where dr=0 "
                 .replace("{table}", obj.getTableName())
                 .replace("{idname}", obj.getIdName());
+    }
+
+    public static <T extends IEntity> String buildCreateTableSql(T obj) {
+        String sql = String.format("create table %s ( ", obj.getTableName());
+
+        Set<String> fs = obj.getFieadNames();
+        for (String f : fs) {
+            if (f.equals("dr")) {
+                sql += ", dr INT default 0 ";
+                continue;
+            }
+
+            Field field = ReflectUtil.getField(obj.getClass(), f);
+            if (field.getType().isAssignableFrom(CharSequence.class)
+                    || field.getType() == char.class
+                    || field.getType() == String.class
+                    || field.getType() == Character.class
+            ) {
+                sql += ", " + f + " TEXT ";
+            } else if (field.getType() == int.class
+                    || field.getType() == long.class
+                    || field.getType() == byte.class
+                    || field.getType() == Byte.class
+                    || field.getType() == Integer.class
+                    || field.getType() == Long.class
+            ) {
+                sql += ", " + f + " INT ";
+            } else if (field.getType() == float.class
+                    || field.getType() == Float.class
+                    || field.getType() == double.class
+                    || field.getType() == Double.class
+            ) {
+                sql += ", " + f + " REAL ";
+            } else {
+                sql += ", " + f + " TEXT ";
+            }
+
+            if (f.equals(obj.getIdName())) {
+                sql += " primary key ";
+            }
+        }
+
+        return sql + " ) ";
     }
 
     public <T extends IEntity> T getById(String id, Class<T> clz) throws InstantiationException
@@ -221,6 +265,16 @@ public class BaseDao {
         }
 
         return row;
+    }
+
+    public int update(String sql) throws SQLException {
+        Statement st = null;
+        try {
+            st = conn.createStatement();
+            return st.executeUpdate(sql);
+        } finally {
+            IoUtil.close(st);
+        }
     }
 
     public List<Map<String, Object>> queryRows(String sql) throws SQLException {

@@ -13,6 +13,13 @@ public class MstscEntitServiceImpl {
 
     public MstscEntitServiceImpl(String dbfile) throws Exception {
         dao = new BaseDao(dbfile);
+        try {
+            dao.findAll(BaseDao.buildSelectSql(new MstscEntity()) + " and 1=2 ", MstscEntity.class);
+        } catch (SQLException throwables) {
+            //初始化表！
+           dao.update(dao.buildCreateTableSql(new MstscEntity()));
+           dao.submitNoClose();
+        }
     }
 
     public List<MstscEntity> findAll() throws SQLException, InstantiationException, IllegalAccessException {
