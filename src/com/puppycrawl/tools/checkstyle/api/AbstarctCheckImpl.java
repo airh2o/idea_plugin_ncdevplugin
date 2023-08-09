@@ -7,14 +7,21 @@ import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.OrderRootType;
+import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
+import com.intellij.openapi.roots.ui.configuration.ModuleEditor;
+import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
+import com.intellij.openapi.roots.ui.configuration.ProjectStructureConfigurable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 import lombok.Data;
@@ -99,21 +106,31 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
             return;
         }
 
+        ModulesConfigurator modulesConfigurator = new ModulesConfigurator(project,
+                ProjectStructureConfigurable.getInstance(project));
         for (Module module : modules) {
-            File src = new File(new File(module.getModuleFile().getPath()).getParentFile(), "src");
+            ModuleEditor editor = modulesConfigurator.getOrCreateModuleEditor(module);
+            ContentEntry[] contentEntries = editor.getModifiableRootModel().getContentEntries();
+            ContentEntry contentEntry = contentEntries[0];
+            SourceFolder[] sfs = contentEntry.getSourceFolders();
+            for (SourceFolder sf : sfs) {
+                if (sf.isTestSource()) {
+                    continue;
+                }
 
-            for (File fs : src.listFiles()) {
+                VirtualFile fs = sf.getFile();
+
                 int from = 1;
                 if (fs.getName().equals("public")) {
                 } else if (fs.getName().equals("client")) {
                     from = 2;
                 } else if (fs.getName().equals("private")) {
                     from = 3;
-                } else if (fs.getName().equals("test")) {
+                } else {
                     continue;
                 }
 
-                File[] fs2 = fs.listFiles();
+                File[] fs2 = fs.toNioPath().toFile().listFiles();
                 if (CollUtil.isEmpty(fs2)) {
                     continue;
                 }
@@ -122,11 +139,9 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
                     if (file.isFile()) {
                         continue;
                     }
-                    initMap4Dir("", file, cecha, from);
+                    initMap4Dir("", file, cecha, from, true);
                 }
             }
-
-            System.out.println();
         }
     }
 
@@ -164,7 +179,7 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
                 try {
                     File ff = new File(f.getPath());
                     for (File f2 : ff.listFiles()) {
-                        initMap4Dir("", f2, cecha, from);
+                        initMap4Dir("", f2, cecha, from, false);
                     }
                 } catch (Exception e) {
                     initMap4File(f, cecha, from);
@@ -175,7 +190,7 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
         }
     }
 
-    public static void initMap4Dir(String packge, File f, Cecha cecha, int from) {
+    public static void initMap4Dir(String packge, File f, Cecha cecha, int from, boolean fromSrc) {
         String simpleName = FileNameUtil.getPrefix(f);
         if (f.isDirectory()) {
             File[] fs = f.listFiles();
@@ -184,13 +199,12 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
             }
 
             for (File f2 : fs) {
-                if (StrUtil.isNotBlank(packge)) {
-                    packge += '.';
-                }
-                initMap4Dir(packge + simpleName, f2, cecha, from);
+                initMap4Dir((StrUtil.isNotBlank(packge) ? packge + '.' : packge) + simpleName, f2, cecha, from,
+                        fromSrc);
             }
         } else if (f.isFile()) {
-            if (StrUtil.endWith(f.getPath().toLowerCase().trim(), ".class")) {
+            if (StrUtil.endWith(f.getPath().toLowerCase().trim(), ".class")
+                    || (fromSrc && StrUtil.endWith(f.getPath().toLowerCase().trim(), ".java"))) {
                 String clz = packge + '.' + simpleName;
                 cecha.getClass2PathMap().putIfAbsent(clz, Sets.newConcurrentHashSet());
                 cecha.getClass2PathMap().get(clz).add(f.getPath());
@@ -240,7 +254,7 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
             }
         } catch (IOException e) {
             LogUtil.error(e.getMessage(), e);
-        }finally {
+        } finally {
             IoUtil.close(jar);
         }
     }
@@ -251,26 +265,43 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
      * @param className
      * @return
      */
-    public Set<Integer> findClassFrom(String className) {
+    public Map<Integer, List<String>> findClassFrom(String className) {
+        HashMap<Integer, List<String>> re = Maps.newHashMap();
         if (StrUtil.isBlank(className)) {
-            return Sets.newHashSet(FROM_PUBLIC);
+            re.put(FROM_PUBLIC, Lists.newArrayList());
+            return re;
+        }
+
+        if (className.startsWith("java.")
+                || className.startsWith("javax.")
+                || className.startsWith("lombok.")
+                || className.startsWith("sun.")
+        ) {
+            re.put(FROM_PUBLIC, Lists.newArrayList("JDK"));
+            return re;
         }
 
         //可能是工程 源码里面的
-        HashSet<Integer> all = Sets.newHashSet();
-        Set<Integer> from;
+        Set<Integer> froms;
         Cecha cecha = PROJECT_SOURCE_CECHA.get();
         Set<String> paths = cecha.getClass2PathMap().get(className);
         if (CollUtil.isNotEmpty(paths)) {
             for (String path : paths) {
-                from = cecha.getPath2TypeMap().get(path);
-                if (from != null) {
-                    all.addAll(from);
+                froms = cecha.getPath2TypeMap().get(path);
+                if (froms != null) {
+                    for (Integer from : froms) {
+                        List<String> ss = re.get(from);
+                        if (ss == null) {
+                            ss = Lists.newArrayList();
+                            re.put(from, ss);
+                        }
+                        ss.add(path);
+                    }
                 }
             }
 
-            if (!all.isEmpty()) {
-                return all;
+            if (!re.isEmpty()) {
+                return re;
             }
         }
 
@@ -278,18 +309,25 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
         paths = cecha.getClass2PathMap().get(className);
         if (CollUtil.isNotEmpty(paths)) {
             for (String path : paths) {
-                from = cecha.getPath2TypeMap().get(path);
-                if (from != null) {
-                    all.addAll(from);
+                froms = cecha.getPath2TypeMap().get(path);
+                if (froms != null) {
+                    for (Integer from : froms) {
+                        List<String> ss = re.get(from);
+                        if (ss == null) {
+                            ss = Lists.newArrayList();
+                            re.put(from, ss);
+                        }
+                        ss.add(path);
+                    }
                 }
             }
 
-            if (!all.isEmpty()) {
-                return all;
+            if (!re.isEmpty()) {
+                return re;
             }
         }
 
-        return Sets.newHashSet(FROM_PUBLIC);
+        return re;
     }
 
     public Cecha getCecha() {

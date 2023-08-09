@@ -4,9 +4,12 @@ import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.alibaba.fastjson.JSON;
 import lombok.Data;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -77,7 +80,12 @@ public class NCImportCheckImpl extends AbstarctCheckImpl {
                     line = line.substring(6, line.indexOf('.') - 1).trim();
                 }
 
-                if (StrUtil.endWith(line, '*')) {
+                if (StrUtil.endWith(line, '*')
+                        && !line.startsWith("java.")
+                        && !line.startsWith("javax.")
+                        && !line.startsWith("lombok.")
+                        && !line.startsWith("sun.")
+                ) {
                     violation = new Violation(i + 1
                             , lines[i].length()
                             , lines[i].length()
@@ -88,7 +96,7 @@ public class NCImportCheckImpl extends AbstarctCheckImpl {
                             , SeverityLevel.WARNING
                             , null
                             , this.getClass()
-                            , "Import语句中使用*包范围导入的或者代码中使用全限定名访问的类不支持NC代码导入规范检查!(请import具体类全路径!)");
+                            , "Import语句中使用*包范围导入的或者代码中使用全限定名访问的类不支持NC代码导入规范检查!(请import具体类全路径!): " + line);
                     fileContext.getViolations().add(violation);
                     continue;
                 }
@@ -135,22 +143,37 @@ public class NCImportCheckImpl extends AbstarctCheckImpl {
                                 , SeverityLevel.WARNING
                                 , null
                                 , this.getClass()
-                                , "NCC(BIP)项目中,如果非重量端开发的:client包中应该使用nccloud.framework.service.ServiceLocator而不是nc.bs" +
-                                ".framework.common.NCLocator!");
+                                , "NCC(BIP)项目中,如果非重量端开发的:client包中应该使用" +
+                                "nccloud.framework.service.ServiceLocator而不是nc.bs.framework.common.NCLocator!");
                         fileContext.getViolations().add(violation);
                         continue;
                     }
                 }
 
                 //想办法找到这个类所在的范围
-                Set<Integer> froms = findClassFrom(line);
+                Map<Integer, List<String>> froms = findClassFrom(line);
+                if (froms.isEmpty()) {
+                    violation = new Violation(i + 1
+                            , lines[i].length()
+                            , lines[i].length()
+                            , TokenTypes.IMPORT
+                            , "com.puppycrawl.tools.checkstyle.messages"
+                            , "general.exception"
+                            , new String[]{lines[i]}
+                            , SeverityLevel.WARNING
+                            , null
+                            , this.getClass()
+                            , "无法找到来源信息: " + line);
+                    fileContext.getViolations().add(violation);
+                    continue;
+                }
 
-                if (froms.contains(fileFrom) || froms.contains(FROM_PUBLIC)) {
+                if (froms.containsKey(fileFrom) || froms.containsKey(FROM_PUBLIC)) {
                     continue;
                 }
 
                 if (FROM_PUBLIC == fileFrom) {
-                    if (froms.contains(FROM_CLIENT)) {
+                    if (froms.containsKey(FROM_CLIENT)) {
                         violation = new Violation(i + 1
                                 , lines[i].length()
                                 , lines[i].length()
@@ -161,11 +184,11 @@ public class NCImportCheckImpl extends AbstarctCheckImpl {
                                 , SeverityLevel.ERROR
                                 , null
                                 , this.getClass()
-                                , "public中不允许导入client的类!");
+                                , "public中不允许导入client的类: " + line + " ,来源路径:" + buildFromInfos(froms));
                         fileContext.getViolations().add(violation);
                         continue;
                     }
-                    if (froms.contains(FROM_PRIVATE)) {
+                    if (froms.containsKey(FROM_PRIVATE)) {
                         violation = new Violation(i + 1
                                 , lines[i].length()
                                 , lines[i].length()
@@ -176,14 +199,14 @@ public class NCImportCheckImpl extends AbstarctCheckImpl {
                                 , SeverityLevel.ERROR
                                 , null
                                 , this.getClass()
-                                , "public中不允许导入private的类!");
+                                , "public中不允许导入private的类: " + line + " ,来源路径:" + buildFromInfos(froms));
                         fileContext.getViolations().add(violation);
                         continue;
                     }
                 }
 
                 if (FROM_CLIENT == fileFrom) {
-                    if (froms.contains(FROM_PRIVATE)) {
+                    if (froms.containsKey(FROM_PRIVATE)) {
                         violation = new Violation(i + 1
                                 , lines[i].length()
                                 , lines[i].length()
@@ -194,14 +217,14 @@ public class NCImportCheckImpl extends AbstarctCheckImpl {
                                 , SeverityLevel.ERROR
                                 , null
                                 , this.getClass()
-                                , "client中不允许导入private的类!");
+                                , "client中不允许导入private的类: " + line + " ,来源路径:" + buildFromInfos(froms));
                         fileContext.getViolations().add(violation);
                         continue;
                     }
                 }
 
                 if (FROM_PRIVATE == fileFrom) {
-                    if (froms.contains(FROM_CLIENT)) {
+                    if (froms.containsKey(FROM_CLIENT)) {
                         violation = new Violation(i + 1
                                 , lines[i].length()
                                 , lines[i].length()
@@ -212,13 +235,31 @@ public class NCImportCheckImpl extends AbstarctCheckImpl {
                                 , SeverityLevel.ERROR
                                 , null
                                 , this.getClass()
-                                , "private中不允许导入client的类!");
+                                , "private中不允许导入client的类: " + line + " ,来源路径:" + buildFromInfos(froms));
                         fileContext.getViolations().add(violation);
                         continue;
                     }
                 }
             }
         }
+    }
+
+    private String buildFromInfos(Map<Integer, List<String>> froms) {
+        if (CollUtil.isEmpty(froms)) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder(4000);
+
+        if (CollUtil.isNotEmpty(froms.get(FROM_PUBLIC))) {
+            sb.append(" Public包:").append(froms.get(FROM_PUBLIC).toString());
+        } else if (CollUtil.isNotEmpty(froms.get(FROM_CLIENT))) {
+            sb.append(" Client包:").append(froms.get(FROM_CLIENT).toString());
+        } else if (CollUtil.isNotEmpty(froms.get(FROM_PRIVATE))) {
+            sb.append(" Private包:").append(froms.get(FROM_PRIVATE).toString());
+        }
+
+        return sb.toString();
     }
 }
 
