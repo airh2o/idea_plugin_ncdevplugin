@@ -246,13 +246,18 @@ onleyFullSql=true
 ```
 
 # 版本兼容性 
-V2以及以下版本 兼容IDEA2017+ 支持JDK5 和JDK6            
-V3以及以上版本 兼容IDEA2021+ 支持JDK8+                      
+V2以及以下版本 兼容IDEA2017-2023 (IDEA 本身支持JDK5及以后)            
+V3以及以上版本 兼容IDEA2021-2023 (IDEA 本身支持JDK7及以后)                       
 老版本的下载，见根目录 idea_plugin_ncdevplugin.zip 里的提交历史 下载历史文件即可！           
 
-如果你用的是BIP，启动服务有问题 可以参数修改JVM参数：       
+如果你用的是BIP，启动服务有问题 可以参数修改JVM参数：          
+````text        
 -Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl           
--Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl               
+-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl       
+````
+
+检查NC代码规范因为需要全局扫描会比较慢，没反应就多点几次检查就好了。
+
 
 # 感谢
 
