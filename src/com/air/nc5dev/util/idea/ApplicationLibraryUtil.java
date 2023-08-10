@@ -128,7 +128,7 @@ public class ApplicationLibraryUtil {
                 continue;
             }
             if (ApplicationLibraryUtil.notHas(ModuleRootManager.getInstance(module).getModifiableModel(), library.getName())) {
-                ModuleRootModificationUtil.addDependency(module, library);
+                ModuleRootModificationUtil.addDependency(module, library, DependencyScope.PROVIDED, false);
             }
         }
     }
