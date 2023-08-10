@@ -468,7 +468,7 @@ public class IdeaProjectGenerateUtil {
                         for (LibraryEx library : LibraryExList) {
                             if (ApplicationLibraryUtil.notHas(ModuleRootManager.getInstance(module).getModifiableModel(),
                                     library.getName())) {
-                                ModuleRootModificationUtil.addDependency(module, library);
+                                ModuleRootModificationUtil.addDependency(module, library, DependencyScope.PROVIDED, false);
                             }
                         }
                     }
