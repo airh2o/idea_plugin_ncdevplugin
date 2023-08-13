@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding='gb2312'?>
+<items docType="SDP_SCRIPT_ITEM">
+    <vars>
+        <!--        这个可以定义这个文件范围内的变量，然后可以在下面的 标签值中 使用变量
+        ， 比如 我定一个 一个变量名 billType 那么下面使用可以用 {billType} 使用他(大小写敏感)
+        ，固定内置变量： date 当前日期， datetime 当前日期加时间 ， project 项目名称， module 模块名称
+         -->
+        <var name="appcode">40060101</var>
+        <var name="user">_by 张三 {datetime} 导出应用编码：{appcode} 所属项目 {project} 代码模块 {module}</var>
+    </vars>
+
+    <item>
+        <itemKey>pub_systemplate_base</itemKey>
+        <itemName>默认模版{user}</itemName>
+        <itemRule>pub_systemplate_base</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and appcode like '{appcode}%'
+        </fixedWhere>
+    </item>
+
+    <item>
+        <!-- 这个表自带sub表 pub_area -->
+        <itemKey>pub_page_templet</itemKey>
+        <itemName>单据模板{user}</itemName>
+        <itemRule>pub_page_templet</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and appcode like '{appcode}%'
+        </fixedWhere>
+    </item>
+    <!-- sm_appregister  -->
+    <item>
+        <itemKey>sm_apppage</itemKey>
+        <itemName>sm_apppage{user}</itemName>
+        <itemRule>sm_apppage</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and parent_id in(select pk_appregister from sm_appregister where nvl(dr,0)=0
+            and code like '{appcode}%')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>sm_appbutnregister</itemKey>
+        <itemName>sm_appbutnregister{user}</itemName>
+        <itemRule>sm_appbutnregister</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and ( appid in(
+            select pk_appregister from sm_appregister where nvl(dr,0)=0
+            and code like '{appcode}%'
+            )
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>sm_appparam</itemKey>
+        <itemName>sm_appparam{user}</itemName>
+        <itemRule>sm_appparam</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and parentid in(
+            select pk_appregister from sm_appregister where nvl(dr,0)=0
+            and code like '{appcode}%'
+            )
+        </fixedWhere>
+    </item>
+    <!--    END sm_appregister  -->
+
+    <!--  pub_page_templet   -->
+    <item>
+        <itemKey>pub_area</itemKey>
+        <itemName>pub_area{user}</itemName>
+        <itemRule>pub_area</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and templetid in(
+            select pk_page_templet from pub_page_templet where nvl(dr,0)=0
+            and appcode like '{appcode}%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_query_property</itemKey>
+        <itemName>pub_query_property{user}</itemName>
+        <itemRule>pub_query_property</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and areaid in(
+            select pk_area from pub_area where TEMPLETID in(
+            select pk_page_templet from pub_page_templet where
+            nvl(dr,0)=0 and appcode like '{appcode}%'
+            )
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_form_property</itemKey>
+        <itemName>pub_form_property{user}</itemName>
+        <itemRule>pub_form_property</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and areaid in(
+            select pk_area from PUB_AREA where TEMPLETID in(
+            select pk_page_templet from pub_page_templet where
+            nvl(dr,0)=0 and appcode like '{appcode}%'
+            )
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_ncc_queryscheme</itemKey>
+        <itemName>pub_ncc_queryscheme{user}</itemName>
+        <itemRule>pub_ncc_queryscheme</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and areaid in(select pk_area from PUB_AREA where TEMPLETID
+            in(select pk_page_templet from pub_page_templet where
+            nvl(dr,0)=0 and appcode like '{appcode}%')
+            )
+        </fixedWhere>
+    </item>
+    <!--    END pub_page_templet  -->
+
+    <item>
+        <itemKey>aam_appasset</itemKey>
+        <itemName>输出模板{user}</itemName>
+        <itemRule>aam_appasset</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and
+            DATAID in(
+            select CTEMPLATEID from pub_print_template where 1=1
+            and ( VTEMPLATECODE like '{appcode}%'
+            or VTEMPLATECODE like '{appcode}%'
+            )
+            )
+        </fixedWhere>
+    </item>
+    <!--    NCC自定义消息开发-->
+    <item>
+        <!-- 这个表自带sub表 pub_msgtemp_var -->
+        <itemKey>pub_msgtemp_type</itemKey>
+        <itemName>消息模板类型注册{user}</itemName>
+        <itemRule>pub_msgtemp_type</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and tempcode in(
+            'mmmpsxj_notif_msg'
+            , 'mmmpsxj_notif_msg_month_bcptxqsq'
+            ,'mmmpsxj_notif_msg_month_dzjptxqsq'
+            , 'WF_mmmonthplan','WF_mmweekplan','WF_mmyearplan'
+            ,'WF_MMMPSXJ','MMYEARPLAN'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_msgres_reg</itemKey>
+        <itemName>消息源类型注册{user}</itemName>
+        <itemRule>pub_msgres_reg</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            moduleid in('50H0')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_msgtemp</itemKey>
+        <itemName>消息模板{user}</itemName>
+        <itemRule>pub_msgtemp</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            tempcode in(
+            'mmmpsxj_notif_msg'
+            , 'mmmpsxj_notif_msg_month_bcptxqsq'
+            ,'mmmpsxj_notif_msg_month_dzjptxqsq'
+            ,'MMYEARPLAN','MMMONTHPLAN','MMWEEKPLAN','MMWEEKSD'
+            ,'WF_MMMPSXJ','MMYEARPLAN'
+            )
+        </fixedWhere>
+    </item>
+
+    <item>
+        <itemKey>pub_systemplate_base</itemKey>
+        <itemName>默认模板(打印模板输出){user}</itemName>
+        <itemRule>pub_systemplate_base</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            dr=0 and appcode = '{appcode}' and tempstyle = 3
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>sm_res_operation</itemKey>
+        <itemName>数据权限 资源操作 (!**注意全抽,并注意dbml的多语,确保别人的都在**){user}</itemName>
+        <itemRule>sm_res_operation</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            resourceid in(select pk_permission_res from sm_permission_res where
+            mdid='3c7a9f40-b0a5-4245-b5d9-8a3c12bde637')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_page_templet</itemKey>
+        <itemName>单据模板{user}</itemName>
+        <itemRule>pub_page_templet</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            appcode in ('{appcode}','{appcode}P','{appcode}L')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_print_template</itemKey>
+        <itemName>打印模板{user}</itemName>
+        <itemRule>pub_print_template</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            dr=0 and appcode in ('{appcode}','{appcode}P','{appcode}L')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>sm_appregister</itemKey>
+        <itemName>应用注册{user}</itemName>
+        <itemRule>sm_appregister</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            code in ('{appcode}','{appcode}P','{appcode}L')
+        </fixedWhere>
+    </item>
+</items>

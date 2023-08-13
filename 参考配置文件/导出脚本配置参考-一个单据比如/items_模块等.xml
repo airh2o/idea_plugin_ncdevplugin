@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding='gb2312'?>
+<items docType="SDP_SCRIPT_ITEM">
+    <item>
+        <itemKey>sm_appmenuitem</itemKey>
+        <itemName>应用菜单项注册</itemName>
+        <itemRule>sm_appmenuitem</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and menuitemcode like '400600850%'
+        </fixedWhere>
+    </item>
+
+    <item>
+        <itemKey>dap_dapsystem</itemKey>
+        <itemName>功能模块</itemName>
+        <itemRule>dap_dapsystem</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <!--        '50',-->
+        <fixedWhere>nvl(dr,0)=0 and moduleid in('50H0')
+        </fixedWhere>
+    </item>
+
+    <item>
+        <!-- sub表 dap_defitem dap_billfactor pub_votable
+         pub_billtobillrefer pub_function pub_billaction
+         pub_billactiongroup pub_busiclass bd_fwdbilltype
+         bd_relatedapp bd_billtype2 pub_publishapp -->
+        <itemKey>bd_billtype</itemKey>
+        <itemName>单据类型</itemName>
+        <itemRule>bd_billtype</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and nodecode like '400600850%'
+        </fixedWhere>
+        <!--        只导出 交易类型， 因为单据类型默认会导出 and istransaction='Y'-->
+    </item>
+
+    <item>
+        <!-- sub表 pub_bcr_candiattr -->
+        <itemKey>pub_bcr_nbcr</itemKey>
+        <itemName>编码对象描述</itemName>
+        <itemRule>pub_bcr_nbcr</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and metaid in
+            (
+            select id from MD_CLASS where FULLCLASSNAME like '%.mmmpsxj.%'
+            )
+        </fixedWhere> <!-- 元数据里实体的id -->
+    </item>
+
+    <item>
+        <itemKey>bd_refinfo</itemKey>
+        <itemName>参照</itemName>
+        <itemRule>bd_refinfo</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            modulename='so' and metadatanamespace='so' and metadatatypename='encasementhead' and (mobilerefpath is null
+            or mobilerefpath='' or mobilerefpath='~' ) and name like '装箱单_装箱单表头_%'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billitfdef</itemKey>
+        <itemName>单据接口定义</itemName>
+        <itemRule>pub_billitfdef</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and (
+            src_billtype in(select pk_billtypecode from bd_billtype where nodecode like '400600850%')
+            or dest_billtype in(select pk_billtypecode from bd_billtype where nodecode like '400600850%')
+            )
+        </fixedWhere>
+    </item>
+    <!--    配置权限的时候 不显示-->
+    <item>
+        <itemKey>sm_createcorp</itemKey>
+        <itemName>sm_createcorp</itemName>
+        <itemRule>sm_createcorp</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and
+            FUNCCODE in('50H0')
+        </fixedWhere>
+    </item>
+
+    <!--	单据类型分组   -->
+    <item>
+        <itemKey>md_dev_busi_module</itemKey>
+        <itemName>md_dev_busi_module</itemName>
+        <itemRule>md_dev_busi_module</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            BUSIMODULE like '400600850%'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>md_comp_busimodule</itemKey>
+        <itemName>md_comp_busimodule</itemName>
+        <itemRule>md_comp_busimodule</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            busimodulecode like '400600850%'
+        </fixedWhere>
+    </item>
+
+    <!--    单据交换-->
+    <!-- sub表 pub_vochange_b pub_vochange_s -->
+    <item>
+        <itemKey>pub_vochange</itemKey>
+        <itemName>pub_vochange</itemName>
+        <itemRule>pub_vochange</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and src_billtype in (
+            select pk_billtypecode from bd_billtype where nodecode like '400600850%'
+            )
+        </fixedWhere>
+    </item>
+
+    <!--    NCC自定义消息开发-->
+    <item>
+        <!--  sub表 pub_msgtemp_var -->
+        <itemKey>pub_msgtemp_type</itemKey>
+        <itemName>消息模板类型注册</itemName>
+        <itemRule>pub_msgtemp_type</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and tempcode in(
+            'mmmpsxj_notif_msg'
+            , 'mmmpsxj_notif_msg_month_bcptxqsq'
+            ,'mmmpsxj_notif_msg_month_dzjptxqsq'
+            , 'WF_mmmonthplan','WF_mmweekplan','WF_mmyearplan'
+            ,'WF_MMMPSXJ','MMYEARPLAN'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_msgres_reg</itemKey>
+        <itemName>消息源类型注册</itemName>
+        <itemRule>pub_msgres_reg</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            moduleid in('50H0')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_msgtemp</itemKey>
+        <itemName>消息模板</itemName>
+        <itemRule>pub_msgtemp</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            tempcode in(
+            'mmmpsxj_notif_msg'
+            , 'mmmpsxj_notif_msg_month_bcptxqsq'
+            ,'mmmpsxj_notif_msg_month_dzjptxqsq'
+            ,'MMYEARPLAN','MMMONTHPLAN','MMWEEKPLAN','MMWEEKSD'
+            ,'WF_MMMPSXJ','MMYEARPLAN'
+            )
+        </fixedWhere>
+    </item>
+
+    <!--    单据控制规则 可选择的单据-->
+    <item>
+        <itemKey>bd_cr_resource</itemKey>
+        <itemName>bd_cr_resource</itemName>
+        <itemRule>bd_cr_resource</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            TRIM(PK_RESOURCE) in(
+            select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+        </fixedWhere>
+    </item>
+
+    <item>
+        <itemKey>pub_sysinittemp</itemKey>
+        <itemName>参数模板设置</itemName>
+        <itemRule>pub_sysinittemp</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            initcode in('')
+        </fixedWhere>
+    </item>
+
+    <item>
+        <itemKey>sm_rule_type</itemKey>
+        <itemName>数据权限 规则类型 (!**注意全抽,并注意dbml的多语,确保别人的都在**)</itemName>
+        <itemRule>sm_rule_type</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            ownresource in(select pk_permission_res from sm_permission_res where
+            mdid='3c7a9f40-b0a5-4245-b5d9-8a3c12bde637')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>xi_billdefine</itemKey>
+        <itemName>外部交换平台</itemName>
+        <itemRule>xi_billdefine</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            billtype='400600850'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>excel_billprocess</itemKey>
+        <itemName>导入</itemName>
+        <itemRule>excel_billprocess</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            billtype = 'ENCASEMENTHEAD_400600850'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>excel_outputprocess</itemKey>
+        <itemName>导出</itemName>
+        <itemRule>excel_outputprocess</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            billtype = 'ENCASEMENTHEAD_400600850'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>bd_mode_all</itemKey>
+        <itemName>全部管控模式</itemName>
+        <itemRule>bd_mode_all</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            MDCLASSID='3c7a9f40-b0a5-4245-b5d9-8a3c12bde637'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>sm_permission_res</itemKey>
+        <itemName>数据权限资源 (!**注意全抽,并注意dbml的多语,确保别人的都在**)</itemName>
+        <itemRule>sm_permission_res</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            mdid='3c7a9f40-b0a5-4245-b5d9-8a3c12bde637'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_bcr_candiattr</itemKey>
+        <itemName>编码规则候选属性</itemName>
+        <itemRule>pub_bcr_candiattr</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            pk_nbcr in(select pk_nbcr from pub_bcr_nbcr where metaid = '3c7a9f40-b0a5-4245-b5d9-8a3c12bde637')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>bd_mode_selected</itemKey>
+        <itemName>当前管控模式</itemName>
+        <itemRule>bd_mode_selected</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            MDCLASSID='3c7a9f40-b0a5-4245-b5d9-8a3c12bde637'
+        </fixedWhere>
+    </item>
+
+    <item>
+        <itemKey>xx_busiprodef</itemKey>
+        <itemName>外部交换平台</itemName>
+        <itemRule>xx_busiprodef</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            metadataid='3c7a9f40-b0a5-4245-b5d9-8a3c12bde637'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>bd_uniquerule</itemKey>
+        <itemName>唯一性规则</itemName>
+        <itemRule>bd_uniquerule</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            MDCLASSID='3c7a9f40-b0a5-4245-b5d9-8a3c12bde637'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>opm_apimanager</itemKey>
+        <itemName>OpenAPI</itemName>
+        <itemRule>opm_apimanager</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            APIURI=''
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_systemplate_base</itemKey>
+        <itemName>默认模板(打印模板输出)</itemName>
+        <itemRule>pub_systemplate_base</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            dr=0 and appcode = '400600850' and tempstyle = 3
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>sm_res_operation</itemKey>
+        <itemName>数据权限 资源操作 (!**注意全抽,并注意dbml的多语,确保别人的都在**)</itemName>
+        <itemRule>sm_res_operation</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            resourceid in(select pk_permission_res from sm_permission_res where
+            mdid='3c7a9f40-b0a5-4245-b5d9-8a3c12bde637')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_page_templet</itemKey>
+        <itemName>单据模板</itemName>
+        <itemRule>pub_page_templet</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            appcode in ('400600850','400600850P','400600850L')
+        </fixedWhere>
+    </item>
+
+    <item>
+        <itemKey>excel_translator</itemKey>
+        <itemName>导入导出翻译器</itemName>
+        <itemRule>excel_translator</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            TRACLASSNAME = 'nc.impl.so.soencasement.encasementhead.P7BillVOTranslator'
+        </fixedWhere>
+    </item>
+
+    <item>
+        <itemKey>sm_appregister</itemKey>
+        <itemName>应用注册</itemName>
+        <itemRule>sm_appregister</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            code in ('400600850','400600850P','400600850L')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>md_attr_power</itemKey>
+        <itemName>元数据过滤(会计平台)</itemName>
+        <itemRule>md_attr_power</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            beanid
+            in(''3c7a9f40-b0a5-4245-b5d9-8a3c12bde637','c5cdf4da-e354-4ec5-8fc9-d238c74c8059','48c26c98-d08b-4998-9f38-d91712ee6cc8','ffc80127-6b09-43d0-896b-d834300b63a5','5b285bd6-aea5-46bd-8a73-aaba6b0ce61f''
+        </fixedWhere>
+    </item>
+
+    <item>
+        <itemKey>dap_defitem</itemKey>
+        <itemName>dap_defitem</itemName>
+        <itemRule>dap_defitem</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>dap_billfactor</itemKey>
+        <itemName>dap_billfactor</itemName>
+        <itemRule>dap_billfactor</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_votable</itemKey>
+        <itemName>pub_votable</itemName>
+        <itemRule>pub_votable</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billtobillrefer</itemKey>
+        <itemName>pub_billtobillrefer</itemName>
+        <itemRule>pub_billtobillrefer</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_function</itemKey>
+        <itemName>pub_function</itemName>
+        <itemRule>pub_function</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billaction</itemKey>
+        <itemName>pub_billaction</itemName>
+        <itemRule>pub_billaction</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billactiongroup</itemKey>
+        <itemName>pub_billactiongroup</itemName>
+        <itemRule>pub_billactiongroup</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billactionconfig</itemKey>
+        <itemName>pub_billactionconfig</itemName>
+        <itemRule>pub_billactionconfig</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billactiongroup in(
+            select pk_billactiongroup from pub_billactiongroup where nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_busiclass</itemKey>
+        <itemName>pub_busiclass</itemName>
+        <itemRule>pub_busiclass</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>bd_fwdbilltype</itemKey>
+        <itemName>bd_fwdbilltype</itemName>
+        <itemRule>bd_fwdbilltype</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and (
+            pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+            or
+            pk_backbilltype in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>bd_relatedapp</itemKey>
+        <itemName>bd_relatedapp</itemName>
+        <itemRule>bd_relatedapp</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>bd_billtype2</itemKey>
+        <itemName>bd_billtype2</itemName>
+        <itemRule>bd_billtype2</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtype in(
+            select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_publishapp</itemKey>
+        <itemName>pub_publishapp</itemName>
+        <itemRule>pub_publishapp</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billtypeid in(
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '400600850%'
+            )
+        </fixedWhere>
+    </item>
+    <!--    END bd_billtype  -->
+
+    <!--      pub_vochange  -->
+    <item>
+        <itemKey>pub_vochange_b</itemKey>
+        <itemName>pub_vochange_b</itemName>
+        <itemRule>pub_vochange_b</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_vochange in(
+            select pk_vochange from pub_vochange where nvl(dr,0)=0 and src_billtype in (select pk_billtypecode from
+            bd_billtype where nodecode like '400600850%')
+            )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_vochange_s</itemKey>
+        <itemName>pub_vochange_s</itemName>
+        <itemRule>pub_vochange_s</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_vochange in(
+            select pk_vochange from pub_vochange where nvl(dr,0)=0 and src_billtype in (select pk_billtypecode from
+            bd_billtype where nodecode like '400600850%')
+            )
+        </fixedWhere>
+    </item>
+    <!--    END pub_vochange  -->
+
+    <!--      pub_msgtemp_type  -->
+    <item>
+        <itemKey>pub_msgtemp_var</itemKey>
+        <itemName>pub_msgtemp_var</itemName>
+        <itemRule>pub_msgtemp_var</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_temptype in(
+            select pk_temptype from pub_msgtemp_type where nvl(dr,0)=0
+            and tempcode in(
+            'mmmpsxj_notif_msg'
+            , 'mmmpsxj_notif_msg_month_bcptxqsq'
+            ,'mmmpsxj_notif_msg_month_dzjptxqsq'
+            ,'WF_MMMPSXJ','MMYEARPLAN'
+            )
+            )
+        </fixedWhere>
+    </item>
+    <!--    END pub_msgtemp_type  -->
+    <item>
+        <itemKey>bd_userdefruleref</itemKey>
+        <itemName>bd_userdefruleref</itemName>
+        <itemRule>bd_userdefruleref</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and 1=2
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>bd_userdefitem</itemKey>
+        <itemName>bd_userdefitem</itemName>
+        <itemRule>bd_userdefitem</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and 1=2
+        </fixedWhere>
+    </item>
+    <!--  END  用户定义属性组-->
+
+    <item>
+        <itemKey>md_module</itemKey>
+        <itemName>md_module</itemName>
+        <itemRule>md_module</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and id like 'mmmpsxj%'
+        </fixedWhere>
+    </item>
+
+    <!--    单据编码规则-->
+    <item>
+        <itemKey>pub_bcr_rulebase</itemKey>
+        <itemName>
+            编码规则定义(编码规则集团级的预置数据是在重量端点击的导出为预置数据，文件路径：XXX/config/billcodepredata/billcodepredata.xml)
+        </itemName>
+        <itemRule>pub_bcr_rulebase</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            nbcrcode = (select code from pub_bcr_nbcr where metaid = '3c7a9f40-b0a5-4245-b5d9-8a3c12bde637')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_bcr_elem</itemKey>
+        <itemName>pub_bcr_elem</itemName>
+        <itemRule>pub_bcr_elem</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0 and pk_billcodebase in(
+            select pk_billcodebase from pub_bcr_rulebase where nvl(dr,0)=0 and nbcrcode
+            in('MMWEEKSD','MMWEEKPLAN','MMMONTHPLAN','MMYEARPLAN' )
+            )
+        </fixedWhere>
+    </item>
+    <!--  END  单据编码规则-->
+    <item>
+        <itemKey>excel_translator</itemKey>
+        <itemName>导入导出翻译器</itemName>
+        <itemRule>excel_translator</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            TRACLASSNAME = 'nc.impl.so.soencasement.encasementhead.P7BillVOTranslator'
+        </fixedWhere>
+    </item>
+
+    <item>
+        <itemKey>bd_userdefrule</itemKey>
+        <itemName>自定义项属性组(!**注意全抽,并注意dbml的多语,确保别人的都在**)</itemName>
+        <itemRule>bd_userdefrule</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>
+            code in('encasementhead','encasementbody','encasementbodydh','encasementbodygd','encasementbodytg')
+        </fixedWhere>
+    </item>
+</items>
