@@ -126,7 +126,7 @@ public class MstscDialog extends DialogWrapper {
     private void onClose() {
         try {
             getMstscEntitService().getDao().submit();
-        } catch (SQLException ex) {
+        } catch (Throwable ex) {
             ex.printStackTrace();
             LogUtil.error(ex.getMessage(), ex);
         }
