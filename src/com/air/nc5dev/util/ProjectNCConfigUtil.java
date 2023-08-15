@@ -37,6 +37,7 @@ public class ProjectNCConfigUtil {
     /*** NC配置文件在项目中文件的名字 ***/
     public static final String DEFUAL_NC_CONFIG_PROJECT_FILENAME = "nc.properties";
     public static final String[] dsTypes = new String[]{"ORACLE11G", "ORACLE10G", "SQLSERVER2008", "DB297"};
+    public static final String[] LIB_SCOPES = new String[]{"Compile", "Provided", "Runtime", "Test"};
     public static final String[] dsTypeClasss = new String[]{"oracle.jdbc.OracleDriver", "oracle.jdbc.OracleDriver"
             , "com.microsoft.sqlserver.jdbc.SQLServerDriver", "com.ibm.db2.jcc.DB2Driver"};
     private static Map<String, Boolean> isInit = Maps.newConcurrentMap();
@@ -340,6 +341,11 @@ public class ProjectNCConfigUtil {
         if (!prop.containsKey("onleyFullSql")) {
             prop.put("onleyFullSql", "true");
         }
+        if (!prop.containsKey("libScope")) {
+            //Compile  Test Runtime Provided
+            prop.put("libScope", "Compile");
+        }
+
         IoUtil.wirtePropertis(prop, ProjectNCConfigUtil.configFile.get(project.getBasePath()));
     }
 

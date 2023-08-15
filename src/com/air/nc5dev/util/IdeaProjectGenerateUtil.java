@@ -354,6 +354,19 @@ public class IdeaProjectGenerateUtil {
             Messages.showInfoMessage("NC HOME不正确，请在 Tools 菜单下 配置NC HOME 菜单进行配置！", "警告");
         }
         ArrayList<LibraryEx> LibraryExList = new ArrayList<>();
+        //  Compile  Test Runtime Provided
+        String libScope = ProjectNCConfigUtil.getConfigValue(theProject, "libScope", "Compile");
+        DependencyScope dependencyScope1 = null;
+        for (DependencyScope v : DependencyScope.values()) {
+            if (v.name().equalsIgnoreCase(libScope)) {
+                dependencyScope1 = v;
+                break;
+            }
+        }
+        if (dependencyScope1 == null) {
+            dependencyScope1 = DependencyScope.COMPILE;
+        }
+        final DependencyScope dependencyScope = dependencyScope1;
 
         Boolean finalsh = ApplicationManager.getApplication().runWriteAction(new Computable<Boolean>() {
             @Override
@@ -458,7 +471,7 @@ public class IdeaProjectGenerateUtil {
             }
         });
 
-          finalsh = ApplicationManager.getApplication().runWriteAction(new Computable<Boolean>() {
+        finalsh = ApplicationManager.getApplication().runWriteAction(new Computable<Boolean>() {
             @Override
             public Boolean compute() {
                 try {
@@ -468,7 +481,7 @@ public class IdeaProjectGenerateUtil {
                         for (LibraryEx library : LibraryExList) {
                             if (ApplicationLibraryUtil.notHas(ModuleRootManager.getInstance(module).getModifiableModel(),
                                     library.getName())) {
-                                ModuleRootModificationUtil.addDependency(module, library, DependencyScope.PROVIDED, false);
+                                ModuleRootModificationUtil.addDependency(module, library, dependencyScope, false);
                             }
                         }
                     }

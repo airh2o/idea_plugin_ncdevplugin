@@ -123,12 +123,27 @@ public class ApplicationLibraryUtil {
         LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_NCCloud_Library));
         LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_RESOURCES));
 
+        //  Compile  Test Runtime Provided
+        String libScope = ProjectNCConfigUtil.getConfigValue(module.getProject(), "libScope", "Compile");
+        DependencyScope dependencyScope1 = null;
+        for (DependencyScope v : DependencyScope.values()) {
+            if (v.name().equalsIgnoreCase(libScope)) {
+                dependencyScope1 = v;
+                break;
+            }
+        }
+        if (dependencyScope1 == null) {
+            dependencyScope1 = DependencyScope.COMPILE;
+        }
+        final DependencyScope dependencyScope = dependencyScope1;
+
         for (LibraryEx library : LibraryExList) {
             if (library == null) {
                 continue;
             }
-            if (ApplicationLibraryUtil.notHas(ModuleRootManager.getInstance(module).getModifiableModel(), library.getName())) {
-                ModuleRootModificationUtil.addDependency(module, library, DependencyScope.PROVIDED, false);
+            if (ApplicationLibraryUtil.notHas(ModuleRootManager.getInstance(module).getModifiableModel()
+                    , library.getName())) {
+                ModuleRootModificationUtil.addDependency(module, library, dependencyScope, false);
             }
         }
     }

@@ -142,7 +142,7 @@ public class NC5HomeConfigDialogUIListener {
         ProjectNCConfigUtil.setNCHomePath(ui.textField_home.getText());
         ProjectNCConfigUtil.setNCClientIP(ui.textField_clientip.getText());
         ProjectNCConfigUtil.setNCClientPort(ui.textField_cientport.getText());
-
+        ProjectNCConfigUtil.setNCConfigPropertice("libScope", ui.comboBox_libScope.getSelectedItem().toString());
         ProjectNCConfigUtil.saveConfig2File();
         //NCPropXmlUtil.saveDataSources();
     }
@@ -258,6 +258,7 @@ public class NC5HomeConfigDialogUIListener {
         ui.textField_home.setText(ProjectNCConfigUtil.getNCHomePath());
         ui.textField_clientip.setText(ProjectNCConfigUtil.getNCClientIP());
         ui.textField_cientport.setText(ProjectNCConfigUtil.getNCClientPort());
+        ui.comboBox_libScope.setSelectedItem(ProjectNCConfigUtil.getConfigValue("libScope", "Compile"));
 
         NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
         List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS();
