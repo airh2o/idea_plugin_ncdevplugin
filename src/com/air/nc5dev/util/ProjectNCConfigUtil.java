@@ -235,7 +235,7 @@ public class ProjectNCConfigUtil {
             return DependencyScope.COMPILE;
         }
 
-        String libScope = getConfigValue(module.getProject(), "libScope", "Compile");
+        String libScope = getConfigValue(module.getProject(), "libScope", "Provided");
         DependencyScope dependencyScope1 = null;
         for (DependencyScope v : DependencyScope.values()) {
             if (v.name().equalsIgnoreCase(libScope)) {
@@ -367,7 +367,7 @@ public class ProjectNCConfigUtil {
         }
         if (!prop.containsKey("libScope")) {
             //Compile  Test Runtime Provided
-            prop.put("libScope", "Compile");
+            prop.put("libScope", "Provided");
         }
 
         IoUtil.wirtePropertis(prop, ProjectNCConfigUtil.configFile.get(project.getBasePath()));

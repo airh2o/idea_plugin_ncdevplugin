@@ -17,7 +17,7 @@
                 description="设置NC5的HOME主路径">
         </action>
         <action id="nc5dev.config.updateclasspath" class="com.air.nc5dev.acion.UpdateProjectNCDependencyAction"
-                text="更新NC库依赖" description="立即更新当前设置的NC HOME的所有NC类依赖">
+                text="更新NC库依赖" description="立即更新当前设置的NC HOME的所有NC类依赖(耗时可能会较长,请耐心等待反应)">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift u"/>
         </action>
         <action id="nc5dev.config.AddDataSource2DbnToolAction" class="com.air.nc5dev.acion.AddDataSource2DbnToolAction"
