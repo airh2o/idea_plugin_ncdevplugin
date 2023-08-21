@@ -6,7 +6,9 @@ import com.air.nc5dev.util.idea.ProjectUtil;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.DependencyScope;
 import com.intellij.openapi.ui.Messages;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -224,6 +226,28 @@ public class ProjectNCConfigUtil {
     public static final String getConfigValue(Project project, @NotNull String key, String ifnull) {
         String s = getConfigValue(project, key);
         return s == null ? ifnull : s;
+    }
+
+    public static DependencyScope getLibScope(Module module) {
+        //如果当前模块是运行模块
+        Module runMenuNCServiceModel = IdeaProjectGenerateUtil.getRunMenuNCServiceModel(module.getProject());
+        if (runMenuNCServiceModel != null && module.equals(runMenuNCServiceModel)) {
+            return DependencyScope.COMPILE;
+        }
+
+        String libScope = getConfigValue(module.getProject(), "libScope", "Compile");
+        DependencyScope dependencyScope1 = null;
+        for (DependencyScope v : DependencyScope.values()) {
+            if (v.name().equalsIgnoreCase(libScope)) {
+                dependencyScope1 = v;
+                break;
+            }
+        }
+        if (dependencyScope1 == null) {
+            dependencyScope1 = DependencyScope.COMPILE;
+        }
+
+        return dependencyScope1;
     }
 
     /**

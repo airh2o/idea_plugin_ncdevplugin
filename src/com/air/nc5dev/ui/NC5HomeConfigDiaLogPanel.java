@@ -66,14 +66,14 @@ public class NC5HomeConfigDiaLogPanel extends JScrollPane {
         contentPanel.add(comboBox_dbtype);
 
         button_testdb = new JButton("测试链接");
-        button_testdb.setBounds(369, 112, 120, 42);
+        button_testdb.setBounds(300, 112, 120, 42);
         contentPanel.add(button_testdb);
 
         JLabel l34 = new JLabel("添加依赖的Scope:");
-        l34.setBounds(490, 112, 110, 42);
+        l34.setBounds(430, 112, 110, 42);
         contentPanel.add(l34);
         comboBox_libScope = new JComboBox(ProjectNCConfigUtil.LIB_SCOPES);
-        comboBox_libScope.setBounds(600, 112, 120, 42);
+        comboBox_libScope.setBounds(540, 112, 120, 42);
         contentPanel.add(comboBox_libScope);
 
         button_adddesign = new JButton("新增开发源");

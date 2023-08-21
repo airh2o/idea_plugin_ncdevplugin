@@ -197,6 +197,29 @@ public class IdeaProjectGenerateUtil {
         }
     }
 
+    public static Module getRunMenuNCServiceModel(Project project) {
+        if (!checkNCHomeSetPass()) {
+            return null;
+        }
+
+        RunManagerImpl runManager = RunConfigurationUtil.getRunManagerImpl(ProjectUtil.getDefaultProject());
+        List<RunConfiguration> configurationsList = runManager.getConfigurationsList(ApplicationConfigurationType
+                .getInstance());
+
+        if (CollUtil.isEmpty(configurationsList)) {
+            return null;
+        }
+
+        for (RunConfiguration cf : configurationsList) {
+            ApplicationConfiguration c = (ApplicationConfiguration) cf;
+            if ("ufmiddle.start.tomcat.StartDirectServer".equals(c.getMainClassName())) {
+                return c.getConfigurationModule().getModule();
+            }
+        }
+
+        return null;
+    }
+
     /**
      * 生成 项目的 NC2个运行配置
      *
@@ -354,20 +377,6 @@ public class IdeaProjectGenerateUtil {
             Messages.showInfoMessage("NC HOME不正确，请在 Tools 菜单下 配置NC HOME 菜单进行配置！", "警告");
         }
         ArrayList<LibraryEx> LibraryExList = new ArrayList<>();
-        //  Compile  Test Runtime Provided
-        String libScope = ProjectNCConfigUtil.getConfigValue(theProject, "libScope", "Compile");
-        DependencyScope dependencyScope1 = null;
-        for (DependencyScope v : DependencyScope.values()) {
-            if (v.name().equalsIgnoreCase(libScope)) {
-                dependencyScope1 = v;
-                break;
-            }
-        }
-        if (dependencyScope1 == null) {
-            dependencyScope1 = DependencyScope.COMPILE;
-        }
-        final DependencyScope dependencyScope = dependencyScope1;
-
         Boolean finalsh = ApplicationManager.getApplication().runWriteAction(new Computable<Boolean>() {
             @Override
             public Boolean compute() {
@@ -479,10 +488,11 @@ public class IdeaProjectGenerateUtil {
                     Module[] modules = ModuleManager.getInstance(project).getModules();
                     for (Module module : modules) {
                         for (LibraryEx library : LibraryExList) {
-                            if (ApplicationLibraryUtil.notHas(ModuleRootManager.getInstance(module).getModifiableModel(),
-                                    library.getName())) {
-                                ModuleRootModificationUtil.addDependency(module, library, dependencyScope, false);
-                            }
+                            ApplicationLibraryUtil.removeLib(module,
+                                    library.getName());
+
+                            ModuleRootModificationUtil.addDependency(module, library,
+                                    ProjectNCConfigUtil.getLibScope(module), false);
                         }
                     }
                 } catch (Exception e) {
