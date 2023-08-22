@@ -366,6 +366,11 @@ public class ExportNCPatcherUtil {
 
         if (contentVO.exportResources) {
             File resources = new File(webinf.getParentFile(), "resources");
+
+            if (!resources.isDirectory()) {
+                IoUtil.makeDirs(resources);
+            }
+
             File dist = new File(new File(contentVO.getHotwebsResourcePath()), "dist");
             if (dist.isDirectory()) {
                 moduleDirs = dist.listFiles();
@@ -611,7 +616,8 @@ public class ExportNCPatcherUtil {
                 if (com.air.nc5dev.util.CollUtil.isNotEmpty(fs)) {
                     for (File f : fs) {
                         if (f.isFile() && f.getName().toLowerCase().endsWith(".xml")) {
-                            List<ItemsItemVO> vs = ItemsItemVO.read(f , contentVO.getProject(), contentVO.moduleHomeDir2ModuleMap.get(modulePath));
+                            List<ItemsItemVO> vs = ItemsItemVO.read(f, contentVO.getProject(),
+                                    contentVO.moduleHomeDir2ModuleMap.get(modulePath));
                             if (com.air.nc5dev.util.CollUtil.isNotEmpty(vs)) {
                                 if (txt.length() > 0) {
                                     txt.delete(0, txt.length());
@@ -823,7 +829,7 @@ public class ExportNCPatcherUtil {
 
         if (!resources.exists()) {
             try {
-                resources.mkdirs();
+               IoUtil.makeDirs(resources);
             } catch (Exception e) {
                 LogUtil.error(e.getMessage(), e);
                 e.printStackTrace();
@@ -882,7 +888,7 @@ public class ExportNCPatcherUtil {
                         if (yyconfig.isDirectory()) {
                             File outf = new File(outBaseDir, "extend");
                             if (!outf.isDirectory()) {
-                                outf.mkdirs();
+                                IoUtil.makeDirs(outf);
                             }
                             IoUtil.copyFile(yyconfig, outf);
                             FileUtil.del(yyconfig);
@@ -896,7 +902,7 @@ public class ExportNCPatcherUtil {
                     }
 
                     if (!outf.isDirectory()) {
-                        outf.mkdirs();
+                        IoUtil.makeDirs(outf);
                     }
                     IoUtil.copyFile(cf, outf, configVO.getNccClientHotwebsPackges());
                     IoUtil.deleteAllEmptyDirs(cf);
@@ -1100,7 +1106,7 @@ public class ExportNCPatcherUtil {
                     || (dir.listFiles().length < 2 && dir.listFiles()[0].getName().equals("META-INF"))) {
                 return new ArrayList<>();
             }
-            outDir.mkdirs();
+            IoUtil.makeDirs(outDir);
             //创建MANIFEST.MF
 
             Manifest maniFest = getManiFest(manifest, dir.getName());
