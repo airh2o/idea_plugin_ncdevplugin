@@ -118,6 +118,7 @@ public class ExportContentVO {
         c.exportSql = exportSql;
         c.onleyFullSql = onleyFullSql;
         c.name = name;
+        c.hotwebsResourcePath = hotwebsResourcePath;
         c.exportModules = exportModules;
         c.module2ExportConfigVoMap = null;
         c.ignoreModules = null;

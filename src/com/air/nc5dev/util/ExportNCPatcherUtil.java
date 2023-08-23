@@ -242,6 +242,20 @@ public class ExportNCPatcherUtil {
                 }
             }
 
+            //复制模块resoureces
+            File resourcesDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "resources");
+            if (resourcesDir.isDirectory()) {
+                contentVO.indicator.setText("导出模块resources:" + resourcesDir.getPath());
+                if (contentVO.isSelectExport() && !contentVO.getSelectFiles().contains(resourcesDir.getPath())) {
+                    copyAll(resourcesDir
+                            , new File(new File(contentVO.outPath).getParentFile(), "resources")
+                            , contentVO);
+                } else {
+                    IoUtil.copyAllFile(resourcesDir
+                            , new File(new File(contentVO.outPath).getParentFile(), "resources"));
+                }
+            }
+
             //检查是否需要把代码打包成 jar文件
             if (configVO.toJar) {
                 File manifest = null;
@@ -829,7 +843,7 @@ public class ExportNCPatcherUtil {
 
         if (!resources.exists()) {
             try {
-               IoUtil.makeDirs(resources);
+                IoUtil.makeDirs(resources);
             } catch (Exception e) {
                 LogUtil.error(e.getMessage(), e);
                 e.printStackTrace();
