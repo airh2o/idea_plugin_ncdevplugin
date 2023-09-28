@@ -2,7 +2,6 @@ package com.air.nc5dev.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
@@ -285,7 +284,7 @@ public class ExportNCPatcherUtil {
         }
 
         //处理NCC特殊的模块补丁结构  这里针对是 某些文件指定的模块路径没有新建idea模块，这里处理下这种
-        if (NcVersionEnum.NCC.equals(contentVO.ncVersion)) {
+        if (NcVersionEnum.isNCCOrBIP(contentVO.ncVersion)) {
             processNCCPatchersWhenFinashLeft(contentVO);
         }
 
@@ -512,7 +511,7 @@ public class ExportNCPatcherUtil {
             new AutoGenerPathcherInfo4YunGuanJiaUtil().run(
                     base.getPath()
                     , StringUtil.get(contentVO.getName(), base.getName())
-                    , NcVersionEnum.NCC.equals(contentVO.getNcVersion())
+                    , NcVersionEnum.isNCCOrBIP(contentVO.getNcVersion())
                     , contentVO
             );
 
@@ -613,10 +612,31 @@ public class ExportNCPatcherUtil {
                 if (!script.isDirectory() || script.listFiles().length < 1) {
                     continue;
                 }
+
+                ArrayList<File> fs = Lists.newArrayList();
                 File conf = new File(script, "conf");
+
+                if (conf.isDirectory()) {
+                    File[] files = conf.listFiles();
+                    if (files != null) {
+                        for (File f : files) {
+                            if (f.isFile() && f.getName().toLowerCase().endsWith(".xml")) {
+                                fs.add(f);
+                            }
+                        }
+                    }
+                }
+
                 File initdata = new File(conf, "initdata");
-                if (!initdata.isDirectory()) {
-                    continue;
+                if (initdata.isDirectory()) {
+                    File[] files = initdata.listFiles();
+                    if (files != null) {
+                        for (File f : files) {
+                            if (f.isFile() && f.getName().toLowerCase().endsWith(".xml")) {
+                                fs.add(f);
+                            }
+                        }
+                    }
                 }
 
                 File moduleSqlDir = new File(sqldir, moduleHomeDir2ModuleMap.get(modulePath).getName());
@@ -626,34 +646,31 @@ public class ExportNCPatcherUtil {
                 File moduleSqlOne;
 
                 //读取items.xml文件
-                File[] fs = initdata.listFiles();
                 if (com.air.nc5dev.util.CollUtil.isNotEmpty(fs)) {
                     for (File f : fs) {
-                        if (f.isFile() && f.getName().toLowerCase().endsWith(".xml")) {
-                            List<ItemsItemVO> vs = ItemsItemVO.read(f, contentVO.getProject(),
-                                    contentVO.moduleHomeDir2ModuleMap.get(modulePath));
-                            if (com.air.nc5dev.util.CollUtil.isNotEmpty(vs)) {
-                                if (txt.length() > 0) {
-                                    txt.delete(0, txt.length());
-                                }
-
-                                moduleSqlOne = new File(moduleSqlDir
-                                        , moduleHomeDir2ModuleMap.get(modulePath).getName() + '_'
-                                        + StringUtil.removeAll(FileNameUtil.getName(f), ".xml")
-                                        + ".sql");
-                                moduleSqlOne.deleteOnExit();
-                                moduleOneSqls.add(moduleSqlOne);
-
-                                for (ItemsItemVO itemVO : vs) {
-                                    if (StringUtil.isBlank(itemVO.getItemKey())) {
-                                        continue;
-                                    }
-
-                                    ConnectionUtil.toInserts(con, itemVO, txt, exsitSqlSet, contentVO);
-                                }
-
-                                FileUtil.writeUtf8String(txt.toString(), moduleSqlOne);
+                        List<ItemsItemVO> vs = ItemsItemVO.read(f, contentVO.getProject(),
+                                contentVO.moduleHomeDir2ModuleMap.get(modulePath));
+                        if (com.air.nc5dev.util.CollUtil.isNotEmpty(vs)) {
+                            if (txt.length() > 0) {
+                                txt.delete(0, txt.length());
                             }
+
+                            moduleSqlOne = new File(moduleSqlDir
+                                    , moduleHomeDir2ModuleMap.get(modulePath).getName() + '_'
+                                    + StringUtil.removeAll(FileNameUtil.getName(f), ".xml")
+                                    + ".sql");
+                            moduleSqlOne.deleteOnExit();
+                            moduleOneSqls.add(moduleSqlOne);
+
+                            for (ItemsItemVO itemVO : vs) {
+                                if (StringUtil.isBlank(itemVO.getItemKey())) {
+                                    continue;
+                                }
+
+                                ConnectionUtil.toInserts(con, itemVO, txt, exsitSqlSet, contentVO);
+                            }
+
+                            FileUtil.writeUtf8String(txt.toString(), moduleSqlOne);
                         }
                     }
                 }
@@ -1067,7 +1084,7 @@ public class ExportNCPatcherUtil {
                 , "private_" + moduleHomeDir.getName()
                 , manifest));
         //client
-        if (!NcVersionEnum.NCC.equals(contentVO.ncVersion)) {
+        if (!NcVersionEnum.isNCCOrBIP(contentVO.ncVersion)) {
             fs.addAll(compressJar(new File(moduleHomeDir
                             , "client"
                             + File.separatorChar + "classes"
@@ -1090,7 +1107,7 @@ public class ExportNCPatcherUtil {
                     )
             );
             //client
-            if (!NcVersionEnum.NCC.equals(contentVO.ncVersion)) {
+            if (!NcVersionEnum.isNCCOrBIP(contentVO.ncVersion)) {
                 IoUtil.cleanUpDirFiles(new File(moduleHomeDir
                                 , "client"
                                 + File.separatorChar + "classes"
@@ -1256,7 +1273,7 @@ public class ExportNCPatcherUtil {
         }
 
         //处理NCC特殊的模块补丁结构
-        if (NcVersionEnum.NCC.equals(contentVO.ncVersion)) {
+        if (NcVersionEnum.isNCCOrBIP(contentVO.ncVersion)) {
             processNCCPatchersWhenFinash(ncType, exportDir, module
                     , sourceRoot, classDir, testClassDir, contentVO);
         }
@@ -1324,7 +1341,7 @@ public class ExportNCPatcherUtil {
             }
 
             //获得类对于的模块名字
-            String outModuleName = NC_TYPE_CLIENT.equals(ncType) && NcVersionEnum.NCC.equals(contentVO.ncVersion) ?
+            String outModuleName = NC_TYPE_CLIENT.equals(ncType) && NcVersionEnum.isNCCOrBIP(contentVO.ncVersion) ?
                     module.getName() : getOutModuleName(contentVO
                     , javaFullClassName, classFile, module, module.getName());
 
@@ -1527,7 +1544,7 @@ public class ExportNCPatcherUtil {
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "\\", ".");
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "/", ".");
             //检查是否配置了 特殊输出路径
-            String outModuleName = NC_TYPE_CLIENT.equals(ncType) && NcVersionEnum.NCC.equals(contentVO.ncVersion) ?
+            String outModuleName = NC_TYPE_CLIENT.equals(ncType) && NcVersionEnum.isNCCOrBIP(contentVO.ncVersion) ?
                     module.getName() : getOutModuleName(contentVO
                     , javaFullClassName, javaFile, module, module.getName());
 

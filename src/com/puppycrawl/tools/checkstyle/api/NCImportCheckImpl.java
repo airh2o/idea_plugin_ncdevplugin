@@ -4,13 +4,11 @@ import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
-import com.alibaba.fastjson.JSON;
 import lombok.Data;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * NC 三大文件夹互相导入检查 </br>
@@ -132,7 +130,7 @@ public class NCImportCheckImpl extends AbstarctCheckImpl {
                         continue;
                     }
                 } else if ("nc.bs.framework.common.NCLocator".equals(line)) {
-                    if (FROM_CLIENT == fileFrom && NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion())) {
+                    if (FROM_CLIENT == fileFrom && NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion())) {
                         violation = new Violation(i + 1
                                 , lines[i].length()
                                 , lines[i].length()

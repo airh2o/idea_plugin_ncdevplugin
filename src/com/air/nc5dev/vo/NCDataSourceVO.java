@@ -52,7 +52,7 @@ public class NCDataSourceVO {
         password = getSonElementTextContent(element, "password", 0);
         passwordOrgin = password;
         password = new NC5xEncode().decode(password);
-        if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion())) {
+        if (NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion())) {
             if (root.getElementsByTagName("isEncode").getLength() > 0) {
                 String isEncode = root.getElementsByTagName("isEncode").item(0).getTextContent();
                 if ("true".equalsIgnoreCase(StringUtil.trim(isEncode))) {

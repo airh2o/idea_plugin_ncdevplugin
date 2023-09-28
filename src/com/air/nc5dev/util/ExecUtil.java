@@ -84,8 +84,8 @@ public class ExecUtil {
      * @param runName 命令名字   build
      * @return
      */
-    public static String npmBuild(String path, Consumer<String> newLine) throws IOException {
-        return npmRun(path, "npm", "build", newLine);
+    public static String npmBuild(String path, Consumer<String> newLine, String command) throws IOException {
+        return npmRun(path, command, newLine);
     }
 
     /**
@@ -96,11 +96,11 @@ public class ExecUtil {
      * @param runName 命令名字 比如 build
      * @return
      */
-    public static String npmRun(String path, String npm, String runName, Consumer<String> newLine) throws IOException {
+    public static String npmRun(String path, String command, Consumer<String> newLine) throws IOException {
         String c = "cmd /c "
                 + "  " + StrUtil.sub(path, 0, StrUtil.indexOf(path, ':') + 1)
                 + " & cd " + path
-                + " & npm run build ";
+                + " & " + command;
 
         if (SystemUtil.getOsInfo().isLinux()) {
 

@@ -77,6 +77,11 @@ public class RestNcUserPassWordDialog
                 "     ,user_code as code, user_name as name,islocked as locked\n" +
                 "from sm_user\n" +
                 "where islocked <> 'y'");
+        nc2SmUserSql.put(NcVersionEnum.BIP, "select\n" +
+                "    cuserid as id, user_password as pass\n" +
+                "     ,user_code as code, user_name as name,islocked as locked\n" +
+                "from sm_user\n" +
+                "where islocked <> 'y'");
     }
 
     public RestNcUserPassWordDialog(AnActionEvent event) {
@@ -211,7 +216,7 @@ public class RestNcUserPassWordDialog
                 || NcVersionEnum.U8Cloud.equals(ProjectNCConfigUtil.getNCVersion())) {
             sqls = buildNc5xUpdateSqls();
         } else if (NcVersionEnum.NC6.equals(ProjectNCConfigUtil.getNCVersion())
-                || NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion())) {
+                || NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion())) {
             sqls = buildNc6xUpdateSqls();
         }
 

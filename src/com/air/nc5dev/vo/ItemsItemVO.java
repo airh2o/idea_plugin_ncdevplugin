@@ -41,6 +41,7 @@ public class ItemsItemVO {
     public String corpField;
     public String grpField;
     public String fixedWhere;
+    public String sql;
 
     public static List<ItemsItemVO> read(File xml, Project project, Module module) {
         List<ItemsItemVO> vs = read0(xml, project, module);
@@ -112,6 +113,7 @@ public class ItemsItemVO {
                     .corpField(getValueIfull2EmtpyStr(n, "corpField"))
                     .grpField(getValueIfull2EmtpyStr(n, "grpField"))
                     .fixedWhere(getValueIfull2EmtpyStr(n, "fixedWhere"))
+                    .sql(getValueIfull2EmtpyStr(n, "sql"))
                     .build();
 
             //处理变量填充
@@ -123,6 +125,7 @@ public class ItemsItemVO {
                 e.setCorpField(StrUtil.replace(e.getCorpField(), "{" + key + "}", vars.get(key)));
                 e.setGrpField(StrUtil.replace(e.getGrpField(), "{" + key + "}", vars.get(key)));
                 e.setFixedWhere(StrUtil.replace(e.getFixedWhere(), "{" + key + "}", vars.get(key)));
+                e.setSql(StrUtil.replace(e.getSql(), "{" + key + "}", vars.get(key)));
             }
 
             vs.add(e);

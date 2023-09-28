@@ -100,6 +100,8 @@ public class ExportContentVO {
      */
     public String hotwebsResourcePath;
 
+    String npmRunCommand;
+
     public ExportContentVO copyBaseInfo() {
         ExportContentVO c = new ExportContentVO();
         c.filtersql = filtersql;
@@ -126,6 +128,7 @@ public class ExportContentVO {
         c.selectFile2ModuleMap = null;
         c.selectModules = null;
         c.no2Jar = no2Jar;
+        c.npmRunCommand = npmRunCommand;
         return c;
     }
 

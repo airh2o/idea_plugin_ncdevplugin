@@ -206,6 +206,61 @@ public class SqlUtil {
         }
     }
 
+    public static SqlQueryResultSet queryResultsByFullSql(ITable table, String fullsql, Connection conn) throws DatabaseRuntimeException {
+        if (table == null) {
+            throw new DatabaseRuntimeException(Messages.SqlUtil_2);
+        } else {
+            checkTable(table);
+            String sql = fullsql;
+            if (Logger.isDebugEnabled()) {
+                Logger.debug(String.format("Query: %s", sql));
+            }
+
+            Statement stmt = null;
+            ResultSet rs = null;
+
+            try {
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery(sql);
+                SqlQueryResultSet sqlQueryResultSet = new SqlQueryResultSet(table);
+
+                while (rs.next()) {
+                    Map<String, Object> colNameValueMap = new LinkedHashMap();
+                    Iterator var9 = table.getAllColumns().iterator();
+
+                    while (var9.hasNext()) {
+                        IColumn col = (IColumn) var9.next();
+                        colNameValueMap.put(col.getName(), rs.getObject(col.getName()));
+                    }
+
+                    sqlQueryResultSet.getResults().add(colNameValueMap);
+                }
+
+                SqlQueryResultSet var11 = sqlQueryResultSet;
+                return var11;
+            } catch (SQLException var20) {
+                Logger.error(Messages.SqlUtil_0, var20);
+                throw new DatabaseRuntimeException(Messages.SqlUtil_1 + sql);
+            } finally {
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException var19) {
+                    }
+                }
+
+                if (stmt != null) {
+                    try {
+                        stmt.close();
+                    } catch (SQLException var18) {
+                    }
+                }
+
+            }
+        }
+    }
+
+
     public static String formatSql(Object obj, int dataType) {
         if (obj != null) {
             String str = obj.toString().trim();

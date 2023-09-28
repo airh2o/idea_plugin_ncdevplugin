@@ -1,7 +1,9 @@
 package com.air.nc5dev.ui;
 
+import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.ui.listener.NC5HomeConfigDialogUIListener;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.intellij.openapi.project.Project;
 import lombok.Data;
 
 import javax.swing.*;
@@ -10,6 +12,7 @@ import java.awt.*;
 @Data
 public class NC5HomeConfigDiaLogPanel extends JScrollPane {
     public JComboBox comboBox_libScope;
+    public JComboBox comboBox_ncversion;
     public JTextField textField_home;
     public JTextField textField_ip;
     public JTextField textField_port;
@@ -30,11 +33,13 @@ public class NC5HomeConfigDiaLogPanel extends JScrollPane {
     public JTextField textField_minConCout;
     public JTextField textField_maxConCount;
     public NC5HomeConfigDialogUIListener nc5HomeConfigDialogUIListner;
+    Project project;
 
     /**
      * Create the dialog.
      */
-    public NC5HomeConfigDiaLogPanel() {
+    public NC5HomeConfigDiaLogPanel(Project project) {
+        this.project = project;
         setLayout(null);
         JPanel contentPanel = new JPanel();
         contentPanel.setBounds(14, 14, 738, 543);
@@ -69,11 +74,18 @@ public class NC5HomeConfigDiaLogPanel extends JScrollPane {
         button_testdb.setBounds(300, 112, 120, 42);
         contentPanel.add(button_testdb);
 
-        JLabel l34 = new JLabel("添加依赖的Scope:");
+        JLabel l34 = new JLabel("指定NC版本:");
         l34.setBounds(430, 112, 110, 42);
         contentPanel.add(l34);
+        comboBox_ncversion = new JComboBox(NcVersionEnum.values());
+        comboBox_ncversion.setBounds(540, 112, 120, 42);
+        contentPanel.add(comboBox_ncversion);
+
+        l34 = new JLabel("添加依赖的Scope:");
+        l34.setBounds(540, 112, 110, 42);
+        contentPanel.add(l34);
         comboBox_libScope = new JComboBox(ProjectNCConfigUtil.LIB_SCOPES);
-        comboBox_libScope.setBounds(540, 112, 120, 42);
+        comboBox_libScope.setBounds(650, 112, 120, 42);
         contentPanel.add(comboBox_libScope);
 
         button_adddesign = new JButton("新增开发源");

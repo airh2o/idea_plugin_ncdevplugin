@@ -14,6 +14,12 @@ public enum NcVersionEnum {
     NC5,
     NC6,
     NCC,
+    BIP,
     U8Cloud,
     ;
+
+
+    public static boolean isNCCOrBIP(NcVersionEnum v){
+        return NCC == v || BIP == v;
+    }
 }

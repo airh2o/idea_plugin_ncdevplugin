@@ -69,6 +69,7 @@ public class PatcherDialog extends DialogWrapper {
     private JTextField textField_saveName;
     private JTextField textField_hotwebsProject;
     private JTextField textField_savePath;
+    private JTextField textField_npmRun;
     JBCheckBox filtersql;
     JBCheckBox rebuild;
     JComboBox dataSourceIndex;
@@ -373,15 +374,17 @@ public class PatcherDialog extends DialogWrapper {
             panel3.add(button_TestDb);
             qdp.add(panel3);
 
-            label_6 = new JBLabel("自动删除hotwebs的dist后执行npm run build:");
+            label_6 = new JBLabel("自动删除hotwebs的dist后执行:");
             reNpmBuild = new JBCheckBox();
             reNpmBuild.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("reNpmBuild", "true")));
+            textField_npmRun = new JTextField("npm run build");
             panel5 = new JBPanel();
             //  panel5.setBorder(LineBorder.createGrayLineBorder());
             panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
             panel5.setBounds(x, y = y + height + 5, width, height);
             panel5.add(label_6);
             panel5.add(reNpmBuild);
+            panel5.add(textField_npmRun);
             qdp.add(panel5);
         }
 
@@ -570,6 +573,7 @@ public class PatcherDialog extends DialogWrapper {
         contentVO.saveConfig = saveConfig.isSelected();
         contentVO.data_source_index = dataSourceIndex.getSelectedIndex();
         contentVO.ncVersion = (NcVersionEnum) ncVersion.getSelectedItem();
+        contentVO.setNpmRunCommand(textField_npmRun.getText());
 
         contentVO.init();
         contentVO.selectExport = selectExport.isSelected() || selectExport2.isSelected();
@@ -870,14 +874,15 @@ public class PatcherDialog extends DialogWrapper {
     private void reBuildNpmPatcther(ExportContentVO contentVO, @NotNull ProgressIndicator indicator) throws IOException {
         File dir = new File(contentVO.hotwebsResourcePath);
         if (dir.isDirectory()) {
-            indicator.setText("强制删除前端hotwebs的dist后执行npm run build中...");
+            indicator.setText("强制删除前端hotwebs的dist后执行" + contentVO.getNpmRunCommand() + "中...");
             IoUtil.cleanUpDirFiles(new File(dir, "dist"));
             String cm = ExecUtil.npmBuild(dir.getPath()
                     , (line) -> {
                         indicator.setText("npm building:" + StrUtil.removeAllLineBreaks(line));
                     }
+                    , contentVO.getNpmRunCommand()
             );
-            LogUtil.infoAndHide("前端 npm run build: " + cm);
+            LogUtil.infoAndHide("前端 " + contentVO.getNpmRunCommand() + ": " + cm);
         }
     }
 

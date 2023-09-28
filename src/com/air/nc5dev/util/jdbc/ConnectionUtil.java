@@ -3,6 +3,7 @@ package com.air.nc5dev.util.jdbc;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.ReflectUtil;
+import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.ncutils.AESEncode;
 import com.air.nc5dev.vo.ExportContentVO;
@@ -55,7 +56,8 @@ public class ConnectionUtil {
     public static void toInserts(Connection con, ItemsItemVO itemVO, StringBuilder txt, Set exsitSqlSet, ExportContentVO contentVO) {
         try {
             ITable iTable = SqlUtil.retrieveTable(itemVO.getItemKey(), null, con);
-            SqlQueryResultSet rs = SqlUtil.queryResults(iTable, itemVO.getFixedWhere(), con);
+            SqlQueryResultSet rs = StringUtil.isBlank(itemVO.getSql()) ? SqlUtil.queryResults(iTable, itemVO.getFixedWhere(), con)
+                    : SqlUtil.queryResultsByFullSql(iTable, itemVO.getSql(), con);
             if (rs == null) {
                 return;
             }

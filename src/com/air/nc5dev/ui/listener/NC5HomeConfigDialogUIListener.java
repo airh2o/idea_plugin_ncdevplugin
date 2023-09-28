@@ -1,6 +1,7 @@
 package com.air.nc5dev.ui.listener;
 
 import com.air.nc5dev.acion.NC5HomePathConfigAction;
+import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.ui.NC5HomeConfigDiaLogPanel;
 import com.air.nc5dev.util.NCPassWordUtil;
 import com.air.nc5dev.util.NCPropXmlUtil;
@@ -143,6 +144,7 @@ public class NC5HomeConfigDialogUIListener {
         ProjectNCConfigUtil.setNCClientIP(ui.textField_clientip.getText());
         ProjectNCConfigUtil.setNCClientPort(ui.textField_cientport.getText());
         ProjectNCConfigUtil.setNCConfigPropertice("libScope", ui.comboBox_libScope.getSelectedItem().toString());
+        ProjectNCConfigUtil.setNCConfigPropertice("nc.version", ui.comboBox_ncversion.getSelectedItem().toString());
         ProjectNCConfigUtil.saveConfig2File();
         //NCPropXmlUtil.saveDataSources();
     }
@@ -259,6 +261,8 @@ public class NC5HomeConfigDialogUIListener {
         ui.textField_clientip.setText(ProjectNCConfigUtil.getNCClientIP());
         ui.textField_cientport.setText(ProjectNCConfigUtil.getNCClientPort());
         ui.comboBox_libScope.setSelectedItem(ProjectNCConfigUtil.getConfigValue("libScope", "Compile"));
+        ui.comboBox_libScope.setSelectedItem(ProjectNCConfigUtil.getConfigValue("nc.version"
+                , ProjectNCConfigUtil.getNCVersion().toString()));
 
         NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
         List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS();

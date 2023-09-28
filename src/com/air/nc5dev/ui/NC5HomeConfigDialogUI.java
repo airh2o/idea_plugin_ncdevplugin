@@ -9,6 +9,7 @@ import java.awt.*;
 
 public class NC5HomeConfigDialogUI extends DialogWrapper {
     private NC5HomeConfigDiaLogPanel centerPanel;
+    Project project;
     public NC5HomeConfigDialogUI(@Nullable Project project) {
         super(project);
         super.init();
@@ -24,7 +25,7 @@ public class NC5HomeConfigDialogUI extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        centerPanel = new NC5HomeConfigDiaLogPanel();
+        centerPanel = new NC5HomeConfigDiaLogPanel(project);
         centerPanel.setPreferredSize(new Dimension(769, 606));
         return centerPanel;
     }

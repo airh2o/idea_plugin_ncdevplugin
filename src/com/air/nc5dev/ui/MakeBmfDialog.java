@@ -1,6 +1,5 @@
 package com.air.nc5dev.ui;
 
-import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.BmfUtil;
 import com.air.nc5dev.util.ExceptionUtil;
@@ -73,7 +72,7 @@ public class MakeBmfDialog extends DialogWrapper {
         try {
             String templateStr = null;
             NcVersionEnum ncVersionEnum = (NcVersionEnum) comboBox_version.getSelectedItem();
-            if (NcVersionEnum.NCC.equals(ncVersionEnum)) {
+            if (NcVersionEnum.isNCCOrBIP(ncVersionEnum)) {
                 templateStr = ProjectUtil.getResourceTemplatesUtf8Txt("meta/ncc/" + template);
             } else if (NcVersionEnum.NC6.equals(ncVersionEnum)) {
                 templateStr = ProjectUtil.getResourceTemplatesUtf8Txt("meta/6/" + template);

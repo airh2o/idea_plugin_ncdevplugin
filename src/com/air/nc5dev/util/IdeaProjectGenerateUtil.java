@@ -22,9 +22,6 @@ import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.*;
 import com.intellij.openapi.roots.impl.ModifiableModelCommitter;
@@ -47,7 +44,6 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 import java.util.stream.Stream;
 
 /***
@@ -299,7 +295,7 @@ public class IdeaProjectGenerateUtil {
                             + " -Dlog4j.ignoreTCL=true "
                             + " -Duser.timezone=GMT+8 "
                             + (
-                            NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion()) ?
+                            NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion()) ?
                                     " -Dfile.encoding=UTF-8 "
                                     : " -Xmx768m -XX:MaxPermSize=256m "
                                     + " -Dfile.encoding=GBK "
@@ -544,7 +540,7 @@ public class IdeaProjectGenerateUtil {
         try {
             copyModuleMetainfoDir2NChome(module);
 
-            if (NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion())) {
+            if (NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion())) {
                 copyModuleNccConfigDir2NChome(module);
                 if (!"true".equals(ProjectNCConfigUtil.getConfigValue("close_client_copy"))) {
                     try {

@@ -29,7 +29,7 @@ public class NCPassWordUtil {
         }
 
         if (NcVersionEnum.NC6.equals(ProjectNCConfigUtil.getNCVersion())
-                || NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion())) {
+                || NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion())) {
             return new NC6xEncode().decode(pass, expars);
         }
 
@@ -49,7 +49,7 @@ public class NCPassWordUtil {
         }
 
         if (NcVersionEnum.NC6.equals(ProjectNCConfigUtil.getNCVersion())
-                || NcVersionEnum.NCC.equals(ProjectNCConfigUtil.getNCVersion())) {
+                || NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion())) {
             return new NC6xEncode().encode(pass, expars);
         }
 

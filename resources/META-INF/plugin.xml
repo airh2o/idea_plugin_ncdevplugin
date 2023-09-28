@@ -81,6 +81,9 @@
                 text="打开最后一次MSTSC连接" description="打开最后一次MSTSC连接">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift l"/>
         </action>
+        <action id="nc5dev.info.MakeExcelByBmfFile" class="com.air.nc5dev.acion.MakeExcelByBmfFileAction"
+                text="元数据文件转字段Excel文档" description="根据bmf元数据文件生成Excel的单据字段文档">
+        </action>
         <action id="nc5dev.info.NCCJsonDecodeAction" class="com.air.nc5dev.acion.NCCJsonDecodeAction"
                 text="NCC(BIP)前端请求解码" description="NCC(BIP)前端请求解码">
         </action>
@@ -135,6 +138,9 @@
                 text="搜索NCC请求地址映射Action" description="NCC请求地址映射Action">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>
             <!--            BACK_SLASH-->
+        </action>
+        <action id="SearchNCRequestMapping" class="com.air.nc5dev.acion.SearchNCRequestMappingAction"
+                text="搜索NCC-BIP请求地址界面" description="NCC请求地址映射Action">
         </action>
         <action id="ReDeployAction" class="com.air.nc5dev.acion.ReDeployAction"
                 text="立即部署更新项目配置到HOME" description="比如ncc的xml文件和重新加载各种项目里的xml信息">
@@ -270,6 +276,7 @@
                 <reference ref="nc5dev.info.OpenYonbipDevWebAction"/>
                 <reference ref="nc5dev.info.SearchFullDataBaseAction"/>
                 <reference ref="nc5dev.info.MstscManggerUIAction"/>
+                <reference ref="nc5dev.info.MakeExcelByBmfFile"/>
                 <reference ref="nc5dev.info.MstscOpenLastAction"/>
                 <reference ref="nc5dev.info.NCCJsonDecodeAction"/>
 
@@ -294,6 +301,7 @@
 
             <reference ref="nc5dev.info.makejarfile"/>
             <reference ref="nc5dev.info.makeNcModulejarfile"/>
+            <reference ref="SearchNCRequestMapping"/>
             <reference ref="GoToNCRequestMapping"/>
             <reference ref="ReDeployAction"/>
             <separator/>

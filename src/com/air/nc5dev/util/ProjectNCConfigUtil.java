@@ -581,6 +581,14 @@ public class ProjectNCConfigUtil {
         }
 
         f = new File(getNCHome(), "hotwebs"
+                + File.separatorChar + "yonbip"
+        );
+
+        if (f.isDirectory()) {
+            return NcVersionEnum.BIP;
+        }
+
+        f = new File(getNCHome(), "hotwebs"
                 + File.separatorChar + "nccloud"
         );
 
