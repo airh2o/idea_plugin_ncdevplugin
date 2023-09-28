@@ -10,7 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-import static java.util.function.Predicate.not;
+import java.util.function.Predicate;
 
 /**
  * A table model for editing CheckStyle file locations.
@@ -40,7 +40,7 @@ public class LocationTableModel extends AbstractTableModel {
             locations.addAll(newLocations);
         }
 
-        this.activeLocations.removeIf(not(locations::contains));
+        this.activeLocations.removeIf(java.util.function.Predicate.not(locations::contains));
 
         fireTableDataChanged();
     }

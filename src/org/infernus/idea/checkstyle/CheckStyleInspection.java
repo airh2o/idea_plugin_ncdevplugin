@@ -40,8 +40,6 @@ import static org.infernus.idea.checkstyle.util.Notifications.showException;
 import static org.infernus.idea.checkstyle.util.Notifications.showWarning;
 
 public class CheckStyleInspection extends LocalInspectionTool {
-
-    private static final Logger LOG = Logger.getInstance(CheckStyleInspection.class);
     private static final List<Problem> NO_PROBLEMS_FOUND = Collections.emptyList();
     private static final long FIVE_SECONDS = 5000L;
 
@@ -52,7 +50,7 @@ public class CheckStyleInspection extends LocalInspectionTool {
     public JComponent createOptionsPanel() {
         synchronized (configPanelLock) {
             if (configPanel == null) {
-                configPanel  = new CheckStyleInspectionPanel();
+                configPanel = new CheckStyleInspectionPanel();
             }
             return configPanel;
         }
@@ -63,7 +61,7 @@ public class CheckStyleInspection extends LocalInspectionTool {
                                          @NotNull final InspectionManager manager,
                                          final boolean isOnTheFly) {
         if (InjectedLanguageManager.getInstance(manager.getProject()).isInjectedFragment(psiFile)) {
-            LOG.debug("Ignoring file as it is an injected fragment: " + psiFile);
+            //LOG.debug("Ignoring file as it is an injected fragment: " + psiFile);
             return noProblemsFound(manager);
         }
 
@@ -74,7 +72,7 @@ public class CheckStyleInspection extends LocalInspectionTool {
                 module,
                 null);
         if (scannableFiles.isEmpty()) {
-            LOG.debug("Inspection has been cancelled as file is not scannable: " + psiFile.getName());
+            //LOG.debug("Inspection has been cancelled as file is not scannable: " + psiFile.getName());
             return noProblemsFound(manager);
         }
 
@@ -90,11 +88,11 @@ public class CheckStyleInspection extends LocalInspectionTool {
                     manager, isOnTheFly);
 
         } catch (ProcessCanceledException | AssertionError e) {
-            LOG.debug("Inspection cancelled when scanning: " + psiFile.getName());
+            //LOG.debug("Inspection cancelled when scanning: " + psiFile.getName());
             return noProblemsFound(manager);
 
         } catch (Throwable e) {
-            LOG.warn("CheckStyle threw an exception when inspecting: " + psiFile.getName(), e);
+            //LOG.warn("CheckStyle threw an exception when inspecting: " + psiFile.getName(), e);
             showException(manager.getProject(), e);
             return noProblemsFound(manager);
         }
@@ -118,7 +116,7 @@ public class CheckStyleInspection extends LocalInspectionTool {
                                       @NotNull final List<ScannableFile> scannableFiles,
                                       @Nullable final Module module,
                                       @NotNull final InspectionManager manager) {
-        LOG.debug("Inspection has been invoked for " + psiFile.getName());
+        //LOG.debug("Inspection has been invoked for " + psiFile.getName());
 
         ArrayList<ConfigurationLocation> configurationLocations = new ArrayList<>();
         try {
@@ -141,11 +139,11 @@ public class CheckStyleInspection extends LocalInspectionTool {
                     .collect(toList());
 
         } catch (ProcessCanceledException | AssertionError e) {
-            LOG.debug("Process cancelled when scanning: " + psiFile.getName());
+            //LOG.debug("Process cancelled when scanning: " + psiFile.getName());
             return NO_PROBLEMS_FOUND;
 
         } catch (CheckStylePluginParseException e) {
-            LOG.debug("Parse exception caught when scanning: " + psiFile.getName(), e);
+            //LOG.debug("Parse exception caught when scanning: " + psiFile.getName(), e);
             return NO_PROBLEMS_FOUND;
 
         } catch (Throwable e) {
@@ -169,7 +167,7 @@ public class CheckStyleInspection extends LocalInspectionTool {
                                        final List<ConfigurationLocation> configurationLocations,
                                        final @NotNull Project project) {
         if (e.getCause() != null && e.getCause() instanceof ProcessCanceledException) {
-            LOG.debug("Process cancelled when scanning: " + psiFile.getName());
+            //LOG.debug("Process cancelled when scanning: " + psiFile.getName());
 
         } else if (e.getCause() != null && e.getCause() instanceof FileNotFoundException) {
             disableActiveConfiguration(project);
@@ -179,7 +177,7 @@ public class CheckStyleInspection extends LocalInspectionTool {
             block(configurationLocations);
 
         } else {
-            LOG.warn("CheckStyle threw an exception when scanning: " + psiFile.getName(), e);
+            //LOG.warn("CheckStyle threw an exception when scanning: " + psiFile.getName(), e);
             showException(project, e);
             block(configurationLocations);
         }

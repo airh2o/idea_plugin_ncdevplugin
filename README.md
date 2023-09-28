@@ -118,6 +118,23 @@ onleyFullSql=true
 ####
 ```
 
+IDEA连接数据库导出SQL的xml配置文件:
+```text
+参考 参考配置文件中的 xml，
+新增变量功能：
+
+ <vars>
+        <!--        这个可以定义这个文件范围内的变量，然后可以在下面的 标签值中 使用变量
+        ， 比如 我定一个 一个变量名 billType 那么下面使用可以用 {billType} 使用他(大小写敏感)
+        ，固定内置变量： date 当前日期， datetime 当前日期加时间 ， project 项目名称， module 模块名称
+         -->
+        <var name="appcode">40060101</var>
+        <var name="user">_by 张三 {datetime} 导出应用编码：{appcode} 所属项目 {project} 代码模块 {module}</var>
+ </vars>
+
+
+```
+
 # 常见问题
 
 1. IDEA 重启后如果提示运行配置的 variables 比如 FIELD_NC_HOME 等无效，请无视他 ，因为在项目运行列表里里配置了 ，无需在 file > setting > apperarance & behavior >
