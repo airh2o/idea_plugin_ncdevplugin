@@ -1,15 +1,13 @@
 package com.air.nc5dev.util.jdbc;
 
-import com.air.nc5dev.util.CollUtil;
-import com.air.nc5dev.util.ProjectNCConfigUtil;
-import com.air.nc5dev.util.ReflectUtil;
-import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.util.*;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.ncutils.AESEncode;
 import com.air.nc5dev.vo.ExportContentVO;
 import com.air.nc5dev.vo.ItemsItemVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.air.nc5dev.vo.SubTableVO;
+import com.alibaba.fastjson.JSON;
 import nc.uap.studio.pub.db.ScriptHelper;
 import nc.uap.studio.pub.db.SqlUtil;
 import nc.uap.studio.pub.db.model.ITable;
@@ -75,7 +73,10 @@ public class ConnectionUtil {
         } catch (Exception e) {
             e.printStackTrace();
             LogUtil.error("导出表:" + itemVO.getItemKey() + " 出错!" + e.toString() + " ," + itemVO.getFixedWhere(), e);
-            throw new RuntimeException("导出表:" + itemVO.getItemKey() + " 出错!" + e.toString() + " ," + itemVO.getFixedWhere(), e);
+            throw new RuntimeException("导出表:" + itemVO.getItemKey() + " 出错!"
+                    + "sql= " + (StringUtil.isBlank(itemVO.getSql()) ? itemVO.getFixedWhere() : itemVO.getSql())
+                    + ExceptionUtil.toStringLines(ExceptionUtil.getTopCase(e), 30)
+                    + " ," + JSON.toJSONString(itemVO), e);
         }
     }
 

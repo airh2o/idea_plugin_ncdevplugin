@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.DependencyScope;
 import com.intellij.openapi.ui.Messages;
 import lombok.Getter;
+import oracle.jdbc.logging.annotations.DisableTrace;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.DOMException;
@@ -64,6 +65,7 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:11
      * @Param []
      */
+    @Deprecated
     public static final File getNCHome() {
         String configValue = getConfigValue(KEY_PROJECT_NC_CONFIG_NCHOME);
         if (StringUtil.isBlank(configValue)) {
@@ -79,6 +81,7 @@ public class ProjectNCConfigUtil {
         return hasSetNCHOME();
     }
 
+    @Deprecated
     public static boolean hasSetNCHOME() {
         File f = getNCHome();
         if (f == null) {
@@ -103,6 +106,7 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:11
      * @Param []
      */
+    @Deprecated
     public static final String getNCHomePath(Project project) {
         return getConfigValue(project, KEY_PROJECT_NC_CONFIG_NCHOME);
     }
@@ -118,6 +122,7 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:11
      * @Param []
      */
+    @Deprecated
     public static final String getNCHomePath() {
         return getConfigValue(ProjectUtil.getProject(), KEY_PROJECT_NC_CONFIG_NCHOME);
     }
@@ -133,6 +138,7 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:13
      * @Param [path]
      */
+    @Deprecated
     public static final void setNCHomePath(String path) {
         setNCConfigPropertice(KEY_PROJECT_NC_CONFIG_NCHOME, path);
     }
@@ -148,6 +154,7 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:11
      * @Param []
      */
+    @Deprecated
     public static final String getNCClientIP() {
         return getConfigValue(KEY_PROJECT_NC_CONFIG_CLIENT_IP);
     }
@@ -163,6 +170,7 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:13
      * @Param [path]
      */
+    @Deprecated
     public static final void setNCClientIP(String path) {
         setNCConfigPropertice(KEY_PROJECT_NC_CONFIG_CLIENT_IP, path);
     }
@@ -178,6 +186,7 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:11
      * @Param []
      */
+    @Deprecated
     public static final String getNCClientPort() {
         return getConfigValue(KEY_PROJECT_NC_CONFIG_CLIENT_PORT);
     }
@@ -193,6 +202,7 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:13
      * @Param [port]
      */
+    @Deprecated
     public static final void setNCClientPort(String port) {
         setNCConfigPropertice(KEY_PROJECT_NC_CONFIG_CLIENT_PORT, port);
     }
@@ -208,6 +218,7 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:12
      * @Param [key]
      */
+    @Deprecated
     public static final String getConfigValue(@NotNull String key, String ifnull) {
         return getConfigValue(ProjectUtil.getProject(), key, ifnull);
     }
@@ -261,6 +272,7 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:12
      * @Param [key]
      */
+    @Deprecated
     public static final String getConfigValue(@NotNull String key) {
         return getConfigValue(ProjectUtil.getProject(), key);
     }
@@ -384,6 +396,7 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:13
      * @Param [key, value]
      */
+    @Deprecated
     public static final void setNCConfigPropertice(@NotNull String key, String value) {
         setNCConfigPropertice(ProjectUtil.getProject(), key, value);
     }
@@ -552,9 +565,19 @@ public class ProjectNCConfigUtil {
      *
      * @return
      */
+    @Deprecated
     public static NcVersionEnum getNCVersion() {
+        return getNCVersion(ProjectUtil.getDefaultProject());
+    }
+
+    /**
+     * 获取NC的版本
+     *
+     * @return
+     */
+    public static NcVersionEnum getNCVersion(Project project) {
         //先看看是否配置文件强行指定了NC版本！
-        String version = getConfigValue("nc.version");
+        String version = getConfigValue(project, "nc.version");
         if (StringUtil.isNotEmpty(version)) {
             return NcVersionEnum.valueOf(version);
         }
@@ -604,6 +627,7 @@ public class ProjectNCConfigUtil {
      *
      * @return
      */
+    @Deprecated //要增加project参数才对
     public static boolean isHyVersion() {
         // 读取配置文件
         File f = new File(getNCHome(), "ierp"

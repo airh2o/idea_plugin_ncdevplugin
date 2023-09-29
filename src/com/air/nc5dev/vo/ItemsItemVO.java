@@ -107,8 +107,8 @@ public class ItemsItemVO {
             Node n = is.item(i);
             ItemsItemVO e = ItemsItemVO.builder()
                     .itemKey(getValueIfull2EmtpyStr(n, "itemKey"))
-                    .itemName(getValueIfull2EmtpyStr(n, "itemName"))
-                    .itemRule(getValueIfull2EmtpyStr(n, "itemRule"))
+                    .itemName(getValueTwo(n, "itemName", "itemKey"))
+                    .itemRule(getValueTwo(n, "itemRule", "itemKey"))
                     .sysField(getValueIfull2EmtpyStr(n, "sysField"))
                     .corpField(getValueIfull2EmtpyStr(n, "corpField"))
                     .grpField(getValueIfull2EmtpyStr(n, "grpField"))
@@ -132,6 +132,22 @@ public class ItemsItemVO {
         }
 
         return vs;
+    }
+
+    public static String getValueTwo(Node n, String nodeName, String ifblackKey) {
+        String v = getValue(n, nodeName);
+        if (StringUtil.isBlank(v)) {
+            return getValueIfull2EmtpyStr(n, ifblackKey);
+        }
+        return v;
+    }
+
+    public static String getValue(Node n, String nodeName, String ifblack) {
+        String v = getValue(n, nodeName);
+        if (StringUtil.isBlank(v)) {
+            return ifblack;
+        }
+        return v;
     }
 
     public static String getValueIfull2EmtpyStr(Node n, String nodeName) {

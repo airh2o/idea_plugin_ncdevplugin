@@ -71,18 +71,30 @@ public class BuildManagerListenerImpl implements com.intellij.compiler.server.Bu
     public void doTask(Project project) {
         project = null == project ? ProjectUtil.getDefaultProject() : project;
 
-        if ("true".equals(ProjectNCConfigUtil.getConfigValue("buildAfterNCCodeCheck"))) {
-            checkNCCode(project);
+        if ("true".equals(ProjectNCConfigUtil.getConfigValue(project, "buildAfterNCCodeCheck"))) {
+            try {
+                checkNCCode(project);
+            } catch (Throwable e) {
+                //is ok
+            }
         }
 
         LogUtil.tryInfo(project.getBasePath()
                 + " 项目编译或运行等，触发NC 配置文件文件复制到NCHOME:"
                 + ProjectNCConfigUtil.getNCHomePath());
 
-        IdeaProjectGenerateUtil.copyProjectMetaInfFiles2NCHomeModules();
+        try {
+            IdeaProjectGenerateUtil.copyProjectMetaInfFiles2NCHomeModules();
+        } catch (Throwable e) {
+            //is ok
+        }
 
         //刷新 ncc路径
-        NCCActionRefreshUtil.reloadProjectAction(project);
+        try {
+            NCCActionRefreshUtil.reloadProjectAction(project);
+        } catch (Throwable e) {
+            //is ok
+        }
     }
 
     public static volatile boolean isRuning = false;

@@ -184,9 +184,11 @@ public class SqlUtil {
 
                 SqlQueryResultSet var11 = sqlQueryResultSet;
                 return var11;
-            } catch (SQLException var20) {
-                Logger.error(Messages.SqlUtil_0, var20);
-                throw new DatabaseRuntimeException(Messages.SqlUtil_1 + sql);
+            } catch (SQLException e) {
+                Logger.error(Messages.SqlUtil_0, e);
+                DatabaseRuntimeException e1 = new DatabaseRuntimeException(e.toString() + "  sql=" + sql);
+                e1.setStackTrace(e.getStackTrace());
+                throw e1;
             } finally {
                 if (rs != null) {
                     try {

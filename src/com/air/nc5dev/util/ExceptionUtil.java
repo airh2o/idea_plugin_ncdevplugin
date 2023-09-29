@@ -11,6 +11,23 @@ import com.air.nc5dev.exception.BusinessException;
  * @date 2019-9-9 下午9:54:53
  */
 public  final class ExceptionUtil extends cn.hutool.core.exceptions.ExceptionUtil{
+	public static Throwable getTopCase(Throwable e){
+		if (e == null) {
+			return null;
+		}
+
+		Throwable e1 = e.getCause();
+
+		while(e1 != null && e1 != e){
+			e1 = e1.getCause();
+			if (e1 != null) {
+				e = e1;
+			}
+		}
+
+		return e1 == null ? e : e1;
+	}
+
 	/**
 	 * 获取所有错误栈代码方法全限定名字和行数
 	 * 
