@@ -21,10 +21,7 @@ public class AddFile2PathcerSelectFilesAction extends AbstractIdeaAction {
     protected void doHandler(AnActionEvent e) {
         VirtualFile f = getSelectedFile(e.getProject());
 
-        PatcherDialog.FORCEADDSELECTFILES.putIfAbsent(e.getProject(), new CopyOnWriteArrayList<>());
-        List<VirtualFile> vs = PatcherDialog.FORCEADDSELECTFILES.get(e.getProject());
-
-        vs.add(f);
+        PatcherDialog.addForceAddSelectFile(e.getProject(), f);
     }
 
     @Nullable
@@ -52,9 +49,6 @@ public class AddFile2PathcerSelectFilesAction extends AbstractIdeaAction {
 
         VirtualFile f = getSelectedFile(e.getProject());
 
-        PatcherDialog.FORCEADDSELECTFILES.putIfAbsent(e.getProject(), new CopyOnWriteArrayList<>());
-        List<VirtualFile> vs = PatcherDialog.FORCEADDSELECTFILES.get(e.getProject());
-
-        e.getPresentation().setEnabled(!vs.contains(f));
+        e.getPresentation().setEnabled(!PatcherDialog.containsForceAddSelectFile(e.getProject(), f));
     }
 }

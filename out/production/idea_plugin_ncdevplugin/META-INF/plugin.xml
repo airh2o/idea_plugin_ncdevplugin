@@ -204,6 +204,13 @@
                 text="立即运行NC代码检查" description="检查代码是否符合最低NC规范要求">
         </action>
 
+        <action id="ShowPathcerSelectFilesListAction"
+                class="com.air.nc5dev.acion.ShowPathcerSelectFilesListAction"
+                text="查看文件列表(补丁导出选定的文件列表)"
+                description="查看文件列表补丁导出选定的文件列表"
+        >
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
         <action id="AddFile2PathcerSelectFilesAction"
                 class="com.air.nc5dev.acion.AddFile2PathcerSelectFilesAction"
                 text="当前文件加入(补丁导出选定的文件列表)"

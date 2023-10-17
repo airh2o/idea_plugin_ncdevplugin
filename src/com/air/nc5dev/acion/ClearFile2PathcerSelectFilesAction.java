@@ -19,10 +19,7 @@ public class ClearFile2PathcerSelectFilesAction extends AbstractIdeaAction {
 
     @Override
     protected void doHandler(AnActionEvent e) {
-        PatcherDialog.FORCEADDSELECTFILES.putIfAbsent(e.getProject(), new CopyOnWriteArrayList<>());
-        List<VirtualFile> vs = PatcherDialog.FORCEADDSELECTFILES.get(e.getProject());
-
-        vs.clear();
+        PatcherDialog.clearForceAddSelectFile(e.getProject());
     }
 
     @Nullable
@@ -48,11 +45,6 @@ public class ClearFile2PathcerSelectFilesAction extends AbstractIdeaAction {
     public void update(final @NotNull AnActionEvent e) {
         super.update(e);
 
-        VirtualFile f = getSelectedFile(e.getProject());
-
-        PatcherDialog.FORCEADDSELECTFILES.putIfAbsent(e.getProject(), new CopyOnWriteArrayList<>());
-        List<VirtualFile> vs = PatcherDialog.FORCEADDSELECTFILES.get(e.getProject());
-
-        e.getPresentation().setEnabled(!vs.isEmpty());
+        e.getPresentation().setEnabled(!PatcherDialog.getForceAddSelectFiles(e.getProject()).isEmpty());
     }
 }

@@ -1,6 +1,7 @@
 package com.air.nc5dev.ui;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
@@ -21,6 +22,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.ui.components.*;
 import com.intellij.ui.table.JBTable;
 import lombok.AllArgsConstructor;
@@ -676,7 +678,75 @@ public class PatcherDialog extends DialogWrapper {
         }
     }
 
-    public static Map<Project, List<VirtualFile>> FORCEADDSELECTFILES = new ConcurrentHashMap<>();
+    public static List<VirtualFile> getForceAddSelectFiles(Project project) {
+        List<VirtualFile> vs = loadForceAddSelectFiles(project);
+
+        return vs;
+    }
+
+    public static boolean addForceAddSelectFile(Project project, VirtualFile f) {
+        List<VirtualFile> vs = getForceAddSelectFiles(project);
+        try {
+            if (vs.contains(f)) {
+                return false;
+            }
+
+            return vs.add(f);
+        } finally {
+            flushForceAddSelectFiles(project, vs);
+        }
+    }
+
+    public static boolean containsForceAddSelectFile(Project project, VirtualFile f) {
+        return getForceAddSelectFiles(project).contains(f);
+    }
+
+    public static boolean removeForceAddSelectFile(Project project, VirtualFile f) {
+        List<VirtualFile> vs = getForceAddSelectFiles(project);
+        try {
+            return vs.remove(f);
+        } finally {
+            flushForceAddSelectFiles(project, vs);
+        }
+    }
+
+    private static void flushForceAddSelectFiles(Project project, List<VirtualFile> vs) {
+        FileUtil.writeUtf8String(JSON.toJSONString(
+                        vs.stream().map(v -> v.getUrl()).collect(Collectors.toSet()))
+                , new File(new File(project.getBasePath(), ".idea"), "ForceAddSelectFiles.json"));
+    }
+
+    public static List<VirtualFile> loadForceAddSelectFiles(Project project) {
+        List<String> pts = null;
+        try {
+            String json = FileUtil.readUtf8String(new File(new File(project.getBasePath(), ".idea"), "ForceAddSelectFiles.json"));
+            pts = JSON.parseArray(json, String.class);
+        } catch (Throwable e) {
+        }
+
+        List<VirtualFile> vs = new CopyOnWriteArrayList<>();
+        VirtualFileManager vm = VirtualFileManager.getInstance();
+        if (CollUtil.isNotEmpty(pts)) {
+            for (String pt : pts) {
+                VirtualFile f = vm.findFileByUrl(pt);
+                if (f == null) {
+                    continue;
+                }
+                vs.add(f);
+            }
+        }
+
+        return vs;
+    }
+
+    public static void clearForceAddSelectFile(Project project) {
+        List<VirtualFile> vs = getForceAddSelectFiles(project);
+        try {
+            vs.clear();
+        } finally {
+            flushForceAddSelectFiles(project, vs);
+        }
+    }
 
     private void updateSelectFileTable() {
         ArrayList<SelectDTO> rows = Lists.newArrayList();
@@ -684,8 +754,7 @@ public class PatcherDialog extends DialogWrapper {
         if (selectExport.isSelected()) {
             VirtualFile[] selects = V.get(LangDataKeys.VIRTUAL_FILE_ARRAY.getData(event.getDataContext()),
                     new VirtualFile[0]);
-            List<VirtualFile> vs = V.get(FORCEADDSELECTFILES.getOrDefault(event.getProject(),
-                    new CopyOnWriteArrayList<>()), new ArrayList<>());
+            List<VirtualFile> vs = getForceAddSelectFiles(event.getProject());
             for (VirtualFile select : selects) {
                 rows.add(SelectDTO.builder()
                         .select(true)
@@ -714,7 +783,7 @@ public class PatcherDialog extends DialogWrapper {
         ArrayList<SelectDTO> rows = Lists.newArrayList();
         selectExport.setSelected(false);
         if (selectExport2.isSelected()) {
-            List<VirtualFile> vs = FORCEADDSELECTFILES.getOrDefault(event.getProject(), new CopyOnWriteArrayList<>());
+            List<VirtualFile> vs = getForceAddSelectFiles(event.getProject());
             for (VirtualFile select : vs) {
                 rows.add(SelectDTO.builder()
                         .select(true)

@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding='gb2312'?>
 <items docType="SDP_SCRIPT_ITEM">
-<!--    下面有部分表，配置了and 1=2 要你自己根据情况手工调整！！！！！-->
+    <!--    下面有部分表，配置了and 1=2 要你自己根据情况手工调整！！！！！-->
 
     <!--    变量列表， name 变量名， 下面使用通过 {变量名}  ，变量本身也可以引用其他变量-->
     <vars>
         <!--        模块-->
-        <var name="module">pu</var>
+        <var name="module">ich5</var>
         <!--        单据类型编码-->
         <var name="billtype">P5</var>
         <!--        功能注册 编码-->
-        <var name="node">400450030%</var>
+        <var name="node">40H55010%</var>
         <!--        菜单编码-->
-        <var name="menu">40045510%</var>
+        <var name="menu">40H55010%</var>
         <!--        元数据 里 表组件 名称列表-->
         <var name="metaNames">'P5HVO','P5BVO'</var>
         <!--        元数据里 表组件 id列表 -->
-        <var name="metaIds">'a2181063-b7d0-4818-beee-8fb5410062e7','f2f3826c-8fe2-4b56-afd8-ef9ed73f759a'</var>
+        <var name="metaIds">select id from md_class where name in({metaNames})</var>
     </vars>
 
     <item>
@@ -30,6 +30,11 @@
     </item>
 
     <item>
+        <itemKey>sm_appmenuitem</itemKey>
+        <fixedWhere>  MENUITEMCODE like '400455' and PK_MENU='1004Z510000000000FFL' </fixedWhere>
+    </item>
+
+    <item>
         <itemKey>pub_sysinittemp</itemKey>
         <itemName>参数模板设置</itemName>
         <sysField></sysField>
@@ -37,8 +42,8 @@
         <grpField></grpField>
         <sql></sql>
         <itemRule>pub_sysinittemp</itemRule><fixedWhere>
-            initcode in('')
-        </fixedWhere>
+        initcode in('')
+    </fixedWhere>
     </item>
     <item>
         <itemKey>sm_rule_type</itemKey>
@@ -52,153 +57,153 @@
         <itemKey>xi_billdefine</itemKey>
         <itemName>外部交换平台</itemName>
         <itemRule>xi_billdefine</itemRule><fixedWhere>
-            billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
-        </fixedWhere>
+        billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
+    </fixedWhere>
     </item>
     <item>
         <itemKey>excel_billprocess</itemKey>
         <itemName>导入</itemName>
         <itemRule>excel_billprocess</itemRule><fixedWhere>
-            billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
-        </fixedWhere>
+        billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_bcr_rulebase</itemKey>
         <itemName>编码规则定义(编码规则集团级的预置数据是在重量端点击的导出为预置数据，文件路径：XXX/config/billcodepredata/billcodepredata.xml)</itemName>
         <itemRule>pub_bcr_rulebase</itemRule><fixedWhere>
-            nbcrcode = (select code from pub_bcr_nbcr where metaid in ({metaIds}) )
-        </fixedWhere>
+        nbcrcode = (select code from pub_bcr_nbcr where metaid in ({metaIds}) )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>bd_refinfo</itemKey>
         <itemName>参照</itemName>
         <itemRule>bd_refinfo</itemRule><fixedWhere>
-            code in ({metaNames})
-        </fixedWhere>
+        code in ({metaNames})
+    </fixedWhere>
     </item>
     <item>
         <itemKey>excel_outputprocess</itemKey>
         <itemName>导出</itemName>
         <itemRule>excel_outputprocess</itemRule><fixedWhere>
-            billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
-        </fixedWhere>
+        billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
+    </fixedWhere>
     </item>
     <item>
         <itemKey>bd_mode_all</itemKey>
         <itemName>全部管控模式</itemName>
         <itemRule>bd_mode_all</itemRule><fixedWhere>
-            MDCLASSID in({metaIds})
-        </fixedWhere>
+        MDCLASSID in({metaIds})
+    </fixedWhere>
     </item>
     <item>
         <itemKey>sm_permission_res</itemKey>
         <itemName>数据权限资源 (!**注意全抽,并注意dbml的多语,确保别人的都在**)</itemName>
         <itemRule>sm_permission_res</itemRule><fixedWhere>
-            mdid in({metaIds})
-        </fixedWhere>
+        mdid in({metaIds})
+    </fixedWhere>
     </item>
     <!--      pub_bcr_nbcr  -->
     <item>
         <itemKey>pub_bcr_candiattr</itemKey>
         <itemName>编码规则候选属性</itemName>
         <itemRule>pub_bcr_candiattr</itemRule><fixedWhere>
-            pk_nbcr in(select pk_nbcr from pub_bcr_nbcr where metaid in ({metaIds}) )
-        </fixedWhere>
+        pk_nbcr in(select pk_nbcr from pub_bcr_nbcr where metaid in ({metaIds}) )
+    </fixedWhere>
     </item>
     <!--    END pub_bcr_nbcr  -->
     <item>
         <itemKey>pub_msgtemp_type</itemKey>
         <itemName>消息模板分类</itemName>
         <itemRule>pub_msgtemp_type</itemRule><fixedWhere>
-            metaid in ({metaIds})
-        </fixedWhere>
+        metaid in ({metaIds})
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_msgres_reg</itemKey>
         <itemName>消息源类型注册</itemName>
         <itemRule>pub_msgres_reg</itemRule><fixedWhere>
-            moduleid like '{node}'
-        </fixedWhere>
+        moduleid like '{node}'
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_vochange</itemKey>
         <itemName>单据转换规则(***要全抽，不然只有自己的，别人的都没了***)</itemName>
         <itemRule>pub_vochange</itemRule><fixedWhere>
-            dest_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
-               or src_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
-        </fixedWhere>
+        dest_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
+        or src_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
+    </fixedWhere>
     </item>
     <item>
         <itemKey>bd_mode_selected</itemKey>
         <itemName>当前管控模式</itemName>
         <itemRule>bd_mode_selected</itemRule><fixedWhere>
-            MDCLASSID in ({metaIds})
-        </fixedWhere>
+        MDCLASSID in ({metaIds})
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_bcr_nbcr</itemKey>
         <itemName>编码对象注册</itemName>
         <itemRule>pub_bcr_nbcr</itemRule><fixedWhere>
-            metaid in ({metaIds})
-        </fixedWhere>
+        metaid in ({metaIds})
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_billitfdef</itemKey>
         <itemName>单据接口定义</itemName>
         <itemRule>pub_billitfdef</itemRule><fixedWhere>nvl(dr,0)=0
-            and (
-                src_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
-                  or dest_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
-            )
-        </fixedWhere>
+        and (
+        src_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
+        or dest_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
+        )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>xx_busiprodef</itemKey>
         <itemName>外部交换平台</itemName>
         <itemRule>xx_busiprodef</itemRule><fixedWhere>
-            metadataid in ({metaIds})
-        </fixedWhere>
+        metadataid in ({metaIds})
+    </fixedWhere>
     </item>
     <item>
         <itemKey>aam_appasset</itemKey>
         <itemName>输出模板</itemName>
         <itemRule>aam_appasset</itemRule><fixedWhere>nvl(dr,0)=0
-            and DATAID in(
-            select CTEMPLATEID from pub_print_template where 1=1
-            and (
-            vtemplatecode like '{node}' or vtemplatecode like '{node}'
-            )
-            )
-        </fixedWhere>
+        and DATAID in(
+        select CTEMPLATEID from pub_print_template where 1=1
+        and (
+        vtemplatecode like '{node}' or vtemplatecode like '{node}'
+        )
+        )
+    </fixedWhere>
     </item>
     <!--    配置权限的时候 不显示-->
     <item>
         <itemKey>sm_createcorp</itemKey>
         <itemName>sm_createcorp</itemName>
         <itemRule>sm_createcorp</itemRule><fixedWhere>nvl(dr,0)=0 and funccode like '{node}'
-        </fixedWhere>
+    </fixedWhere>
     </item>
     <!--	单据类型分组   -->
     <item>
         <itemKey>md_dev_busi_module</itemKey>
         <itemName>md_dev_busi_module</itemName>
         <itemRule>md_dev_busi_module</itemRule><fixedWhere>
-            busimodule like '{node}'
-        </fixedWhere>
+        busimodule like '{node}'
+    </fixedWhere>
     </item>
     <item>
         <itemKey>bd_uniquerule</itemKey>
         <itemName>唯一性规则</itemName>
         <itemRule>bd_uniquerule</itemRule><fixedWhere>
-            MDCLASSID in ({metaIds})
-        </fixedWhere>
+        MDCLASSID in ({metaIds})
+    </fixedWhere>
     </item>
     <item>
         <itemKey>opm_apimanager</itemKey>
         <itemName>OpenAPI</itemName>
         <itemRule>opm_apimanager</itemRule><fixedWhere>
-            APIURI=''
-        </fixedWhere>
+        APIURI=''
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_systemplate_base</itemKey>
@@ -212,66 +217,66 @@
         <itemKey>sm_res_operation</itemKey>
         <itemName>数据权限 资源操作 (!**注意全抽,并注意dbml的多语,确保别人的都在**)</itemName>
         <itemRule>sm_res_operation</itemRule><fixedWhere>
-            resourceid in(select pk_permission_res from sm_permission_res where
-            mdid in ({metaIds}))
-        </fixedWhere>
+        resourceid in(select pk_permission_res from sm_permission_res where
+        mdid in ({metaIds}))
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_page_templet</itemKey>
         <itemName>单据模板</itemName>
         <itemRule>pub_page_templet</itemRule><fixedWhere>
-            nvl(dr,0)=0 and appcode like '{node}'
-        </fixedWhere>
+        nvl(dr,0)=0 and appcode like '{node}'
+    </fixedWhere>
     </item>
     <item>
         <itemKey>dap_dapsystem</itemKey>
         <itemName>模块注册</itemName>
         <itemRule>dap_dapsystem</itemRule><fixedWhere>
-            nvl(dr,0)=0 and moduleid = '{module}' and 1=2
-        </fixedWhere>
+        nvl(dr,0)=0 and moduleid = '{module}' and 1=2
+    </fixedWhere>
     </item>
 
     <item>
         <itemKey>bd_billtype</itemKey>
         <itemName>单据类型(包含单据动作脚本)***注意新增的一定要全抽！dbml对应的是多语文件！只抽自己的就把别人的name丢了***</itemName>
         <itemRule>bd_billtype</itemRule><fixedWhere>
-           nvl(dr,0)=0 and nodecode like '{node}'
-        </fixedWhere>
+        nvl(dr,0)=0 and nodecode like '{node}'
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_print_template</itemKey>
         <itemName>打印模板</itemName>
         <itemRule>pub_print_template</itemRule><fixedWhere>
-            nvl(dr,0)=0 and appcode like '{node}'
-        </fixedWhere>
+        nvl(dr,0)=0 and appcode like '{node}'
+    </fixedWhere>
     </item>
     <item>
         <itemKey>sm_appmenuitem</itemKey>
         <itemName>应用菜单项注册</itemName>
         <itemRule>sm_appmenuitem</itemRule><fixedWhere>
-            menuitemcode like '{menu}'
-        </fixedWhere>
+        menuitemcode like '{menu}'
+    </fixedWhere>
     </item>
     <item>
         <itemKey>sm_appregister</itemKey>
         <itemName>应用注册</itemName>
         <itemRule>sm_appregister</itemRule><fixedWhere>
-            code like '{node}'
-        </fixedWhere>
+        code like '{node}'
+    </fixedWhere>
     </item>
     <item>
         <itemKey>md_attr_power</itemKey>
         <itemName>元数据过滤(会计平台)</itemName>
         <itemRule>md_attr_power</itemRule><fixedWhere>
-            beanid in( {metaIds} )
-        </fixedWhere>
+        beanid in( {metaIds} )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>bd_userdefrule</itemKey>
         <itemName>自定义项属性组(!**注意全抽,并注意dbml的多语,确保别人的都在**)</itemName>
         <itemRule>bd_userdefrule</itemRule><fixedWhere>
-            code in(select name from md_class where id in ( {metaIds} ))
-        </fixedWhere>
+        code in(select name from md_class where id in ( {metaIds} ))
+    </fixedWhere>
     </item>
 
     <!-- sm_appregister  -->
@@ -279,27 +284,27 @@
         <itemKey>sm_apppage</itemKey>
         <itemName>sm_apppage</itemName>
         <itemRule>sm_apppage</itemRule><fixedWhere>nvl(dr,0)=0
-            and parent_id in(select pk_appregister from sm_appregister where nvl(dr,0)=0
-            and code like '{node}')
-        </fixedWhere>
+        and parent_id in(select pk_appregister from sm_appregister where nvl(dr,0)=0
+        and code like '{node}')
+    </fixedWhere>
     </item>
     <item>
         <itemKey>sm_appbutnregister</itemKey>
         <itemName>sm_appbutnregister</itemName>
         <itemRule>sm_appbutnregister</itemRule><fixedWhere>nvl(dr,0)=0
-            and appid in(
-                        select pk_appregister from sm_appregister where nvl(dr,0)=0 and code like '{node}'
-                )
-        </fixedWhere>
+        and appid in(
+        select pk_appregister from sm_appregister where nvl(dr,0)=0 and code like '{node}'
+        )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>sm_appparam</itemKey>
         <itemName>sm_appparam</itemName>
         <itemRule>sm_appparam</itemRule><fixedWhere>nvl(dr,0)=0
-            and parentid in(
-                    select pk_appregister from sm_appregister where nvl(dr,0)=0 and code like '{node}'
-            )
-        </fixedWhere>
+        and parentid in(
+        select pk_appregister from sm_appregister where nvl(dr,0)=0 and code like '{node}'
+        )
+    </fixedWhere>
     </item>
     <!--    END sm_appregister  -->
 
@@ -311,173 +316,173 @@
         <itemKey>pub_area</itemKey>
         <itemName>pub_area</itemName>
         <itemRule>pub_area</itemRule><fixedWhere>nvl(dr,0)=0
-            and templetid in(select pk_page_templet from pub_page_templet where nvl(dr,0)=0 and appcode like '{node}')
-        </fixedWhere>
+        and templetid in(select pk_page_templet from pub_page_templet where nvl(dr,0)=0 and appcode like '{node}')
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_query_property</itemKey>
         <itemName>pub_query_property</itemName>
         <itemRule>pub_query_property</itemRule><fixedWhere>nvl(dr,0)=0
-            and areaid in(select pk_area from pub_area where TEMPLETID
-            in(select pk_page_templet from pub_page_templet where
-            nvl(dr,0)=0 and appcode like '{node}')
-            )
-        </fixedWhere>
+        and areaid in(select pk_area from pub_area where TEMPLETID
+        in(select pk_page_templet from pub_page_templet where
+        nvl(dr,0)=0 and appcode like '{node}')
+        )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_form_property</itemKey>
         <itemName>pub_form_property</itemName>
         <itemRule>pub_form_property</itemRule><fixedWhere>nvl(dr,0)=0
-            and areaid in(select pk_area from PUB_AREA where TEMPLETID
-            in(select pk_page_templet from pub_page_templet where
-            nvl(dr,0)=0 and appcode like '{node}')
-            )
-        </fixedWhere>
+        and areaid in(select pk_area from PUB_AREA where TEMPLETID
+        in(select pk_page_templet from pub_page_templet where
+        nvl(dr,0)=0 and appcode like '{node}')
+        )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_ncc_queryscheme</itemKey>
         <itemName>pub_ncc_queryscheme</itemName>
         <itemRule>pub_ncc_queryscheme</itemRule><fixedWhere>nvl(dr,0)=0
-            and areaid in(select pk_area from PUB_AREA where TEMPLETID
-            in(select pk_page_templet from pub_page_templet where
-            nvl(dr,0)=0 and appcode like '{node}')
-            )
-        </fixedWhere>
+        and areaid in(select pk_area from PUB_AREA where TEMPLETID
+        in(select pk_page_templet from pub_page_templet where
+        nvl(dr,0)=0 and appcode like '{node}')
+        )
+    </fixedWhere>
     </item>
     <!--    END pub_page_templet  -->
 
     <!--   bd_billtype  -->
 
-<!--    <item>
-        <itemKey>dap_defitem</itemKey>
-        <itemName>dap_defitem</itemName>
-        <itemRule>dap_defitem</itemRule><fixedWhere>nvl(dr,0)=0
-            and pk_billtypeid in(
-                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
-            )
-        </fixedWhere>
-    </item>-->
+    <!--    <item>
+            <itemKey>dap_defitem</itemKey>
+            <itemName>dap_defitem</itemName>
+            <itemRule>dap_defitem</itemRule><fixedWhere>nvl(dr,0)=0
+                and pk_billtypeid in(
+                    select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+                )
+            </fixedWhere>
+        </item>-->
 
- <!--   <item>
-        <itemKey>dap_billfactor</itemKey>
-        <itemName>dap_billfactor</itemName>
-        <itemRule>dap_billfactor</itemRule><fixedWhere>nvl(dr,0)=0
-            and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
-            )
-        </fixedWhere>
-    </item>-->
-<!--    <item>
-        <itemKey>pub_votable</itemKey>
-        <itemName>pub_votable</itemName>
-        <itemRule>pub_votable</itemRule><fixedWhere>nvl(dr,0)=0
-            and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
-            )
-        </fixedWhere>
-    </item>
-    <item>
-        <itemKey>pub_billtobillrefer</itemKey>
-        <itemName>pub_billtobillrefer</itemName>
-        <itemRule>pub_billtobillrefer</itemRule><fixedWhere>nvl(dr,0)=0
-            and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
-            )
-        </fixedWhere>
-    </item>-->
+    <!--   <item>
+           <itemKey>dap_billfactor</itemKey>
+           <itemName>dap_billfactor</itemName>
+           <itemRule>dap_billfactor</itemRule><fixedWhere>nvl(dr,0)=0
+               and pk_billtypeid in(
+               select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+               )
+           </fixedWhere>
+       </item>-->
+    <!--    <item>
+            <itemKey>pub_votable</itemKey>
+            <itemName>pub_votable</itemName>
+            <itemRule>pub_votable</itemRule><fixedWhere>nvl(dr,0)=0
+                and pk_billtypeid in(
+                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+                )
+            </fixedWhere>
+        </item>
+        <item>
+            <itemKey>pub_billtobillrefer</itemKey>
+            <itemName>pub_billtobillrefer</itemName>
+            <itemRule>pub_billtobillrefer</itemRule><fixedWhere>nvl(dr,0)=0
+                and pk_billtypeid in(
+                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+                )
+            </fixedWhere>
+        </item>-->
     <item>
         <itemKey>pub_function</itemKey>
         <itemName>pub_function</itemName>
         <itemRule>pub_function</itemRule><fixedWhere>nvl(dr,0)=0
-            and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
-            )
-        </fixedWhere>
+        and pk_billtypeid in(
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_billaction</itemKey>
         <itemName>pub_billaction</itemName>
         <itemRule>pub_billaction</itemRule><fixedWhere>nvl(dr,0)=0
-            and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
-            )
-        </fixedWhere>
+        and pk_billtypeid in(
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_billactiongroup</itemKey>
         <itemName>pub_billactiongroup</itemName>
         <itemRule>pub_billactiongroup</itemRule><fixedWhere>nvl(dr,0)=0
+        and pk_billtypeid in(
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        )
+    </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billactionconfig</itemKey>
+        <itemName>pub_billactionconfig</itemName>
+        <itemRule>pub_billactionconfig</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <grpField></grpField>
+        <fixedWhere>nvl(dr,0)=0
+            and pk_billactiongroup in(
+            select pk_billactiongroup from pub_billactiongroup where nvl(dr,0)=0
             and pk_billtypeid in(
             select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+            )
             )
         </fixedWhere>
     </item>
     <item>
-          <itemKey>pub_billactionconfig</itemKey>
-          <itemName>pub_billactionconfig</itemName>
-          <itemRule>pub_billactionconfig</itemRule>
-          <sysField></sysField>
-          <corpField></corpField>
-          <grpField></grpField>
-          <fixedWhere>nvl(dr,0)=0
-              and pk_billactiongroup in(
-              select pk_billactiongroup from pub_billactiongroup where nvl(dr,0)=0
-              and pk_billtypeid in(
-                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
-              )
-              )
-          </fixedWhere>
-      </item>
-    <item>
         <itemKey>pub_busiclass</itemKey>
         <itemName>pub_busiclass</itemName>
         <itemRule>pub_busiclass</itemRule><fixedWhere>nvl(dr,0)=0
-            and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
-            )
-        </fixedWhere>
+        and pk_billtypeid in(
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>bd_fwdbilltype</itemKey>
         <itemName>bd_fwdbilltype</itemName>
         <itemRule>bd_fwdbilltype</itemRule><fixedWhere>nvl(dr,0)=0
-            and (
-            pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
-            )
-            or
-            pk_backbilltype in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
-            )
-            )
-        </fixedWhere>
+        and (
+        pk_billtypeid in(
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        )
+        or
+        pk_backbilltype in(
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        )
+        )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>bd_relatedapp</itemKey>
         <itemName>bd_relatedapp</itemName>
         <itemRule>bd_relatedapp</itemRule><fixedWhere>nvl(dr,0)=0
-            and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
-            )
-        </fixedWhere>
+        and pk_billtypeid in(
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>bd_billtype2</itemKey>
         <itemName>bd_billtype2</itemName>
         <itemRule>bd_billtype2</itemRule><fixedWhere>nvl(dr,0)=0
-            and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
-            )
-        </fixedWhere>
+        and pk_billtypeid in(
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_publishapp</itemKey>
         <itemName>pub_publishapp</itemName>
         <itemRule>pub_publishapp</itemRule><fixedWhere>nvl(dr,0)=0
-            and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
-            )
-        </fixedWhere>
+        and pk_billtypeid in(
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        )
+    </fixedWhere>
     </item>
     <!--    END bd_billtype  -->
 
@@ -486,23 +491,23 @@
         <itemKey>pub_vochange_b</itemKey>
         <itemName>pub_vochange_b</itemName>
         <itemRule>pub_vochange_b</itemRule><fixedWhere>nvl(dr,0)=0
-            and pk_vochange in(
-            select pk_vochange from pub_vochange where nvl(dr,0)=0 and src_billtype in (
-                    select pk_billtypecode from bd_billtype where nodecode like '{node}'
-                )
-            )
-        </fixedWhere>
+        and pk_vochange in(
+        select pk_vochange from pub_vochange where nvl(dr,0)=0 and src_billtype in (
+        select pk_billtypecode from bd_billtype where nodecode like '{node}'
+        )
+        )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>pub_vochange_s</itemKey>
         <itemName>pub_vochange_s</itemName>
         <itemRule>pub_vochange_s</itemRule><fixedWhere>nvl(dr,0)=0
-            and pk_vochange in(
-            select pk_vochange from pub_vochange where nvl(dr,0)=0 and src_billtype in (
-                    select pk_billtypecode from bd_billtype where nodecode like '{node}'
-                )
-            )
-        </fixedWhere>
+        and pk_vochange in(
+        select pk_vochange from pub_vochange where nvl(dr,0)=0 and src_billtype in (
+        select pk_billtypecode from bd_billtype where nodecode like '{node}'
+        )
+        )
+    </fixedWhere>
     </item>
     <!--    END pub_vochange  -->
 
@@ -511,16 +516,16 @@
         <itemKey>pub_msgtemp_var</itemKey>
         <itemName>pub_msgtemp_var</itemName>
         <itemRule>pub_msgtemp_var</itemRule><fixedWhere>nvl(dr,0)=0
-            and pk_temptype in(
-                select pk_temptype from pub_msgtemp_type where nvl(dr,0)=0
-                and tempcode in(
-                    'mmmpsxj_notif_msg'
-                    , 'mmmpsxj_notif_msg_month_bcptxqsq'
-                    ,'mmmpsxj_notif_msg_month_dzjptxqsq'
-                    ,'WF_MMMPSXJ','MMYEARPLAN'
-                )
-            ) and 1=2
-        </fixedWhere>
+        and pk_temptype in(
+        select pk_temptype from pub_msgtemp_type where nvl(dr,0)=0
+        and tempcode in(
+        'mmmpsxj_notif_msg'
+        , 'mmmpsxj_notif_msg_month_bcptxqsq'
+        ,'mmmpsxj_notif_msg_month_dzjptxqsq'
+        ,'WF_MMMPSXJ','MMYEARPLAN'
+        )
+        ) and 1=2
+    </fixedWhere>
     </item>
     <!--    END pub_msgtemp_type  -->
 
@@ -529,22 +534,22 @@
         <itemKey>bd_userdefrule</itemKey>
         <itemName>bd_userdefrule</itemName>
         <itemRule>bd_userdefrule</itemRule><fixedWhere>
-            nvl(dr,0)=0 and lower(code) in ( select lower(defaulttablename) from md_class where id in ({metaIds}) )
-        </fixedWhere>
+        nvl(dr,0)=0 and lower(code) in ( select lower(defaulttablename) from md_class where id in ({metaIds}) )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>bd_userdefruleref</itemKey>
         <itemName>bd_userdefruleref</itemName>
         <itemRule>bd_userdefruleref</itemRule><fixedWhere>
-             pk_userdefrule in (select pk_userdefrule from bd_userdefrule  where nvl(dr,0)=0 and lower(code) in ( select lower(defaulttablename) from md_class where id in ({metaIds}) ) )
-        </fixedWhere>
+        pk_userdefrule in (select pk_userdefrule from bd_userdefrule  where nvl(dr,0)=0 and lower(code) in ( select lower(defaulttablename) from md_class where id in ({metaIds}) ) )
+    </fixedWhere>
     </item>
     <item>
         <itemKey>bd_userdefitem</itemKey>
         <itemName>bd_userdefitem</itemName>
         <itemRule>bd_userdefitem</itemRule><fixedWhere>
-            pk_userdefrule in (select pk_userdefrule from bd_userdefrule  where nvl(dr,0)=0 and lower(code) in ( select lower(defaulttablename) from md_class where id in ({metaIds}) ) )
-        </fixedWhere>
+        pk_userdefrule in (select pk_userdefrule from bd_userdefrule  where nvl(dr,0)=0 and lower(code) in ( select lower(defaulttablename) from md_class where id in ({metaIds}) ) )
+    </fixedWhere>
     </item>
     <!--  END  用户定义属性组-->
 
@@ -552,22 +557,22 @@
         <itemKey>md_comp_busimodule</itemKey>
         <itemName>md_comp_busimodule</itemName>
         <itemRule>md_comp_busimodule</itemRule><fixedWhere>
-            nvl(dr,0)=0 and BUSIMODULECODE like '{node}'
-        </fixedWhere>
+        nvl(dr,0)=0 and BUSIMODULECODE like '{node}'
+    </fixedWhere>
     </item>
     <item>
         <itemKey>md_dev_busi_module</itemKey>
         <itemName>md_dev_busi_module</itemName>
         <itemRule>md_dev_busi_module</itemRule><fixedWhere>
-            nvl(dr,0)=0 and BUSIMODULE like '{node}'
-        </fixedWhere>
+        nvl(dr,0)=0 and BUSIMODULE like '{node}'
+    </fixedWhere>
     </item>
     <item>
         <itemKey>md_module</itemKey>
         <itemName>md_module</itemName>
         <itemRule>md_module</itemRule><fixedWhere>
-            nvl(dr,0)=0 and id = '{module}' and 1=2
-        </fixedWhere>
+        nvl(dr,0)=0 and id = '{module}' and 1=2
+    </fixedWhere>
     </item>
 
     <!--    单据编码规则-->
