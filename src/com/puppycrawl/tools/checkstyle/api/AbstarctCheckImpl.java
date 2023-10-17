@@ -119,6 +119,9 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
                 }
 
                 VirtualFile fs = sf.getFile();
+                if (fs == null) {
+                    continue;
+                }
 
                 int from = 1;
                 if (fs.getName().equals("public")) {
