@@ -15,7 +15,7 @@
         <!--        元数据 里 表组件 名称列表-->
         <var name="metaNames">'P6HVO','P6BVO'</var>
         <!--        元数据里 表组件 id列表 -->
-        <var name="metaIds">'feef9a13-eb65-4ec0-a3bc-188b839c12db','587694d3-9db0-442a-b161-f2bdef055b09'</var>
+        <var name="metaIds">select id from md_class where name in({metaNames})</var>
     </vars>
 
     <item>
@@ -49,30 +49,30 @@
         <itemKey>pub_billtemplet</itemKey>
         <sql></sql>
         <fixedWhere>
-            nodecode like '{node}'
+             (nodecode like '{node}' or pk_billtypecode in({billtype})
         </fixedWhere>
     </item>
     <item>
         <itemKey>pub_billtemplet_b</itemKey>
         <sql></sql>
         <fixedWhere>
-            pk_billtemplet in( select pk_billtemplet from pub_billtemplet where nodecode like '{node}' )
+            pk_billtemplet in( select pk_billtemplet from pub_billtemplet where  (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         </fixedWhere>
     </item>
     <item>
         <itemKey>pub_billtemplet_t</itemKey>
         <sql></sql>
         <fixedWhere>
-            pk_billtemplet in( select pk_billtemplet from pub_billtemplet where nodecode like '{node}' )
+            pk_billtemplet in( select pk_billtemplet from pub_billtemplet where  (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         </fixedWhere>
     </item>
     <item>
         <itemKey>pub_systemplate_base</itemKey>
         <sql></sql>
         <fixedWhere>
-            templateid in( select pk_billtemplet from pub_billtemplet where nodecode like '{node}' )
+            templateid in( select pk_billtemplet from pub_billtemplet where  (nodecode like '{node}' or pk_billtypecode in({billtype}) )
             or templateid in( select id from pub_query_templet where node_code like '{node}' )
-            or templateid in( select ctemplateid from pub_print_template where vnodecode like '{node}' )
+            or templateid in( select ctemplateid from pub_print_template where v (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         </fixedWhere>
     </item>
     <item>
@@ -94,14 +94,14 @@
         <itemKey>pub_print_template</itemKey>
         <sql></sql>
         <fixedWhere>
-            vnodecode like '{node}'
+             (nodecode like '{node}' or pk_billtypecode in({billtype})
         </fixedWhere>
     </item>
     <item>
         <itemKey>pub_print_cell</itemKey>
         <sql></sql>
         <fixedWhere>
-            ctemplateid in( select ctemplateid from pub_print_template where vnodecode like '{node}' )
+            ctemplateid in( select ctemplateid from pub_print_template where v (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         </fixedWhere>
     </item>
 
@@ -109,21 +109,21 @@
         <itemKey>bd_billtype</itemKey>
         <sql></sql>
         <fixedWhere>
-            nodecode like '{node}'
+             (nodecode like '{node}' or pk_billtypecode in({billtype})
         </fixedWhere>
     </item>
     <item>
         <itemKey>pub_billaction</itemKey>
         <sql></sql>
         <fixedWhere>
-            pk_billtypeid in( select pk_billtypeid from bd_billtype where nodecode like '{node}' )
+            pk_billtypeid in( select pk_billtypeid from bd_billtype where  (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         </fixedWhere>
     </item>
     <item>
         <itemKey>pub_busiclass</itemKey>
         <sql></sql>
         <fixedWhere>
-            pk_billtypeid in( select pk_billtypeid from bd_billtype where nodecode like '{node}' )
+            pk_billtypeid in( select pk_billtypeid from bd_billtype where  (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         </fixedWhere>
     </item>
 

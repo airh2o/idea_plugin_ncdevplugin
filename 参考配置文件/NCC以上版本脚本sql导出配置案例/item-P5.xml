@@ -5,15 +5,15 @@
     <!--    变量列表， name 变量名， 下面使用通过 {变量名}  ，变量本身也可以引用其他变量-->
     <vars>
         <!--        模块-->
-        <var name="module">ich5</var>
+        <var name="module">pu</var>
         <!--        单据类型编码-->
-        <var name="billtype">P5</var>
+        <var name="billtype">'P6'</var>
         <!--        功能注册 编码-->
-        <var name="node">40H55010%</var>
+        <var name="node">400450040%</var>
         <!--        菜单编码-->
-        <var name="menu">40H55010%</var>
+        <var name="menu">40045520%</var>
         <!--        元数据 里 表组件 名称列表-->
-        <var name="metaNames">'P5HVO','P5BVO'</var>
+        <var name="metaNames">'P6HVO','P6BVO'</var>
         <!--        元数据里 表组件 id列表 -->
         <var name="metaIds">select id from md_class where name in({metaNames})</var>
     </vars>
@@ -25,13 +25,8 @@
         <!-- 支持sql标签，如果里面写了sql语句 直接使用这个sql执行 的结果导出插入语句，而不会根据itemKey和fixedWhere来查询。-->
         <sql></sql>
         <fixedWhere>
-            TRACLASSNAME = 'nc.impl.pu.p5.p5hvo.AggP5BillHVOTranslator'
+            TRACLASSNAME = 'nc.impl.pu.p6.p6hvo.AggP6BillHVOTranslator'
         </fixedWhere>
-    </item>
-
-    <item>
-        <itemKey>sm_appmenuitem</itemKey>
-        <fixedWhere>  MENUITEMCODE like '400455' and PK_MENU='1004Z510000000000FFL' </fixedWhere>
     </item>
 
     <item>
@@ -57,14 +52,14 @@
         <itemKey>xi_billdefine</itemKey>
         <itemName>外部交换平台</itemName>
         <itemRule>xi_billdefine</itemRule><fixedWhere>
-        billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
+        billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
     </fixedWhere>
     </item>
     <item>
         <itemKey>excel_billprocess</itemKey>
         <itemName>导入</itemName>
         <itemRule>excel_billprocess</itemRule><fixedWhere>
-        billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
+        billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
     </fixedWhere>
     </item>
     <item>
@@ -85,7 +80,7 @@
         <itemKey>excel_outputprocess</itemKey>
         <itemName>导出</itemName>
         <itemRule>excel_outputprocess</itemRule><fixedWhere>
-        billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
+        billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
     </fixedWhere>
     </item>
     <item>
@@ -129,8 +124,8 @@
         <itemKey>pub_vochange</itemKey>
         <itemName>单据转换规则(***要全抽，不然只有自己的，别人的都没了***)</itemName>
         <itemRule>pub_vochange</itemRule><fixedWhere>
-        dest_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
-        or src_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
+        dest_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
+        or src_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
     </fixedWhere>
     </item>
     <item>
@@ -152,8 +147,8 @@
         <itemName>单据接口定义</itemName>
         <itemRule>pub_billitfdef</itemRule><fixedWhere>nvl(dr,0)=0
         and (
-        src_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
-        or dest_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}')
+        src_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
+        or dest_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
         )
     </fixedWhere>
     </item>
@@ -240,7 +235,7 @@
         <itemKey>bd_billtype</itemKey>
         <itemName>单据类型(包含单据动作脚本)***注意新增的一定要全抽！dbml对应的是多语文件！只抽自己的就把别人的name丢了***</itemName>
         <itemRule>bd_billtype</itemRule><fixedWhere>
-        nvl(dr,0)=0 and nodecode like '{node}'
+        nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
     </fixedWhere>
     </item>
     <item>
@@ -358,7 +353,7 @@
             <itemName>dap_defitem</itemName>
             <itemRule>dap_defitem</itemRule><fixedWhere>nvl(dr,0)=0
                 and pk_billtypeid in(
-                    select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+                    select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
                 )
             </fixedWhere>
         </item>-->
@@ -368,7 +363,7 @@
            <itemName>dap_billfactor</itemName>
            <itemRule>dap_billfactor</itemRule><fixedWhere>nvl(dr,0)=0
                and pk_billtypeid in(
-               select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+               select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
                )
            </fixedWhere>
        </item>-->
@@ -377,7 +372,7 @@
             <itemName>pub_votable</itemName>
             <itemRule>pub_votable</itemRule><fixedWhere>nvl(dr,0)=0
                 and pk_billtypeid in(
-                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
                 )
             </fixedWhere>
         </item>
@@ -386,7 +381,7 @@
             <itemName>pub_billtobillrefer</itemName>
             <itemRule>pub_billtobillrefer</itemRule><fixedWhere>nvl(dr,0)=0
                 and pk_billtypeid in(
-                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
                 )
             </fixedWhere>
         </item>-->
@@ -395,7 +390,7 @@
         <itemName>pub_function</itemName>
         <itemRule>pub_function</itemRule><fixedWhere>nvl(dr,0)=0
         and pk_billtypeid in(
-        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         )
     </fixedWhere>
     </item>
@@ -404,7 +399,7 @@
         <itemName>pub_billaction</itemName>
         <itemRule>pub_billaction</itemRule><fixedWhere>nvl(dr,0)=0
         and pk_billtypeid in(
-        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         )
     </fixedWhere>
     </item>
@@ -413,7 +408,7 @@
         <itemName>pub_billactiongroup</itemName>
         <itemRule>pub_billactiongroup</itemRule><fixedWhere>nvl(dr,0)=0
         and pk_billtypeid in(
-        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         )
     </fixedWhere>
     </item>
@@ -428,7 +423,7 @@
             and pk_billactiongroup in(
             select pk_billactiongroup from pub_billactiongroup where nvl(dr,0)=0
             and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
             )
             )
         </fixedWhere>
@@ -438,7 +433,7 @@
         <itemName>pub_busiclass</itemName>
         <itemRule>pub_busiclass</itemRule><fixedWhere>nvl(dr,0)=0
         and pk_billtypeid in(
-        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         )
     </fixedWhere>
     </item>
@@ -448,11 +443,11 @@
         <itemRule>bd_fwdbilltype</itemRule><fixedWhere>nvl(dr,0)=0
         and (
         pk_billtypeid in(
-        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         )
         or
         pk_backbilltype in(
-        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         )
         )
     </fixedWhere>
@@ -462,7 +457,7 @@
         <itemName>bd_relatedapp</itemName>
         <itemRule>bd_relatedapp</itemRule><fixedWhere>nvl(dr,0)=0
         and pk_billtypeid in(
-        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         )
     </fixedWhere>
     </item>
@@ -471,7 +466,7 @@
         <itemName>bd_billtype2</itemName>
         <itemRule>bd_billtype2</itemRule><fixedWhere>nvl(dr,0)=0
         and pk_billtypeid in(
-        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         )
     </fixedWhere>
     </item>
@@ -480,7 +475,7 @@
         <itemName>pub_publishapp</itemName>
         <itemRule>pub_publishapp</itemRule><fixedWhere>nvl(dr,0)=0
         and pk_billtypeid in(
-        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and nodecode like '{node}'
+        select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
         )
     </fixedWhere>
     </item>
