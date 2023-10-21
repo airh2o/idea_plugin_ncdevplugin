@@ -290,6 +290,7 @@ public class NCPropXmlUtil {
         }
     }
 
+    @Deprecated
     public static List<NCDataSourceVO> getDataSourceVOS() {
         init(null);
 

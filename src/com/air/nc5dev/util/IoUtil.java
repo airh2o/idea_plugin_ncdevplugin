@@ -638,6 +638,50 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         }).collect(Collectors.toList());
     }
 
+    public static List<File> getAllFiles(@NotNull File dir
+            , boolean hasChiled
+            , Function<File, Boolean> dirFilter
+            , @NotNull final String... fileEndFixs) {
+        List<File> ar = getAllFiles(dir, hasChiled, dirFilter);
+        if (null == ar) {
+            return new ArrayList<>();
+        }
+
+        return ar.stream()
+                .filter(file
+                        -> {
+                    boolean mach = file.exists() && file.isFile();
+                    boolean endMach = false;
+                    for (String fileEndFix : fileEndFixs) {
+                        endMach = file.getName().toLowerCase().endsWith(fileEndFix);
+                        if (endMach) {
+                            break;
+                        }
+                    }
+                    return mach && endMach;
+                }).collect(Collectors.toList());
+    }
+
+    public static List<File> getAllFiles(File dir, boolean hasChiled, Function<File, Boolean> dirFilter) {
+        File[] fs = dir.listFiles();
+
+        ArrayList<File> ar = new ArrayList<File>(null == fs ? 1 : fs.length);
+
+        try {
+            File f;
+            for (int i = 0; i < fs.length; i++) {
+                f = fs[i];
+                if (f.isFile() && (dirFilter == null || dirFilter.apply(f))) {
+                    ar.add(fs[i]);
+                } else if (f.isDirectory() && hasChiled && (dirFilter == null || dirFilter.apply(f))) {
+                    ar.addAll(getAllFiles(f, hasChiled, dirFilter));
+                }
+            }
+        } catch (Exception e) {
+        }
+
+        return ar;
+    }
 
     /**
      * 搜索一个文件夹内 所有的末级子文件夹！

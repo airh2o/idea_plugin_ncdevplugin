@@ -3,6 +3,8 @@ package com.air.nc5dev.util;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import com.air.nc5dev.exception.BusinessException;
+import nc.vo.pub.lang.UFDate;
+import nc.vo.pub.lang.UFDateTime;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -919,6 +921,10 @@ public class ConvertUtil extends Convert {
                 } else if (type.equals(Boolean.class) || type.equals(boolean.class)) {
                     v = (T) ("Y".equalsIgnoreCase(valueStr) || "true".equalsIgnoreCase(valueStr) ? Boolean.TRUE :
                             Boolean.FALSE);
+                } else if (type.equals(UFDateTime.class)) {
+                    v = (T) new UFDateTime(valueStr);
+                } else if (type.equals(UFDate.class)) {
+                    v = (T) new UFDate(valueStr);
                 }
             }
 

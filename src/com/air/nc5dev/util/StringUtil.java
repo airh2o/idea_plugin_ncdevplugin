@@ -2,6 +2,8 @@ package com.air.nc5dev.util;
 
 
 import cn.hutool.core.util.StrUtil;
+import nc.vo.pub.lang.UFDate;
+import nc.vo.pub.lang.UFDateTime;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -12,7 +14,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -166,6 +171,26 @@ public final class StringUtil extends StrUtil {
         }
 
         return o.toString().trim();
+    }
+
+    public static String obj4StrIfnullBlack(Object o) {
+        if (null == o) {
+            return "";
+        }
+
+        if (o instanceof Date) {
+            return V.formatDateTime((Date) o);
+        } else if (o instanceof LocalDateTime) {
+            return V.formatDateTime((LocalDateTime) o);
+        } else if (o instanceof LocalDate) {
+            return V.formatDate((LocalDate) o);
+        } else if (o instanceof UFDate) {
+            return ((UFDate) o).toString();
+        } else if (o instanceof UFDateTime) {
+            return ((UFDateTime) o).toString();
+        }
+
+        return o.toString();
     }
 
     /**

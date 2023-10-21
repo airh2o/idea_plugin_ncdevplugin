@@ -164,7 +164,7 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
             label = new JBLabel("数据源:");
             label.setBounds(x, y += height + 5, 82, height);
             jbxxp.add(label);
-            final List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS();
+            final List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS(getProject());
             comboBox_dataSourceIndex = new JComboBox(new Vector(
                     dataSourceVOS.stream()
                             .map(v -> v.getDataSourceName() + '/' + v.getUser())
@@ -193,8 +193,8 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
                     NCDataSourceVO ds = NCPropXmlUtil.get(i);
                     if (ds == null) {
                         Messages.showErrorDialog(project, "数据源索引不存在: " + i + " ,数据源数量: "
-                                        + (NCPropXmlUtil.getDataSourceVOS() == null ? 0 :
-                                        NCPropXmlUtil.getDataSourceVOS().size())
+                                        + (NCPropXmlUtil.getDataSourceVOS(getProject()) == null ? 0 :
+                                        NCPropXmlUtil.getDataSourceVOS(getProject()).size())
                                 , "错误:");
                         return;
                     }

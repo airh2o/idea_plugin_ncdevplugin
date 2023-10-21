@@ -36,8 +36,8 @@ public class AddDataSource2DbnToolAction extends AbstractIdeaAction {
         }
 
         String basePath = e.getProject().getBasePath();
-        NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
-        List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS();
+        NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath(e.getProject()));
+        List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS(e.getProject());
   /*      ProjectUtil.addDatabaseToolLinks(basePath, dataSourceVOS);
 
         e.getProject().getBaseDir().refresh(false, true);

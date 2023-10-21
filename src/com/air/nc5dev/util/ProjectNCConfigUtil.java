@@ -106,7 +106,6 @@ public class ProjectNCConfigUtil {
      * @date 2019/12/25 0025 9:11
      * @Param []
      */
-    @Deprecated
     public static final String getNCHomePath(Project project) {
         return getConfigValue(project, KEY_PROJECT_NC_CONFIG_NCHOME);
     }

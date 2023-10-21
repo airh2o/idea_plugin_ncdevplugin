@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -261,5 +262,45 @@ public final class XmlUtil extends cn.hutool.core.util.XmlUtil {
         doc = BmfUtil.str2Xml(str);//根据替换后的XML内容重新生成DOM对象
 
         return doc;
+    }
+
+/*    public static String xml2Str(Document doc) {
+        try {
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            //去除XML头部声明(<?xml version="1.0" encoding="UTF-8" standalone="no"?>)
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            //启用缩进
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            //指定了缩进量,可以将 "2" 替换成其他值，如 "4" 或 "tab" 等
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            // 设置字符编码
+            transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(doc), new StreamResult(writer));
+            return writer.toString().trim();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }*/
+
+    public static String xml2Str(Document doc) {
+        return doc.asXML();
+    }
+
+    public static void addAttr(Document doc, Element ele, Object v, HashMap<String, String> map) {
+        Field[] attrs = ReflectUtil.getFields(v.getClass());
+        if (CollUtil.isEmpty(attrs)) {
+            return;
+        }
+
+        if (map == null) {
+            map = new HashMap<>();
+        }
+
+        for (Field attr : attrs) {
+            ele.addAttribute(map.containsKey(attr.getName().toLowerCase())
+                            ? map.get(attr.getName().toLowerCase()) : attr.getName()
+                    , StringUtil.obj4StrIfnullBlack(ReflectUtil.getFieldValue(v, attr)));
+        }
     }
 }

@@ -125,7 +125,7 @@ public class NC5HomeConfigDialogUIListener {
             design.setDataSourceName(designName);
             design.setIsBase("false");
             NCPropXmlUtil.add(design);
-            putDataSourceVOs2UI(NCPropXmlUtil.getDataSourceVOS());
+            putDataSourceVOs2UI(NCPropXmlUtil.getDataSourceVOS(ui.getProject()));
 
         } catch (CloneNotSupportedException e1) {
             e1.printStackTrace();
@@ -264,8 +264,8 @@ public class NC5HomeConfigDialogUIListener {
         ui.comboBox_libScope.setSelectedItem(ProjectNCConfigUtil.getConfigValue("nc.version"
                 , ProjectNCConfigUtil.getNCVersion().toString()));
 
-        NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
-        List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS();
+        NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath(ui.getProject()));
+        List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS(ui.getProject());
 
         if (null != dataSourceVOS && !dataSourceVOS.isEmpty()) {
             putDataSourceVOs2UI(dataSourceVOS);

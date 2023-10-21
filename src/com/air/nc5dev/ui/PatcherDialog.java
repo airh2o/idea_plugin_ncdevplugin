@@ -349,8 +349,8 @@ public class PatcherDialog extends DialogWrapper {
                     NCDataSourceVO ds = NCPropXmlUtil.get(i);
                     if (ds == null) {
                         Messages.showErrorDialog(event.getProject(), "数据源索引不存在: " + i + " ,数据源数量: "
-                                        + (NCPropXmlUtil.getDataSourceVOS() == null ? 0 :
-                                        NCPropXmlUtil.getDataSourceVOS().size())
+                                        + (NCPropXmlUtil.getDataSourceVOS(event.getProject()) == null ? 0 :
+                                        NCPropXmlUtil.getDataSourceVOS(event.getProject()).size())
                                 , "错误:");
                         return;
                     }

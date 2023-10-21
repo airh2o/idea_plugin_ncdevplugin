@@ -23,6 +23,8 @@
 
 ![NC代码规范检查](readme/imgs/4.png "NC代码规范检查")
 
+![抽取BMF](readme/imgs/6.png "抽取BMF")
+
 ![编辑文件右键菜单](readme/imgs/5.png "编辑文件右键菜单")
 
 ![重置密码](https://s1.ax1x.com/2020/11/11/BjAWD0.png "重置密码")
@@ -152,6 +154,12 @@ IDEA连接数据库导出SQL的xml配置文件:
 # 版本更新
 
 ``` 
+<em>4.0 版本 更新:</em> <br>
+      <ul>
+              <li>1. 新增 根据数据库表最新数据导出BMF元数据功能！</li>
+              <li>2. 优化 导出指定文件功能！</li>
+      </ul>
+
 <em>3.8 版本 更新:</em> <br>
       <ul>
           <li>1. 优化和修复部分功能</li>

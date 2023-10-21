@@ -24,8 +24,8 @@ import java.util.List;
 public class ShowNCDBUserListAction extends AbstractIdeaAction {
     @Override
     protected void doHandler(AnActionEvent e) throws IOException {
-        NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
-        List<NCDataSourceVO> ds = NCPropXmlUtil.getDataSourceVOS();
+        NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath(e.getProject()));
+        List<NCDataSourceVO> ds = NCPropXmlUtil.getDataSourceVOS(e.getProject());
         if (CollUtil.isEmpty(ds)) {
             LogUtil.info("没有找到数据源列表,请配置NCHOME和NC的数据源!");
             return;
