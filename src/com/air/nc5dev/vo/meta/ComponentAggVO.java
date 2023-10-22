@@ -3,6 +3,7 @@ package com.air.nc5dev.vo.meta;
 import com.air.nc5dev.ui.exportbmf.ExportbmfDialog;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.V;
+import com.air.nc5dev.util.meta.QueryClassVOListUtil;
 import com.air.nc5dev.util.meta.QueryPropertyVOListUtil;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.project.Project;
@@ -103,6 +104,7 @@ public class ComponentAggVO implements Serializable, Cloneable {
         HashSet<Object> distent = Sets.newHashSet();
         distent.clear();
         QueryPropertyVOListUtil queryPropertyVOListUtil = new QueryPropertyVOListUtil(con);
+        QueryClassVOListUtil queryClassVOListUtil = new QueryClassVOListUtil(con);
         for (BizItfMapDTO bizItfMapDTO : allBizItfMapDTOs) {
             if (bmfSelfClassIds.contains(bizItfMapDTO.getBizInterfaceID())) {
                 //不是引用的对象
@@ -139,7 +141,8 @@ public class ComponentAggVO implements Serializable, Cloneable {
             referenceDTO.setComponentID(componentVO.getId());
             referenceDTO.setRefId(bizItfMapDTO.getBizInterfaceID());
             SearchComponentVO c = V.get(ExportbmfDialog.CACHE.get(project), new HashMap<String, SearchComponentVO>())
-                    .get(referenceDTO.getRefId());
+                    .get(queryClassVOListUtil.getCompomentIDByClassId(referenceDTO.getRefId())
+                    );
             if (c != null) {
                 referenceDTO.setModuleName(c.getOwnModule());
                 String name = c.getFilePath().substring(c.getFilePath().lastIndexOf('\\'));
@@ -148,7 +151,7 @@ public class ComponentAggVO implements Serializable, Cloneable {
                     pp = pp.substring(0, pp.length() - 1);
                 }
                 pp = pp.substring(pp.lastIndexOf('\\'));
-                referenceDTO.setMdFilePath(pp + "\\" + name);
+                referenceDTO.setMdFilePath(pp + name);
                 referenceDTO.setDisplayName("引用：" + c.getDisplayName());
             }
             referenceDTO.setName("reference" + referenceList.size());

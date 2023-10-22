@@ -241,7 +241,7 @@ public class ExportbmfDialog extends DialogWrapper {
 
                     if (onlyOnlyBmf && vo.getFileName() != null && !vo.getFileName().toLowerCase().endsWith(".bmf")) {
                         it.remove();
-                    }else{
+                    } else {
                         if (onlyNoMatch) {
                             if (StringUtil.equalsIgnoreCase(vo.getVersion(), vo.getFileVersion())) {
                                 it.remove();
@@ -281,8 +281,8 @@ public class ExportbmfDialog extends DialogWrapper {
                 }
             }
         };
-        backgroundable.setCancelText("放弃吧,没有卵用的按钮");
-        backgroundable.setCancelTooltipText("这是一个没有卵用的按钮");
+        backgroundable.setCancelText("停止任务");
+        backgroundable.setCancelTooltipText("停止这个任务");
         ProgressManager.getInstance().run(backgroundable);
     }
 
@@ -317,12 +317,16 @@ public class ExportbmfDialog extends DialogWrapper {
 
             for (SearchComponentVO v : vs) {
                 if (indicator != null) {
+                    if (indicator.isCanceled()) {
+                        LogUtil.infoAndHide("手工取消任务完成，导出元数据文件: " + outDir.getPath());
+                        return;
+                    }
                     indicator.setText("导出： " + v.getName() + "  " + v.getDisplayName() + " 中...");
                 }
                 ComponentAggVO agg = new QueryCompomentVOUtil(con).queryVOAgg(v.getId(), getProject());
                 MetaXmlBuilder4NC6 metaXmlBuilder4NC6 = new MetaXmlBuilder4NC6(con, agg);
                 String str = metaXmlBuilder4NC6.toBmfStr();
-                FileUtil.writeUtf8String(str, new File(outDir, v.getOwnModule() + '_' + v.getName() + ".bmf"));
+                FileUtil.writeUtf8String(str, new File(outDir, StringUtil.get(v.getFileName(), v.getOwnModule() + '_' + v.getName() + ".bmf")));
             }
 
             LogUtil.infoAndHide("导出元数据文件完成: " + outDir.getPath());
@@ -336,7 +340,7 @@ public class ExportbmfDialog extends DialogWrapper {
         }
     }
 
-    private void searchAllBmfFile() {
+    private void searchAllBmfFile(ProgressIndicator indicator) {
         File home = new File(ProjectNCConfigUtil.getNCHomePath(getProject()));
         if (!home.isDirectory()) {
             return;
@@ -357,16 +361,24 @@ public class ExportbmfDialog extends DialogWrapper {
                 )
                 , ".bmf", ".bpf"), new ArrayList<>());
 
-        readBmfFileInfo2Cache(bmfs);
+        readBmfFileInfo2Cache(bmfs, indicator);
 
-        searchProjectBmfFile();
+        searchProjectBmfFile(indicator);
     }
 
-    private void readBmfFileInfo2Cache(List<File> bmfs) {
+    private void readBmfFileInfo2Cache(List<File> bmfs, ProgressIndicator indicator) {
         CACHE.putIfAbsent(getProject(), new ConcurrentHashMap<>());
         Map<String, SearchComponentVO> m = CACHE.get(getProject());
         for (File bmf : bmfs) {
             try {
+                if (indicator != null) {
+                    if (indicator.isCanceled()) {
+                        LogUtil.infoAndHide("取消缓存BMF任务完成");
+                        return;
+                    }
+                    indicator.setText("正在读取BMF文件到缓存: " + bmf.getPath());
+                }
+
                 ComponentDTO c = MeatBaseInfoReadUtil.readComponentInfo(FileUtil.readUtf8String(bmf));
                 SearchComponentVO s = ReflectUtil.copy2VO(c, SearchComponentVO.class);
                 s.setFileName(bmf.getName());
@@ -374,10 +386,10 @@ public class ExportbmfDialog extends DialogWrapper {
                 s.setFileVersion(c.getVersion());
 
                 if (StringUtil.isBlank(c.getMetaType())) {
-                    if (Boolean.TRUE.equals(c.getIsbizmodel())) {
-                        c.setMetaType(".bpf");
-                    } else {
+                    if (Boolean.FALSE.equals(c.getIsbizmodel()) || StringUtil.endWithIgnoreCase(s.getFileName(), ".bmf")) {
                         c.setMetaType(".bmf");
+                    } else {
+                        c.setMetaType(".bpf");
                     }
                 }
 
@@ -389,7 +401,7 @@ public class ExportbmfDialog extends DialogWrapper {
         }
     }
 
-    private void searchProjectBmfFile() {
+    private void searchProjectBmfFile(ProgressIndicator indicator) {
         List<File> bmfs = V.get(IoUtil.getAllFiles(
                 new File(getProject().getBasePath())
                 , true
@@ -401,7 +413,7 @@ public class ExportbmfDialog extends DialogWrapper {
                 )
                 , ".bmf", ".bpf"), new ArrayList<>());
 
-        readBmfFileInfo2Cache(bmfs);
+        readBmfFileInfo2Cache(bmfs, indicator);
     }
 
     public void initFiles(int type) {
@@ -417,9 +429,9 @@ public class ExportbmfDialog extends DialogWrapper {
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
                     if (1 == type) {
-                        searchAllBmfFile();
+                        searchAllBmfFile(indicator);
                     } else if (0 == type) {
-                        searchProjectBmfFile();
+                        searchProjectBmfFile(indicator);
                     }
                 } finally {
                     runing.set(false);
@@ -431,8 +443,8 @@ public class ExportbmfDialog extends DialogWrapper {
                 }
             }
         };
-        backgroundable.setCancelText("放弃吧,没有卵用的按钮");
-        backgroundable.setCancelTooltipText("这是一个没有卵用的按钮");
+        backgroundable.setCancelText("停止任务");
+        backgroundable.setCancelTooltipText("停止这个任务");
         ProgressManager.getInstance().run(backgroundable);
     }
 

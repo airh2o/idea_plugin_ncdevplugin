@@ -76,4 +76,24 @@ public class QueryClassVOListUtil {
             IoUtil.close(st);
         }
     }
+
+    public String getCompomentIDByClassId(String classId) throws SQLException {
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = con.prepareStatement("select componentid from md_class where id=?");
+
+            st.setObject(1, classId);
+
+            rs = st.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString(1);
+            }
+        } finally {
+            IoUtil.close(rs);
+            IoUtil.close(st);
+        }
+        return null;
+    }
 }
