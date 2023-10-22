@@ -2,6 +2,7 @@ package com.air.nc5dev.acion;
 
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
 import com.air.nc5dev.ui.PatcherDialog;
+import com.air.nc5dev.util.CollUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -14,40 +15,27 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class RemoveFile2PathcerSelectFilesAction extends AbstractIdeaAction {
-
-
+public class RemoveFile2PathcerSelectFilesAction extends AddFile2PathcerSelectFilesAction {
     @Override
     protected void doHandler(AnActionEvent e) {
-        VirtualFile f = getSelectedFile(e.getProject());
-
-        PatcherDialog.removeForceAddSelectFile(e.getProject(), f);
-    }
-
-    @Nullable
-    private VirtualFile getSelectedFile(final Project project) {
-        VirtualFile selectedFile = null;
-        final Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-        if (selectedTextEditor != null) {
-            selectedFile = FileDocumentManager.getInstance().getFile(selectedTextEditor.getDocument());
-        }
-
-        if (selectedFile == null) {
-            // this is the preferred solution, but it doesn't respect the focus of split editors at present
-            final VirtualFile[] selectedFiles = FileEditorManager.getInstance(project).getSelectedFiles();
-            if (selectedFiles.length > 0) {
-                selectedFile = selectedFiles[0];
+        List<VirtualFile> vs = getSelectedFile(e);
+        if (CollUtil.isNotEmpty(vs)) {
+            for (VirtualFile v : vs) {
+                PatcherDialog.removeForceAddSelectFile(e.getProject(), v);
             }
         }
+    }
 
-        return selectedFile;
+    @Override
+    public boolean showConform() {
+        return true;
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
         super.update(e);
 
-        VirtualFile f = getSelectedFile(e.getProject());
+        VirtualFile f = CollUtil.getFirst(getSelectedFile(e));
 
         e.getPresentation().setEnabled(PatcherDialog.containsForceAddSelectFile(e.getProject(), f));
     }

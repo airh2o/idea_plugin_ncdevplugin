@@ -14,31 +14,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class ClearFile2PathcerSelectFilesAction extends AbstractIdeaAction {
-
-
+public class ClearFile2PathcerSelectFilesAction extends AddFile2PathcerSelectFilesAction {
     @Override
     protected void doHandler(AnActionEvent e) {
         PatcherDialog.clearForceAddSelectFile(e.getProject());
     }
 
-    @Nullable
-    private VirtualFile getSelectedFile(final Project project) {
-        VirtualFile selectedFile = null;
-        final Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-        if (selectedTextEditor != null) {
-            selectedFile = FileDocumentManager.getInstance().getFile(selectedTextEditor.getDocument());
-        }
-
-        if (selectedFile == null) {
-            // this is the preferred solution, but it doesn't respect the focus of split editors at present
-            final VirtualFile[] selectedFiles = FileEditorManager.getInstance(project).getSelectedFiles();
-            if (selectedFiles.length > 0) {
-                selectedFile = selectedFiles[0];
-            }
-        }
-
-        return selectedFile;
+    @Override
+    public boolean showConform() {
+        return true;
     }
 
     @Override

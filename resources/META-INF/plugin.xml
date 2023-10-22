@@ -210,6 +210,7 @@
                 description="查看文件列表补丁导出选定的文件列表"
         >
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
         <action id="AddFile2PathcerSelectFilesAction"
                 class="com.air.nc5dev.acion.AddFile2PathcerSelectFilesAction"
@@ -217,6 +218,7 @@
                 description="当前文件加入补丁导出选定的文件列表"
         >
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
         <action id="RemoveFile2PathcerSelectFilesAction"
                 class="com.air.nc5dev.acion.RemoveFile2PathcerSelectFilesAction"
@@ -224,6 +226,7 @@
                 description="当前文件移出补丁导出选定的文件列表"
         >
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
         <action id="ClearFile2PathcerSelectFilesAction"
                 class="com.air.nc5dev.acion.ClearFile2PathcerSelectFilesAction"
@@ -231,6 +234,7 @@
                 description="清空添加的补丁导出选定的文件列表"
         >
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
 
         <group id="nc5devtool" text="NC 开发插件配置" popup="true" description="配置NC开发插件"
