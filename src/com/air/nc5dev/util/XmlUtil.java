@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -298,6 +299,11 @@ public final class XmlUtil extends cn.hutool.core.util.XmlUtil {
         }
 
         for (Field attr : attrs) {
+            if (Modifier.isStatic(attr.getModifiers())
+                    || Modifier.isTransient(attr.getModifiers())) {
+                continue;
+            }
+
             ele.addAttribute(map.containsKey(attr.getName().toLowerCase())
                             ? map.get(attr.getName().toLowerCase()) : attr.getName()
                     , StringUtil.obj4StrIfnullBlack(ReflectUtil.getFieldValue(v, attr)));

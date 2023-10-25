@@ -326,7 +326,8 @@ public class ExportbmfDialog extends DialogWrapper {
                 ComponentAggVO agg = new QueryCompomentVOUtil(con).queryVOAgg(v.getId(), getProject());
                 MetaXmlBuilder4NC6 metaXmlBuilder4NC6 = new MetaXmlBuilder4NC6(con, agg);
                 String str = metaXmlBuilder4NC6.toBmfStr();
-                FileUtil.writeUtf8String(str, new File(outDir, StringUtil.get(v.getFileName(), v.getOwnModule() + '_' + v.getName() + ".bmf")));
+                FileUtil.writeUtf8String(str, new File(outDir, StringUtil.get(v.getFileName()
+                        , v.getOwnModule() + '_' + v.getName() + ".bmf")));
             }
 
             LogUtil.infoAndHide("导出元数据文件完成: " + outDir.getPath());

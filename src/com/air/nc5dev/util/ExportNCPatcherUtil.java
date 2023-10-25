@@ -146,7 +146,7 @@ public class ExportNCPatcherUtil {
         String testClassDirPath;
 
         String moduleName;
-        while (moduleIterator.hasNext()) {
+        while (moduleIterator.hasNext() && !contentVO.indicator.isCanceled()) {
             //循环所有的模块
             entry = moduleIterator.next();
 
@@ -170,6 +170,10 @@ public class ExportNCPatcherUtil {
             testClassDirPath = null == compilerModuleExtension.getCompilerOutputPathForTests()
                     ? null : compilerModuleExtension.getCompilerOutputPathForTests().getPath();
             for (VirtualFile sourceRoot : sourceRoots) {
+                if (contentVO.indicator.isCanceled()) {
+                    return;
+                }
+
                 //循环输出 NC 3大文件夹
                 if (null == classDir) {
                     ProjectUtil.warnNotification("编译输出路径不存在!请重新build或者" +
@@ -201,7 +205,7 @@ public class ExportNCPatcherUtil {
 
             //复制模块配置文件！
             File umpDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "META-INF");
-            if (umpDir.isDirectory()) {
+            if (umpDir.isDirectory() && !contentVO.indicator.isCanceled()) {
                 contentVO.indicator.setText("导出模块配置文件:" + umpDir.getPath());
                 if (contentVO.isSelectExport() && !contentVO.getSelectFiles().contains(umpDir.getPath())) {
                     copyAll(umpDir
@@ -225,7 +229,7 @@ public class ExportNCPatcherUtil {
             File bmfDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "METADATA");
 
             //复制模块元数据
-            if (bmfDir.isDirectory()) {
+            if (bmfDir.isDirectory() && !contentVO.indicator.isCanceled()) {
                 contentVO.indicator.setText("导出模块元数据:" + umpDir.getPath());
                 if (contentVO.isSelectExport() && !contentVO.getSelectFiles().contains(umpDir.getPath())) {
                     copyAll(bmfDir
@@ -243,7 +247,7 @@ public class ExportNCPatcherUtil {
 
             //复制模块resoureces
             File resourcesDir = new File(new File(entry.getValue().getModuleFilePath()).getParentFile(), "resources");
-            if (resourcesDir.isDirectory()) {
+            if (resourcesDir.isDirectory() && !contentVO.indicator.isCanceled()) {
                 contentVO.indicator.setText("导出模块resources:" + resourcesDir.getPath());
                 if (contentVO.isSelectExport() && !contentVO.getSelectFiles().contains(resourcesDir.getPath())) {
                     copyAll(resourcesDir
@@ -256,7 +260,7 @@ public class ExportNCPatcherUtil {
             }
 
             //检查是否需要把代码打包成 jar文件
-            if (configVO.toJar) {
+            if (configVO.toJar && !contentVO.indicator.isCanceled()) {
                 File manifest = null;
                 if (StringUtil.notEmpty(configVO.manifestFilePath)) {
                     manifest = new File(configVO.manifestFilePath);
@@ -272,8 +276,12 @@ public class ExportNCPatcherUtil {
             //模块循环结束
         }
 
+        if (contentVO.indicator.isCanceled()) {
+            return;
+        }
+
         //处理NCC特殊的模块补丁结构
-        if (contentVO.exportSql) {
+        if (contentVO.exportSql && !contentVO.indicator.isCanceled()) {
             if (contentVO.rebuildsql) {
                 contentVO.indicator.setText("强制直接连接数据库生成SQL合并文件...");
                 reBuildNCCSqlAndFrontFiles(contentVO);
@@ -288,12 +296,12 @@ public class ExportNCPatcherUtil {
             processNCCPatchersWhenFinashLeft(contentVO);
         }
 
-        if (contentVO.isFormat4Ygj()) {
+        if (contentVO.isFormat4Ygj() && !contentVO.indicator.isCanceled()) {
             //转换云管家格式！
             toYgjFormatExportStract(contentVO);
         }
 
-        if (contentVO.isReWriteSourceFile()) {
+        if (contentVO.isReWriteSourceFile() && !contentVO.indicator.isCanceled()) {
             reWriteSourceFile(contentVO);
         }
 
@@ -595,6 +603,10 @@ public class ExportNCPatcherUtil {
             }
 
             for (String modulePath : moduleHomeDir2ModuleMap.keySet()) {
+                if (contentVO.indicator.isCanceled()) {
+                    return;
+                }
+
                 if (contentVO.ignoreModules.contains(moduleHomeDir2ModuleMap.get(modulePath))) {
                     //需要跳过的模块
                     continue;

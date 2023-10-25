@@ -1,6 +1,10 @@
 package com.air.nc5dev.vo.meta;
 
+import com.air.nc5dev.util.meta.consts.DataTypeStyleConverter;
+import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
+import com.air.nc5dev.util.meta.consts.VisibilityConverter;
 import lombok.Data;
+import nc.vo.pub.VOStatus;
 import nc.vo.pub.lang.UFDateTime;
 
 import java.io.Serializable;
@@ -31,7 +35,7 @@ public class PropertyDTO implements Serializable, Cloneable {
     private String name;
     private Integer precise;
     private String refModelName;
-    private Integer attrsequence;
+    private Integer attrsequence; //sequence
     private Integer visibility = 0;
     private Integer versionType = 0;
     private String typeName;
@@ -65,4 +69,23 @@ public class PropertyDTO implements Serializable, Cloneable {
     Boolean isShare = false;
 
 
+    /**
+     * @see VOStatus
+     */
+    transient int state;
+    transient String dataTypeStyleName;
+    transient String visibilityName;
+    transient boolean select;
+
+    public void fixDisplays() {
+        DataTypeStyleConverter dataTypeStyleConverter = new DataTypeStyleConverter();
+        VisibilityConverter visibilityConverter = new VisibilityConverter();
+        setDbtype(PropertyDataTypeEnum.ofTypeDefualt(getDataType()).getDbtype());
+        setTypeDisplayName(PropertyDataTypeEnum.ofTypeDefualt(getDataType()).getTypeDisplayName());
+        setTypeName(PropertyDataTypeEnum.ofTypeDefualt(getDataType()).getTypeName());
+        setFieldType(PropertyDataTypeEnum.ofTypeDefualt(getDataType()).getFieldType());
+        setDataTypeStyleName(dataTypeStyleConverter.getConvertBefor(getDataTypeStyle()));
+        setVisibilityName(visibilityConverter.getNameOfVisibility(getVisibility()));
+        setFieldName(getName());
+    }
 }

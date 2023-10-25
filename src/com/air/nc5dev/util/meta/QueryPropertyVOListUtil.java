@@ -2,7 +2,9 @@ package com.air.nc5dev.util.meta;
 
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.jdbc.resulthandel.VOArrayListResultSetExtractor;
+import com.air.nc5dev.util.meta.consts.DataTypeStyleConverter;
 import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
+import com.air.nc5dev.util.meta.consts.VisibilityConverter;
 import com.air.nc5dev.vo.meta.PropertyDTO;
 import lombok.Data;
 
@@ -53,11 +55,7 @@ public class QueryPropertyVOListUtil {
             }
 
             for (PropertyDTO v : vs) {
-                v.setDbtype(PropertyDataTypeEnum.ofTypeDefualt(v.getDataType()).getDbtype());
-                v.setTypeDisplayName(PropertyDataTypeEnum.ofTypeDefualt(v.getDataType()).getTypeDisplayName());
-                v.setTypeName(PropertyDataTypeEnum.ofTypeDefualt(v.getDataType()).getTypeName());
-                v.setFieldType(v.getDbtype());
-                v.setFieldName(v.getName());
+                v.fixDisplays();
             }
 
             return vs;

@@ -112,8 +112,8 @@ public class MetaXmlBuilder4NC6 {
                 for (PropertyDTO p : propertyDTOs) {
                     Element attribute = attributelist.addElement("attribute");
                     XmlUtil.addAttr(doc, attribute, p, attributeNameMaping);
-                    attribute.addAttribute("dataTypeStyle", new DataTypeStyleConverter().getConvertBefor(p.getDataTypeStyle()));
-                    attribute.addAttribute("visibility", new VisibilityConverter().getNameOfVisibility(p.getVisibility()));
+                    attribute.addAttribute("dataTypeStyle", p.getDataTypeStyleName());
+                    attribute.addAttribute("visibility", p.getVisibilityName());
                 }
 
                 Element operationlist = celllist.addElement("operationlist");

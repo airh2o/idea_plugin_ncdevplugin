@@ -135,12 +135,12 @@
         </action>
 
         <action id="GoToNCRequestMapping" class="com.air.nc5dev.acion.GoToNCRequestMappingAction"
-                text="搜索NCC请求地址映射Action" description="NCC请求地址映射Action">
+                text="快速搜索NCC请求地址Action" description="精简界面-快速查找">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>
             <!--            BACK_SLASH-->
         </action>
         <action id="SearchNCRequestMapping" class="com.air.nc5dev.acion.SearchNCRequestMappingAction"
-                text="搜索NCC-BIP请求地址界面" description="NCC请求地址映射Action">
+                text="搜索NCC-BIP请求地址Action界面" description="完整界面来高级搜索Action情况">
         </action>
         <action id="ReDeployAction" class="com.air.nc5dev.acion.ReDeployAction"
                 text="立即部署更新项目配置到HOME" description="比如ncc的xml文件和重新加载各种项目里的xml信息">
@@ -176,6 +176,12 @@
         <action id="nc5dev.info.meta.TakeBmfFromDatabaseAction"
                 class="com.air.nc5dev.acion.meta.TakeBmfFromDatabaseAction"
                 text="抽取数据库导出BMF文件" description="从数据库里元数据表数据导出BMF元数据文件-主要用做元数据文件不是最新而要从数据库抽取">
+        </action>
+        <action id="nc5dev.info.meta.AddDefField2BmfAction"
+                class="com.air.nc5dev.acion.meta.AddDefField2BmfAction"
+                text="快速新增或复制元数据字段" description="快速新增元数据文件中的自定义项目">
+
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
 
         <action id="nc5dev.info.JavadocGenerateAction" class="com.air.nc5dev.acion.JavadocGenerateAction"
@@ -257,7 +263,7 @@
             <separator/>
 
             <group id="nc5devtoolMatabmfEdit" text="快速新增元数据文件"
-                   popup="true" description="快速新增一个全新的元数据文件-根据常用的类型模板">
+                   popup="true" description="快速新增或处理元数据文件的各种功能">
                 <reference ref="nc5dev.info.meta.MakeBmf4OneHeadOneBodyBillAction"/>
                 <reference ref="nc5dev.info.meta.MakeBmf41zBillAction"/>
                 <reference ref="nc5dev.info.meta.MakeBmf41bBillAction"/>
@@ -266,21 +272,21 @@
                 <reference ref="nc5dev.info.meta.TakeBmfFromDatabaseAction"/>
 
                 <reference ref="nc5dev.info.copyMateFile2NewFile"/>
-            </group>
-            <group id="nc5devtoolExportBillAll" text="导出已有节点单据SQL脚本"
-                   popup="true" description="导出已有节点单据SQL脚本">
-                <reference ref="nc5dev.info.exportBillAll"/>
+
+                <reference ref="nc5dev.info.meta.AddDefField2BmfAction"/>
             </group>
             <separator/>
+
+            <reference ref="nc5dev.info.opennchome"/>
+            <reference ref="nc5dev.info.opennclogconfigfile"/>
+            <reference ref="nc5dev.info.openncdataconfigfile"/>
 
             <group id="nc5devtoolOtherTools" text="其他小功能"
                    popup="true" description="其他小功能">
                 <reference ref="nc5dev.info.deletenclogs"/>
-                <reference ref="nc5dev.info.opennchome"/>
+
                 <reference ref="nc5dev.info.opennchomeierpbin"/>
                 <reference ref="nc5dev.info.openncconfigwindow"/>
-                <reference ref="nc5dev.info.opennclogconfigfile"/>
-                <reference ref="nc5dev.info.openncdataconfigfile"/>
                 <reference ref="nc5dev.info.OpenNCCDevWebAction"/>
                 <reference ref="nc5dev.info.OpenNCCUIWebAction"/>
                 <reference ref="nc5dev.info.OpenCopyWebAction"/>
@@ -291,11 +297,28 @@
                 <reference ref="nc5dev.info.MstscOpenLastAction"/>
                 <reference ref="nc5dev.info.NCCJsonDecodeAction"/>
 
+                <reference ref="nc5dev.info.makejarfile"/>
+                <reference ref="nc5dev.info.makeNcModulejarfile"/>
+
                 <reference ref="nc5dev.info.JavadocGenerateAction"/>
                 <reference ref="GenerateGetSetAction"/>
                 <reference ref="GenerateGetAction"/>
                 <reference ref="GenerateSetAction"/>
+
+                <group id="nc5devtoolExportBillAll" text="导出已有节点单据SQL脚本"
+                       popup="true" description="导出已有节点单据SQL脚本">
+                    <reference ref="nc5dev.info.exportBillAll"/>
+                </group>
             </group>
+            <separator/>
+
+            <reference ref="nc5dev.info.showlocalncjavaexe"/>
+            <reference ref="nc5dev.info.ShowNCDBUserListAction"/>
+            <separator/>
+
+            <reference ref="SearchNCRequestMapping"/>
+            <reference ref="GoToNCRequestMapping"/>
+            <reference ref="ReDeployAction"/>
             <separator/>
 
             <reference ref="nc5dev.info.openjconsole"/>
@@ -304,21 +327,6 @@
 
             <reference ref="nc5dev.info.ReConfigModuleAction"/>
             <reference ref="nc5dev.info.ReConfigProjectAction"/>
-            <separator/>
-
-            <reference ref="nc5dev.info.showlocalncjavaexe"/>
-            <reference ref="nc5dev.info.ShowNCDBUserListAction"/>
-            <separator/>
-
-            <reference ref="nc5dev.info.makejarfile"/>
-            <reference ref="nc5dev.info.makeNcModulejarfile"/>
-            <reference ref="SearchNCRequestMapping"/>
-            <reference ref="GoToNCRequestMapping"/>
-            <reference ref="ReDeployAction"/>
-            <separator/>
-
-            <reference ref="nc5dev.info.about"/>
-            <reference ref="nc5dev.info.help"/>
             <separator/>
 
             <reference ref="SerializeGenerator"/>
@@ -433,6 +441,9 @@
                 </action>
             </group>
 
+            <reference ref="nc5dev.info.about"/>
+            <reference ref="nc5dev.info.help"/>
+            <separator/>
 
             <add-to-group group-id="ToolsMenu" anchor="first"/>
             <add-to-group group-id="MainToolBarSettings" anchor="first"/>

@@ -867,12 +867,15 @@ public class PatcherDialog extends DialogWrapper {
                     contentVO.indicator = indicator;
                     File opendir = null;
                     try {
-                        if (contentVO.exportResources && contentVO.reNpmBuild) {
+                        if (contentVO.exportResources && contentVO.reNpmBuild && !contentVO.indicator.isCanceled()) {
                             //你懂得！
                             reBuildNpmPatcther(contentVO, indicator);
                         }
 
-                        ExportNCPatcherUtil.export(contentVO);
+                        if (!contentVO.indicator.isCanceled()) {
+                            ExportNCPatcherUtil.export(contentVO);
+                        }
+
                         long e = System.currentTimeMillis();
                         LogUtil.infoAndHide("导出成功,耗时:" + ((e - s) / 1000.0d) + " (秒s)!硬盘路径： " + contentVO.getOutPath());
 
@@ -881,14 +884,14 @@ public class PatcherDialog extends DialogWrapper {
                         LogUtil.infoAndHide("导出补丁原始目录： " + dirToOpen.getPath());
 
                         try {
-                            if (contentVO.zip) {
+                            if (contentVO.zip && !contentVO.indicator.isCanceled()) {
                                 opendir = zipPathcers(contentVO, dirToOpen);
                             }
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
 
-                        if (contentVO.isFormat4Ygj()) {
+                        if (contentVO.isFormat4Ygj() && !contentVO.indicator.isCanceled()) {
                             if (contentVO.isDeleteDir()) {
                                 try {
                                     FileUtil.del(dirToOpen);
@@ -896,7 +899,7 @@ public class PatcherDialog extends DialogWrapper {
                                 }
                             }
                         } else {
-                            if (contentVO.isDeleteDir()) {
+                            if (contentVO.isDeleteDir() && !contentVO.indicator.isCanceled()) {
                                 try {
                                     FileUtil.del(dirToOpen.getParentFile());
                                 } catch (Throwable ex) {
@@ -919,6 +922,10 @@ public class PatcherDialog extends DialogWrapper {
                                 LogUtil.infoAndHide("导出成功！路径: " + opendir.getPath());
                             }
                         }
+
+                        if (contentVO.indicator.isCanceled()) {
+                            LogUtil.infoAndHide("手工取消导出补丁成功.");
+                        }
                     } catch (Throwable iae) {
                         LogUtil.error("自动打开路径失败: " + ExceptionUtil.getExcptionDetall(iae)
                                 + " ,路径: " + (opendir == null ? null : opendir.getPath()));
@@ -928,8 +935,8 @@ public class PatcherDialog extends DialogWrapper {
                     isRuning = false;
                 }
             };
-            backgroundable.setCancelText("放弃吧,没有卵用的按钮");
-            backgroundable.setCancelTooltipText("这是一个没有卵用的按钮");
+            backgroundable.setCancelText("停止导出");
+            backgroundable.setCancelTooltipText("立即停止导出");
             ProgressManager.getInstance().run(backgroundable);
 
             dispose();
