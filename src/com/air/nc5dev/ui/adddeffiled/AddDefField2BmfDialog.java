@@ -224,9 +224,12 @@ public class AddDefField2BmfDialog extends DialogWrapper {
             }
 
             Map<String, Element> attrId2EleMap = new HashMap<>();
-            if (e.element("attributelist") != null) {
-                attrId2EleMap = e.element("attributelist").elements("attribute")
+            Element attributelist = e.element("attributelist");
+            if (attributelist != null) {
+                attrId2EleMap = attributelist.elements("attribute")
                         .stream().collect(Collectors.toMap(v -> v.attributeValue("id"), v -> v));
+            }else{
+                attributelist = e.addElement("attributelist");
             }
 
             Map<Integer, List<PropertyDTO>> state2ProsMap = vs.stream().collect(Collectors.groupingBy(v -> v.getState()));
@@ -235,7 +238,7 @@ public class AddDefField2BmfDialog extends DialogWrapper {
                 for (PropertyDTO p : ps) {
                     Element el = attrId2EleMap.get(p.getId());
                     if (el != null) {
-                        e.remove(el);
+                        attributelist.remove(el);
                     }
                 }
             }
@@ -243,7 +246,7 @@ public class AddDefField2BmfDialog extends DialogWrapper {
             ps = state2ProsMap.get(VOStatus.NEW);
             if (CollUtil.isNotEmpty(ps)) {
                 for (PropertyDTO p : ps) {
-                    Element el = e.addElement("attribute");
+                    Element el = attributelist.addElement("attribute");
                     XmlUtil.addAttr(doc, el, p, attributeNameMaping);
                 }
             }
@@ -253,7 +256,7 @@ public class AddDefField2BmfDialog extends DialogWrapper {
                 for (PropertyDTO p : ps) {
                     Element el = attrId2EleMap.get(p.getId());
                     if (el == null) {
-                        el = e.addElement("attribute");
+                        el = attributelist.addElement("attribute");
                     }
                     XmlUtil.addAttr(doc, el, p, attributeNameMaping);
                 }
