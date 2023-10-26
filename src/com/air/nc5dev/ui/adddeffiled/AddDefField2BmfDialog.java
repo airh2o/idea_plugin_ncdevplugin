@@ -1,26 +1,45 @@
 package com.air.nc5dev.ui.adddeffiled;
 
-import com.air.nc5dev.enums.NcVersionEnum;
+import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.ui.exportbmf.ExportbmfDialog;
 import com.air.nc5dev.util.*;
 import com.air.nc5dev.util.idea.LogUtil;
+import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
+import com.air.nc5dev.util.meta.xml.MeatBaseInfoReadUtil;
+import com.air.nc5dev.vo.meta.ClassDTO;
+import com.air.nc5dev.vo.meta.ComponentDTO;
 import com.air.nc5dev.vo.meta.PropertyDTO;
+import com.google.common.collect.Maps;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import nc.vo.pub.VOStatus;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.ByteArrayInputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /***
  *     弹框UI        </br>
@@ -32,7 +51,8 @@ import java.util.*;
  * @Param
  * @return
  */
-@Data
+@Getter
+@Setter
 public class AddDefField2BmfDialog extends DialogWrapper {
     public static String[] tableNames = new String[]{
             "序号", "组件名", "组件显示名", "模块", "名称空间"
@@ -45,14 +65,13 @@ public class AddDefField2BmfDialog extends DialogWrapper {
 
 
     public static String[] tablePropNames = new String[]{
-            "选择", "序号", "名称", "显示名称", "类型样式"
+            "序号", "名称", "显示名称", "类型样式"
             , "类型", "字段名称", "字段类型", "参照名称"
     };
     public static String[] tablePropAttrs = new String[]{
-            "select", "attrsequence", "name", "displayName", "dataTypeStyleName"
+            "attrsequence", "name", "displayName", "dataTypeStyleName"
             , "typeName", "fieldName", "fieldType", "refModelName"
     };
-
 
     VirtualFile bmf;
     JBTabbedPane contentPane;
@@ -82,7 +101,9 @@ public class AddDefField2BmfDialog extends DialogWrapper {
     /**
      * key=calssid 实体id, value =属性列表
      */
-    Map<String, List<PropertyDTO>> propertys = new HashMap<>();
+    Map<String, List<PropertyDTO>> propertyMap = new HashMap<>();
+
+    String oKButtonTextStr = "保存到文件";
 
     public AddDefField2BmfDialog(Project project, VirtualFile bmf) {
         super(project);
@@ -90,7 +111,7 @@ public class AddDefField2BmfDialog extends DialogWrapper {
         this.bmf = bmf;
         createCenterPanel();
         init();
-        setOKButtonText("保存到文件");
+        setOKButtonText(oKButtonTextStr);
         setCancelButtonText("关闭窗口");
         setTitle("快速新增自定义项字段或复制字段到元数据文件(表格点击右键操作)");
     }
@@ -112,28 +133,28 @@ public class AddDefField2BmfDialog extends DialogWrapper {
 
             comboBoxModelClass = new DefaultComboBoxModel<ClassComboxDTO>(readClassList());
             JBLabel label = new JBLabel("选择实体:");
-            label.setBounds(1, y, w, 60);
+            label.setBounds(x, y, w, 60);
             panel_main.add(label);
             comboBoxClass = new ComboBox(comboBoxModelClass);
-            comboBoxClass.setBounds(x + w, y, 150, h);
+            comboBoxClass.setBounds(x + label.getWidth(), y, 600, h);
             panel_main.add(comboBoxClass);
 
             labelInfo = new JBLabel();
-            labelInfo.setBounds(1, y = 45 + 150 + 40, getWidth() - 50, 30);
+            labelInfo.setBounds(x = 1, y += comboBoxClass.getHeight() + 3, getWidth() - 50, 30);
             panel_main.add(labelInfo);
 
             tableModelClass = new DefaultTableModel(null, tableNames);
             tableClass = new ClassEntityListTable(tableModelClass, this);
             panel_tableClass = new JBScrollPane(tableClass);
             panel_tableClass.setAutoscrolls(true);
-            panel_tableClass.setBounds(x = 1, y = 45 + 150 + 40 + 25, getWidth() - 50, 330);
+            panel_tableClass.setBounds(x = 1, y += labelInfo.getHeight() + 2, getWidth() - 50, 100);
             panel_main.add(panel_tableClass);
 
             tableModelPropertis = new DefaultTableModel(null, tablePropNames);
             tablePropertis = new ProperteListTable(tableModelPropertis, this);
             panel_tablePropertis = new JBScrollPane(tablePropertis);
             panel_tablePropertis.setAutoscrolls(true);
-            panel_tablePropertis.setBounds(x = 1, y = 45 + 150 + 40 + 25, getWidth() - 50, 330);
+            panel_tablePropertis.setBounds(x = 1, y += panel_tableClass.getHeight() + 5, getWidth() - 50, 400);
             panel_main.add(panel_tablePropertis);
 
             initListeners();
@@ -143,66 +164,121 @@ public class AddDefField2BmfDialog extends DialogWrapper {
         initDefualtValues();
     }
 
-    /**
-     * 搜索
-     *
-     * @param e
-     */
-    public void onSearch(ActionEvent e) {
-
-    }
-
-    /**
-     * 导出
-     */
-    @Override
-    protected void doOKAction() {
-        save2Files();
-        // super.doOKAction();
-    }
-
     public void save2Files() {
-        Task.Backgroundable backgroundable = new Task.Backgroundable(project, "正在写入文件...请耐心等待") {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                try {
-                    save2Files0(indicator);
-                } finally {
-                }
-            }
-        };
-        backgroundable.setCancelText("停止任务");
-        backgroundable.setCancelTooltipText("停止这个任务");
-        ProgressManager.getInstance().run(backgroundable);
-    }
-
-    public void save2Files0(ProgressIndicator indicator) {
+//        String bmfXml = FileUtil.readUtf8String(bmf.toNioPath().toFile());
+//        if (bmfXml.startsWith("\uFEFF")) {
+//            bmfXml = StringUtil.removeStart(bmfXml, "\uFEFF");
+//        }
+        org.dom4j.Document doc = null;
+        org.dom4j.Element root = null;
         try {
-            for (PropertyDTO v : result) {
-                if (indicator != null) {
-                    if (indicator.isCanceled()) {
-                        LogUtil.infoAndHide("手工取消任务完成，导出元数据文件: ");
-                        return;
+            doc = new SAXReader().read(bmf.toNioPath().toFile());
+            root = doc.getRootElement();
+        } catch (Throwable e) {
+            //出错了
+            e.printStackTrace();
+            LogUtil.error("解析xml文件失败:" + e.getMessage(), e);
+            return;
+        }
+
+        org.dom4j.Element celllist = null;
+        List<Element> ets = null;
+        if (root.elements("celllist").size() < 1) {
+            celllist = root.addElement("celllist");
+        } else {
+            celllist = root.element("celllist");
+        }
+        ets = celllist.elements("entity");
+
+        if (ets.size() < 0) {
+            ets = new ArrayList<>();
+        }
+
+        HashMap<String, org.dom4j.Element> entityId2EleMap = Maps.newHashMap();
+        for (Element et : ets) {
+            entityId2EleMap.put(et.attributeValue("id"), et);
+        }
+
+        HashMap<String, String> attributeNameMaping = new HashMap();
+        attributeNameMaping.put("hided", "isHide");
+        attributeNameMaping.put("nullable", "isNullable");
+        attributeNameMaping.put("readonly", "isReadOnly");
+        attributeNameMaping.put("accessorclassname", "accessStrategy");
+        attributeNameMaping.put("attrmaxvalue", "maxValue");
+        attributeNameMaping.put("attrminvalue", "minValue");
+        attributeNameMaping.put("attrlength", "length");
+        attributeNameMaping.put("attrsequence", "sequence");
+        attributeNameMaping.put("dynamicattr", "dynamic");
+
+        org.dom4j.Element e = null;
+        for (String entityId : propertyMap.keySet()) {
+            e = entityId2EleMap.get(entityId);
+            if (e == null) {
+                continue;
+            }
+
+            List<PropertyDTO> vs = propertyMap.get(entityId);
+            int i = 1;
+            for (PropertyDTO v : vs) {
+                v.setAttrsequence(i++);
+            }
+
+            Map<String, Element> attrId2EleMap = new HashMap<>();
+            if (e.element("attributelist") != null) {
+                attrId2EleMap = e.element("attributelist").elements("attribute")
+                        .stream().collect(Collectors.toMap(v -> v.attributeValue("id"), v -> v));
+            }
+
+            Map<Integer, List<PropertyDTO>> state2ProsMap = vs.stream().collect(Collectors.groupingBy(v -> v.getState()));
+            List<PropertyDTO> ps = state2ProsMap.get(VOStatus.DELETED);
+            if (CollUtil.isNotEmpty(ps)) {
+                for (PropertyDTO p : ps) {
+                    Element el = attrId2EleMap.get(p.getId());
+                    if (el != null) {
+                        e.remove(el);
                     }
-                    indicator.setText("导出： " + v.getName() + "  " + v.getDisplayName() + " 中...");
                 }
             }
 
-            LogUtil.infoAndHide("写入元数据文件完成!");
-        } catch (Throwable e) {
-            e.printStackTrace();
-            LogUtil.error(e.getMessage(), e);
-        } finally {
+            ps = state2ProsMap.get(VOStatus.NEW);
+            if (CollUtil.isNotEmpty(ps)) {
+                for (PropertyDTO p : ps) {
+                    Element el = e.addElement("attribute");
+                    XmlUtil.addAttr(doc, el, p, attributeNameMaping);
+                }
+            }
+
+            ps = state2ProsMap.get(VOStatus.UPDATED);
+            if (CollUtil.isNotEmpty(ps)) {
+                for (PropertyDTO p : ps) {
+                    Element el = attrId2EleMap.get(p.getId());
+                    if (el == null) {
+                        el = e.addElement("attribute");
+                    }
+                    XmlUtil.addAttr(doc, el, p, attributeNameMaping);
+                }
+            }
+
+            ps = state2ProsMap.get(VOStatus.UNCHANGED);
+            if (CollUtil.isNotEmpty(ps)) {
+                for (PropertyDTO p : ps) {
+                    Element el = attrId2EleMap.get(p.getId());
+                    if (el != null) {
+                        el.addAttribute("sequence", String.valueOf(p.getAttrsequence()));
+                    }
+                }
+            }
         }
+
+        FileUtil.writeUtf8String(doc.asXML(), bmf.toNioPath().toFile());
+        LogUtil.infoAndHide("保存文件成功!");
+
+        readClassList();
+        loadPerpotes((ClassComboxDTO) comboBoxClass.getSelectedItem());
     }
 
     public void initFiles(int type) {
         new ExportbmfDialog(getProject()).initFiles(type);
-    }
-
-    @Override
-    public void doCancelAction() {
-        super.doCancelAction();
     }
 
     @Override
@@ -221,10 +297,22 @@ public class AddDefField2BmfDialog extends DialogWrapper {
 
     public void initDefualtValues() {
         try {
-            NcVersionEnum ncVersion = ProjectNCConfigUtil.getNCVersion(getProject());
-            comboBoxClass.setSelectedItem(ncVersion);
-            labelInfo.setText("注意:粉红色背景意思是找不到bmf文件或版本和数据库不一致！(导出的元数据文件一定要自己测试是否正常哈！)" +
-                    " 表格行点击鼠标右键可以导出指定行! 暂不支持导出bpf业务操作组件!");
+            labelInfo.setText("注意:点击属性表格右键出现功能,背景行粉色 标记删除行,背景行绿色 更新行,背景行 白色 新增行!(都必须点击 "
+                    + getOKButtonTextStr() + " 按钮后才会真的保存写入文件)");
+
+            removeAll(tableModelClass);
+            if (CollUtil.isNotEmpty(entits)) {
+                for (ClassComboxDTO e : entits) {
+                    Vector row = new Vector();
+                    for (int i = 0; i < tableAttrs.length; i++) {
+                        row.add(ReflectUtil.getFieldValue(e, tableAttrs[i]));
+                    }
+                    tableModelClass.addRow(row);
+                }
+                tableClass.fitTableColumns();
+            }
+
+            loadPerpotes((ClassComboxDTO) comboBoxClass.getSelectedItem());
         } catch (Throwable e) {
             e.printStackTrace();
             LogUtil.error(e.getMessage(), e);
@@ -241,47 +329,230 @@ public class AddDefField2BmfDialog extends DialogWrapper {
         dispose();
     }
 
-    private void initListeners() {
-        tablePropertis.addMouseListener(new ProperteListTableMouseListenerImpl(this));
-    }
-
     public void removeAll(DefaultTableModel tm) {
         while (tm.getRowCount() > 0) {
             tm.removeRow(0);
         }
     }
 
-    public void loadDatas(List<PropertyDTO> vs) {
-        result = vs;
-        DefaultTableModel tm = tableModelPropertis;
-        removeAll(tm);
+    public List<PropertyDTO> getSelects() {
+        int[] rows = tablePropertis.getSelectedRows();
+        if (rows == null || rows.length < 1) {
+            return null;
+        }
 
+        ArrayList<PropertyDTO> ps = new ArrayList();
+        for (int row : rows) {
+            ps.add(CollUtil.get(getResult(), row));
+        }
+        return ps;
+    }
+
+    public PropertyDTO getSelect() {
+        PropertyDTO p = CollUtil.get(getResult(), tablePropertis.getSelectedRow());
+        return p;
+    }
+
+    public void loadPerpotes(ClassComboxDTO c) {
+        List<PropertyDTO> ps = propertyMap.get(c.getId());
+        setPerpotiesTableRows(ps);
+    }
+
+    Vector<ClassComboxDTO> entits;
+    ComponentDTO componentDTO;
+
+    private Vector<ClassComboxDTO> readClassList() {
+        String xml = FileUtil.readUtf8String(bmf.toNioPath().toFile());
+        componentDTO = MeatBaseInfoReadUtil.readEntityList(xml);
+        List<ClassDTO> es = componentDTO.getClassDTOS();
+
+        entits = new Vector(es.stream()
+                .map(ClassComboxDTO::ofClassDTO)
+                .collect(Collectors.toList()));
+        for (ClassComboxDTO entit : entits) {
+            entit.setOwnModule(componentDTO.getOwnModule());
+        }
+
+        propertyMap.clear();
+        for (ClassComboxDTO v : entits) {
+            propertyMap.put(v.getId(), V.get(v.getPerperties(), new ArrayList<>()));
+        }
+
+        return entits;
+    }
+
+    public PropertyDTO getRow(int row) {
+        PropertyDTO p = CollUtil.get(getResult(), row);
+        return p;
+    }
+
+    List<PropertyDTO> copyedPropertis;
+
+    public void setPerpotiesTableRows(List<PropertyDTO> vs) {
+        result = vs;
+
+        removeAll(tableModelPropertis);
         if (CollUtil.isNotEmpty(vs)) {
             for (PropertyDTO e : vs) {
                 Vector row = new Vector();
-                for (int i = 0; i < tableAttrs.length; i++) {
-                    row.add(ReflectUtil.getFieldValue(e, tableAttrs[i]));
+                for (int i = 0; i < tablePropAttrs.length; i++) {
+                    row.add(ReflectUtil.getFieldValue(e, tablePropAttrs[i]));
                 }
-                tm.addRow(row);
+                tableModelPropertis.addRow(row);
             }
             tablePropertis.fitTableColumns();
         }
     }
 
-    public List<PropertyDTO> getSelects() {
-        for (PropertyDTO p : result) {
+    private void initListeners() {
+        tablePropertis.addMouseListener(new ProperteListTableMouseListenerImpl(this));
+        comboBoxClass.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    loadPerpotes((ClassComboxDTO) e.getItem());
+                }
+            }
+        });
+    }
 
+    @Override
+    protected void doOKAction() {
+        int updateClassPath = Messages.showYesNoDialog("确定保存修改到文件?"
+                , "询问", Messages.getQuestionIcon());
+        if (updateClassPath != Messages.OK) {
+            return;
         }
-        return null;
+
+        save2Files();
+        // super.doOKAction();
     }
 
-    private Vector<ClassComboxDTO> readClassList() {
+    @Override
+    public void doCancelAction() {
+        int updateClassPath = Messages.showYesNoDialog("你确定不保存文件,直接关闭?"
+                , "询问", Messages.getQuestionIcon());
+        if (updateClassPath != Messages.OK) {
+            return;
+        }
 
-        return null;
+        super.doCancelAction();
     }
 
-    private List<PropertyDTO> readPropsList() {
+    public void addDef(PropertyDataTypeEnum type) {
+        AddDefFieldDialog d = new AddDefFieldDialog(getProject(), this, type);
+        if (d.showAndGet()) {
+            String prefix = d.getTextFieldFieldCodePrefix().getText().trim();
+            String prefixName = d.getTextFieldFieldNamePrefix().getText().trim();
+            int start = d.getTextFieldNum().getNumber();
+            int count = d.getTextFieldCount().getNumber();
 
-        return null;
+            PropertyDTO p = d.getPropertyDTO();
+            ArrayList<PropertyDTO> ps = new ArrayList<>(count << 1 + 16);
+            for (int i = 0; i < count; i++) {
+                try {
+                    p = p.clone();
+                    p.setId(StringUtil.uuid());
+                    p.setFieldName(prefix + (start + i));
+                    p.setName(prefixName + (start + i));
+                    p.setDisplayName(d.getType().getTypeDisplayName() + (start + i));
+                    ps.add(p);
+                } catch (CloneNotSupportedException e) {
+                }
+            }
+
+            past2LineAfter(ps, getTablePropertis().getSelectedRow() + 1);
+        }
     }
+
+    public void past2LineAfter(List<PropertyDTO> ps, int startRow) {
+        if (startRow >= getResult().size()) {
+            past2tail();
+            return;
+        }
+
+        if (CollUtil.isEmpty(ps)) {
+            return;
+        }
+
+        try {
+            int i = 0;
+            ArrayList<PropertyDTO> nps = new ArrayList<>();
+            for (PropertyDTO p : getResult()) {
+                if (i == startRow) {
+                    for (PropertyDTO p2 : ps) {
+                        PropertyDTO np = p2.clone();
+                        np.setId(StringUtil.uuid());
+                        np.setAttrsequence(i++);
+                        np.setState(VOStatus.NEW);
+                        nps.add(np);
+                    }
+                }
+
+                p.setAttrsequence(i++);
+            }
+
+            getResult().addAll(startRow, nps);
+
+            setPerpotiesTableRows(getResult());
+        } catch (CloneNotSupportedException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void past2top() {
+        List<PropertyDTO> ps = getCopyedPropertis();
+        if (CollUtil.isEmpty(ps)) {
+            return;
+        }
+
+        try {
+            int i = 0;
+            ArrayList<PropertyDTO> nps = new ArrayList<>();
+            for (PropertyDTO p : ps) {
+                PropertyDTO np = p.clone();
+                np.setId(StringUtil.uuid());
+                np.setAttrsequence(i++);
+                np.setState(VOStatus.NEW);
+                nps.add(np);
+            }
+
+            for (PropertyDTO p : getResult()) {
+                p.setAttrsequence(i++);
+            }
+
+            getResult().addAll(0, nps);
+            setPerpotiesTableRows(getResult());
+        } catch (CloneNotSupportedException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void past2tail() {
+        List<PropertyDTO> ps = getCopyedPropertis();
+        if (CollUtil.isEmpty(ps)) {
+            return;
+        }
+
+        try {
+            int i = 0;
+            ArrayList<PropertyDTO> nps = new ArrayList<>();
+            for (PropertyDTO p : getResult()) {
+                p.setAttrsequence(i++);
+            }
+            for (PropertyDTO p : ps) {
+                PropertyDTO np = p.clone();
+                np.setId(StringUtil.uuid());
+                np.setAttrsequence(i++);
+                np.setState(VOStatus.NEW);
+                nps.add(np);
+            }
+
+            getResult().addAll(nps);
+            setPerpotiesTableRows(getResult());
+        } catch (CloneNotSupportedException ex) {
+            ex.printStackTrace();
+        }
+    }
+
 }

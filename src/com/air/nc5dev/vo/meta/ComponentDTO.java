@@ -4,6 +4,7 @@ import lombok.Data;
 import nc.vo.pub.lang.UFDateTime;
 
 import java.io.Serializable;
+import java.util.List;
 
 //com.yonyou.studio.mdp.database.model.ComponentVO
 @Data
@@ -37,4 +38,7 @@ public class ComponentDTO implements Serializable, Cloneable {
     private String programcode;
     private String filePath;
     String metaType;
+
+
+    transient List<ClassDTO> classDTOS;
 }

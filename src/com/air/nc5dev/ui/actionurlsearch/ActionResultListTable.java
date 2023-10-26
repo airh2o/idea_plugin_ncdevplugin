@@ -67,6 +67,7 @@ import com.intellij.ui.table.JBTable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.tangsu.mstsc.ui.MainPanel;
 
@@ -83,6 +84,7 @@ import java.util.*;
 import java.util.List;
 
 @Getter
+@Setter
 public class ActionResultListTable extends JBTable {
     NCCActionURLSearchUI nccActionURLSearchUI;
     DefaultTableModel tableModel;

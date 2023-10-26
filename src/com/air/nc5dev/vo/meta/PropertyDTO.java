@@ -75,7 +75,6 @@ public class PropertyDTO implements Serializable, Cloneable {
     transient int state;
     transient String dataTypeStyleName;
     transient String visibilityName;
-    transient boolean select;
 
     public void fixDisplays() {
         DataTypeStyleConverter dataTypeStyleConverter = new DataTypeStyleConverter();
@@ -87,5 +86,15 @@ public class PropertyDTO implements Serializable, Cloneable {
         setDataTypeStyleName(dataTypeStyleConverter.getConvertBefor(getDataTypeStyle()));
         setVisibilityName(visibilityConverter.getNameOfVisibility(getVisibility()));
         setFieldName(getName());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s-%s-%s", fieldName, displayName, typeDisplayName);
+    }
+
+    @Override
+    public PropertyDTO clone() throws CloneNotSupportedException {
+        return (PropertyDTO) super.clone();
     }
 }

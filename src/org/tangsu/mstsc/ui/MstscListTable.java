@@ -6,6 +6,8 @@ import com.intellij.psi.impl.compiled.ClsClassImpl;
 import com.intellij.psi.impl.java.stubs.JavaStubElementTypes;
 import com.intellij.psi.impl.java.stubs.impl.PsiClassStubImpl;
 import com.intellij.ui.table.JBTable;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -13,7 +15,8 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
-
+@Getter
+@Setter
 public class MstscListTable extends JBTable {
     public MstscListTable(TableModel tableModel) {
         super(tableModel);

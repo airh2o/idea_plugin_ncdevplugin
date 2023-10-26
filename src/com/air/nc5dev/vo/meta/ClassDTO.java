@@ -65,6 +65,7 @@ public class ClassDTO implements Serializable, Cloneable {
     String typeName;
     String visibility = "public";
 
+    transient List<PropertyDTO> perperties;
 
     public void setIndustry(String industry) {
         if (StringUtil.isBlank(industry)) {

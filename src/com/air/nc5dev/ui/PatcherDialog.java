@@ -25,10 +25,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.ui.components.*;
 import com.intellij.ui.table.JBTable;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,7 +59,8 @@ import java.util.stream.Collectors;
  * @Param
  * @return
  */
-@Data
+@Getter
+@Setter
 public class PatcherDialog extends DialogWrapper {
     //全局标识， 是否有导出任务未处理完
     private static boolean isRuning = false;
@@ -475,13 +473,14 @@ public class PatcherDialog extends DialogWrapper {
             selectTable.addMouseListener(new MySelectFileTableMouseAdpaterImpl(this));
             //  JScrollPane jScrollPane = new JBScrollPane(selectTable);
             // jScrollPane.setAutoscrolls(true);
-            selectTable.setBounds(x, y = y + height + 5, 770, 200);
+            JBScrollPane selectTableScrollPane = new JBScrollPane(selectTable);
+            selectTableScrollPane.setBounds(x, y = y + height + 5, 770, 200);
             // 对每一列设置单元格渲染器
             for (int i = 0; i < selectTable.getColumnCount(); i++) {
                 selectTable.getColumnModel().getColumn(i).setCellRenderer(new MyTableRenderer());
             }
             selectTable.getColumnModel().getColumn(0).setCellEditor(new MyTableCellEditor(this, new JBCheckBox()));
-            jgp.add(selectTable);
+            jgp.add(selectTableScrollPane);
         }
 
         //设置点默认值

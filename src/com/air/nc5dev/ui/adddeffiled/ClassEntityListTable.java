@@ -4,6 +4,8 @@ import com.air.nc5dev.util.StringUtil;
 import com.intellij.ui.table.JBTable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -12,7 +14,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 
-@Data
+@Getter
+@Setter
 public class ClassEntityListTable extends JBTable {
     MyDefaultTableCellRenderer myDefaultTableCellRenderer;
     AddDefField2BmfDialog addDefField2BmfDialog;
@@ -51,39 +54,6 @@ public class ClassEntityListTable extends JBTable {
             TableColumn column = (TableColumn) columns.nextElement();
             int col = header.getColumnModel().getColumnIndex(
                     column.getIdentifier());
-            if (AddDefField2BmfDialog.tableAttrs[col].equals("version")) {
-                column.setWidth(50);
-                header.setResizingColumn(column);
-                continue;
-            } else if (AddDefField2BmfDialog.tableAttrs[col].equals("name")) {
-                column.setWidth(60);
-                header.setResizingColumn(column);
-                continue;
-            } else if (AddDefField2BmfDialog.tableAttrs[col].equals("displayName")) {
-                column.setWidth(60);
-                header.setResizingColumn(column);
-                continue;
-            } else if (AddDefField2BmfDialog.tableAttrs[col].equals("order1")) {
-                column.setWidth(30);
-                header.setResizingColumn(column);
-                continue;
-            } else if (AddDefField2BmfDialog.tableAttrs[col].equals("fileVersion")) {
-                column.setWidth(50);
-                header.setResizingColumn(column);
-                continue;
-            } else if (AddDefField2BmfDialog.tableAttrs[col].equals("filePath")) {
-                column.setWidth(400);
-                header.setResizingColumn(column);
-                continue;
-            } else if (AddDefField2BmfDialog.tableAttrs[col].equals("id")) {
-                column.setWidth(200);
-                header.setResizingColumn(column);
-                continue;
-            } else {
-                column.setWidth(50);
-                header.setResizingColumn(column);
-                continue;
-            }
 
             /*int width = (int) myTable.getTableHeader().getDefaultRenderer()
                     .getTableCellRendererComponent(myTable,

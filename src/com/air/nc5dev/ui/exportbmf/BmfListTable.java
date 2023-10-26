@@ -10,6 +10,8 @@ import com.intellij.psi.impl.java.stubs.impl.PsiClassStubImpl;
 import com.intellij.ui.table.JBTable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -18,7 +20,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 
-@Data
+@Getter
+@Setter
 public class BmfListTable extends JBTable {
     MyDefaultTableCellRenderer myDefaultTableCellRenderer;
     ExportbmfDialog exportbmfDialog;
