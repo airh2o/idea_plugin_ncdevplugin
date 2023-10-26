@@ -44,7 +44,7 @@ public class AddDefField2BmfAction extends AddFile2PathcerSelectFilesAction {
 
         VirtualFile f = getSelectedFileTree(e);
 
-        e.getPresentation().setEnabled(f.getName().toLowerCase().endsWith(".bmf"));
+        e.getPresentation().setEnabled(f != null && f.getName().toLowerCase().endsWith(".bmf"));
     }
 
     public VirtualFile getSelectedFileTree(AnActionEvent e) {

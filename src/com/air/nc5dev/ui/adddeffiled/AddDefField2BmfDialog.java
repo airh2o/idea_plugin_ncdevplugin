@@ -228,7 +228,7 @@ public class AddDefField2BmfDialog extends DialogWrapper {
             if (attributelist != null) {
                 attrId2EleMap = attributelist.elements("attribute")
                         .stream().collect(Collectors.toMap(v -> v.attributeValue("id"), v -> v));
-            }else{
+            } else {
                 attributelist = e.addElement("attributelist");
             }
 
@@ -248,6 +248,8 @@ public class AddDefField2BmfDialog extends DialogWrapper {
                 for (PropertyDTO p : ps) {
                     Element el = attributelist.addElement("attribute");
                     XmlUtil.addAttr(doc, el, p, attributeNameMaping);
+                    el.addAttribute("dataTypeStyle", p.getDataTypeStyleName());
+                    el.addAttribute("visibility", p.getVisibilityName());
                 }
             }
 
@@ -259,6 +261,8 @@ public class AddDefField2BmfDialog extends DialogWrapper {
                         el = attributelist.addElement("attribute");
                     }
                     XmlUtil.addAttr(doc, el, p, attributeNameMaping);
+                    el.addAttribute("dataTypeStyle", p.getDataTypeStyleName());
+                    el.addAttribute("visibility", p.getVisibilityName());
                 }
             }
 
@@ -459,6 +463,7 @@ public class AddDefField2BmfDialog extends DialogWrapper {
                     p.setFieldName(prefix + (start + i));
                     p.setName(prefixName + (start + i));
                     p.setDisplayName(d.getType().getTypeDisplayName() + (start + i));
+                    p.fixDisplays();
                     ps.add(p);
                 } catch (CloneNotSupportedException e) {
                 }
