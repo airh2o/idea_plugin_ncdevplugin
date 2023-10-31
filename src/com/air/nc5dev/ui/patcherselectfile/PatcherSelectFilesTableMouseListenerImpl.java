@@ -2,6 +2,7 @@ package com.air.nc5dev.ui.patcherselectfile;
 
 import com.air.nc5dev.ui.MstscDialog;
 import com.air.nc5dev.ui.PatcherDialog;
+import com.air.nc5dev.ui.SearchTableFieldDialog;
 import com.air.nc5dev.ui.actionurlsearch.ActionResultListTable;
 import com.air.nc5dev.util.CollUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -46,6 +47,12 @@ public class PatcherSelectFilesTableMouseListenerImpl implements MouseListener {
         }
 
         final JPopupMenu popup = new JPopupMenu();
+        JMenuItem item = new JMenuItem("查找");
+        popup.add(item);
+        item.addActionListener(event -> {
+            new SearchTableFieldDialog(mainPanel.getProject(), mainPanel.getTable()).show();
+        });
+
         JMenuItem remove = new JMenuItem("删除选中行");
         popup.add(remove);
         remove.addActionListener(event -> {

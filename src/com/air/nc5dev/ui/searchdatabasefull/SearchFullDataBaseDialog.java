@@ -2,6 +2,7 @@ package com.air.nc5dev.ui.searchdatabasefull;
 
 import com.air.nc5dev.ui.MyTableCellEditor;
 import com.air.nc5dev.ui.MyTableRenderer;
+import com.air.nc5dev.ui.SearchTableFieldDialog;
 import com.air.nc5dev.util.*;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.util.searchfulldatabase.DbConnectionFactory;
@@ -474,6 +475,13 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
                     final int column = dialog.selectTable.columnAtPoint(me.getPoint());
 
                     final JPopupMenu popup = new JPopupMenu();
+
+                    JMenuItem item = new JMenuItem("查找");
+                    popup.add(item);
+                    item.addActionListener(event -> {
+                        new SearchTableFieldDialog(dialog.getProject(), dialog.getSelectTable()).show();
+                    });
+
                     JMenuItem selectAllOrNot = new JMenuItem("全选/全消");
 
                     selectAllOrNot.addActionListener(new ActionListener() {

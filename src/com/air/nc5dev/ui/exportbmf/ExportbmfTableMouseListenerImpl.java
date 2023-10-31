@@ -2,6 +2,7 @@ package com.air.nc5dev.ui.exportbmf;
 
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.ui.PatcherDialog;
+import com.air.nc5dev.ui.SearchTableFieldDialog;
 import com.air.nc5dev.ui.actionurlsearch.ActionResultDTO;
 import com.air.nc5dev.ui.actionurlsearch.ActionResultListTable;
 import com.air.nc5dev.util.CollUtil;
@@ -46,6 +47,12 @@ public class ExportbmfTableMouseListenerImpl implements MouseListener {
         }
 
         final JPopupMenu popup = new JPopupMenu();
+
+        JMenuItem item = new JMenuItem("查找");
+        popup.add(item);
+        item.addActionListener(event -> {
+            new SearchTableFieldDialog(mainPanel.getProject(), mainPanel.getTable()).show();
+        });
 
         JMenuItem export = new JMenuItem("导出当前行BMF文件");
         popup.add(export);

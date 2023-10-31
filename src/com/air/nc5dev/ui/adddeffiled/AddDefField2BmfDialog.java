@@ -562,5 +562,4 @@ public class AddDefField2BmfDialog extends DialogWrapper {
             ex.printStackTrace();
         }
     }
-
 }

@@ -608,6 +608,12 @@ public class PatcherDialog extends DialogWrapper {
                     final int column = patcherDialog.selectTable.columnAtPoint(me.getPoint());
 
                     final JPopupMenu popup = new JPopupMenu();
+                    JMenuItem item = new JMenuItem("查找");
+                    popup.add(item);
+                    item.addActionListener(event -> {
+                        new SearchTableFieldDialog(getPatcherDialog().getFromUI().getProject(), patcherDialog.getSelectTable()).show();
+                    });
+
                     JMenuItem selectAllOrNot = new JMenuItem("全选/全消");
 
                     selectAllOrNot.addActionListener(new ActionListener() {

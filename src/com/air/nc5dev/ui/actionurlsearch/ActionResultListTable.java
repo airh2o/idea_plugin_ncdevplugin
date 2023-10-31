@@ -9,6 +9,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.acion.GoToNCRequestMappingAction;
 import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
+import com.air.nc5dev.ui.SearchTableFieldDialog;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
@@ -339,6 +340,12 @@ public class ActionResultListTable extends JBTable {
                 final ActionResultDTO vo = table.getDataOfRow(row);
                 final int column = table.columnAtPoint(me.getPoint());
                 final JPopupMenu popup = new JPopupMenu();
+
+                JMenuItem item = new JMenuItem("查找");
+                popup.add(item);
+                item.addActionListener(event -> {
+                    new SearchTableFieldDialog(getTable().getNccActionURLSearchUI().getProject(), getTable()).show();
+                });
 
                 JMenuItem openClass = new JMenuItem("打开Class");
                 popup.add(openClass);
