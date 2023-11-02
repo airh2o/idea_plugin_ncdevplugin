@@ -28,7 +28,7 @@ public class ClassEntityListTable extends JBTable {
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return false;
+        return true;
     }
 
     @Override

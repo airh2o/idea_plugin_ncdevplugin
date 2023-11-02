@@ -413,6 +413,7 @@ public class AddDefField2BmfDialog extends DialogWrapper {
 
     private void initListeners() {
         tablePropertis.addMouseListener(new ProperteListTableMouseListenerImpl(this));
+        tableClass.addMouseListener(new ClassListTableMouseListenerImpl(this));
         comboBoxClass.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
