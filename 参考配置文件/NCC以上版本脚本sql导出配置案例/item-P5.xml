@@ -122,8 +122,7 @@
     </item>
     <item>
         <itemKey>pub_vochange</itemKey>
-        <itemName>单据转换规则(***要全抽，不然只有自己的，别人的都没了***)</itemName>
-        <itemRule>pub_vochange</itemRule><fixedWhere>
+        <fixedWhere>
         dest_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
         or src_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
     </fixedWhere>
@@ -484,12 +483,10 @@
     <!--      pub_vochange  -->
     <item>
         <itemKey>pub_vochange_b</itemKey>
-        <itemName>pub_vochange_b</itemName>
-        <itemRule>pub_vochange_b</itemRule><fixedWhere>nvl(dr,0)=0
+        <fixedWhere>nvl(dr,0)=0
         and pk_vochange in(
-        select pk_vochange from pub_vochange where nvl(dr,0)=0 and src_billtype in (
-        select pk_billtypecode from bd_billtype where nodecode like '{node}'
-        )
+            select pk_vochange from pub_vochange where   dest_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
+            or src_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
         )
     </fixedWhere>
     </item>
@@ -498,9 +495,9 @@
         <itemName>pub_vochange_s</itemName>
         <itemRule>pub_vochange_s</itemRule><fixedWhere>nvl(dr,0)=0
         and pk_vochange in(
-        select pk_vochange from pub_vochange where nvl(dr,0)=0 and src_billtype in (
-        select pk_billtypecode from bd_billtype where nodecode like '{node}'
-        )
+             select pk_vochange from pub_vochange where
+               dest_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
+               or src_billtype  in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
         )
     </fixedWhere>
     </item>
