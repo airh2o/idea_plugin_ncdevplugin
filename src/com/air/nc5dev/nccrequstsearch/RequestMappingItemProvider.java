@@ -6,6 +6,7 @@ import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.NCCActionInfoVO;
+import com.google.common.base.Joiner;
 import com.intellij.ide.util.gotoByName.ChooseByNameBase;
 import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider;
 import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
@@ -283,17 +284,18 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             match = label;
         } else {
             String[] inputStrs = StringUtil.split(str, ".");
-            if (like(urlName, inputStrs)) {
+            int i = like(urlName, inputStrs);
+            if (i > 0) {
                 match = urlName;
-                score += 10;
+                score += i;
             }
-            if (like(className, inputStrs)) {
+            if ((i = like(className, inputStrs)) > 0) {
                 match = className;
-                ++score;
+                score += i;
             }
-            if (like(label, inputStrs)) {
+            if ((i = like(label, inputStrs)) > 0) {
                 match = label;
-                ++score;
+                score += i;
             } else {
             }
         }
@@ -304,25 +306,47 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
 
         if (match != null) {
             vo.setScore(score);
-        }else{
+        } else {
             vo.setScore(0);
         }
 
         return match;
     }
 
-    public boolean like(String match, String[] ss) {
+    public int like(String match, String[] ss) {
+        int i = 0;
         if (ss == null || StringUtil.isBlank(match)) {
-            return false;
+            return i;
         }
 
-        for (String s : ss) {
-            if (!StringUtil.contains(match,s)) {
-                return false;
+        String full = Joiner.on('.').skipNulls().join(ss);
+        if (match.equals(full)) {
+            return 100;
+        }
+
+        if (match.startsWith(full) || match.endsWith(full)) {
+            return 50;
+        }
+
+        List<String> mm = StringUtil.split(match, '.');
+        HashSet<String> set = CollUtil.newHashSet(ss);
+        for (String s : mm) {
+            if (set.contains(s)) {
+                ++i;
             }
         }
 
-        return true;
+        if (i > 0) {
+            return i;
+        }
+
+        for (String s : ss) {
+            if (!StringUtil.contains(match, s)) {
+                return 1;
+            }
+        }
+
+        return i;
     }
 
     /**
