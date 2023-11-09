@@ -763,7 +763,38 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
                 return;
             }
 
-            if (!filter.apply(file)) {
+            if (filter != null && !filter.apply(file)) {
+                return;
+            }
+
+            copyFile(file, toDir);
+        });
+    }
+
+    /**
+     * 把一个文件夹 本目录当前级次内所有文件复制到指定的路径（会复制下级文件夹！）        </br>
+     * </br>
+     * </br>
+     * </br>
+     *
+     * @return void
+     * @author air Email: 209308343@qq.com
+     * @date 2020/1/16 0016 20:07
+     * @Param [fromDir, toDir]
+     */
+    public static void copyAllFileAndDir(@NotNull File fromDir, @NotNull final File toDir,
+                                         Function<File, Boolean> filter) {
+        if (fromDir.isFile()) {
+            copyFile(fromDir, toDir);
+            return;
+        }
+
+        Stream.of(fromDir.listFiles()).forEach(file -> {
+            if (file.isDirectory()) {
+                copyAllFileAndDir(file, new File(toDir, file.getName()), filter);
+            }
+
+            if (filter != null && !filter.apply(file)) {
                 return;
             }
 

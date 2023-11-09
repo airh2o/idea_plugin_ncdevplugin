@@ -216,7 +216,7 @@ public class ExportNCPatcherUtil {
                             , configVO.notExportModelueXml ? f -> !"module.xml".equalsIgnoreCase(f.getName()) :
                                     f -> true);
                 } else {
-                    IoUtil.copyAllFile(umpDir
+                    IoUtil.copyAllFileAndDir(umpDir
                             , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
                                     .separatorChar +
                                     "META-INF")
@@ -238,10 +238,12 @@ public class ExportNCPatcherUtil {
                                     "METADATA")
                             , contentVO);
                 } else {
-                    IoUtil.copyAllFile(bmfDir
+                    IoUtil.copyAllFileAndDir(bmfDir
                             , new File(contentVO.outPath + File.separatorChar + entry.getValue().getName() + File
                                     .separatorChar +
-                                    "METADATA"));
+                                    "METADATA")
+                            , null
+                    );
                 }
             }
 
@@ -254,8 +256,9 @@ public class ExportNCPatcherUtil {
                             , new File(new File(contentVO.outPath).getParentFile(), "resources")
                             , contentVO);
                 } else {
-                    IoUtil.copyAllFile(resourcesDir
-                            , new File(new File(contentVO.outPath).getParentFile(), "resources"));
+                    IoUtil.copyAllFileAndDir(resourcesDir
+                            , new File(new File(contentVO.outPath).getParentFile(), "resources")
+                            , null);
                 }
             }
 

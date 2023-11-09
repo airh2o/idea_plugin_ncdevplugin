@@ -260,9 +260,8 @@ public class NC5HomeConfigDialogUIListener {
         ui.textField_home.setText(ProjectNCConfigUtil.getNCHomePath());
         ui.textField_clientip.setText(ProjectNCConfigUtil.getNCClientIP());
         ui.textField_cientport.setText(ProjectNCConfigUtil.getNCClientPort());
-        ui.comboBox_libScope.setSelectedItem(ProjectNCConfigUtil.getConfigValue("libScope", "Compile"));
-        ui.comboBox_libScope.setSelectedItem(ProjectNCConfigUtil.getConfigValue("nc.version"
-                , ProjectNCConfigUtil.getNCVersion().toString()));
+        ui.comboBox_libScope.setSelectedItem(ProjectNCConfigUtil.getConfigValue("libScope", "Provided"));
+        ui.comboBox_ncversion.setSelectedItem(ProjectNCConfigUtil.getConfigValue("nc.version", ProjectNCConfigUtil.getNCVersion().toString()));
 
         NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath(ui.getProject()));
         List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS(ui.getProject());
