@@ -274,13 +274,13 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
 
         String match = null;
         if (urlName.equals(str)) {
-            score = 10000;
+            score = 200;
             match = urlName;
         } else if (className.equals(str)) {
-            score = 10000;
+            score = 200;
             match = className;
         } else if (label.equals(str)) {
-            score = 10000;
+            score = 200;
             match = label;
         } else {
             String[] inputStrs = StringUtil.split(str, ".");
@@ -324,7 +324,7 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             return 100;
         }
 
-        if (match.startsWith(full) || match.endsWith(full)) {
+        if (match.startsWith(full) || match.endsWith(full) || match.contains(full)) {
             return 50;
         }
 
