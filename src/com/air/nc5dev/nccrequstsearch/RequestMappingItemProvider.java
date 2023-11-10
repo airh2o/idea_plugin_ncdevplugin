@@ -2,6 +2,7 @@ package com.air.nc5dev.nccrequstsearch;
 
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.NCCActionRefreshUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
@@ -268,7 +269,10 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         }
 
         int score = 0;
-        String urlName = vo.getName().toLowerCase();
+        String urlName = vo.getName().toLowerCase().indexOf("/nccloud/") > -1 ?
+                vo.getName().toLowerCase().substring(vo.getName().toLowerCase().indexOf("/nccloud/") + 9)
+                : vo.getName().toLowerCase();
+        urlName = StringUtil.replaceAll(urlName, "/", ".");
         String className = vo.getClazz().toLowerCase();
         String label = vo.getLabel() == null ? "" : vo.getLabel().toLowerCase();
 
@@ -340,11 +344,11 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             return i;
         }
 
-        for (String s : ss) {
-            if (!StringUtil.contains(match, s)) {
-                return 1;
-            }
-        }
+//        for (String s : ss) {
+//            if (StringUtil.contains(match, s)) {
+//                return 1;
+//            }
+//        }
 
         return i;
     }

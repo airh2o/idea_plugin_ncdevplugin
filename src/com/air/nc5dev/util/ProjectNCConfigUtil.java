@@ -189,7 +189,9 @@ public class ProjectNCConfigUtil {
     public static final String getNCClientPort() {
         return getConfigValue(KEY_PROJECT_NC_CONFIG_CLIENT_PORT);
     }
-
+    public static final String getNCClientPort(Project project) {
+        return getConfigValue(project, KEY_PROJECT_NC_CONFIG_CLIENT_PORT);
+    }
     /**
      * 设置NC 客户端要链接的服务器  端口  </br>
      * </br>
