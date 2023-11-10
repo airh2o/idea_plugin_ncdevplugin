@@ -32,7 +32,7 @@ public class NCCActionInfoVO implements Serializable, Cloneable {
     /**
      * 来自 工程源码里
      */
-    public static final int FROM_SRC = 1000;
+    public static final int FROM_SRC = 1;
 
     /**
      * action

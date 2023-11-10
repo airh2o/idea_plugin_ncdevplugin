@@ -500,10 +500,6 @@ public class ProjectNCConfigUtil {
     public static final String LIB_Module_Lang_Library = "NC_LIBS/Module_Lang_Library";
     /*****    NC 依赖库： NC模块  Generated_EJB     ****/
     public static final String LIB_Generated_EJB = "NC_LIBS/Generated_EJB";
-    /*****    NC 依赖库： NC模块  NCC     ****/
-    public static final String LIB_NCCloud_Library = "NC_LIBS/Module_NCCloud_Library";
-    /*****    NC 依赖库： NC模块  NCCHR     ****/
-    public static final String LIB_NCCHR_Library = "NC_LIBS/Module_NCCHR_Library";
     /*****    NC 依赖库： Resources     ****/
     public static final String LIB_RESOURCES = "NC_LIBS/Resources";
 

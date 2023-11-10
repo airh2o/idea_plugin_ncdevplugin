@@ -1,6 +1,8 @@
 package com.air.nc5dev.util.idea;
 
+import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.StringUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -46,8 +48,8 @@ public class ApplicationLibraryUtil {
         LibraryEx library = (LibraryEx) model.getLibraryByName(libraryName);
         if (library != null) {
             // 已经存在库的，删除库里的东西
-         //   model.removeLibrary(library);
-        }else{
+            //   model.removeLibrary(library);
+        } else {
             library = (LibraryEx) model.createLibrary(libraryName);
         }
 
@@ -157,7 +159,20 @@ public class ApplicationLibraryUtil {
         LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Module_Private_Library));
         LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Module_Lang_Library));
         LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_Generated_EJB));
-        LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_NCCloud_Library));
+
+        //hotwebs系列
+        List<File> hotwebs = getHotwebsModules(module.getProject());
+        if (!hotwebs.isEmpty()) {
+            for (File h : hotwebs) {
+                LibraryEx lb = (LibraryEx) model.getLibraryByName(StringUtil.format("NC_LIBS/hotwebs_%s"
+                        , h.getName()));
+                if (lb == null) {
+                    continue;
+                }
+                LibraryExList.add(lb);
+            }
+        }
+
         LibraryExList.add((LibraryEx) model.getLibraryByName(ProjectNCConfigUtil.LIB_RESOURCES));
 
         //  Compile  Test Runtime Provided
@@ -172,5 +187,52 @@ public class ApplicationLibraryUtil {
                 ModuleRootModificationUtil.addDependency(module, library, dependencyScope, false);
             }
         }
+    }
+
+    public static List<File> getHotwebsModules(Project project) {
+        String home = ProjectNCConfigUtil.getNCHomePath(project);
+        if (StringUtil.isBlank(home)) {
+            return new ArrayList<>();
+        }
+
+        File h = new File(home);
+        File hotwebs = new File(h, "hotwebs");
+        if (!hotwebs.isDirectory()) {
+            return new ArrayList<>();
+        }
+
+        File[] fs = hotwebs.listFiles();
+        ArrayList<File> all = new ArrayList();
+
+        for (File f : fs) {
+            if (f.isDirectory()) {
+                File wf = new File(f, "WEB-INF");
+                if (!wf.isDirectory()) {
+                    continue;
+                }
+                File lb = new File(wf, "lib");
+                int i = 0;
+                if (lb.isDirectory() && CollUtil.isEmpty(lb.listFiles())) {
+                    for (File b : lb.listFiles()) {
+                        if (b.isFile()) {
+                            ++i;
+                            break;
+                        }
+                    }
+                }
+
+                if (new File(wf, "classes").isDirectory()) {
+                    ++i;
+                }
+
+                if (i < 1) {
+                    continue;
+                }
+
+                all.add(f);
+            }
+        }
+
+        return all;
     }
 }

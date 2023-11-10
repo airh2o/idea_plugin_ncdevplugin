@@ -5,6 +5,8 @@ import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.util.idea.ApplicationLibraryUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.google.common.collect.Lists;
@@ -164,11 +166,23 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
 
         initMap0(cecha, FROM_CLIENT,
                 (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_Module_Client_Library));
-        initMap0(cecha, FROM_CLIENT,
-                (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_NCCloud_Library));
 
         initMap0(cecha, FROM_PRIVATE,
                 (LibraryEx) modifiableModel.getLibraryByName(ProjectNCConfigUtil.LIB_Module_Private_Library));
+
+        //hotwebs系列
+        List<File> hotwebs = ApplicationLibraryUtil.getHotwebsModules(project);
+        if (!hotwebs.isEmpty()) {
+            for (File h : hotwebs) {
+                LibraryEx lb = (LibraryEx) modifiableModel.getLibraryByName(StringUtil.format("NC_LIBS/hotwebs_%s"
+                        , h.getName()));
+                if (lb == null) {
+                    continue;
+                }
+
+                initMap0(cecha, FROM_CLIENT, lb);
+            }
+        }
     }
 
     public void initMap0(Cecha cecha, int from, LibraryEx library) {

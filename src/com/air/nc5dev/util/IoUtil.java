@@ -314,34 +314,13 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static ArrayList<File> serachAllNCCJars(File ncHome) {
+    public static ArrayList<File> serachAllHotwebsJars(File ncHome, String name) {
         return new ArrayList<>(getAllJarFiles(new File(ncHome
                 , "hotwebs"
-                + File.separatorChar + "nccloud"
+                + File.separatorChar + name
                 + File.separatorChar + "WEB-INF"
                 + File.separatorChar + "lib"
         ), true));
-    }
-
-    /**
-     * 获取NC的 所有 模块的 所有    NCCHR_Library
-     *
-     * @param ncHome
-     * @return
-     */
-    public static ArrayList<File> serachNCCHR_Library(File ncHome) {
-        ArrayList<File> all = serachAllNCCHRJars(ncHome);
-
-        File f = new File(ncHome, "hotwebs"
-                + File.separatorChar + "ncchr"
-                + File.separatorChar + "WEB-INF"
-                + File.separatorChar + "classes"
-        );
-        if (f.isDirectory()) {
-            all.add(f);
-        }
-
-        return all;
     }
 
     /**
@@ -350,11 +329,11 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @param ncHome
      * @return
      */
-    public static ArrayList<File> serachNCCloud_Library(File ncHome) {
-        ArrayList<File> all = serachAllNCCJars(ncHome);
+    public static ArrayList<File> serachHotwebs_Library(File ncHome, String name) {
+        ArrayList<File> all = serachAllHotwebsJars(ncHome, name);
 
         File f = new File(ncHome, "hotwebs"
-                + File.separatorChar + "nccloud"
+                + File.separatorChar + name
                 + File.separatorChar + "WEB-INF"
                 + File.separatorChar + "classes"
         );
@@ -363,7 +342,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         }
 
         f = new File(ncHome, "hotwebs"
-                + File.separatorChar + "nccloud"
+                + File.separatorChar + name
                 + File.separatorChar + "WEB-INF"
                 + File.separatorChar + "extend"
         );

@@ -278,13 +278,13 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
 
         String match = null;
         if (urlName.equals(str)) {
-            score = 200;
+            score = 20;
             match = urlName;
         } else if (className.equals(str)) {
-            score = 200;
+            score = 20;
             match = className;
         } else if (label.equals(str)) {
-            score = 200;
+            score = 20;
             match = label;
         } else {
             String[] inputStrs = StringUtil.split(str, ".");
@@ -325,18 +325,18 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
 
         String full = Joiner.on('.').skipNulls().join(ss);
         if (match.equals(full)) {
-            return 100;
+            return 15;
         }
 
         if (match.startsWith(full) || match.endsWith(full) || match.contains(full)) {
-            return 50;
+            return 10;
         }
 
         List<String> mm = StringUtil.split(match, '.');
         HashSet<String> set = CollUtil.newHashSet(ss);
         for (String s : mm) {
             if (set.contains(s)) {
-                ++i;
+                i += 2;
             }
         }
 

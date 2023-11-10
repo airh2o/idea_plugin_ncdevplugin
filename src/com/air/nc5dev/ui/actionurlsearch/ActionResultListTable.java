@@ -142,7 +142,7 @@ public class ActionResultListTable extends JBTable {
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return true;
+        return column > 1;
     }
 
     public void fitTableColumns() {

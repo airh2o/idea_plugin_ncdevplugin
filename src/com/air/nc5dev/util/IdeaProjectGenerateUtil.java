@@ -443,16 +443,15 @@ public class IdeaProjectGenerateUtil {
                             ProjectNCConfigUtil.LIB_Module_Private_Library
                             , IoUtil.serachModule_Private_Library(ncHome)));
 
-                    if (new File(ProjectNCConfigUtil.getNCHome(), "hotwebs" + File.separatorChar + "ncchr").isDirectory()) {
-                        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
-                                ProjectNCConfigUtil.LIB_NCCHR_Library
-                                , IoUtil.serachNCCHR_Library(ncHome)));
-                    }
 
-                    if (new File(ProjectNCConfigUtil.getNCHome(), "hotwebs" + File.separatorChar + "nccloud").isDirectory()) {
-                        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
-                                ProjectNCConfigUtil.LIB_NCCloud_Library
-                                , IoUtil.serachNCCloud_Library(ncHome)));
+                    //hotwebs系列
+                    List<File> hotwebs = ApplicationLibraryUtil.getHotwebsModules(project);
+                    if (!hotwebs.isEmpty()) {
+                        for (File h : hotwebs) {
+                            LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project
+                                    , StringUtil.format("NC_LIBS/hotwebs_%s", h.getName())
+                                    , IoUtil.serachHotwebs_Library(ncHome, h.getName())));
+                        }
                     }
 
                     LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,

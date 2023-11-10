@@ -36,7 +36,7 @@ public class NCCActionURLSearchUI extends DialogWrapper {
             , "非UPM的Servlet", "SpringMVC注解接口", "Jaxrs(javax.ws.rs.Path)"};
     public static String[] tableNames = new String[]{
             "序号"
-            , "来源(1000=工程源码)"
+            , "来源(1=工程)"
             // , "模块"
             , "URL"
             , "标签"
