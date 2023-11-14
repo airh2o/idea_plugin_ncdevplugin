@@ -257,7 +257,7 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
      */
     private String like(String name, NCCActionInfoVO vo, String str) {
         if ((requestMappingModel != null && requestMappingModel.onlySearchPorjectUrl)
-                && vo.getProject().startsWith("NCHOME")) {
+                && StringUtil.startsWith(vo.getProject(), "NCHOME")) {
             return null;
         }
 

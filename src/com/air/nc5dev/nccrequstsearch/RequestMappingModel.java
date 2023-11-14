@@ -61,7 +61,7 @@ public class RequestMappingModel extends FilteringGotoByModel implements DumbAwa
 
     @Override
     public String getPromptText() {
-        return "输入请求地址nccloud/aim/acceptance/querylist.do或acceptance.querylist等(输入!开头意思是 只查询项目src源码的action)";
+        return "输入请求地址nccloud/aim/acceptance/querylist.do或acceptance.querylist等(输入!开头意思是 查询项目src源码+NCHOME的action)";
     }
 
     @NotNull
@@ -79,7 +79,7 @@ public class RequestMappingModel extends FilteringGotoByModel implements DumbAwa
     @Nullable
     @Override
     public String getCheckBoxName() {
-        return "只搜索项目内URL映射(不包含HOME,输入搜索内容用!开头一个意思)";
+        return "包含NCHOME(是否也搜索HOME.不勾选 只搜索工程不搜索NCHOME.搜索内容用!开头视为勾选.)";
     }
 
     @Override
