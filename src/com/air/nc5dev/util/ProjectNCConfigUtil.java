@@ -189,9 +189,11 @@ public class ProjectNCConfigUtil {
     public static final String getNCClientPort() {
         return getConfigValue(KEY_PROJECT_NC_CONFIG_CLIENT_PORT);
     }
+
     public static final String getNCClientPort(Project project) {
         return getConfigValue(project, KEY_PROJECT_NC_CONFIG_CLIENT_PORT);
     }
+
     /**
      * 设置NC 客户端要链接的服务器  端口  </br>
      * </br>
@@ -381,6 +383,14 @@ public class ProjectNCConfigUtil {
         if (!prop.containsKey("libScope")) {
             //Compile  Test Runtime Provided
             prop.put("libScope", "Provided");
+        }
+        if (!prop.containsKey("GLOBAL_HOTKEY_F3_RUN")) {
+            //Compile  Test Runtime Provided
+            prop.put("GLOBAL_HOTKEY_F3_RUN", "没有配置GLOBAL_HOTKEY_F3_RUN命令在IDEA .idea的nc.propertis中");
+        }
+        if (!prop.containsKey("GLOBAL_HOTKEY_F4_RUN")) {
+            //Compile  Test Runtime Provided
+            prop.put("GLOBAL_HOTKEY_F4_RUN", "没有配置GLOBAL_HOTKEY_F3_RUN命令在IDEA .idea的nc.propertis中");
         }
 
         IoUtil.wirtePropertis(prop, ProjectNCConfigUtil.configFile.get(project.getBasePath()));
