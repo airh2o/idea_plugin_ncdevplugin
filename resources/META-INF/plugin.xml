@@ -283,6 +283,7 @@
             <reference ref="nc5dev.info.opennchome"/>
             <reference ref="nc5dev.info.opennclogconfigfile"/>
             <reference ref="nc5dev.info.openncdataconfigfile"/>
+            <reference ref="nc5dev.info.NCDataDictionaryAction"/>
 
             <group id="nc5devtoolOtherTools" text="其他小功能"
                    popup="true" description="其他小功能">
@@ -299,7 +300,6 @@
                 <reference ref="nc5dev.info.MakeExcelByBmfFile"/>
                 <reference ref="nc5dev.info.MstscOpenLastAction"/>
                 <reference ref="nc5dev.info.NCCJsonDecodeAction"/>
-                <reference ref="nc5dev.info.NCDataDictionaryAction"/>
 
                 <reference ref="nc5dev.info.makejarfile"/>
                 <reference ref="nc5dev.info.makeNcModulejarfile"/>

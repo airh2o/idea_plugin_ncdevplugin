@@ -29,3 +29,5 @@ target/
 .project
 .settings/
 .classpath
+
+front/element-demo/node_modules

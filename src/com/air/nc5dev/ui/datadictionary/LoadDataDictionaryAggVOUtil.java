@@ -1,14 +1,14 @@
 package com.air.nc5dev.ui.datadictionary;
 
-import com.air.nc5dev.util.CollUtil;
-import com.air.nc5dev.util.IoUtil;
-import com.air.nc5dev.util.ProjectNCConfigUtil;
-import com.air.nc5dev.util.V;
+import cn.hutool.core.util.StrUtil;
+import com.air.nc5dev.util.*;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.util.jdbc.resulthandel.VOArrayListResultSetExtractor;
+import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
 import com.air.nc5dev.vo.DataDictionaryAggVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.air.nc5dev.vo.meta.ClassDTO;
+import com.air.nc5dev.vo.meta.EnumValueDTO;
 import com.air.nc5dev.vo.meta.PropertyDTO;
 import com.air.nc5dev.vo.meta.SearchComponentVO;
 import com.alibaba.fastjson.JSON;
@@ -20,9 +20,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -36,87 +34,33 @@ import java.util.stream.Collectors;
  * @Version
  */
 @Data
-@AllArgsConstructor
 public class LoadDataDictionaryAggVOUtil {
     Project project;
     NCDataSourceVO ncDataSourceVO;
     DataDictionaryAggVO agg;
+    String compomentSql = "select * from md_component";
 
-    public String toHtml(DataDictionaryAggVO agg) {
-        String template = "";
-
-
-        return template
-                .replace("{{'aggJsonString':'aggJsonString'}}", JSON.toJSONString(agg))
-                .replace("{{TreeHtml}}", buildTreeHtml(agg))
-                ;
-    }
-
-    private CharSequence buildTreeHtml(DataDictionaryAggVO agg) {
-        StringBuilder tree = new StringBuilder(10000);
-        for (DataDictionaryAggVO.Module m : agg.getModules()) {
-            tree.append(buildTreeHtml(m));
-        }
-        return tree.toString();
-    }
-
-    private CharSequence buildTreeHtml(DataDictionaryAggVO.Module m) {
-        StringBuilder tree = new StringBuilder(10000);
-        StringBuilder childDir = new StringBuilder(10000);
-        if (CollUtil.isNotEmpty(m.getChilds())) {
-            for (DataDictionaryAggVO.Module c : m.getChilds()) {
-                childDir.append(buildTreeHtml(c));
-            }
-        }
-
-        tree.append(String.format(
-                " <div id=\"%s\" class=\"card section fade scale slide-in-up-100 slide-in-right-50 show in choosed open\" >\n" +
-                        "          <div class=\"card-heading\" title=\"%s\">\n" +
-                        "              <i class=\"icon icon-tablet\"></i>\n" +
-                        "              <h5><a class=\"name\" onclick=\"memu1click('%s')\">%s</a></h5>\n" +
-                        "          </div>\n" +
-                        "          <div class=\"card-content\">\n" +
-                        "                  %s \n" +
-                        "                  %s" +
-                        "          </div>" +
-                        "</div>"
-                , m.getId()
-                , m.getName()
-                , m.getId()
-                , m.getDisplayname()
-                , childDir
-                , buildTreeHtml0(m.getMetas())
-        ));
-        return tree.toString();
-    }
-
-    private CharSequence buildTreeHtml0(List<SearchComponentVO> metas) {
-        if (CollUtil.isEmpty(metas)) {
-            return "";
-        }
-
-        StringBuilder tree = new StringBuilder(10000);
-        for (SearchComponentVO m : metas) {
-            tree.append(String.format(
-                    "<ul class=\"topics\">\n" +
-                            "    <li><a onclick=\"memu2click('%s')\" id=\"%s\">%s</a></li>\n" +
-                            "</ul>\n"
-                    , m.getId()
-                    , m.getName()
-                    , m.getDisplayName()
-            ));
-        }
-        return tree.toString();
+    public LoadDataDictionaryAggVOUtil(Project project, NCDataSourceVO ncDataSourceVO) {
+        this.project = project;
+        this.ncDataSourceVO = ncDataSourceVO;
     }
 
     public DataDictionaryAggVO read() throws SQLException, ClassNotFoundException {
         agg = new DataDictionaryAggVO();
+        agg.setClassId2EnumValuesMap(new HashMap<>());
+        agg.setCompomentIdMap(new HashMap<>());
 
         Connection conn = ConnectionUtil.getConn(ncDataSourceVO);
         Statement st = conn.createStatement();
-        ResultSet rs = st.executeQuery("select version from sm_product_version where versionn is not null");
+        ResultSet rs = st.executeQuery("select version from sm_product_version where version is not null");
         if (rs.next()) {
             agg.setNcVersion(rs.getString(1));
+        }
+        IoUtil.close(rs);
+
+        rs = st.executeQuery("select name from org_group");
+        if (rs.next()) {
+            agg.setGroupName(rs.getString(1));
         }
         IoUtil.close(rs);
 
@@ -127,26 +71,21 @@ public class LoadDataDictionaryAggVOUtil {
         List<DataDictionaryAggVO.Module> modules = V.toTree(allModules, "id", "parentmoduleid", "childs");
 
         //读取元数据了
-        rs = st.executeQuery("select * from md_component ");
+        rs = st.executeQuery(compomentSql);
         ArrayList<SearchComponentVO> coms = new VOArrayListResultSetExtractor<SearchComponentVO>(SearchComponentVO.class).extractData(rs);
         IoUtil.close(rs);
 
         //读取他们的实体列表和字段列表
-        Map<String, DataDictionaryAggVO.Module> id2ModuleMap = allModules.stream().collect(Collectors.toMap(DataDictionaryAggVO.Module::getId, m -> m));
+        LinkedList<ClassDTO> allClasss = new LinkedList<>();
+        Map<String, DataDictionaryAggVO.Module> id2ModuleMap = allModules.stream()
+                .collect(Collectors.toMap(DataDictionaryAggVO.Module::getId, m -> m, (m1, m2) -> m2));
         for (SearchComponentVO com : coms) {
-            rs = st.executeQuery("select * from md_class where componentid='" + com.getId() + "' ");
+            rs = st.executeQuery("select id,name,displayName,fullClassName,componentID,classType,parentClassID from md_class where componentid='" + com.getId() + "' ");
             ArrayList<ClassDTO> cs = new VOArrayListResultSetExtractor<ClassDTO>(ClassDTO.class).extractData(rs);
             IoUtil.close(rs);
 
             com.setClassDTOS(cs);
-
-            for (ClassDTO c : cs) {
-                rs = st.executeQuery("select * from md_property where classid='" + c.getId() + "' ");
-                ArrayList<PropertyDTO> ps = new VOArrayListResultSetExtractor<PropertyDTO>(PropertyDTO.class).extractData(rs);
-                IoUtil.close(rs);
-
-                c.setPerperties(ps);
-            }
+            allClasss.addAll(cs);
 
             DataDictionaryAggVO.Module m = id2ModuleMap.get(com.getOwnModule());
             if (m == null) {
@@ -160,17 +99,134 @@ public class LoadDataDictionaryAggVOUtil {
             }
 
             m.getMetas().add(com);
+
+            for (ClassDTO c : cs) {
+                if (ClassDTO.CLASSTYPE_ENTITY.equals(c.getClassType())) {
+                    rs = st.executeQuery("select * from md_property where classid='" + c.getId() + "' ");
+                    ArrayList<PropertyDTO> ps = new VOArrayListResultSetExtractor<PropertyDTO>(PropertyDTO.class).extractData(rs);
+                    IoUtil.close(rs);
+
+                    c.setPerperties(ps);
+
+                    rs = st.executeQuery("select paravalue from md_accessorpara where id='" + c.getId() + "' ");
+                    if (rs.next()) {
+                        c.setAggFullClassName(rs.getString(1));
+                    }
+                    IoUtil.close(rs);
+                } else if (ClassDTO.CLASSTYPE_ENUMERATE.equals(c.getClassType())) {
+                    rs = st.executeQuery("select * from md_enumvalue where id='" + c.getId() + "' ");
+                    ArrayList<EnumValueDTO> ps = new VOArrayListResultSetExtractor<EnumValueDTO>(EnumValueDTO.class).extractData(rs);
+                    IoUtil.close(rs);
+
+                    agg.getClassId2EnumValuesMap().put(c.getId(), ps);
+                }
+
+                if (m.getChilds() == null) {
+                    m.setChilds(new ArrayList<>());
+                }
+                m.getChilds().add(DataDictionaryAggVO.Module.builder()
+                        .id(c.getId())
+                        .type(V.get(c.getClassType(), ClassDTO.CLASSTYPE_ENTITY))
+                        .name(c.getName() + " " + simpleClassName(c.getFullClassName()))
+                        .displayname(c.getDisplayName())
+                        .build());
+            }
         }
 
         agg.setProjectName(getProject().getName());
         agg.setNcHome(ProjectNCConfigUtil.getNCHomePath(getProject()));
         agg.setModules(modules);
+        agg.setClassMap(allClasss.stream().collect(Collectors.toMap(ClassDTO::getId, c -> c, (c1, c2) -> c2)));
+        for (ClassDTO c : allClasss) {
+            if (CollUtil.isEmpty(c.getPerperties())) {
+                continue;
+            }
+
+            for (PropertyDTO p : c.getPerperties()) {
+                p.setFileTypeDesc(p.getTypeName());
+                p.setRefModelDesc(p.getTypeDisplayName() + " (" + p.getFieldType() + ')');
+
+                if (PropertyDataTypeEnum.BS000010000100001051.is(p.getDataType())) {
+                    p.setRefModelDesc("当前表主键:字符串 (String)");
+                    p.setRefModelName(null);
+                    continue;
+                }
+
+                if (StrUtil.isBlank(p.getRefModelName())) {
+                    if (p.getAttrLength() != null && p.getAttrLength() != 0) {
+                        p.setFileTypeDesc(p.getTypeName() + " (" + p.getAttrLength() + ')');
+                    }
+                    p.setRefModelName(null);
+                    continue;
+                }
+
+                //引用的其他元数据！！！
+                ClassDTO refc = agg.getClassMap().get(p.getDataType());
+                if (refc == null) {
+                    p.setRefModelDesc(p.getRefModelDesc() + " (引用的其他实体 但是找不到此实体信息!) " + p.getRefModelName());
+                    p.setRefModelName(null);
+                    continue;
+                }
+
+                if (ClassDTO.CLASSTYPE_ENUMERATE.equals(refc.getClassType())) {
+                    //枚举!
+                    List<EnumValueDTO> vs = agg.getClassId2EnumValuesMap().get(refc.getId());
+                    if (vs == null) {
+                        p.setRefModelDesc(String.format(
+                                "%s(%s %s) 这是枚举实体 但是找不到注册的值"
+                                , refc.getDisplayName()
+                                , refc.getName()
+                                , simpleClassName(refc.getFullClassName())
+                        ));
+                        continue;
+                    }
+
+                    String s = "";
+                    for (EnumValueDTO v : vs) {
+                        s += v.getValue() + "=" + v.getName() + ";<br/>";
+                    }
+                    p.setDescription(s);
+                }
+
+                p.setRefModelDesc(String.format(
+                        "%s(%s %s)"
+                        , refc.getDisplayName()
+                        , refc.getName()
+                        , simpleClassName(refc.getFullClassName())
+                ));
+            }
+        }
+
+        for (SearchComponentVO c : coms) {
+            if (c.getClassDTOS() != null) {
+                ArrayList<ClassDTO> ncas = new ArrayList<>();
+                for (ClassDTO ca : c.getClassDTOS()) {
+                    ClassDTO nca = new ClassDTO();
+                    nca.setId(ca.getId());
+                    nca.setName(ca.getName());
+                    nca.setDisplayName(ca.getDisplayName());
+                    nca.setFullClassName(ca.getFullClassName());
+                    nca.setAggFullClassName(ca.getAggFullClassName());
+                    nca.setClassType(ca.getClassType());
+                    nca.setParentClassID(ca.getParentClassID());
+                    nca.setComponentID(ca.getComponentID());
+                    nca.setRefModelName(ca.getRefModelName());
+                    nca.setDefaultTableName(ca.getDefaultTableName());
+                    ncas.add(nca);
+                }
+                c.setClassDTOS(ncas);
+            }
+            agg.getCompomentIdMap().put(c.getId(), c);
+        }
+
         return agg;
     }
 
-    public String toHtml() throws SQLException, ClassNotFoundException {
-        return toHtml(read());
+    public String simpleClassName(String c) {
+        if (c == null) {
+            return "";
+        }
+
+        return c.substring(c.lastIndexOf('.') + 1);
     }
-
-
 }

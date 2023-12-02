@@ -59,6 +59,7 @@ public class ClassDTO implements Serializable, Cloneable {
     private Integer x;
     private Integer y;
 
+    String aggFullClassName;
     String dataType;
     String dbtype;
     String typeDisplayName;

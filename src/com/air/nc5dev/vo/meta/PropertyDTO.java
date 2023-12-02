@@ -68,6 +68,10 @@ public class PropertyDTO implements Serializable, Cloneable {
     Boolean isKey = false;
     Boolean isShare = false;
 
+    //引用类型描述
+    String refModelDesc;
+    //字段类型描述
+    String fileTypeDesc;
 
     /**
      * @see VOStatus
