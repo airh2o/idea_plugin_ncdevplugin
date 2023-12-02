@@ -28,9 +28,13 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
                 Runtime.getRuntime().exec("explorer /select, " + f.getPath());
             } catch (Throwable e) {
                 try {
-                    Desktop desktop = Desktop.getDesktop();
-                    desktop.open(f.getParentFile());
-                } catch (Throwable ioException) {
+                    Runtime.getRuntime().exec("explorer /select, " + f.getParentFile().getPath());
+                } catch (Throwable e2) {
+                    try {
+                        Desktop desktop = Desktop.getDesktop();
+                        desktop.open(f.getParentFile());
+                    } catch (Throwable ioException) {
+                    }
                 }
             }
         } else {

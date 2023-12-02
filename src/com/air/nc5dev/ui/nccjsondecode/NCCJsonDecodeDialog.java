@@ -1,7 +1,6 @@
 package com.air.nc5dev.ui.nccjsondecode;
 
 import com.air.nc5dev.util.*;
-import com.air.nc5dev.util.idea.LogUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.openapi.project.Project;
@@ -19,7 +18,10 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
@@ -324,7 +326,7 @@ public class NCCJsonDecodeDialog extends DialogWrapper {
     }
 
     public static String unGZip(String txt) throws IOException {
-        org.apache.commons.codec.binary.Base64 bo = new org.apache.commons.codec.binary.Base64();
+        Base64 bo = new Base64();
         Object decodes = bo.decode(txt.getBytes());
         byte[] ret = null;
         if (decodes != null) {

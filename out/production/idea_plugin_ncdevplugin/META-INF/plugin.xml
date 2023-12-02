@@ -87,6 +87,9 @@
         <action id="nc5dev.info.NCCJsonDecodeAction" class="com.air.nc5dev.acion.NCCJsonDecodeAction"
                 text="NCC(BIP)前端请求解码" description="NCC(BIP)前端请求解码">
         </action>
+        <action id="nc5dev.info.NCDataDictionaryAction" class="com.air.nc5dev.acion.NCDataDictionaryAction"
+                text="NC数据字典" description="NC当前数据源的数字字典">
+        </action>
         <action id="nc5dev.info.openjconsole" class="com.air.nc5dev.acion.OpenJconsoleAction"
                 text="打开 Jconsole" description="打开Jconsole">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift j"/>
@@ -296,6 +299,7 @@
                 <reference ref="nc5dev.info.MakeExcelByBmfFile"/>
                 <reference ref="nc5dev.info.MstscOpenLastAction"/>
                 <reference ref="nc5dev.info.NCCJsonDecodeAction"/>
+                <reference ref="nc5dev.info.NCDataDictionaryAction"/>
 
                 <reference ref="nc5dev.info.makejarfile"/>
                 <reference ref="nc5dev.info.makeNcModulejarfile"/>

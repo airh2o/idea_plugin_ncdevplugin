@@ -1,0 +1,269 @@
+@charset "UTF-8";
+/**
+ * all.scss 总样式文件 
+ *
+ */
+/*默认样式*/
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td { margin: 0; padding: 0; border: 0; outline: 0; font-size: 100%; background: transparent; }
+body { line-height: 1; font-size: 12px; }
+ol, ul { list-style: none; }
+blockquote, q { quotes: none; }
+blockquote:before, blockquote:after, q:before, q:after { content: ''; content: none; }
+body { overflow: hidden; }
+:focus { outline: 0; }
+/* remember to highlight inserts somehow! */
+ins { text-decoration: none; }
+del { text-decoration: line-through; }
+/* tables still need 'cellspacing="0"' in the markup */
+table { border-collapse: collapse; border-spacing: 0; }
+/*link style*/
+a { text-decoration: none; color: #999; cursor: pointer; }
+/*a:visited {color: #666;}*/
+a:hover, a:active { color: #CC0000; }
+/*clear style*/
+.clear { clear: both; }
+.clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+.clearfix { display: block; }
+.icon { /* 通过设置 font-size 来改变图标大小 */
+width: 1em; height: 1em; /* 图标和文字相邻时，垂直对齐 */
+vertical-align: -0.15em; /* 通过设置 color 来改变 SVG 的颜色/fill */
+fill: currentColor; /* path 和 stroke 溢出 viewBox 部分在 IE 下会显示
+             normalize.css 中也包含这行 */
+overflow: hidden; font-size: 20px; }
+a { text-decoration: none; color: #999; cursor: pointer; }
+.hide { display: none; }
+#layout { text-align: left; display: block; height: 100%; position: relative; }
+#layout #header { display: none; overflow: hidden; height: 50px; z-index: 30; background-color: #102c4a; background-repeat: repeat-x; background-image: url("../../images/background/header_bg.png"); }
+#layout #header .headerNav { height: 50px; background-repeat: repeat-x; background-position: 0 0; background-image: url("../../images/background/header_bg.png"); }
+#layout #header .headerNav .logo { background-image: url(sprite.png); background-position: -30px 0px; width: 325px; height: 41px; float: left; width: 325px; height: 41px; text-indent: -1000px; margin-top: 5px; }
+#layout #header .headerNav .themeList { position: absolute; top: 30px; right: 10px; }
+#layout #header .headerNav .themeList li { float: left; padding: 0 3px; }
+#layout #header .headerNav .themeList li div { display: block; overflow: hidden; width: 13px; height: 11px; text-indent: -100px; cursor: pointer; }
+#layout #header .headerNav .themeList li.default div { background-image: url(sprite.png); background-position: -144px -209px; width: 13px; height: 11px; }
+#layout #header .headerNav .themeList li.default .selected { background-image: url(sprite.png); background-position: -330px -186px; width: 13px; height: 11px; }
+#layout #header .headerNav .themeList li.green div { background-image: url(sprite.png); background-position: -126px -209px; width: 13px; height: 11px; }
+#layout #header .headerNav .themeList li.green .selected { background-image: url(sprite.png); background-position: -216px -209px; width: 13px; height: 11px; }
+#layout #header .headerNav .themeList li.purple div { background-image: url(sprite.png); background-position: -162px -209px; width: 13px; height: 11px; }
+#layout #header .headerNav .themeList li.purple .selected { background-image: url(sprite.png); background-position: -180px -209px; width: 13px; height: 11px; }
+#layout #header .headerNav .themeList li.silver div { background-image: url(sprite.png); background-position: -198px -209px; width: 13px; height: 11px; }
+#layout #header .headerNav .themeList li.silver .selected { background-image: url(sprite.png); background-position: -312px -186px; width: 13px; height: 11px; }
+#layout #header .headerNav .themeList li.azure div { background-image: url(sprite.png); background-position: -90px -209px; width: 13px; height: 11px; }
+#layout #header .headerNav .themeList li.azure .selected { background-image: url(sprite.png); background-position: -108px -209px; width: 13px; height: 11px; }
+#layout #headerToolBar { z-index: 10; position: absolute; top: 0; right: 20px; width: 230px; height: 31px; display: block; }
+#layout #headerToolBar .toolBarLeft { background-image: url(sprite.png); background-position: -30px -46px; width: 101px; height: 106px; width: 29px; height: 30px; float: left; display: block; }
+#layout #headerToolBar .toolBarRight { background-image: url(sprite.png); background-position: -321px -46px; width: 27px; height: 30px; width: 29px; height: 30px; float: right; display: block; }
+#layout #headerToolBar .toolBarCenter { background-image: url(../../images/background/header_tool_bar_c.png); background-repeat: repeat-x; margin: 0 29px; height: 30px; position: relative; z-index: 2; }
+#layout #headerToolBar .toolBarCenter a { float: left; height: 22px; margin-top: 4px; margin-right: 6px; }
+#layout #headerToolBar .toolBarCenter a i { color: #1296db; font-size: 20px; }
+#layout #headerToolBar .toolBarCenter .fullscreen { margin-left: -8px; }
+#layout #headerToolBar .toolBarCenter #toolbarUser { border: 1px solid #ccc; border-radius: 4px; padding: 0 3px; margin-top: 1px; }
+#layout #headerToolBar .toolBarCenter #helpCenter { cursor: help; }
+#layout #headerToolBar .hBar { background-repeat: no-repeat; }
+#layout #headerToolBar .toolbarUserInfo { background-image: url(sprite.png); background-position: -136px -46px; width: 95px; height: 100px; background-position: left bottom; display: none; position: absolute; top: 24px; right: 60px; height: 50px; width: 96px; z-index: 2; background-repeat: no-repeat; }
+#layout #headerToolBar .toolbarUserInfo a { font-size: 12px; width: 86px; height: 20px; margin: 0 1px; padding-left: 6px; color: #505050; overflow: hidden; display: block; line-height: 20px; float: left; }
+#layout #headerToolBar .toolbarUserInfo a:hover { background-color: #3690c8; color: #fff; }
+#layout #mymenuBar { background-image: url("../../images/background/headmenuBg.png"); height: 25px; position: relative; background-position: 0 -75px; padding: 5px; font-size: 12px; }
+#layout #mymenuBar #nav li { float: left; height: 22px; line-height: 22px; padding: 0 15px 0 0; z-index: 1; vertical-align: bottom; }
+#layout #mymenuBar #nav li a { display: block; color: #000; }
+#layout #mymenuBar #nav li a span { line-height: 20px; }
+#layout #mymenuBar #nav li a .main_caret { background-image: url(sprite.png); background-position: -348px -81px; width: 7px; height: 4px; width: 7px; height: 4px; display: inline-block; background-repeat: no-repeat; }
+#root-menu-div ul { padding: 12px 1px 10px 1px; width: 180px; height: auto; z-index: 300; border-radius: 4px 4px 4px 4px; box-shadow: 2px 3px 3px rgba(0, 0, 0, 0.15); background: none repeat scroll 0 0 white; border: 1px solid #A8C9E5; }
+#root-menu-div ul li { white-space: nowrap; height: 23px; line-height: 23px; text-align: left; }
+.menu-ul div.menu-item a { height: 23px; width: auto; line-height: 23px; display: block; overflow: hidden; padding: 0 0 0 5px; font-size: 12px; color: black; }
+.menu-ul div.menu-item a .external_small { background-image: url(sprite.png); background-position: -270px -186px; width: 16px; height: 16px; display: inline-block; margin-right: 2px; margin-top: 3px; }
+.menu-ul div.menu-item a .font_pos { display: inline-block; height: 23px; vertical-align: middle; }
+.menu-ul div.menu-item img.menu-item-arrow { position: absolute; right: 14px; top: 8px; opacity: 0.2; filter: Alpha(Opacity=20); }
+.menu-ul li.active { background-color: #FEDDA8; color: #3d6190; }
+.menu-ul li.active img.menu-item-arrow { opacity: 0.8; filter: Alpha(Opacity=80); }
+#container { position: absolute; top: 32px; }
+#container .tabsPage .tabsPageHeader { display: block; height: 27px; border-style: solid; border-width: 0px 1px 0 1px; background-position: 0 -450px; background-repeat: repeat-x; position: relative; background-image: url(../../images/background/tabspage.png); }
+#container .tabsPage .tabsPageHeader .tabsPageHeaderContent { display: block; overflow: hidden; height: 27px; margin-right: 19px; position: relative; }
+#container .tabsPage .tabsPageHeader .tabsPageHeaderContent ul { display: block; width: 10000px; height: 26px; z-index: 1; position: absolute; }
+#container .tabsPage .tabsPageHeader .tabsPageHeaderContent ul li { float: left; display: block; height: 26px; margin-left: 2px; background-image: url(../../background/images/tabspage.png); background-position: 0 -100px; background-repeat: repeat-x; position: relative; cursor: pointer; }
+#container .tabsPage .tabsPageHeader .tabsPageHeaderContent ul li a { float: left; display: block; overflow: hidden; height: 26px; padding-left: 5px; line-height: 25px; color: #183152; background-position: 0 0; background-repeat: no-repeat; background-image: url(../../images/background/tabspage.png); }
+#container .tabsPage .tabsPageHeader .tabsPageHeaderContent ul li a span { font-size: 12px; float: left; display: block; overflow: hidden; width: 92px; height: 24px; padding: 2px 10px 0 3px; line-height: 22px; background-position: 100% -50px; cursor: pointer; background-image: url(../../images/background/tabspage.png); background-repeat: no-repeat; }
+#container .tabsPage .tabsPageHeader .tabsPageHeaderContent ul li a span .home_icon { padding: 0 0 0 18px; }
+#container .tabsPage .tabsPageHeader .tabsPageHeaderContent ul li a.close { background-image: url(sprite.png); background-position: -308px -131px; width: 12px; height: 12px; float: left; display: block; overflow: hidden; width: 12px; height: 12px; padding: 0; text-indent: -1000px; position: absolute; top: 3px; right: -2px; opacity: 0.3; filter: alpha(opacity=30); }
+#container .tabsPage .tabsPageHeader .tabsPageHeaderContent ul li a.close:hover { background-image: url(sprite.png); background-position: -325px -131px; width: 12px; height: 12px; opacity: 0.8; }
+#container .tabsPage .tabsPageHeader .tabsPageHeaderContent ul li i.tabnumber { z-index: 1; position: absolute; right: 5px; font-family: arial; font-size: 9px; bottom: 2px; color: #3f4e60; opacity: 0.5; filter: alpha(opacity=50); }
+#container .tabsPage .tabsPageHeader .tabsPageHeaderContent ul li.selected { background-position: 0 -400px; }
+#container .tabsPage .tabsPageHeader .tabsPageHeaderContent ul li.selected span { font-weight: bold; }
+#container .tabsPage .tabsMoreList { display: none; overflow: hidden; width: 170px; padding: 2px; border-style: solid; border-width: 1px; position: absolute; top: 24px; right: 0; z-index: 3; border-color: #b8d0d6; background: #FFF; }
+#container .tabsPage .tabsMoreList li { display: block; overflow: hidden; height: 23px; line-height: 21px; }
+#container .tabsPage .tabsMoreList li a { font-size: 12px; display: block; width: 148px; height: 21px; padding: 0 10px; border: solid 1px #FFF; white-space: nowrap; line-height: 21px; }
+#container .tabsPage .tabsMoreList li.selected a { font-weight: bold; border-color: #dfe5ed; background: #e8edf3; }
+.tabsPage .tabsMore { top: 4px; right: 0; cursor: pointer; display: block; overflow: hidden; width: 17px; height: 23px; position: absolute; z-index: 2; }
+.icon-zhuye { font-weight: normal !important; }
+.tabsPage .tabsPageContent { display: block; overflow: hidden; border-style: solid; border-width: 0 1px 1px 1px; position: relative; }
+.tabsPage .tabsPageContent #sidebar { width: 230px; position: absolute; top: 0; left: 0; z-index: 20; overflow: hidden; background: #5290cb; }
+.tabsPage .tabsPageContent #sidebar .toggleCollapse { display: block; overflow: hidden; height: 26px; }
+.tabsPage .tabsPageContent #sidebar .toggleCollapse .navigationbar { margin: 3px 4px; }
+.tabsPage .tabsPageContent #sidebar .toggleCollapse .navigationbar #searchMenu { margin-right: 5px; float: left; display: inline-block; position: relative; }
+.tabsPage .tabsPageContent #sidebar .toggleCollapse .navigationbar #searchMenu input.span2 { height: 14px; width: 135px; float: left; padding: 2px 18px 2px 4px; border-radius: 0; }
+.tabsPage .tabsPageContent #sidebar .toggleCollapse .navigationbar #searchMenu a.treeclosebtn { width: 16px; height: 16px; margin: 1px; border: 1px solid #3786d0; left: 120px; position: absolute; background: url(../../images/background/button-bg.png) center center repeat-x; }
+.tabsPage .tabsPageContent #sidebar .toggleCollapse .navigationbar #searchMenu a.treeclosebtn .myicons { color: #1296db; }
+.tabsPage .tabsPageContent #sidebar .toggleCollapse .navigationbar #searchMenu a.treesearchbtn { width: 16px; height: 16px; margin: 1px; border: 1px solid #3786d0; position: absolute; background: url(../../images/background/button-bg.png) center center repeat-x; left: 139px; }
+.tabsPage .tabsPageContent #sidebar .toggleCollapse .navigationbar #searchMenu a.treesearchbtn .myicons { color: #1296db; }
+.tabsPage .tabsPageContent #sidebar .toggleCollapse .navigationbar #searchMenuBar { float: left; display: inline-block; position: relative; }
+.tabsPage .tabsPageContent #sidebar .toggleCollapse .navigationbar #searchMenuBar a.treebar { width: 18px; height: 18px; display: block; padding: 2px 0 0 2px; float: left; margin-right: 2px; }
+.tabsPage .tabsPageContent #sidebar .toggleCollapse .navigationbar #searchMenuBar a.treebar .collapse-all { color: #fff; font-weight: bold; }
+.tabsPage .tabsPageContent #sidebar .toggleCollapse .navigationbar #searchMenuBar a.treebar .expand-all { color: #fff; font-weight: bold; }
+.tabsPage .tabsPageContent { display: block; overflow: hidden; border-style: solid; border-width: 0 1px 1px 1px; position: relative; }
+.tabsPage .tabsPageContent #sidebar { width: 230px; position: absolute; top: 0; left: 0; z-index: 20; overflow: hidden; background: #5290cb; }
+.accordion { display: block; border-style: solid; border-width: 1px 1px 0 1px; border-color: #5290CB; background: url(../../images/background/009.png) repeat; }
+.accordion .accordionContent { display: block; overflow: auto; border-style: solid; border-width: 0 0 1px 0; border-color: #5290CB; }
+.accordion .accordionContent .tree div { display: block; overflow: hidden; height: 22px; line-height: 22px; white-space: nowrap; }
+.accordion .accordionContent .tree li { clear: both; display: block; line-height: 22px; cursor: pointer; }
+.accordion .accordionContent .tree div div { float: left; display: block; overflow: hidden; width: 22px; height: 22px; border: none; white-space: nowrap; }
+.accordion .accordionContent .tree .end_expandable { background-image: url(sprite.png); background-position: -303px -157px; width: 22px; height: 21px; }
+.accordion .accordionContent .tree .expandable { background-image: url(sprite.png); background-position: -141px -157px; width: 22px; height: 22px; }
+.accordion .accordionContent .tree .end_collapsable { background-image: url(sprite.png); background-position: -168px -157px; width: 22px; height: 22px; }
+.accordion .accordionContent .tree .collapsable { background-image: url(sprite.png); background-position: -195px -157px; width: 22px; height: 22px; }
+.accordion .accordionContent .tree .folder_expandable { background-image: url(smiley_evil.png); width: 16px; height: 16px; margin-top: 3px; margin-right: 3px; }
+.accordion .accordionContent .tree .folder_collapsable { background-image: url(smiley_sleep.png); width: 16px; height: 16px; margin-top: 3px; margin-right: 3px; }
+.accordion .accordionContent .tree .node { background-image: url(sprite.png); background-position: -321px -81px; width: 22px; height: 22px; }
+.accordion .accordionContent .tree .last .node { background-image: url(sprite.png); background-position: -330px -157px; width: 22px; height: 20px; }
+.accordion .accordionContent .tree .file { background-image: url(sprite.png); background-position: -168px -186px; width: 22px; height: 18px; }
+.accordion .accordionContent .tree .appSubLoad .file { background-image: url(sprite.png); background-position: -222px -186px; width: 22px; height: 18px; }
+.accordion .accordionContent .tree .layouthelp .file { background-image: url(sprite.png); background-position: -87px -186px; width: 22px; height: 18px; }
+.accordion .accordionContent .tree .windowmode .file { background-image: url(sprite.png); background-position: -141px -186px; width: 22px; height: 18px; }
+.accordion .accordionContent .tree .dateinput .file { background-image: url(sprite.png); background-position: -321px -108px; width: 22px; height: 18px; }
+.accordion .accordionContent .tree .uicombox .file { background-image: url(sprite.png); background-position: -195px -186px; width: 22px; height: 18px; }
+.accordion .accordionContent .tree .formValid .file { background-image: url(sprite.png); background-position: -60px -186px; width: 22px; height: 18px; }
+.accordion .accordionContent .tree .form_valid .file { background-image: url(sprite.png); background-position: -87px -186px; width: 22px; height: 18px; }
+.accordion .accordionContent .tree .treehelp .file { background-image: url(sprite.png); background-position: -114px -186px; width: 22px; height: 18px; }
+.accordion .accordionContent .tree .line { background-image: url(sprite.png); background-position: -222px -157px; width: 22px; height: 22px; }
+.accordion .accordionContent .tree .last_expandable { background-image: url(sprite.png); background-position: -276px -157px; width: 22px; height: 22px; }
+.accordion .accordionContent .tree .last_collapsable { background-image: url(sprite.png); background-position: -249px -157px; width: 22px; height: 22px; }
+.btn { display: inline-block; padding: 3px 10px; margin-bottom: 0; font-size: 13px; line-height: 16px; color: #333333; text-align: center; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75); vertical-align: middle; cursor: pointer; background-color: #f5f5f5; background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6); background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6)); background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6); background-image: -o-linear-gradient(top, #ffffff, #e6e6e6); background-image: linear-gradient(top, #ffffff, #e6e6e6); background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6); background-repeat: repeat-x; border: 1px solid #cccccc; border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25); border-color: #e6e6e6 #e6e6e6 #bfbfbf; border-bottom-color: #b3b3b3; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px;  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6', GradientType=0);
+ filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05); -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05); }
+.btn-group > .btn:hover, .btn-group > .btn:focus, .btn-group > .btn:active, .btn-group > .btn.active { z-index: 2; }
+.btn-warning:hover, .btn-warning:active, .btn-warning.active, .btn-warning.disabled, .btn-warning[disabled] { background-color: #f89406;  *background-color: #df8505;
+}
+.btn-primary { background-color: #0074cc; background-image: -ms-linear-gradient(top, #0088cc, #0055cc); background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0055cc)); background-image: -webkit-linear-gradient(top, #0088cc, #0055cc); background-image: -o-linear-gradient(top, #0088cc, #0055cc); background-image: -moz-linear-gradient(top, #0088cc, #0055cc); background-image: linear-gradient(top, #0088cc, #0055cc); background-repeat: repeat-x; border-color: #0055cc #0055cc #003580; border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#0088cc', endColorstr='#0055cc', GradientType=0);
+ filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+}
+#rightContainer { position: relative; z-index: 2; float: left; margin-left: 230px; width: 100%; height: 100%; background: url(../../images/background/pagecontentBg.png) repeat-y scroll left top; }
+#rightContainer .winStyle { position: absolute; top: 5px; right: 5px; opacity: 0.2; filter: alpha(opacity=20); z-index: 10; }
+#rightContainer .winStyle .btn-toolbar .btn-group { display: inline-block; position: relative; display: inline-block; font-size: 0; white-space: nowrap; vertical-align: middle; }
+#rightContainer .winStyle .btn-toolbar .btn-group .btn { position: relative; float: left; margin-left: -1px; -webkit-border-radius: 0; -moz-border-radius: 0; border-radius: 0; }
+#rightContainer .winStyle .btn-toolbar .btn-group .btn i { display: inline-block; }
+#rightContainer .winStyle .btn-toolbar .btn-group .btn .icon-th { background-image: url(sprite.png); background-position: -108px -240px; width: 11px; height: 12px; }
+#rightContainer .winStyle .btn-toolbar .btn-group .btn .icon-th.icon-white { background-image: url(sprite.png); background-position: -76px -240px; width: 11px; height: 12px; }
+#rightContainer .winStyle .btn-toolbar .btn-group .btn .icon-th-list { background-image: url(sprite.png); background-position: -291px -131px; width: 12px; height: 12px; }
+#rightContainer .winStyle .btn-toolbar .btn-group .btn .icon-th-list.icon-white { background-image: url(sprite.png); background-position: -342px -131px; width: 12px; height: 12px; }
+#rightContainer .winStyle .btn-toolbar .btn-group .btn .icon-th-large { background-image: url(sprite.png); background-position: -60px -240px; width: 11px; height: 12px; }
+#rightContainer .winStyle .btn-toolbar .btn-group .btn .icon-th-large.icon-white { background-image: url(sprite.png); background-position: -92px -240px; width: 11px; height: 12px; }
+#rightContainer .winStyle .btn-toolbar .btn-group .btn:first-child { margin-left: 0; margin-right: 0; -webkit-border-bottom-left-radius: 4px; border-bottom-left-radius: 4px; -webkit-border-top-left-radius: 4px; border-top-left-radius: 4px; -moz-border-radius-bottomleft: 4px; -moz-border-radius-topleft: 4px; }
+#rightContainer .winStyle2layout { padding: 5px 0 0 5px; position: absolute; width: 300px; height: 200px; top: 40px; right: 40px; background: #fff; border: 1px solid #cadeee; display: none; z-index: 10; }
+.thewins .winContent { padding: 0 3px 0 5px; }
+.thewins .winContent ul.winAppArea { position: absolute; margin: 20px; }
+.thewins .winContent ul.winAppArea li.appButton { width: 70px; cursor: pointer; height: 80px; position: absolute; z-index: 101; list-style: none; text-align: center; }
+.thewins .winContent ul.winAppArea li.appButton a.winicons { z-index: 2; width: 70px; height: 36px; display: block; text-decoration: none; color: #999; cursor: pointer; }
+.thewins .winContent ul.winAppArea li.appButton span.title { background-image: url(sprite.png); background-position: -60px -157px; width: 76px; height: 24px; z-index: 2; max-height: 36px; min-height: 22px; overflow: hidden; display: block; font-size: 12px; margin-top: 1px; color: #000; line-height: 20px; text-align: center; }
+.thewins .winContent ul.winAppArea li.appButton .winBg { background-image: url(sprite.png); background-position: -236px -46px; width: 80px; height: 80px; display: none; width: 80px; height: 80px; position: absolute; top: -10px; z-index: -1; left: -4px; }
+.html5_video { width: 100%; position: relative; z-index: 0; }
+.html5_video video { position: absolute; top: 0; left: 0; min-width: 100%; min-height: 100%; }
+/**
+ * 关于ztree的css
+ */
+/*-------------------------------------
+zTree Style
+
+version:	3.5.19
+author:		Hunter.z
+email:		hunter.z@263.net
+website:	http://code.google.com/p/jquerytree/
+
+-------------------------------------*/
+.ztree * { padding: 0; margin: 0; font-size: 12px; font-family: Verdana, Arial, Helvetica, AppleGothic, sans-serif; }
+.ztree { margin: 0; padding: 5px; color: #333; }
+.ztree li { padding: 0; margin: 0; list-style: none; line-height: 14px; text-align: left; white-space: nowrap; outline: 0; }
+.ztree li ul { margin: 0; padding: 0 0 0 18px; }
+.ztree li ul.line { background: url(./img/line_conn.gif) 0 0 repeat-y; }
+.ztree li a { padding: 1px 3px 0 0; margin: 0; cursor: pointer; height: 17px; color: #333; background-color: transparent; text-decoration: none; vertical-align: top; display: inline-block; }
+.ztree li a:hover { text-decoration: underline; }
+.ztree li a.curSelectedNode { padding-top: 0px; background-color: #FFE6B0; color: black; height: 16px; border: 1px #FFB951 solid; opacity: 0.8; }
+.ztree li a.curSelectedNode_Edit { padding-top: 0px; background-color: #FFE6B0; color: black; height: 16px; border: 1px #FFB951 solid; opacity: 0.8; }
+.ztree li a.tmpTargetNode_inner { padding-top: 0px; background-color: #316AC5; color: white; height: 16px; border: 1px #316AC5 solid; opacity: 0.8; filter: alpha(opacity=80); }
+.ztree li a input.rename { height: 14px; width: 80px; padding: 0; margin: 0; font-size: 12px; border: 1px #7EC4CC solid;  *border: 0px;
+}
+.ztree li span { line-height: 16px; margin-right: 2px; }
+.ztree li span.button { line-height: 0; margin: 0; width: 16px; height: 16px; display: inline-block; vertical-align: middle; border: 0 none; cursor: pointer; outline: none; background-color: transparent; background-repeat: no-repeat; background-attachment: scroll; background-image: url("../../images/ztree/zTreeStandard.png");  *background-image: url("../../images/ztree/zTreeStandard.gif");
+}
+.ztree li span.button.chk { width: 13px; height: 13px; margin: 0 3px 0 0; cursor: auto; }
+.ztree li span.button.chk.checkbox_false_full { background-position: 0 0; }
+.ztree li span.button.chk.checkbox_false_full_focus { background-position: 0 -14px; }
+.ztree li span.button.chk.checkbox_false_part { background-position: 0 -28px; }
+.ztree li span.button.chk.checkbox_false_part_focus { background-position: 0 -42px; }
+.ztree li span.button.chk.checkbox_false_disable { background-position: 0 -56px; }
+.ztree li span.button.chk.checkbox_true_full { background-position: -14px 0; }
+.ztree li span.button.chk.checkbox_true_full_focus { background-position: -14px -14px; }
+.ztree li span.button.chk.checkbox_true_part { background-position: -14px -28px; }
+.ztree li span.button.chk.checkbox_true_part_focus { background-position: -14px -42px; }
+.ztree li span.button.chk.checkbox_true_disable { background-position: -14px -56px; }
+.ztree li span.button.chk.radio_false_full { background-position: -28px 0; }
+.ztree li span.button.chk.radio_false_full_focus { background-position: -28px -14px; }
+.ztree li span.button.chk.radio_false_part { background-position: -28px -28px; }
+.ztree li span.button.chk.radio_false_part_focus { background-position: -28px -42px; }
+.ztree li span.button.chk.radio_false_disable { background-position: -28px -56px; }
+.ztree li span.button.chk.radio_true_full { background-position: -42px 0; }
+.ztree li span.button.chk.radio_true_full_focus { background-position: -42px -14px; }
+.ztree li span.button.chk.radio_true_part { background-position: -42px -28px; }
+.ztree li span.button.chk.radio_true_part_focus { background-position: -42px -42px; }
+.ztree li span.button.chk.radio_true_disable { background-position: -42px -56px; }
+.ztree li span.button.switch { width: 18px; height: 18px; }
+.ztree li span.button.root_open { background-position: -92px -54px; }
+.ztree li span.button.root_close { background-position: -74px -54px; }
+.ztree li span.button.roots_open { background-position: -92px 0; }
+.ztree li span.button.roots_close { background-position: -74px 0; }
+.ztree li span.button.center_open { background-position: -92px -18px; }
+.ztree li span.button.center_close { background-position: -74px -18px; }
+.ztree li span.button.bottom_open { background-position: -92px -36px; }
+.ztree li span.button.bottom_close { background-position: -74px -36px; }
+.ztree li span.button.noline_open { background-position: -92px -72px; }
+.ztree li span.button.noline_close { background-position: -74px -72px; }
+.ztree li span.button.root_docu { background: none; }
+.ztree li span.button.roots_docu { background-position: -56px 0; }
+.ztree li span.button.center_docu { background-position: -56px -18px; }
+.ztree li span.button.bottom_docu { background-position: -56px -36px; }
+.ztree li span.button.noline_docu { background: none; }
+.ztree li span.button.ico_open { margin-right: 2px; background-position: -110px -16px; vertical-align: top;  *vertical-align: middle;
+}
+.ztree li span.button.ico_close { margin-right: 2px; background-position: -110px 0; vertical-align: top;  *vertical-align: middle;
+}
+.ztree li span.button.ico_docu { margin-right: 2px; background-position: -110px -32px; vertical-align: top;  *vertical-align: middle;
+}
+.ztree li span.button.edit { margin-right: 2px; background-position: -110px -48px; vertical-align: top;  *vertical-align: middle;
+}
+.ztree li span.button.remove { margin-right: 2px; background-position: -110px -64px; vertical-align: top;  *vertical-align: middle;
+}
+.ztree li span.button.ico_loading { margin-right: 2px; background: url(./img/loading.gif) no-repeat scroll 0 0 transparent; vertical-align: top;  *vertical-align: middle;
+}
+ul.tmpTargetzTree { background-color: #FFE6B0; opacity: 0.8; filter: alpha(opacity=80); }
+span.tmpzTreeMove_arrow { width: 16px; height: 16px; display: inline-block; padding: 0; margin: 2px 0 0 1px; border: 0 none; position: absolute; background-color: transparent; background-repeat: no-repeat; background-attachment: scroll; background-position: -110px -80px; background-image: url("./img/zTreeStandard.png");  *background-image: url("./img/zTreeStandard.gif");
+}
+ul.ztree.zTreeDragUL { margin: 0; padding: 0; position: absolute; width: auto; height: auto; overflow: hidden; background-color: #cfcfcf; border: 1px #00B83F dotted; opacity: 0.8; filter: alpha(opacity=80); }
+.zTreeMask { z-index: 10000; background-color: #cfcfcf; opacity: 0.0; filter: alpha(opacity=0); position: absolute; }
+/* level style*/
+/*.ztree li span.button.level0 {
+	display:none;
+}
+.ztree li ul.level0 {
+	padding:0;
+	background:none;
+}*/
+/**
+ * 关于jtree的css
+ * 
+ */
+.color-white { color: #fff; }
+.color-red { color: #f00; text-shadow: none; }
+.color-red1 { color: #ff5050; }
+.color-blue { color: #004eff; text-shadow: none; }
+.color-blue1 { color: #022e57; }
+.color-gray { color: #999; }
+.color-black { color: #000; }
+.tree li a, .tree li span { color: #183152; text-decoration: none; font-size: 12px; }
+.tree div, .tree a, .tree span { display: inherit; white-space: nowrap; }
