@@ -371,7 +371,7 @@ public class AddDefField2BmfDialog extends DialogWrapper {
     private Vector<ClassComboxDTO> readClassList() {
         String xml = FileUtil.readUtf8String(bmf.toNioPath().toFile());
         componentDTO = MeatBaseInfoReadUtil.readEntityList(xml);
-        List<ClassDTO> es = componentDTO.getClassDTOS();
+        List<? extends ClassDTO> es = componentDTO.getClassDTOS();
 
         entits = new Vector(es.stream()
                 .map(ClassComboxDTO::ofClassDTO)

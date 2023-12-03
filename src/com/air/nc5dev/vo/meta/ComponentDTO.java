@@ -40,5 +40,5 @@ public class ComponentDTO implements Serializable, Cloneable {
     String metaType;
 
 
-    transient List<ClassDTO> classDTOS;
+    transient List<? extends ClassDTO> classDTOS;
 }

@@ -40,6 +40,8 @@ public class DataDictionaryAggVO implements Serializable, Cloneable {
     Map<String, ClassDTO> classMap;
     Map<String, SearchComponentVO> compomentIdMap;
     Map<String, List<EnumValueDTO>> classId2EnumValuesMap;
+    Map<String, DataDictionaryAggVO.Module> id2ModuleMap;
+    ArrayList<DataDictionaryAggVO.Module> allModules;
 
     /**
      * select id, name ,displayname, parentmoduleid from md_module ;
@@ -52,6 +54,8 @@ public class DataDictionaryAggVO implements Serializable, Cloneable {
         String id;
         String name;
         String displayname;
+        String fullClassName;
+        String aggFullClassName;
         String parentmoduleid;
         @Builder.Default
         int type = 0;
@@ -63,8 +67,8 @@ public class DataDictionaryAggVO implements Serializable, Cloneable {
         /**
          * 元数据
          */
-        @Builder.Default
-        List<SearchComponentVO> metas = new ArrayList<>();
+       /* @Builder.Default
+        List<SearchComponentVO> metas = new ArrayList<>();*/
     }
 
 

@@ -19,6 +19,7 @@ import com.air.nc5dev.vo.meta.ComponentAggVO;
 import com.air.nc5dev.vo.meta.ComponentDTO;
 import com.air.nc5dev.vo.meta.SearchComponentVO;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -69,6 +70,7 @@ public class NCDataDictionaryDialog extends DialogWrapper {
     int height = 200;
     int width = 300;
     Project project;
+    long start;
 
     public NCDataDictionaryDialog(Project project) {
         super(project);
@@ -133,35 +135,41 @@ public class NCDataDictionaryDialog extends DialogWrapper {
      */
     @Override
     protected void doOKAction() {
-        Task.Backgroundable backgroundable = new Task.Backgroundable(project, "正在生成...请耐心等待") {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                try {
-                    getButtonSearch().setEnabled(false);
-                    getOKAction().setEnabled(false);
-                    getCancelAction().setEnabled(false);
+        try {
+            start = System.currentTimeMillis();
+            Task.Backgroundable backgroundable = new Task.Backgroundable(project, "正在生成...耗时会比较长...完成后会自动打开...请耐心等待") {
+                @Override
+                public void run(@NotNull ProgressIndicator indicator) {
+                    try {
+                        getButtonSearch().setEnabled(false);
+                        getOKAction().setEnabled(false);
+                        getCancelAction().setEnabled(false);
 
-                    export2Files0(
-                            new File(System.getProperty("java.io.tmpdir"), "nc_data_dictionary_" + System.currentTimeMillis() + ".html")
-                            , false
-                            , indicator
-                    );
-                } finally {
-                    getButtonSearch().setEnabled(true);
-                    getOKAction().setEnabled(true);
-                    getCancelAction().setEnabled(true);
-                    close(1);
+                        export2Files0(
+                                new File(System.getProperty("java.io.tmpdir"), "nc_data_dictionary_" + System.currentTimeMillis() + ".html")
+                                , false
+                                , indicator
+                        );
+                    } catch (Throwable e) {
+                        LogUtil.error(e.getMessage(), e);
+                    } finally {
+                        getButtonSearch().setEnabled(true);
+                        getOKAction().setEnabled(true);
+                        getCancelAction().setEnabled(true);
+                    }
                 }
-            }
-        };
-        backgroundable.setCancelText("停止任务");
-        backgroundable.setCancelTooltipText("停止这个任务");
-        ProgressManager.getInstance().run(backgroundable);
+            };
+            backgroundable.setCancelText("停止任务");
+            backgroundable.setCancelTooltipText("停止这个任务");
+            ProgressManager.getInstance().run(backgroundable);
+        } finally {
+            close(1);
+        }
     }
 
     public void export2Files() {
         //选择保存位置
-        File outDir = new File(getProject().getBasePath(), "nc_data_dictionary_" + System.currentTimeMillis() + ".html");
+        File outDir = new File(getProject().getBasePath(), "nc_data_dictionary_" + System.currentTimeMillis());
         if (!outDir.exists()) {
             outDir.mkdirs();
         }
@@ -169,6 +177,7 @@ public class NCDataDictionaryDialog extends DialogWrapper {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         fileChooser.setCurrentDirectory(outDir);
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fileChooser.setDialogTitle("选择保存路径:");
         int flag = fileChooser.showSaveDialog(null);
         if (flag == JFileChooser.APPROVE_OPTION
@@ -183,31 +192,36 @@ public class NCDataDictionaryDialog extends DialogWrapper {
             return;
         }
 
-        File f = outDir;
-        Task.Backgroundable backgroundable = new Task.Backgroundable(project, "正在生成...请耐心等待") {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                try {
-                    getButtonSearch().setEnabled(false);
-                    getOKAction().setEnabled(false);
-                    getCancelAction().setEnabled(false);
+        try {
+            File f = new File(outDir, "nc_data_dictionary");
+            Task.Backgroundable backgroundable = new Task.Backgroundable(project, "正在生成...耗时会比较长...完成后会自动打开...请耐心等待") {
+                @Override
+                public void run(@NotNull ProgressIndicator indicator) {
+                    try {
+                        getButtonSearch().setEnabled(false);
+                        getOKAction().setEnabled(false);
+                        getCancelAction().setEnabled(false);
 
-                    export2Files0(
-                            f
-                            , true
-                            , indicator
-                    );
-                } finally {
-                    getButtonSearch().setEnabled(true);
-                    getOKAction().setEnabled(true);
-                    getCancelAction().setEnabled(true);
-                    close(1);
+                        export2Files0(
+                                f
+                                , true
+                                , indicator
+                        );
+                    } catch (Throwable e) {
+                        LogUtil.error(e.getMessage(), e);
+                    } finally {
+                        getButtonSearch().setEnabled(true);
+                        getOKAction().setEnabled(true);
+                        getCancelAction().setEnabled(true);
+                    }
                 }
-            }
-        };
-        backgroundable.setCancelText("停止任务");
-        backgroundable.setCancelTooltipText("停止这个任务");
-        ProgressManager.getInstance().run(backgroundable);
+            };
+            backgroundable.setCancelText("停止任务");
+            backgroundable.setCancelTooltipText("停止这个任务");
+            ProgressManager.getInstance().run(backgroundable);
+        } finally {
+            close(1);
+        }
     }
 
     public void export2Files0(File f, boolean openDir, ProgressIndicator indicator) {
@@ -218,22 +232,58 @@ public class NCDataDictionaryDialog extends DialogWrapper {
         try {
             NCDataSourceVO ds = NCPropXmlUtil.getDataSourceVOS(getProject()).get(comboBoxDb.getSelectedIndex());
             LoadDataDictionaryAggVOUtil util = new LoadDataDictionaryAggVOUtil(getProject(), ds);
+            util.setIndicator(indicator);
             util.setCompomentSql(textFieldSerach.getText());
             DataDictionaryAggVO agg = util.read();
-            String str = JSON.toJSONString(agg);
-            FileUtil.writeUtf8String(str, new File("E:\\temp\\nc_data_dictionary.json"));
-            String html = ProjectUtil.getResourceTemplatesUtf8Txt("nc_data_dictionary.html");
-            html = html.replace("{{DataDictionaryAggVOJsonString}}", str);
-            FileUtil.writeUtf8String(html, f);
 
-            LogUtil.infoAndHide("生成数据字典文件成功: " + f.getPath());
+            agg.setClassId2EnumValuesMap(null);
+            agg.setId2ModuleMap(null);
+            agg.setAllModules(null);
+
+            if (indicator.isCanceled()) {
+                return;
+            }
+
+            String str = JSON.toJSONString(agg, SerializerFeature.DisableCircularReferenceDetect);
+            String html = ProjectUtil.getResourceTemplatesUtf8Txt("nc_data_dictionary/index.html");
+            html = html.replace("{{DataDictionaryAggVOJsonString}}", str);
+
+            File index = new File(f, "index.html");
+            FileUtil.writeUtf8String(html, index);
+
+            HashSet<String> fs = CollUtil.newHashSet("index.js"
+                    , "manifest.js"
+                    , "vendor.js"
+                    , "674f50d287a8c48dc19ba404d20fe713.png"
+                    , "912ec66d7572ff821749319396470bde.png"
+                    , "535877f50039c0cb49a6196a5b7517cd.png"
+                    , "732389ded34cb9c52dd88271f1345af9.png"
+                    , "af7ae505a9eed503f8b8e6982036873e.png"
+                    , "b06871f281fee6b241d60582ae9369b9.png"
+                    , "fee66e712a8a08eef5805a46892932ad.png"
+            );
+            for (String s : fs) {
+                byte[] bts = ProjectUtil.getResourceByte("nc_data_dictionary/" + s);
+                if (bts == null) {
+                    File strf = ProjectUtil.getResourceTemplates("nc_data_dictionary/" + s);
+                    if (strf != null && strf.isFile()) {
+                        bts = FileUtil.readBytes(strf);
+                    }
+                }
+                if (bts == null) {
+                    continue;
+                }
+                FileUtil.writeBytes(bts, new File(f, s));
+            }
+
+            LogUtil.infoAndHide("耗时: " + ((System.currentTimeMillis() - start) / 1000) + "秒 ,生成数据字典文件成功: " + f.getPath());
 
             if (openDir) {//保存离线数据字典html文件
-                Runtime.getRuntime().exec("explorer /select, " + f.getPath());
+                Runtime.getRuntime().exec("explorer /select, " + index.getPath());
             } else {//直接浏览器打开临时文件即可
                 try {
                     Desktop desktop = Desktop.getDesktop();
-                    desktop.open(f);
+                    desktop.open(index);
                 } catch (Throwable ioException) {
                 }
             }
@@ -246,6 +296,7 @@ public class NCDataDictionaryDialog extends DialogWrapper {
 
     @Override
     public void doCancelAction() {
+        start = System.currentTimeMillis();
         export2Files();
     }
 

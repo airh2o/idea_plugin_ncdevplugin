@@ -23,10 +23,10 @@ public class PropertyDTO implements Serializable, Cloneable {
     private String description;
     private String displayName;
     private String help;
-    private Boolean isActive = true;
-    private Boolean hided = false;
-    private Boolean nullable = true;
-    private Boolean readOnly = false;
+    private Boolean isActive;
+    private Boolean hided;
+    private Boolean nullable;
+    private Boolean readOnly;
     private Integer attrLength;
     private String attrMaxValue;
     private String attrMinValue;
@@ -36,37 +36,37 @@ public class PropertyDTO implements Serializable, Cloneable {
     private Integer precise;
     private String refModelName;
     private Integer attrsequence; //sequence
-    private Integer visibility = 0;
-    private Integer versionType = 0;
+    private Integer visibility;
+    private Integer versionType;
     private String typeName;
-    private Boolean fixedLength = false;
-    private Boolean calculation = false;
-    private Boolean isAuthen = true;
+    private Boolean fixedLength;
+    private Boolean calculation;
+    private Boolean isAuthen;
     private String resid;
     private Boolean customattr;
-    private Boolean notSerialize = false;
+    private Boolean notSerialize;
     private Boolean dynamicattr;
     private String dynamicTable;
     private Boolean accesspower;
     private String accesspowergroup;
     private String industry;
-    private Boolean industryChanged = false;
+    private Boolean industryChanged;
     private String createIndustry;
-    private String modifyIndustry = "0";
+    private String modifyIndustry;
     private Boolean isSource;
 
-    Boolean isAuthorization = true;
+    Boolean isAuthorization;
     String dbtype;
     String fieldType;
     String fieldName;
     String typeDisplayName;
-    Boolean forLocale = false;
-    Boolean isDefaultDimensionAttribute = false;
-    Boolean isDefaultMeasureAttribute = false;
-    Boolean isFeature = false;
-    Boolean isGlobalization = false;
-    Boolean isKey = false;
-    Boolean isShare = false;
+    Boolean forLocale;
+    Boolean isDefaultDimensionAttribute;
+    Boolean isDefaultMeasureAttribute;
+    Boolean isFeature;
+    Boolean isGlobalization;
+    Boolean isKey;
+    Boolean isShare;
 
     //引用类型描述
     String refModelDesc;
@@ -90,6 +90,27 @@ public class PropertyDTO implements Serializable, Cloneable {
         setDataTypeStyleName(dataTypeStyleConverter.getConvertBefor(getDataTypeStyle()));
         setVisibilityName(visibilityConverter.getNameOfVisibility(getVisibility()));
         setFieldName(getName());
+
+        forLocale = false;
+        isDefaultDimensionAttribute = false;
+        isDefaultMeasureAttribute = false;
+        isFeature = false;
+        isGlobalization = false;
+        isKey = false;
+        isShare = false;
+        isAuthorization = true;
+        modifyIndustry = "0";
+        industryChanged = false;
+        notSerialize = false;
+        isAuthen = true;
+        calculation = false;
+        fixedLength = false;
+        versionType = 0;
+        visibility = 0;
+        isActive = true;
+        hided = false;
+        nullable = true;
+        readOnly = false;
     }
 
     @Override

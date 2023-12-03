@@ -303,6 +303,19 @@ public class ProjectUtil {
         }
     }
 
+    public static byte[] getResourceByte(String name) {
+        InputStream input = ProjectUtil.class.getResourceAsStream("/templates/" + name);
+        if (input == null) {
+            return null;
+        }
+
+        try {
+            return IoUtil.readBytes(input);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public static File getResource() {
         return new File(ProjectUtil.class.getResource("/").getPath());
     }

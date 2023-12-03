@@ -7,11 +7,9 @@ import com.air.nc5dev.util.jdbc.resulthandel.VOArrayListResultSetExtractor;
 import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
 import com.air.nc5dev.vo.DataDictionaryAggVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
-import com.air.nc5dev.vo.meta.ClassDTO;
-import com.air.nc5dev.vo.meta.EnumValueDTO;
-import com.air.nc5dev.vo.meta.PropertyDTO;
-import com.air.nc5dev.vo.meta.SearchComponentVO;
+import com.air.nc5dev.vo.meta.*;
 import com.alibaba.fastjson.JSON;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,6 +37,7 @@ public class LoadDataDictionaryAggVOUtil {
     NCDataSourceVO ncDataSourceVO;
     DataDictionaryAggVO agg;
     String compomentSql = "select * from md_component";
+    ProgressIndicator indicator;
 
     public LoadDataDictionaryAggVOUtil(Project project, NCDataSourceVO ncDataSourceVO) {
         this.project = project;
@@ -49,177 +48,323 @@ public class LoadDataDictionaryAggVOUtil {
         agg = new DataDictionaryAggVO();
         agg.setClassId2EnumValuesMap(new HashMap<>());
         agg.setCompomentIdMap(new HashMap<>());
+        agg.setClassMap(new HashMap<>());
 
-        Connection conn = ConnectionUtil.getConn(ncDataSourceVO);
-        Statement st = conn.createStatement();
-        ResultSet rs = st.executeQuery("select version from sm_product_version where version is not null");
-        if (rs.next()) {
-            agg.setNcVersion(rs.getString(1));
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = ConnectionUtil.getConn(ncDataSourceVO);
+            st = conn.createStatement();
+            ResultSet rs = st.executeQuery("select version from sm_product_version where version is not null");
+            if (rs.next()) {
+                agg.setNcVersion(rs.getString(1));
+            }
+            IoUtil.close(rs);
+
+            rs = st.executeQuery("select name from org_group");
+            if (rs.next()) {
+                agg.setGroupName(rs.getString(1));
+            }
+            IoUtil.close(rs);
+
+            String sql = compomentSql
+                    .toLowerCase()
+                    .replace("\n", " ")
+                    .replace("\r", " ")
+                    .replace("\t", " ");
+            String[] ss = StringUtil.split(sql, " ");
+            sql = "";
+            for (String s : ss) {
+                if (StringUtil.isBlank(s)) {
+                    continue;
+                }
+
+                sql += " " + s;
+            }
+
+
+            sql = "select id, name ,displayname, parentmoduleid from md_module where id in(select ownmodule "
+                    + sql.substring(
+                    sql.indexOf(" from ")
+                    , sql.lastIndexOf(" order by ")
+            ) + ')';
+            if (indicator != null) {
+                indicator.setText2(String.format("正在查询模块列表...%s", sql));
+            }
+            rs = st.executeQuery(sql);
+            ArrayList<DataDictionaryAggVO.Module> allModules = new VOArrayListResultSetExtractor<DataDictionaryAggVO.Module>
+                    (DataDictionaryAggVO.Module.class).extractData(rs);
+            IoUtil.close(rs);
+            List<DataDictionaryAggVO.Module> modules = V.toTree(allModules, "id", "parentmoduleid", "childs");
+            Map<String, DataDictionaryAggVO.Module> id2ModuleMap = allModules.stream()
+                    .collect(Collectors.toMap(DataDictionaryAggVO.Module::getId, m -> m, (m1, m2) -> m2));
+            agg.setId2ModuleMap(id2ModuleMap);
+            agg.setAllModules(allModules);
+
+            //读取元数据了
+            if (indicator != null) {
+                indicator.setText2(String.format("正在查询元数据组件列表...%s", compomentSql));
+            }
+            rs = st.executeQuery(compomentSql);
+            ArrayList<SearchComponentVO2> coms = new VOArrayListResultSetExtractor<SearchComponentVO2>(SearchComponentVO2.class).extractData(rs);
+            IoUtil.close(rs);
+
+            //读取他们的实体列表和字段列表
+            for (SearchComponentVO com : coms) {
+                if (indicator != null && indicator.isCanceled()) {
+                    return agg;
+                }
+
+                if (indicator != null) {
+                    indicator.setText2(String.format("正在加载元数据组件...%s - %s", com.getName(), com.getDisplayName()));
+                }
+
+                loadSearchComponentVO(agg, com, st);
+            }
+
+            agg.setProjectName(getProject().getName());
+            agg.setNcHome(ProjectNCConfigUtil.getNCHomePath(getProject()));
+            agg.setModules(modules);
+
+            agg.getCompomentIdMap().clear();
+            for (SearchComponentVO c : coms) {
+                if (c.getClassDTOS() != null) {
+                    ArrayList<ClassDTO> ncas = new ArrayList<>();
+                    for (ClassDTO ca : c.getClassDTOS()) {
+                        ClassDTO nca = new ClassDTO();
+                        nca.setId(ca.getId());
+                        nca.setName(ca.getName());
+                        nca.setDisplayName(ca.getDisplayName());
+                        nca.setFullClassName(ca.getFullClassName());
+                        nca.setAggFullClassName(ca.getAggFullClassName());
+                        nca.setClassType(ca.getClassType());
+                        nca.setParentClassID(ca.getParentClassID());
+                        nca.setComponentID(ca.getComponentID());
+                        nca.setRefModelName(ca.getRefModelName());
+                        nca.setDefaultTableName(ca.getDefaultTableName());
+                        ncas.add(nca);
+                    }
+                    c.setClassDTOS(ncas);
+                }
+                agg.getCompomentIdMap().put(c.getId(), c);
+            }
+
+            return agg;
+        } finally {
+            IoUtil.close(st);
+            IoUtil.close(conn);
         }
-        IoUtil.close(rs);
+    }
 
-        rs = st.executeQuery("select name from org_group");
-        if (rs.next()) {
-            agg.setGroupName(rs.getString(1));
-        }
-        IoUtil.close(rs);
+    public void loadSearchComponentVO(DataDictionaryAggVO agg, SearchComponentVO c, Statement st) throws SQLException {
+        try {
+            if (agg.getCompomentIdMap().get(c.getId()) != null) {
+                return;
+            }
 
-        rs = st.executeQuery("select id, name ,displayname, parentmoduleid from md_module");
-        ArrayList<DataDictionaryAggVO.Module> allModules = new VOArrayListResultSetExtractor<DataDictionaryAggVO.Module>
-                (DataDictionaryAggVO.Module.class).extractData(rs);
-        IoUtil.close(rs);
-        List<DataDictionaryAggVO.Module> modules = V.toTree(allModules, "id", "parentmoduleid", "childs");
+            String sql = compomentSql
+                    .replace("\n", " ")
+                    .replace("\r", " ")
+                    .replace("\t", " ");
+            String[] ss = StringUtil.split(sql, " ");
+            sql = "";
+            for (String s : ss) {
+                if (StringUtil.isBlank(s)) {
+                    continue;
+                }
 
-        //读取元数据了
-        rs = st.executeQuery(compomentSql);
-        ArrayList<SearchComponentVO> coms = new VOArrayListResultSetExtractor<SearchComponentVO>(SearchComponentVO.class).extractData(rs);
-        IoUtil.close(rs);
+                sql += " " + s;
+            }
 
-        //读取他们的实体列表和字段列表
-        LinkedList<ClassDTO> allClasss = new LinkedList<>();
-        Map<String, DataDictionaryAggVO.Module> id2ModuleMap = allModules.stream()
-                .collect(Collectors.toMap(DataDictionaryAggVO.Module::getId, m -> m, (m1, m2) -> m2));
-        for (SearchComponentVO com : coms) {
-            rs = st.executeQuery("select id,name,displayName,fullClassName,componentID,classType,parentClassID from md_class where componentid='" + com.getId() + "' ");
-            ArrayList<ClassDTO> cs = new VOArrayListResultSetExtractor<ClassDTO>(ClassDTO.class).extractData(rs);
+            SearchComponentVO com = null;
+            ResultSet rs = null;
+
+            if (StringUtil.isBlank(c.getName())) {
+                rs = st.executeQuery(sql.substring(0, sql.indexOf(" where "))
+                        + " where id='" + c.getId() + "' "
+                );
+                com = CollUtil.getFirst(new VOArrayListResultSetExtractor<SearchComponentVO2>(SearchComponentVO2.class).extractData(rs));
+                IoUtil.close(rs);
+            } else {
+                com = c;
+            }
+
+            if (com == null) {
+                return;
+            }
+
+            agg.getCompomentIdMap().put(com.getId(), com);
+
+            //读取他们的实体列表和字段列表
+            if (indicator != null) {
+                indicator.setText2(String.format("正在查询元数据组件实体列表...%s - %s", com.getName(), com.getDisplayName()));
+            }
+            LinkedList<ClassDTO> allClasss = new LinkedList<>();
+            sql = "select id,name,displayname,fullclassname,componentid,classtype,parentclassid,defaulttablename from md_class where componentid='"
+                    + com.getId() + "' ";
+            rs = st.executeQuery(sql);
+            ArrayList<ClassDTO2> cs = new VOArrayListResultSetExtractor<ClassDTO2>(ClassDTO2.class).extractData(rs);
             IoUtil.close(rs);
 
             com.setClassDTOS(cs);
             allClasss.addAll(cs);
 
-            DataDictionaryAggVO.Module m = id2ModuleMap.get(com.getOwnModule());
+            DataDictionaryAggVO.Module m = agg.getId2ModuleMap().get(com.getOwnModule());
             if (m == null) {
                 m = new DataDictionaryAggVO.Module();
                 m.setId(com.getOwnModule());
                 m.setName(com.getOwnModule());
                 m.setDisplayname(com.getOwnModule());
-                m.setMetas(new ArrayList<>());
-                id2ModuleMap.put(m.getId(), m);
-                modules.add(m);
+                // m.setMetas(new ArrayList<>());
+                agg.getId2ModuleMap().put(m.getId(), m);
             }
 
-            m.getMetas().add(com);
+            // m.getMetas().add(com);
+            //立即放入map中，防止下个元数据 又依赖他的实体！
+            for (ClassDTO2 cla : cs) {
+                agg.getClassMap().put(cla.getId(), cla);
+            }
 
-            for (ClassDTO c : cs) {
-                if (ClassDTO.CLASSTYPE_ENTITY.equals(c.getClassType())) {
-                    rs = st.executeQuery("select * from md_property where classid='" + c.getId() + "' ");
+            for (ClassDTO2 cla : cs) {
+                if (indicator != null && indicator.isCanceled()) {
+                    return;
+                }
+
+                if (indicator != null) {
+                    indicator.setText2(String.format("正在查询元数据组件实体的属性等信息...%s - %s - %s - %s "
+                            , com.getName()
+                            , com.getDisplayName()
+                            , cla.getName()
+                            , cla.getDisplayName()
+                    ));
+                }
+
+                if (ClassDTO.CLASSTYPE_ENTITY.equals(cla.getClassType())) {
+                    rs = st.executeQuery("select name,displayname,nullable,refmodelname,defaultvalue,description ,attrlength,datatype" +
+                            " from md_property where classid='" + cla.getId() + "' ");
                     ArrayList<PropertyDTO> ps = new VOArrayListResultSetExtractor<PropertyDTO>(PropertyDTO.class).extractData(rs);
                     IoUtil.close(rs);
 
-                    c.setPerperties(ps);
+                    cla.setPerperties(ps);
 
-                    rs = st.executeQuery("select paravalue from md_accessorpara where id='" + c.getId() + "' ");
+                    rs = st.executeQuery("select paravalue from md_accessorpara where id='" + cla.getId() + "' ");
                     if (rs.next()) {
-                        c.setAggFullClassName(rs.getString(1));
+                        cla.setAggFullClassName(rs.getString(1));
                     }
                     IoUtil.close(rs);
-                } else if (ClassDTO.CLASSTYPE_ENUMERATE.equals(c.getClassType())) {
-                    rs = st.executeQuery("select * from md_enumvalue where id='" + c.getId() + "' ");
+                } else if (ClassDTO.CLASSTYPE_ENUMERATE.equals(cla.getClassType())) {
+                    rs = st.executeQuery("select * from md_enumvalue where id='" + cla.getId() + "' ");
                     ArrayList<EnumValueDTO> ps = new VOArrayListResultSetExtractor<EnumValueDTO>(EnumValueDTO.class).extractData(rs);
                     IoUtil.close(rs);
 
-                    agg.getClassId2EnumValuesMap().put(c.getId(), ps);
+                    agg.getClassId2EnumValuesMap().put(cla.getId(), ps);
                 }
 
                 if (m.getChilds() == null) {
                     m.setChilds(new ArrayList<>());
                 }
                 m.getChilds().add(DataDictionaryAggVO.Module.builder()
-                        .id(c.getId())
-                        .type(V.get(c.getClassType(), ClassDTO.CLASSTYPE_ENTITY))
-                        .name(c.getName() + " " + simpleClassName(c.getFullClassName()))
-                        .displayname(c.getDisplayName())
+                        .id(cla.getId())
+                        .type(V.get(cla.getClassType(), ClassDTO.CLASSTYPE_ENTITY))
+                        .name(cla.getName() + " " + simpleClassName(cla.getFullClassName()))
+                        .displayname(cla.getDisplayName())
+                        .fullClassName(cla.getFullClassName())
+                        .aggFullClassName(cla.getAggFullClassName())
                         .build());
-            }
-        }
 
-        agg.setProjectName(getProject().getName());
-        agg.setNcHome(ProjectNCConfigUtil.getNCHomePath(getProject()));
-        agg.setModules(modules);
-        agg.setClassMap(allClasss.stream().collect(Collectors.toMap(ClassDTO::getId, c -> c, (c1, c2) -> c2)));
-        for (ClassDTO c : allClasss) {
-            if (CollUtil.isEmpty(c.getPerperties())) {
-                continue;
-            }
-
-            for (PropertyDTO p : c.getPerperties()) {
-                p.setFileTypeDesc(p.getTypeName());
-                p.setRefModelDesc(p.getTypeDisplayName() + " (" + p.getFieldType() + ')');
-
-                if (PropertyDataTypeEnum.BS000010000100001051.is(p.getDataType())) {
-                    p.setRefModelDesc("当前表主键:字符串 (String)");
-                    p.setRefModelName(null);
+                if (CollUtil.isEmpty(cla.getPerperties())) {
                     continue;
                 }
 
-                if (StrUtil.isBlank(p.getRefModelName())) {
-                    if (p.getAttrLength() != null && p.getAttrLength() != 0) {
-                        p.setFileTypeDesc(p.getTypeName() + " (" + p.getAttrLength() + ')');
+                HashSet<String> idFields = new HashSet<>();
+                rs = st.executeQuery(String.format("select name from md_column where tableid='%s' and pkey='Y'", cla.getDefaultTableName()));
+                while (rs.next()) {
+                    idFields.add(rs.getString(1));
+                }
+                IoUtil.close(rs);
+                for (PropertyDTO p : cla.getPerperties()) {
+                    if (indicator != null && indicator.isCanceled()) {
+                        return;
                     }
-                    p.setRefModelName(null);
-                    continue;
-                }
 
-                //引用的其他元数据！！！
-                ClassDTO refc = agg.getClassMap().get(p.getDataType());
-                if (refc == null) {
-                    p.setRefModelDesc(p.getRefModelDesc() + " (引用的其他实体 但是找不到此实体信息!) " + p.getRefModelName());
-                    p.setRefModelName(null);
-                    continue;
-                }
+                    p.setTypeName(PropertyDataTypeEnum.ofTypeDefualt(p.getDataType()).getTypeName());
+                    p.setFieldType(PropertyDataTypeEnum.ofTypeDefualt(p.getDataType()).getFieldType());
+                    p.setFileTypeDesc(p.getTypeName());
+                    p.setTypeDisplayName(PropertyDataTypeEnum.ofTypeDefualt(p.getDataType()).getTypeDisplayName());
+                    p.setRefModelDesc(p.getTypeDisplayName() + " (" + p.getFieldType() + ')');
+                    p.setFieldName(p.getName());
 
-                if (ClassDTO.CLASSTYPE_ENUMERATE.equals(refc.getClassType())) {
-                    //枚举!
-                    List<EnumValueDTO> vs = agg.getClassId2EnumValuesMap().get(refc.getId());
-                    if (vs == null) {
-                        p.setRefModelDesc(String.format(
-                                "%s(%s %s) 这是枚举实体 但是找不到注册的值"
-                                , refc.getDisplayName()
-                                , refc.getName()
-                                , simpleClassName(refc.getFullClassName())
-                        ));
+                    if (idFields.contains(p.getName())) {
+                        p.setRefModelDesc("当前表主键:字符串 (String)");
+                        p.setIsKey(true);
+                        p.setRefModelName(null);
                         continue;
                     }
 
-                    String s = "";
-                    for (EnumValueDTO v : vs) {
-                        s += v.getValue() + "=" + v.getName() + ";<br/>";
+                    if (StrUtil.isBlank(p.getRefModelName())) {
+                        if (p.getAttrLength() != null && p.getAttrLength() != 0) {
+                            p.setFileTypeDesc(p.getTypeName() + " (" + p.getAttrLength() + ')');
+                        }
+                        p.setRefModelName(null);
+                        continue;
                     }
-                    p.setDescription(s);
+
+                    //引用的其他元数据！！！
+                    ClassDTO refc = agg.getClassMap().get(p.getDataType());
+                    if (refc == null) {
+                        String refccid = null;
+                        rs = st.executeQuery("select componentid  from md_class where id ='" + p.getDataType() + "'");
+                        if (rs.next()) {
+                            refccid = rs.getString(1);
+                        }
+                        IoUtil.close(rs);
+
+                        if (refccid != null) {
+                            SearchComponentVO refcc = new SearchComponentVO();
+                            refcc.setId(refccid);
+                            loadSearchComponentVO(agg, refcc, st);
+                        }
+                    }
+                    refc = agg.getClassMap().get(p.getDataType());
+
+                    if (refc == null) {
+                        p.setRefModelDesc(p.getRefModelDesc() + " (引用的其他实体 但是找不到此实体信息!) " + p.getRefModelName());
+                        p.setRefModelName(null);
+                        continue;
+                    }
+
+                    if (ClassDTO.CLASSTYPE_ENUMERATE.equals(refc.getClassType())) {
+                        //枚举!
+                        List<EnumValueDTO> vs = agg.getClassId2EnumValuesMap().get(refc.getId());
+                        if (vs == null) {
+                            p.setRefModelDesc(String.format(
+                                    "%s(%s %s) 这是枚举实体 但是找不到注册的值"
+                                    , refc.getDisplayName()
+                                    , refc.getName()
+                                    , simpleClassName(refc.getFullClassName())
+                            ));
+                            continue;
+                        }
+
+                        String s = "";
+                        for (EnumValueDTO v : vs) {
+                            s += v.getValue() + "=" + v.getName() + ";<br/>";
+                        }
+                        p.setDescription(s);
+                    }
+
+                    p.setRefModelDesc(String.format(
+                            "%s(%s %s)"
+                            , refc.getDisplayName()
+                            , refc.getName()
+                            , simpleClassName(refc.getFullClassName())
+                    ));
                 }
-
-                p.setRefModelDesc(String.format(
-                        "%s(%s %s)"
-                        , refc.getDisplayName()
-                        , refc.getName()
-                        , simpleClassName(refc.getFullClassName())
-                ));
             }
-        }
 
-        for (SearchComponentVO c : coms) {
-            if (c.getClassDTOS() != null) {
-                ArrayList<ClassDTO> ncas = new ArrayList<>();
-                for (ClassDTO ca : c.getClassDTOS()) {
-                    ClassDTO nca = new ClassDTO();
-                    nca.setId(ca.getId());
-                    nca.setName(ca.getName());
-                    nca.setDisplayName(ca.getDisplayName());
-                    nca.setFullClassName(ca.getFullClassName());
-                    nca.setAggFullClassName(ca.getAggFullClassName());
-                    nca.setClassType(ca.getClassType());
-                    nca.setParentClassID(ca.getParentClassID());
-                    nca.setComponentID(ca.getComponentID());
-                    nca.setRefModelName(ca.getRefModelName());
-                    nca.setDefaultTableName(ca.getDefaultTableName());
-                    ncas.add(nca);
-                }
-                c.setClassDTOS(ncas);
-            }
-            agg.getCompomentIdMap().put(c.getId(), c);
+            com.setClassDTOS(cs);
+        } finally {
         }
-
-        return agg;
     }
 
     public String simpleClassName(String c) {
