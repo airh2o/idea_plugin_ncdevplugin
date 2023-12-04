@@ -82,7 +82,6 @@ public class LoadDataDictionaryAggVOUtil {
                 sql += " " + s;
             }
 
-
             sql = "select id, name ,displayname, parentmoduleid from md_module where id in(select ownmodule "
                     + sql.substring(
                     sql.indexOf(" from ")
@@ -201,7 +200,7 @@ public class LoadDataDictionaryAggVOUtil {
             }
             LinkedList<ClassDTO> allClasss = new LinkedList<>();
             sql = "select id,name,displayname,fullclassname,componentid,classtype,parentclassid,defaulttablename from md_class where componentid='"
-                    + com.getId() + "' ";
+                    + com.getId() + "' and classtype=201 ";
             rs = st.executeQuery(sql);
             ArrayList<ClassDTO2> cs = new VOArrayListResultSetExtractor<ClassDTO2>(ClassDTO2.class).extractData(rs);
             IoUtil.close(rs);
@@ -252,25 +251,26 @@ public class LoadDataDictionaryAggVOUtil {
                         cla.setAggFullClassName(rs.getString(1));
                     }
                     IoUtil.close(rs);
+
+                    if (m.getChilds() == null) {
+                        m.setChilds(new ArrayList<>());
+                    }
+                    m.getChilds().add(DataDictionaryAggVO.Module.builder()
+                            .id(cla.getId())
+                            .type(V.get(cla.getClassType(), ClassDTO.CLASSTYPE_ENTITY))
+                            .name(cla.getName())
+                            .defaultTableName(cla.getDefaultTableName())
+                            .displayname(cla.getDisplayName())
+                            .fullClassName(cla.getFullClassName())
+                            .aggFullClassName(cla.getAggFullClassName())
+                            .build());
                 } else if (ClassDTO.CLASSTYPE_ENUMERATE.equals(cla.getClassType())) {
-                    rs = st.executeQuery("select * from md_enumvalue where id='" + cla.getId() + "' ");
+                    rs = st.executeQuery("select  value,name  from md_enumvalue where id='" + cla.getId() + "' ");
                     ArrayList<EnumValueDTO> ps = new VOArrayListResultSetExtractor<EnumValueDTO>(EnumValueDTO.class).extractData(rs);
                     IoUtil.close(rs);
 
                     agg.getClassId2EnumValuesMap().put(cla.getId(), ps);
                 }
-
-                if (m.getChilds() == null) {
-                    m.setChilds(new ArrayList<>());
-                }
-                m.getChilds().add(DataDictionaryAggVO.Module.builder()
-                        .id(cla.getId())
-                        .type(V.get(cla.getClassType(), ClassDTO.CLASSTYPE_ENTITY))
-                        .name(cla.getName() + " " + simpleClassName(cla.getFullClassName()))
-                        .displayname(cla.getDisplayName())
-                        .fullClassName(cla.getFullClassName())
-                        .aggFullClassName(cla.getAggFullClassName())
-                        .build());
 
                 if (CollUtil.isEmpty(cla.getPerperties())) {
                     continue;
@@ -301,7 +301,8 @@ public class LoadDataDictionaryAggVOUtil {
                         continue;
                     }
 
-                    if (StrUtil.isBlank(p.getRefModelName())) {
+                    if (StrUtil.isBlank(p.getDataType()) || PropertyDataTypeEnum.ofType(p.getDataType()) != null) {
+                        //基本类型！
                         if (p.getAttrLength() != null && p.getAttrLength() != 0) {
                             p.setFileTypeDesc(p.getTypeName() + " (" + p.getAttrLength() + ')');
                         }
@@ -311,6 +312,29 @@ public class LoadDataDictionaryAggVOUtil {
 
                     //引用的其他元数据！！！
                     ClassDTO refc = agg.getClassMap().get(p.getDataType());
+
+                    if (refc == null) {//也许是枚举！
+                        //枚举!
+                        List<EnumValueDTO> vs = agg.getClassId2EnumValuesMap().get(p.getDataType());
+                        if (vs == null) {
+                            rs = st.executeQuery("select value,name from md_enumvalue where id='" + p.getDataType() + "' ");
+                            vs = new VOArrayListResultSetExtractor<EnumValueDTO>(EnumValueDTO.class).extractData(rs);
+                            IoUtil.close(rs);
+
+                            agg.getClassId2EnumValuesMap().put(p.getDataType(), vs);
+                        }
+
+                        if (CollUtil.isNotEmpty(vs)) {
+                            for (EnumValueDTO v : vs) {
+                                v.setIndustry(null);
+                            }
+
+                            p.setDescription(JSON.toJSONString(vs));
+                            p.setRefModelDesc("枚举");
+                            continue;
+                        }
+                    }
+
                     if (refc == null) {
                         String refccid = null;
                         rs = st.executeQuery("select componentid  from md_class where id ='" + p.getDataType() + "'");
@@ -328,29 +352,9 @@ public class LoadDataDictionaryAggVOUtil {
                     refc = agg.getClassMap().get(p.getDataType());
 
                     if (refc == null) {
-                        p.setRefModelDesc(p.getRefModelDesc() + " (引用的其他实体 但是找不到此实体信息!) " + p.getRefModelName());
+                        p.setRefModelDesc(p.getRefModelDesc() + " (引用的其他实体 但是找不到此实体信息!) " + p.getDataType());
                         p.setRefModelName(null);
                         continue;
-                    }
-
-                    if (ClassDTO.CLASSTYPE_ENUMERATE.equals(refc.getClassType())) {
-                        //枚举!
-                        List<EnumValueDTO> vs = agg.getClassId2EnumValuesMap().get(refc.getId());
-                        if (vs == null) {
-                            p.setRefModelDesc(String.format(
-                                    "%s(%s %s) 这是枚举实体 但是找不到注册的值"
-                                    , refc.getDisplayName()
-                                    , refc.getName()
-                                    , simpleClassName(refc.getFullClassName())
-                            ));
-                            continue;
-                        }
-
-                        String s = "";
-                        for (EnumValueDTO v : vs) {
-                            s += v.getValue() + "=" + v.getName() + ";<br/>";
-                        }
-                        p.setDescription(s);
                     }
 
                     p.setRefModelDesc(String.format(

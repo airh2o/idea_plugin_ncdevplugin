@@ -57,6 +57,7 @@ public class DataDictionaryAggVO implements Serializable, Cloneable {
         String fullClassName;
         String aggFullClassName;
         String parentmoduleid;
+        String defaultTableName;
         @Builder.Default
         int type = 0;
         /**

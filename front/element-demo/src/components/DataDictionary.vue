@@ -70,9 +70,10 @@
 
             <div class="props-table-div">
               <el-table class="props-table" border stripe
-                        ref="filterTable"
-                        :data="tableData"
-                        style="width: 100%">
+                        ref="filterTable"  :highlight-current-row="true"
+                        :data="tableData" :row-class-name="tableRowClassName"
+                        style="width: 100%"
+              >
                 <el-table-column type="index"/>
                 <el-table-column
                     prop="name"
@@ -116,7 +117,9 @@
                   <template slot-scope="scope">
                     <el-link link :type="scope.row.refModelName ? 'primary' : 'info'"
                              :disabled="!scope.row.refModelName" v-on:click="gotoClass(scope.row, 1)">
-                      {{ scope.row.refModelDesc }}
+                      {{
+                        scope.row.refModelDesc == '枚举' ? scope.row.refModelDesc + '-' + scope.row.dataType : scope.row.refModelDesc
+                      }}
                       <el-icon class="el-icon--right">
                         <icon-view/>
                       </el-icon>
@@ -134,7 +137,25 @@
                     label="取值范围/枚举" sortable
                     :filters="descriptionFilters"
                     :filter-method="descriptionFilterMethod"
-                    width="180"/>
+                    width="180">
+                  <template slot-scope="scope">
+                    {{ buildTableDescriptionColumnValue(scope.row) }}
+                    <div v-if="scope.row.refModelDesc != '枚举'">{{scope.row.description || ''}}</div>
+
+                    <div v-if="scope.row.refModelDesc == '枚举'"
+                         v-for="cc in scope.row.description2"
+                         :key="cc.value" >
+                      <el-link
+                               class="link-enum-item"
+                               size="mini"
+                               type="success"
+                      >
+                        {{ cc.value + '=' + cc.name }}
+                      </el-link>
+                    </div>
+
+                  </template>
+                </el-table-column>
               </el-table>
             </div>
           </el-main>
@@ -170,9 +191,10 @@ export default {
     filterNode(value, data) {
       if (!value) return true;
 
-      let v = data.name + data.displayname + data.displayname + data.fullClassName + data.aggFullClassName;
+      let ps = this.agg.classMap[data.id] && this.agg.classMap[data.id].perperties
+      let v = JSON.stringify(data) + (ps ? JSON.stringify(ps) : '');
 
-      return v.indexOf(value) != -1;
+      return v.toLowerCase().indexOf(value.toLowerCase()) != -1;
     },
     /**
      * 属性表格 点击了 跳转某个 关联class
@@ -372,6 +394,20 @@ export default {
     descriptionFilterMethod(value, row) {
       return this.tableColumnFilter('description', value, row);
     },
+    tableRowClassName({row, rowIndex}) {
+      if (row.isKey == true) {
+        return 'table-row-pk';
+      }
+      return '';
+    },
+    buildTableDescriptionColumnValue(row) {
+      if (!row.description || row.refModelDesc != '枚举' || row.description2) {
+        return '';
+      }
+      row.description2 = row.description && JSON.parse(row.description);
+      row.description2 = row.description2 || []
+      return '';
+    },
   },
   created() {
   },
@@ -388,7 +424,7 @@ export default {
       defaultProps: {
         children: 'childs',
         label: (row, node) => {
-          return (this.treeTypeName[row.type] || '') + row.displayname + ' ' + row.name;
+          return (this.treeTypeName[row.type] || '') + row.displayname + ' ' + row.name + ' ' + (row.defaultTableName || '');
         }
       },
       nowClass: null,
@@ -420,7 +456,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .main-div {
   max-height: calc(100vh - 20px);
 }
@@ -459,6 +495,10 @@ body {
 
 .props-table-div {
   margin-top: 5px;
+}
+
+.el-table .table-row-pk {
+  color: red;
 }
 
 </style>

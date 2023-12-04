@@ -245,6 +245,9 @@ public class NCDataDictionaryDialog extends DialogWrapper {
             }
 
             String str = JSON.toJSONString(agg, SerializerFeature.DisableCircularReferenceDetect);
+
+            FileUtil.writeUtf8String(str, new File("e:/temp/nc_data_dictionary.json"));// TODO FIXME 测试用，正式注释这行
+
             String html = ProjectUtil.getResourceTemplatesUtf8Txt("nc_data_dictionary/index.html");
             html = html.replace("{{DataDictionaryAggVOJsonString}}", str);
 
@@ -254,6 +257,7 @@ public class NCDataDictionaryDialog extends DialogWrapper {
             HashSet<String> fs = CollUtil.newHashSet("index.js"
                     , "manifest.js"
                     , "vendor.js"
+
                     , "674f50d287a8c48dc19ba404d20fe713.png"
                     , "912ec66d7572ff821749319396470bde.png"
                     , "535877f50039c0cb49a6196a5b7517cd.png"
