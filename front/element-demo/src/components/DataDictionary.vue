@@ -12,7 +12,7 @@
               title="易用性设置"
               :visible.sync="showSettingPanel"
               :direction="'ltr'"
-            >
+          >
             <el-tag>树显示字段:</el-tag>
             <el-select class="left-treeShowNames" v-model="treeShowNames"
                        clearable filterable multiple placeholder="树显示字段">
@@ -41,6 +41,24 @@
                        active-text="不敏感" inactive-text="敏感"
             >
             </el-switch>
+
+            <div>
+              <el-tag>类名是否显示全名称:</el-tag>
+              <el-switch class="left-showSimpleClassName"
+                         v-model="showSimpleClassName"
+                         active-text="简单名称" inactive-text="包+类名"
+              >
+              </el-switch>
+            </div>
+
+            <div>
+              <el-tag>Tab标签只显示名称:</el-tag>
+              <el-switch class="left-showSimpleClassName"
+                         v-model="tabTitleJustShowDisplayname"
+                         active-text="名称" inactive-text="名称+编码+表名称"
+              >
+              </el-switch>
+            </div>
           </el-drawer>
 
           <el-input class="left-filterText" clearable resize="both"
@@ -62,8 +80,8 @@
         </el-aside>
 
         <el-container class="main-div">
-          <el-main>
-            <div class="main-title-div">
+          <el-main class="main-button-backs-div">
+            <div>
               <el-button link size="mini"
                          type="info"
                          v-on:click="gotoBack"
@@ -74,129 +92,146 @@
                          v-on:click="gotoForward"
               >前进
               </el-button>
-
-              <el-link v-if="nowClass && nowClass.displayName" link type="primary">
-                {{ `${nowClass.displayName || '未知'} (${this.classTypeName[nowClass.classType] || '未知类型'})` }}
-              </el-link>
-              <el-link v-if="nowClass && nowClass.displayName" type="success">{{
-                  `| 表: ${nowClass.defaultTableName || '未知'}`
-                }}
-              </el-link>
-              <el-link v-if="nowClass && nowClass.displayName" link type="info">{{
-                  `| VO类: ${nowClass.fullClassName || '未知'}`
-                }}
-              </el-link>
-              <el-link v-if="nowClass && nowClass.aggFullClassName" link type="info">{{
-                  `| Agg类: ${nowClass.aggFullClassName || '未知'}`
-                }}
-              </el-link>
-
-              <br/>
-
-              <div v-if="nowCompoment && nowCompoment.classDTOS" class="goto-button-div">
-                <el-button class="goto-button" link size="mini"
-                           type="danger"
-                           v-for="cc in nowCompoment.classDTOS"
-                           :key="cc.id"
-                           v-on:click="gotoClass(cc, 2)"
-                >
-                  {{
-                    cc.name + ' ' + cc.displayName + ' ' + cc.fullClassName.substr(cc.fullClassName.lastIndexOf('.') + 1)
-                  }}
-                </el-button>
-              </div>
             </div>
 
-            <div class="props-table-div">
-              <el-table class="props-table" border stripe
-                        ref="filterTable" :highlight-current-row="true"
-                        :data="tableData" :row-class-name="tableRowClassName"
-                        style="width: 100%"
+            <el-tabs class="main-tabs" v-model="showTabsValue" type="card" closable @edit="handleTabsEdit">
+              <el-tab-pane
+                  :key="item.name"
+                  v-for="(item, index) in tabsList"
+                  :label="item.title"
+                  :name="item.name"
               >
-                <el-table-column type="index"/>
-                <el-table-column
-                    prop="name"
-                    label="属性编码"
-                    sortable
-                    width="180"
-                    column-key="name"
-                    :filters="nameFilters"
-                    :filter-method="nameFilterMethod"
-                />
-                <el-table-column
-                    prop="displayName"
-                    label="属性名称" sortable
-                    :filters="displayNameFilters"
-                    :filter-method="displayNameFilterMethod"
-                    width="180"/>
-                <el-table-column
-                    prop="fieldName"
-                    label="字段编码" sortable
-                    :filters="fieldNameFilters"
-                    :filter-method="fieldNameFilterMethod"
-                    width="180"/>
-                <el-table-column
-                    prop="fileTypeDesc"
-                    label="字段类型" sortable
-                    :filters="fileTypeDescFilters"
-                    :filter-method="fileTypeDescFilterMethod"
-                    width="180"/>
-                <el-table-column
-                    prop="nullable"
-                    label="可空" sortable
-                    :filters="nullableFilters"
-                    :filter-method="nullableFilterMethod"
-                    width="90"/>
-                <el-table-column
-                    prop="refModelDesc"
-                    label="引用模型" sortable
-                    :filters="refModelDescFilters"
-                    :filter-method="refModelDescFilterMethod"
-                    width="280">
-                  <template slot-scope="scope">
-                    <el-link link :type="scope.row.refModelName ? 'primary' : 'info'"
-                             :disabled="!scope.row.refModelName" v-on:click="gotoClass(scope.row, 1)">
+
+                <div class="main-title-div">
+                  <el-link v-if="item.nowClass && item.nowClass.displayName" link type="primary">
+                    {{
+                      buildTableClassTypeName(item)
+                    }}
+                  </el-link>
+                  <el-link v-if="item.nowClass && item.nowClass.displayName" type="success">{{
+                      `| 表: ${item.nowClass.defaultTableName || '未知'}`
+                    }}
+                  </el-link>
+                  <el-link v-if="item.nowClass && item.nowClass.displayName" link type="info">{{
+                      `| VO类: ${item.nowClass.fullClassName || '未知'}`
+                    }}
+                  </el-link>
+                  <el-link v-if="item.nowClass && item.nowClass.aggFullClassName" link type="info">{{
+                      `| Agg类: ${item.nowClass.aggFullClassName || '未知'}`
+                    }}
+                  </el-link>
+
+                  <br/>
+
+                  <div v-if="item.nowCompoment && item.nowCompoment.classDTOS" class="goto-button-div">
+                    <el-button class="goto-button" link size="mini"
+                               type="danger"
+                               v-for="cc in item.nowCompoment.classDTOS"
+                               :key="cc.id"
+                               v-on:click="gotoClass(cc, 2)"
+                    >
                       {{
-                        scope.row.refModelDesc == '枚举' ? scope.row.refModelDesc + '-' + scope.row.dataType : scope.row.refModelDesc
+                        cc.name + ' ' + cc.displayName + ' '
+                        + (showSimpleClassName ? cc.fullClassName.substr(cc.fullClassName.lastIndexOf('.') + 1) : cc.fullClassName)
                       }}
-                      <el-icon class="el-icon--right">
-                        <icon-view/>
-                      </el-icon>
-                    </el-link>
-                  </template>
-                </el-table-column>
-                <el-table-column
-                    prop="defaultValue"
-                    label="默认值" sortable
-                    :filters="defaultValueFilters"
-                    :filter-method="defaultValueFilterMethod"
-                    width="100"/>
-                <el-table-column
-                    prop="description"
-                    label="取值范围/枚举" sortable
-                    :filters="descriptionFilters"
-                    :filter-method="descriptionFilterMethod"
-                    width="180">
-                  <template slot-scope="scope">
-                    {{ buildTableDescriptionColumnValue(scope.row) }}
-                    <div v-if="scope.row.refModelDesc != '枚举'">{{ scope.row.description || '' }}</div>
+                    </el-button>
+                  </div>
+                </div>
 
-                    <div v-if="scope.row.refModelDesc == '枚举'"
-                         v-for="cc in scope.row.description2"
-                         :key="cc.value">
-                      <el-link
-                          class="link-enum-item"
-                          size="mini"
-                          type="success"
-                      >
-                        {{ cc.value + '=' + cc.name }}
-                      </el-link>
-                    </div>
+                <div class="props-table-div">
+                  <el-table class="props-table" border stripe
+                            ref="filterTable" :highlight-current-row="true"
+                            :data="item.tableData" :row-class-name="tableRowClassName"
+                            style="width: 100%"
+                  >
+                    <el-table-column type="index"/>
+                    <el-table-column
+                        prop="name"
+                        label="属性编码"
+                        sortable
+                        width="180"
+                        column-key="name"
+                        :filters="nameFilters"
+                        :filter-method="nameFilterMethod"
+                    />
+                    <el-table-column
+                        prop="displayName"
+                        label="属性名称" sortable
+                        :filters="displayNameFilters"
+                        :filter-method="displayNameFilterMethod"
+                        width="180"/>
+                    <el-table-column
+                        prop="fieldName"
+                        label="字段编码" sortable
+                        :filters="fieldNameFilters"
+                        :filter-method="fieldNameFilterMethod"
+                        width="180"/>
+                    <el-table-column
+                        prop="fileTypeDesc"
+                        label="字段类型" sortable
+                        :filters="fileTypeDescFilters"
+                        :filter-method="fileTypeDescFilterMethod"
+                        width="180"/>
+                    <el-table-column
+                        prop="nullable"
+                        label="可空" sortable
+                        :filters="nullableFilters"
+                        :filter-method="nullableFilterMethod"
+                        width="90"/>
+                    <el-table-column
+                        prop="refModelDesc"
+                        label="引用模型" sortable
+                        :filters="refModelDescFilters"
+                        :filter-method="refModelDescFilterMethod"
+                        width="280">
+                      <template slot-scope="scope">
+                        <el-link link :type="scope.row.refModelName ? 'primary' : 'info'"
+                                 :disabled="!scope.row.refModelName" v-on:click="gotoClass(scope.row, 1)">
+                          {{
+                            scope.row.refModelDesc == '枚举' ? scope.row.refModelDesc + '-' + scope.row.dataType : scope.row.refModelDesc
+                          }}
+                          <el-icon class="el-icon--right">
+                            <icon-view/>
+                          </el-icon>
+                        </el-link>
+                      </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="defaultValue"
+                        label="默认值" sortable
+                        :filters="defaultValueFilters"
+                        :filter-method="defaultValueFilterMethod"
+                        width="100"/>
+                    <el-table-column
+                        prop="description"
+                        label="取值范围/枚举" sortable
+                        :filters="descriptionFilters"
+                        :filter-method="descriptionFilterMethod"
+                        width="180">
+                      <template slot-scope="scope">
+                        {{ buildTableDescriptionColumnValue(scope.row) }}
+                        <div v-if="scope.row.refModelDesc != '枚举'">{{ scope.row.description || '' }}</div>
 
-                  </template>
-                </el-table-column>
-              </el-table>
-            </div>
+                        <div v-if="scope.row.refModelDesc == '枚举'"
+                             v-for="cc in scope.row.description2"
+                             :key="cc.value">
+                          <el-link
+                              class="link-enum-item"
+                              size="mini"
+                              type="success"
+                          >
+                            {{ cc.value + '=' + cc.name }}
+                          </el-link>
+                        </div>
+
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </div>
+
+
+              </el-tab-pane>
+            </el-tabs>
           </el-main>
 
           <el-footer class="footer-info">
@@ -264,6 +299,11 @@ export default {
         id = row.dataType;
       }
 
+      if (this.tabsList.map(m => m.name).indexOf(id) > -1) {
+        this.showTabsValue = id;
+        return;
+      }
+
       if (type != 4 && type != 5) {
         this.historyClassIds.push(id)
         this.historyClassIdsIndex = this.historyClassIds.length - 1
@@ -276,9 +316,9 @@ export default {
 
       let c = this.agg.classMap[id];
 
-      this.nowClass = c;
-      this.nowCompoment = this.agg.compomentIdMap[c.componentID];
-      this.tableData = [];
+      let nowClass = c;
+      let nowCompoment = this.agg.compomentIdMap[c.componentID];
+      let tableData = [];
 
       console.log('要显示实体啦: ', c, this.nowCompoment);
 
@@ -297,7 +337,7 @@ export default {
 
       for (let i = 0; i < c.perperties.length; i++) {
         let r = c.perperties[i];
-        this.tableData.push({
+        tableData.push({
           ...r
         });
 
@@ -375,6 +415,15 @@ export default {
         }
 
       }
+
+      this.tabsList.push({
+        title: this.tabTitleJustShowDisplayname ? c.displayName : `${c.displayName} ${c.name} ${c.defaultTableName}`,
+        name: id,
+        nowClass,
+        nowCompoment,
+        tableData,// 实体属性表格数据
+      })
+      this.showTabsValue = id;
     },
     handleTreeNodeClick(data, node, treeNode, e) {
       console.log('handleTreeNodeClick...', this.agg, data, node, treeNode, e);
@@ -464,6 +513,40 @@ export default {
       row.description2 = row.description2 || []
       return '';
     },
+    handleTabsEdit(targetName, action) {
+      console.log('handleTabsEdit...', targetName, action)
+
+      if (action === 'add') {
+        let newTabName = ++this.tabIndex + '';
+        this.editableTabs.push({
+          title: 'New Tab',
+          name: newTabName,
+          content: 'New Tab content'
+        });
+        this.editableTabsValue = newTabName;
+      }
+      if (action === 'remove') {
+        let tabs = this.editableTabs;
+        let activeName = this.editableTabsValue;
+        if (activeName === targetName) {
+          tabs.forEach((tab, index) => {
+            if (tab.name === targetName) {
+              let nextTab = tabs[index + 1] || tabs[index - 1];
+              if (nextTab) {
+                activeName = nextTab.name;
+              }
+            }
+          });
+        }
+
+        this.editableTabsValue = activeName;
+        this.editableTabs = tabs.filter(tab => tab.name !== targetName);
+      }
+    },
+    buildTableClassTypeName(item) {
+      console.log('buildTableClassTypeName...', item)
+      return `${item.nowClass.displayName || '未知'} (${this.classTypeName[item.nowClass.classType] || '未知类型'})`;
+    },
   },
   created() {
   },
@@ -483,9 +566,10 @@ export default {
           return this.treeShowNames.map(k => k == 'type' ? this.treeTypeName[row.type] || '' : row[k]).join(' ')
         }
       },
-      nowClass: null,
-      nowCompoment: null,
-      tableData: [],// 实体属性表格数据
+
+      showTabsValue: '',
+      tabsList: [],
+
       classTypeName: {
         201: "实体*",
         203: "枚举@",
@@ -507,6 +591,7 @@ export default {
       defaultValueFilters: [],
       descriptionFilters: [],
       fileTypeDescFilters: [],
+
       searchIncloudProperts: true,
       treeShowNames: ['displayname', 'name'],
       treeShowNamesOptions: [
@@ -552,6 +637,8 @@ export default {
       ],
       searchAutoLower: true,
       showSettingPanel: false,
+      showSimpleClassName: true,
+      tabTitleJustShowDisplayname: true,
     };
   }
 }
@@ -619,4 +706,7 @@ body {
   margin-top: 5px;
 }
 
+.main-tabs {
+  margin-top: 5px;
+}
 </style>
