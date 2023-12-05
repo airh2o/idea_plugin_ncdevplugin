@@ -171,10 +171,6 @@ public class NCDataDictionaryDialog extends DialogWrapper {
     public void export2Files() {
         //选择保存位置
         File outDir = new File(getProject().getBasePath(), "nc_data_dictionary_" + System.currentTimeMillis());
-        if (!outDir.exists()) {
-            outDir.mkdirs();
-        }
-
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         fileChooser.setCurrentDirectory(outDir);
@@ -191,6 +187,10 @@ public class NCDataDictionaryDialog extends DialogWrapper {
         if (outDir == null) {
             this.close(1);
             return;
+        }
+
+        if (!outDir.exists()) {
+            outDir.mkdirs();
         }
 
         try {
