@@ -17,4 +17,19 @@ import java.util.List;
 @Data
 public class ClassDTO2 extends ClassDTO {
     List<PropertyDTO> perperties;
+
+    public ClassDTO2() {
+        super();
+
+        setVersionType(null);
+        setIsAuthen(null);
+        setIsCreateSQL(null);
+        setIndustry(null);
+        setIndustryChanged(null);
+        setCreateIndustry(null);
+        setModifyIndustry(null);
+        setHeight(null);
+        setWidth(null);
+        setVisibility(null);
+    }
 }

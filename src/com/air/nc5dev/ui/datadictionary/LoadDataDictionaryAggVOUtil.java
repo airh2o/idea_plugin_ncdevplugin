@@ -1,6 +1,7 @@
 package com.air.nc5dev.ui.datadictionary;
 
 import cn.hutool.core.util.StrUtil;
+import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.*;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.util.jdbc.resulthandel.VOArrayListResultSetExtractor;
@@ -38,6 +39,7 @@ public class LoadDataDictionaryAggVOUtil {
     DataDictionaryAggVO agg;
     String compomentSql = "select * from md_component";
     ProgressIndicator indicator;
+    NcVersionEnum ncVersion;
 
     public LoadDataDictionaryAggVOUtil(Project project, NCDataSourceVO ncDataSourceVO) {
         this.project = project;
@@ -53,19 +55,48 @@ public class LoadDataDictionaryAggVOUtil {
         Connection conn = null;
         Statement st = null;
         try {
+            ncVersion = ProjectNCConfigUtil.getNCVersion(getProject());
             conn = ConnectionUtil.getConn(ncDataSourceVO);
             st = conn.createStatement();
-            ResultSet rs = st.executeQuery("select version from sm_product_version where version is not null");
-            if (rs.next()) {
-                agg.setNcVersion(rs.getString(1));
+            ResultSet rs = null;
+            try {
+                rs = st.executeQuery("select version from sm_product_version where version is not null");
+                if (rs.next()) {
+                    agg.setNcVersion(rs.getString(1));
+                }
+                IoUtil.close(rs);
+            } catch (SQLException e) {
+                //????
             }
-            IoUtil.close(rs);
 
-            rs = st.executeQuery("select name from org_group");
-            if (rs.next()) {
-                agg.setGroupName(rs.getString(1));
+            try {
+                rs = st.executeQuery("select name from org_group");
+                if (rs.next()) {
+                    agg.setGroupName(rs.getString(1));
+                }
+                IoUtil.close(rs);
+                if (NcVersionEnum.U8Cloud.equals(ncVersion)
+                        || NcVersionEnum.NC5.equals(ncVersion)) {
+                    ncVersion = NcVersionEnum.NCC;
+                }
+            } catch (Throwable e) {
+                //U8C or NC5x
+                try {
+                    agg.setNcVersion(ProjectNCConfigUtil.getNCVersion(getProject()).name() + " " + StringUtil.get(agg.getNcVersion()));
+                    rs = st.executeQuery("select unitname from bd_corp order by ts");
+                    if (rs.next()) {
+                        agg.setGroupName(rs.getString(1));
+                    }
+                    IoUtil.close(rs);
+                    if (NcVersionEnum.NC6.equals(ncVersion)
+                            || NcVersionEnum.NCC.equals(ncVersion)
+                            || NcVersionEnum.BIP.equals(ncVersion)) {
+                        ncVersion = NcVersionEnum.NC5;
+                    }
+                } catch (Throwable ex) {
+                    //??????
+                }
             }
-            IoUtil.close(rs);
 
             String sql = compomentSql
                     .toLowerCase()
@@ -192,6 +223,16 @@ public class LoadDataDictionaryAggVOUtil {
                 return;
             }
 
+            String defaulttablename = "defaulttablename";
+            String attrlength = "attrlength";
+            String classOrderBy = " order by attrsequence ";
+            if (NcVersionEnum.U8Cloud.equals(ncVersion)
+                    || NcVersionEnum.NC5.equals(ncVersion)) {
+                defaulttablename = "(select name from md_table where id=md_class.id)";
+                attrlength = "length";
+                classOrderBy = " order by sequence ";
+            }
+
             agg.getCompomentIdMap().put(com.getId(), com);
 
             //读取他们的实体列表和字段列表
@@ -199,8 +240,11 @@ public class LoadDataDictionaryAggVOUtil {
                 indicator.setText2(String.format("正在查询元数据组件实体列表...%s - %s", com.getName(), com.getDisplayName()));
             }
             LinkedList<ClassDTO> allClasss = new LinkedList<>();
-            sql = "select id,name,displayname,fullclassname,componentid,classtype,parentclassid,defaulttablename from md_class where componentid='"
-                    + com.getId() + "' and classtype=201 ";
+            sql = String.format(
+                    "select id,name,displayname,fullclassname,componentid,classtype,parentclassid,%s defaulttablename from md_class where componentid='%s' and classtype=201"
+                    , defaulttablename
+                    , com.getId()
+            );
             rs = st.executeQuery(sql);
             ArrayList<ClassDTO2> cs = new VOArrayListResultSetExtractor<ClassDTO2>(ClassDTO2.class).extractData(rs);
             IoUtil.close(rs);
@@ -239,8 +283,14 @@ public class LoadDataDictionaryAggVOUtil {
                 }
 
                 if (ClassDTO.CLASSTYPE_ENTITY.equals(cla.getClassType())) {
-                    rs = st.executeQuery("select name,displayname,nullable,refmodelname,defaultvalue,description ,attrlength,datatype" +
-                            " from md_property where classid='" + cla.getId() + "' ");
+                    rs = st.executeQuery(
+                            String.format(
+                                    "select name,displayname,nullable,refmodelname,defaultvalue,description ,%s attrlength,datatype from md_property where classid='%s' %s  "
+                                    , attrlength
+                                    , cla.getId()
+                                    , classOrderBy
+                            )
+                    );
                     ArrayList<PropertyDTO> ps = new VOArrayListResultSetExtractor<PropertyDTO>(PropertyDTO.class).extractData(rs);
                     IoUtil.close(rs);
 
@@ -277,7 +327,13 @@ public class LoadDataDictionaryAggVOUtil {
                 }
 
                 HashSet<String> idFields = new HashSet<>();
-                rs = st.executeQuery(String.format("select name from md_column where tableid='%s' and pkey='Y'", cla.getDefaultTableName()));
+                if (NcVersionEnum.U8Cloud.equals(ncVersion)
+                        || NcVersionEnum.NC5.equals(ncVersion)) {
+                    sql = String.format("select name from md_column where tableid='%s' and pkey='Y'", cla.getId());
+                } else {
+                    sql = String.format("select name from md_column where tableid='%s' and pkey='Y'", cla.getDefaultTableName());
+                }
+                rs = st.executeQuery(sql);
                 while (rs.next()) {
                     idFields.add(rs.getString(1));
                 }

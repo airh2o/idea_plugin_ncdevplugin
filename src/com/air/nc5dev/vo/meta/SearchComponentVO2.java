@@ -17,4 +17,10 @@ import java.util.List;
 @Data
 public class SearchComponentVO2 extends SearchComponentVO {
     List<? extends ClassDTO> classDTOS;
+
+    public SearchComponentVO2() {
+        super();
+
+        setIndustry(null);
+    }
 }

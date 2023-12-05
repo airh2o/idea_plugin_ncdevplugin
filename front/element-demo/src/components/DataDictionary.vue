@@ -3,10 +3,49 @@
     <el-container>
       <el-container>
         <el-aside class="left-div-aside" v-drag>
-          <el-input clearable resize="both"
+
+          <el-button @click="showSettingPanel = true" type="primary" style="margin-top: 5px; height: 35px">
+            易用性设置
+          </el-button>
+
+          <el-drawer
+              title="易用性设置"
+              :visible.sync="showSettingPanel"
+              :direction="'ltr'"
+            >
+            <el-tag>树显示字段:</el-tag>
+            <el-select class="left-treeShowNames" v-model="treeShowNames"
+                       clearable filterable multiple placeholder="树显示字段">
+              <el-option
+                  v-for="item in treeShowNamesOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+              </el-option>
+            </el-select>
+
+            <el-tag>搜索哪些地方:</el-tag>
+            <el-select class="left-searchPlaces" v-model="treeSearchPlaces"
+                       clearable filterable multiple placeholder="搜索哪些地方">
+              <el-option
+                  v-for="item in treeSearchPlacesOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+              </el-option>
+            </el-select>
+
+            <el-tag>搜索大小写是否敏感:</el-tag>
+            <el-switch class="left-searchIncloudProperts"
+                       v-model="searchAutoLower"
+                       active-text="不敏感" inactive-text="敏感"
+            >
+            </el-switch>
+          </el-drawer>
+
+          <el-input class="left-filterText" clearable resize="both"
                     v-model="filterText"
                     placeholder="搜索"
-                    class="w-50 m-2"
                     size="small"
                     :suffix-icon="Search"/>
           <el-tree v-drag
@@ -70,7 +109,7 @@
 
             <div class="props-table-div">
               <el-table class="props-table" border stripe
-                        ref="filterTable"  :highlight-current-row="true"
+                        ref="filterTable" :highlight-current-row="true"
                         :data="tableData" :row-class-name="tableRowClassName"
                         style="width: 100%"
               >
@@ -140,15 +179,15 @@
                     width="180">
                   <template slot-scope="scope">
                     {{ buildTableDescriptionColumnValue(scope.row) }}
-                    <div v-if="scope.row.refModelDesc != '枚举'">{{scope.row.description || ''}}</div>
+                    <div v-if="scope.row.refModelDesc != '枚举'">{{ scope.row.description || '' }}</div>
 
                     <div v-if="scope.row.refModelDesc == '枚举'"
                          v-for="cc in scope.row.description2"
-                         :key="cc.value" >
+                         :key="cc.value">
                       <el-link
-                               class="link-enum-item"
-                               size="mini"
-                               type="success"
+                          class="link-enum-item"
+                          size="mini"
+                          type="success"
                       >
                         {{ cc.value + '=' + cc.name }}
                       </el-link>
@@ -192,9 +231,26 @@ export default {
       if (!value) return true;
 
       let ps = this.agg.classMap[data.id] && this.agg.classMap[data.id].perperties
-      let v = JSON.stringify(data) + (ps ? JSON.stringify(ps) : '');
+      let v = '';
 
-      return v.toLowerCase().indexOf(value.toLowerCase()) != -1;
+      for (let i = 0; i < this.treeSearchPlaces.length; i++) {
+        if (this.treeSearchPlaces[i] == 1) {
+          v += data.displayname;
+        } else if (this.treeSearchPlaces[i] == 2) {
+          v += data.name;
+        } else if (this.treeSearchPlaces[i] == 3) {
+          v += data.defaultTableName;
+        } else if (this.treeSearchPlaces[i] == 4) {
+          v += (ps ? JSON.stringify(ps) : '');
+        }
+      }
+
+      if (this.searchAutoLower) {
+        v = v.toLowerCase();
+        value = value.toLowerCase();
+      }
+
+      return v.indexOf(value) != -1;
     },
     /**
      * 属性表格 点击了 跳转某个 关联class
@@ -424,7 +480,7 @@ export default {
       defaultProps: {
         children: 'childs',
         label: (row, node) => {
-          return (this.treeTypeName[row.type] || '') + row.displayname + ' ' + row.name + ' ' + (row.defaultTableName || '');
+          return this.treeShowNames.map(k => k == 'type' ? this.treeTypeName[row.type] || '' : row[k]).join(' ')
         }
       },
       nowClass: null,
@@ -451,6 +507,51 @@ export default {
       defaultValueFilters: [],
       descriptionFilters: [],
       fileTypeDescFilters: [],
+      searchIncloudProperts: true,
+      treeShowNames: ['displayname', 'name'],
+      treeShowNamesOptions: [
+        {
+          value: 'type',
+          label: '类型'
+        },
+        {
+          value: 'name',
+          label: '编码'
+        },
+        {
+          value: 'displayname',
+          label: '名称'
+        },
+        {
+          value: 'defaultTableName',
+          label: '表名'
+        },
+        {
+          value: 'id',
+          label: 'ID'
+        }
+      ],
+      treeSearchPlaces: [1, 2, 3],
+      treeSearchPlacesOptions: [
+        {
+          value: 1,
+          label: '树-名称'
+        },
+        {
+          value: 2,
+          label: '树-编码'
+        },
+        {
+          value: 3,
+          label: '树-表名'
+        },
+        {
+          value: 4,
+          label: '属性列表'
+        }
+      ],
+      searchAutoLower: true,
+      showSettingPanel: false,
     };
   }
 }
@@ -499,6 +600,23 @@ body {
 
 .el-table .table-row-pk {
   color: red;
+}
+
+.left-treeShowNames {
+  width: calc(100vh * 0.345);
+}
+
+.left-searchPlaces {
+  margin-top: 5px;
+  width: calc(100vh * 0.345);
+}
+
+.left-searchIncloudProperts {
+  margin-top: 5px;
+}
+
+.left-filterText {
+  margin-top: 5px;
 }
 
 </style>

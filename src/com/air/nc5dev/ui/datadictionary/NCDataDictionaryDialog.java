@@ -1,6 +1,7 @@
 package com.air.nc5dev.ui.datadictionary;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.http.HttpUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.ui.exportbmf.BmfListTable;
@@ -246,7 +247,10 @@ public class NCDataDictionaryDialog extends DialogWrapper {
 
             String str = JSON.toJSONString(agg, SerializerFeature.DisableCircularReferenceDetect);
 
-           // FileUtil.writeUtf8String(str, new File("e:/temp/nc_data_dictionary.json"));// TODO FIXME 测试用，正式注释这行
+            try {
+                FileUtil.writeUtf8String(str, new File("e:/temp/nc_data_dictionary.json"));// TODO FIXME 测试用，正式注释这行
+            } catch (Throwable e) {
+            }
 
             String html = ProjectUtil.getResourceTemplatesUtf8Txt("nc_data_dictionary/index.html");
             html = html.replace("{{DataDictionaryAggVOJsonString}}", str);
@@ -258,13 +262,13 @@ public class NCDataDictionaryDialog extends DialogWrapper {
                     , "manifest.js"
                     , "vendor.js"
 
-                    , "674f50d287a8c48dc19ba404d20fe713.png"
-                    , "912ec66d7572ff821749319396470bde.png"
-                    , "535877f50039c0cb49a6196a5b7517cd.png"
-                    , "732389ded34cb9c52dd88271f1345af9.png"
-                    , "af7ae505a9eed503f8b8e6982036873e.png"
-                    , "b06871f281fee6b241d60582ae9369b9.png"
-                    , "fee66e712a8a08eef5805a46892932ad.png"
+                    , "674f50d287a8c48dc19ba404d20fe713.eot"
+                    , "912ec66d7572ff821749319396470bde.svg"
+                    , "535877f50039c0cb49a6196a5b7517cd.woff"
+                    , "732389ded34cb9c52dd88271f1345af9.ttf"
+                    , "af7ae505a9eed503f8b8e6982036873e.woff2"
+                    , "b06871f281fee6b241d60582ae9369b9.ttf"
+                    , "fee66e712a8a08eef5805a46892932ad.woff"
             );
             for (String s : fs) {
                 byte[] bts = ProjectUtil.getResourceByte("nc_data_dictionary/" + s);

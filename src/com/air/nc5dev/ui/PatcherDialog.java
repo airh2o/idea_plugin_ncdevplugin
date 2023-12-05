@@ -534,7 +534,13 @@ public class PatcherDialog extends DialogWrapper {
         no2Jar.setSelected(c.no2Jar);
         dataSourceIndex.setSelectedIndex(c.data_source_index);
         if (c.ncVersion != null) {
-            ncVersion.setSelectedItem(c.ncVersion);
+            NcVersionEnum[] vs = NcVersionEnum.values();
+            for (int i = 0; i < vs.length; i++) {
+                if (vs[i].equals(c.getNcVersion())) {
+                    ncVersion.setSelectedIndex(i);
+                    break;
+                }
+            }
         }
     }
 
