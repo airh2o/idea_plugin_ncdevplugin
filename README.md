@@ -7,6 +7,10 @@
   如果有多个 就都下载下来，加压，因为git限制文件大小，所以我可能会压缩zip成为 多个拆分大小的7z文件。
   如果没有7z 那就是 项目根目录的 几十MB大小的那个 zip 文件 。
 
+# 插件使用视频教程
+<a href="https://www.bilibili.com/video/BV1mg4y1f7cQ/?vd_source=6b1c74e795e65a8b04ffe9fe91867a10">
+使用教程:  https://www.bilibili.com/video/BV1mg4y1f7cQ/?vd_source=6b1c74e795e65a8b04ffe9fe91867a10 <a/>
+
 # 因本人目前在微服务公司，所以本人业余接开发私单，有私单才能继续参与NC 继续更新插件
 ## 专业承接 U8C NC5 NC6 NCC BIP，java微服务，前后端分离，小程序 H5APP 等等私活， ncc这些开发都是用友高级以上认证，项目都是100家以上经验！      每年至少会做10家以上私单项目！                    
 ## 业务联系方式: QQ 209308343   微信： yongyourj                  
