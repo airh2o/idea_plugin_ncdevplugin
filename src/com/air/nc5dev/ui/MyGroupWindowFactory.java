@@ -23,6 +23,6 @@ public class MyGroupWindowFactory extends ToolWindowFactory {
 
         new ToolWindowFactory().createToolWindowContent(project, toolWindow);
 
-       // new NCDataDictionaryWindowFactory().createToolWindowContent(project, toolWindow);
+        new NCDataDictionaryWindowFactory().createToolWindowContent(project, toolWindow);
     }
 }

@@ -78,9 +78,16 @@ public class BaseDao {
         String sql = String.format("create table %s ( ", obj.getTableName());
 
         Set<String> fs = obj.getFieadNames();
+        boolean frist = true;
         for (String f : fs) {
+            if (!frist) {
+                sql += ",";
+            }
+
+            frist = false;
+
             if (f.equals("dr")) {
-                sql += ", dr INT default 0 ";
+                sql += " dr INT default 0 ";
                 continue;
             }
 
@@ -90,7 +97,7 @@ public class BaseDao {
                     || field.getType() == String.class
                     || field.getType() == Character.class
             ) {
-                sql += ", " + f + " TEXT ";
+                sql += f + " TEXT ";
             } else if (field.getType() == int.class
                     || field.getType() == long.class
                     || field.getType() == byte.class
@@ -98,15 +105,15 @@ public class BaseDao {
                     || field.getType() == Integer.class
                     || field.getType() == Long.class
             ) {
-                sql += ", " + f + " INT ";
+                sql += f + " INT ";
             } else if (field.getType() == float.class
                     || field.getType() == Float.class
                     || field.getType() == double.class
                     || field.getType() == Double.class
             ) {
-                sql += ", " + f + " REAL ";
+                sql += f + " REAL ";
             } else {
-                sql += ", " + f + " TEXT ";
+                sql += f + " TEXT ";
             }
 
             if (f.equals(obj.getIdName())) {
