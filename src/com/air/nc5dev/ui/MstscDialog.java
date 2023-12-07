@@ -5,6 +5,7 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
@@ -144,9 +145,11 @@ public class MstscDialog extends DialogWrapper {
             try {
                 mstscEntitService = new MstscEntitServiceImpl(null);
                 createCenterPanel0();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
                 LogUtil.error(e.getMessage(), e);
+                contentPane = new JBTabbedPane();
+                contentPane.addTab("出错啦", new JTextArea(ExceptionUtil.getExcptionDetall(e)));
             }
         }
 

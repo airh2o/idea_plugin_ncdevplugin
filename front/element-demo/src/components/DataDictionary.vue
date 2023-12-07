@@ -2,16 +2,12 @@
   <div class="top">
     <el-container>
       <el-container>
-        <el-aside class="left-div-aside" v-drag>
-
-          <el-button @click="showSettingPanel = true" type="primary" style="margin-top: 5px; height: 35px">
-            易用性设置
-          </el-button>
-
+        <el-aside class="left-div-aside" v-drag v-show="showLeftTree">
           <el-drawer
               title="易用性设置"
               :visible.sync="showSettingPanel"
               :direction="'ltr'"
+              class="left-div-aside-setting"
           >
             <el-tag>树显示字段:</el-tag>
             <el-select class="left-treeShowNames" v-model="treeShowNames"
@@ -82,6 +78,20 @@
         <el-container class="main-div">
           <el-main class="main-button-backs-div">
             <div>
+              <el-button v-on:click="showSettingPanel = !showSettingPanel" type="primary" size="mini">
+                易用性设置
+              </el-button>
+
+              <el-button link size="mini" type="primary"
+                         v-on:click="showLeftTree=!showLeftTree"
+              >隐藏/显示 左侧树
+              </el-button>
+
+              <el-button link size="mini" type="primary"
+                         v-on:click="closeAllTab"
+              >关闭打开的标签: {{ tabsList.length }}
+              </el-button>
+
               <el-button link size="mini"
                          type="info"
                          v-on:click="gotoBack"
@@ -538,6 +548,12 @@ export default {
       console.log('buildTableClassTypeName...', item)
       return `${item.nowClass.displayName || '未知'} (${this.classTypeName[item.nowClass.classType] || '未知类型'})`;
     },
+    closeAllTab() {
+      this.tabsList = []
+      this.showTabsValue = ''
+      this.historyClassIds = []
+      this.historyClassIdsIndex = -1
+    },
   },
   created() {
   },
@@ -630,6 +646,7 @@ export default {
       showSettingPanel: false,
       showSimpleClassName: true,
       tabTitleJustShowDisplayname: true,
+      showLeftTree: true,
     };
   }
 }
@@ -687,6 +704,10 @@ body {
 .left-searchPlaces {
   margin-top: 5px;
   width: calc(100vh * 0.345);
+}
+
+.left-div-aside-setting {
+  width: calc(160vh);
 }
 
 .left-searchIncloudProperts {

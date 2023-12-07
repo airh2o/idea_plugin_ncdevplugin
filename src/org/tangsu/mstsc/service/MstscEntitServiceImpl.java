@@ -15,7 +15,7 @@ public class MstscEntitServiceImpl {
         dao = new BaseDao(dbfile);
         try {
             dao.findAll(BaseDao.buildSelectSql(new MstscEntity()) + " and 1=2 ", MstscEntity.class);
-        } catch (SQLException throwables) {
+        } catch (Throwable throwables) {
             //初始化表！
            dao.update(dao.buildCreateTableSql(new MstscEntity()));
            dao.submitNoClose();

@@ -579,8 +579,10 @@ public class ExportNCPatcherUtil {
      * @param contentVO
      */
     public static void reBuildNCCSqlAndFrontFiles(ExportContentVO contentVO) {
-        if (contentVO.exportResources) {
-            buildNCCHotwebs(new File(contentVO.getProject().getBasePath(), "hotwebs"), contentVO);
+        if (contentVO.exportResources
+                && StringUtil.isNotBlank(contentVO.getHotwebsResourcePath())
+                && new File(contentVO.getHotwebsResourcePath()).isDirectory()) {
+            buildNCCHotwebs(new File(contentVO.getHotwebsResourcePath()), contentVO);
         }
 
         HashMap<String, Module> moduleHomeDir2ModuleMap = contentVO.getModuleHomeDir2ModuleMap();
@@ -726,8 +728,10 @@ public class ExportNCPatcherUtil {
      * @param contentVO
      */
     public static void buildNCCSqlAndFrontFiles(ExportContentVO contentVO) {
-        if (contentVO.exportResources) {
-            buildNCCHotwebs(new File(contentVO.getProject().getBasePath(), "hotwebs"), contentVO);
+        if (contentVO.exportResources
+                && StringUtil.isNotBlank(contentVO.getHotwebsResourcePath())
+                && new File(contentVO.getHotwebsResourcePath()).isDirectory()) {
+            buildNCCHotwebs(new File(contentVO.getHotwebsResourcePath()), contentVO);
         }
 
         HashMap<String, Module> moduleHomeDir2ModuleMap = contentVO.getModuleHomeDir2ModuleMap();
