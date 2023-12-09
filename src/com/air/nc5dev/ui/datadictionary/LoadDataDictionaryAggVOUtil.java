@@ -122,8 +122,9 @@ public class LoadDataDictionaryAggVOUtil {
                 indicator.setText2(String.format("正在查询模块列表...%s", sql));
             }
             rs = st.executeQuery(sql);
-            ArrayList<DataDictionaryAggVO.Module> allModules = new VOArrayListResultSetExtractor<DataDictionaryAggVO.Module>
-                    (DataDictionaryAggVO.Module.class).extractData(rs);
+            ArrayList<DataDictionaryAggVO.Module> allModules =
+                    new VOArrayListResultSetExtractor<DataDictionaryAggVO.Module>
+                            (DataDictionaryAggVO.Module.class).extractData(rs);
             IoUtil.close(rs);
             List<DataDictionaryAggVO.Module> modules = V.toTree(allModules, "id", "parentmoduleid", "childs");
             Map<String, DataDictionaryAggVO.Module> id2ModuleMap = allModules.stream()
@@ -136,7 +137,8 @@ public class LoadDataDictionaryAggVOUtil {
                 indicator.setText2(String.format("正在查询元数据组件列表...%s", compomentSql));
             }
             rs = st.executeQuery(compomentSql);
-            ArrayList<SearchComponentVO2> coms = new VOArrayListResultSetExtractor<SearchComponentVO2>(SearchComponentVO2.class).extractData(rs);
+            ArrayList<SearchComponentVO2> coms =
+                    new VOArrayListResultSetExtractor<SearchComponentVO2>(SearchComponentVO2.class).extractData(rs);
             IoUtil.close(rs);
 
             //读取他们的实体列表和字段列表
@@ -225,11 +227,13 @@ public class LoadDataDictionaryAggVOUtil {
 
             String defaulttablename = "defaulttablename";
             String attrlength = "attrlength";
+            String dynamic = "dynamic";
             String classOrderBy = " order by attrsequence ";
             if (NcVersionEnum.U8Cloud.equals(ncVersion)
                     || NcVersionEnum.NC5.equals(ncVersion)) {
                 defaulttablename = "(select name from md_table where id=md_class.id)";
                 attrlength = "length";
+                dynamic = "false";
                 classOrderBy = " order by sequence ";
             }
 
@@ -241,7 +245,8 @@ public class LoadDataDictionaryAggVOUtil {
             }
             LinkedList<ClassDTO> allClasss = new LinkedList<>();
             sql = String.format(
-                    "select id,name,displayname,fullclassname,componentid,classtype,parentclassid,%s defaulttablename from md_class where componentid='%s' and classtype=201"
+                    "select id,name,displayname,fullclassname,componentid,classtype,parentclassid,%s defaulttablename" +
+                            " from md_class where componentid='%s' and classtype=201"
                     , defaulttablename
                     , com.getId()
             );
@@ -285,13 +290,18 @@ public class LoadDataDictionaryAggVOUtil {
                 if (ClassDTO.CLASSTYPE_ENTITY.equals(cla.getClassType())) {
                     rs = st.executeQuery(
                             String.format(
-                                    "select name,displayname,nullable,refmodelname,defaultvalue,description ,%s attrlength,datatype from md_property where classid='%s' %s  "
+                                    "select name,displayname,nullable,refmodelname,defaultvalue,description " +
+                                            ",datatype,calculation,%s dynamic" +
+                                            ",%s attrlength " +
+                                            " from md_property where classid='%s' %s  "
+                                    , dynamic
                                     , attrlength
                                     , cla.getId()
                                     , classOrderBy
                             )
                     );
-                    ArrayList<PropertyDTO> ps = new VOArrayListResultSetExtractor<PropertyDTO>(PropertyDTO.class).extractData(rs);
+                    ArrayList<PropertyDTO> ps =
+                            new VOArrayListResultSetExtractor<PropertyDTO>(PropertyDTO.class).extractData(rs);
                     IoUtil.close(rs);
 
                     cla.setPerperties(ps);
@@ -316,7 +326,8 @@ public class LoadDataDictionaryAggVOUtil {
                             .build());
                 } else if (ClassDTO.CLASSTYPE_ENUMERATE.equals(cla.getClassType())) {
                     rs = st.executeQuery("select  value,name  from md_enumvalue where id='" + cla.getId() + "' ");
-                    ArrayList<EnumValueDTO> ps = new VOArrayListResultSetExtractor<EnumValueDTO>(EnumValueDTO.class).extractData(rs);
+                    ArrayList<EnumValueDTO> ps =
+                            new VOArrayListResultSetExtractor<EnumValueDTO>(EnumValueDTO.class).extractData(rs);
                     IoUtil.close(rs);
 
                     agg.getClassId2EnumValuesMap().put(cla.getId(), ps);
@@ -331,7 +342,8 @@ public class LoadDataDictionaryAggVOUtil {
                         || NcVersionEnum.NC5.equals(ncVersion)) {
                     sql = String.format("select name from md_column where tableid='%s' and pkey='Y'", cla.getId());
                 } else {
-                    sql = String.format("select name from md_column where tableid='%s' and pkey='Y'", cla.getDefaultTableName());
+                    sql = String.format("select name from md_column where tableid='%s' and pkey='Y'",
+                            cla.getDefaultTableName());
                 }
                 rs = st.executeQuery(sql);
                 while (rs.next()) {
