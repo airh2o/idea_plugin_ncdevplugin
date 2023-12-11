@@ -227,7 +227,7 @@ public class LoadDataDictionaryAggVOUtil {
 
             String defaulttablename = "defaulttablename";
             String attrlength = "attrlength";
-            String dynamic = "dynamic";
+            String dynamic = "dynamicattr";
             String classOrderBy = " order by attrsequence ";
             if (NcVersionEnum.U8Cloud.equals(ncVersion)
                     || NcVersionEnum.NC5.equals(ncVersion)) {
