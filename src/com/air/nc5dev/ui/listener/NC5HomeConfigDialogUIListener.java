@@ -269,6 +269,9 @@ public class NC5HomeConfigDialogUIListener {
         if (null != dataSourceVOS && !dataSourceVOS.isEmpty()) {
             putDataSourceVOs2UI(dataSourceVOS);
         }
+
+        NcVersionEnum ncVersion = ProjectNCConfigUtil.getNCVersion(ui.getProject());
+        ui.comboBox_ncversion.setSelectedItem(ncVersion);
     }
 
     /**

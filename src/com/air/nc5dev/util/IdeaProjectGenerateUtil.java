@@ -268,7 +268,9 @@ public class IdeaProjectGenerateUtil {
 
         if (0 == hasNc[0]) {
             //新增服务端
-            ApplicationConfiguration conf = new ApplicationConfiguration("NC服务端", project,
+            ApplicationConfiguration conf = new ApplicationConfiguration(
+                    ProjectNCConfigUtil.getNCVersion() + "服务端"
+                    , project,
                     ApplicationConfigurationType.getInstance());
             conf.setMainClassName(serverClass);
 
@@ -280,10 +282,10 @@ public class IdeaProjectGenerateUtil {
             conf.setVMParameters(
                     " -Dnc.http.port=$FIELD_CLINET_PORT$ "
                             + " -Dcom.sun.management.jmxremote "
-                            + " -Dcom.sun.management.jmxremote.port=" + RandomUtil.randomInt(25000, 55000)
+                            //  + " -Dcom.sun.management.jmxremote.port=" + RandomUtil.randomInt(25000, 55000)
                             + " -Dcom.sun.management.jmxremote.ssl=false "
                             + " -Dcom.sun.management.jmxremote.authenticate=false "
-                            + " -Dnc.exclude.modules1=可以配置你需要排除的模块" //${FIELD_EX_MODULES}
+                            + " -Dnc.exclude.modules=" //${FIELD_EX_MODULES}
                             + " -Dnc.runMode=develop "
                             + " -Dnc.server.location=$FIELD_NC_HOME$ "
                             + " -Dorg.owasp.esapi.resources=$FIELD_NC_HOME$/ierp/bin/esapi "
@@ -297,10 +299,13 @@ public class IdeaProjectGenerateUtil {
                             + (
                             NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion()) ?
                                     " -Dfile.encoding=UTF-8 "
-                                    : " -Xmx768m -XX:MaxPermSize=256m "
-                                    + " -Dfile.encoding=GBK "
+                                    : (
+                                    " -Xmx768m -XX:MaxPermSize=256m "
+                                            + " -Dfile.encoding=GBK "
+                            )
                     )
-                            + " -Xdebug -Xrunjdwp:transport=dt_socket,address=" + RandomUtil.randomInt(25000, 55000) + ",server=y,suspend=n "
+                            // + " -Xdebug -Xrunjdwp:transport=dt_socket,address=" + RandomUtil.randomInt(25000,
+                            // 55000) + ",server=y,suspend=n "
                             + " -Dnc.server.name= "
                             + " -Dnc.server.startCount=0 "
                             + " -Dnc.bs.logging.format=text "
@@ -317,7 +322,8 @@ public class IdeaProjectGenerateUtil {
 
         if (0 == hasNc[1]) {
             //新增客户端
-            ApplicationConfiguration conf = new ApplicationConfiguration("NC客户端", project,
+            ApplicationConfiguration conf = new ApplicationConfiguration(
+                    ProjectNCConfigUtil.getNCVersion() + "客户端", project,
                     ApplicationConfigurationType.getInstance());
             conf.setMainClassName(clientClass);
             HashMap<String, String> envs = new HashMap<>();
