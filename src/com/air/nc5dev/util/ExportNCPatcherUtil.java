@@ -637,6 +637,10 @@ public class ExportNCPatcherUtil {
                     File[] files = conf.listFiles();
                     if (files != null) {
                         for (File f : files) {
+                            if (contentVO.indicator.isCanceled()) {
+                                return ;
+                            }
+
                             if (f.isFile() && f.getName().toLowerCase().endsWith(".xml")) {
                                 fs.add(f);
                             }
@@ -649,6 +653,10 @@ public class ExportNCPatcherUtil {
                     File[] files = initdata.listFiles();
                     if (files != null) {
                         for (File f : files) {
+                            if (contentVO.indicator.isCanceled()) {
+                                return ;
+                            }
+
                             if (f.isFile() && f.getName().toLowerCase().endsWith(".xml")) {
                                 fs.add(f);
                             }
@@ -665,6 +673,12 @@ public class ExportNCPatcherUtil {
                 //读取items.xml文件
                 if (com.air.nc5dev.util.CollUtil.isNotEmpty(fs)) {
                     for (File f : fs) {
+                        if (contentVO.indicator.isCanceled()) {
+                            return ;
+                        }
+
+                        contentVO.indicator.setText("IDEA根据xml配置导出sql:" + f.getPath());
+
                         List<ItemsItemVO> vs = ItemsItemVO.read(f, contentVO.getProject(),
                                 contentVO.moduleHomeDir2ModuleMap.get(modulePath));
                         if (com.air.nc5dev.util.CollUtil.isNotEmpty(vs)) {
@@ -680,6 +694,10 @@ public class ExportNCPatcherUtil {
                             moduleOneSqls.add(moduleSqlOne);
 
                             for (ItemsItemVO itemVO : vs) {
+                                if (contentVO.indicator.isCanceled()) {
+                                    return ;
+                                }
+
                                 if (StringUtil.isBlank(itemVO.getItemKey())) {
                                     continue;
                                 }
@@ -728,6 +746,10 @@ public class ExportNCPatcherUtil {
      * @param contentVO
      */
     public static void buildNCCSqlAndFrontFiles(ExportContentVO contentVO) {
+        if (contentVO.indicator.isCanceled()) {
+            return;
+        }
+
         if (contentVO.exportResources
                 && StringUtil.isNotBlank(contentVO.getHotwebsResourcePath())
                 && new File(contentVO.getHotwebsResourcePath()).isDirectory()) {
@@ -744,6 +766,10 @@ public class ExportNCPatcherUtil {
         }
 
         for (String modulePath : moduleHomeDir2ModuleMap.keySet()) {
+            if (contentVO.indicator.isCanceled()) {
+                return;
+            }
+
             if (contentVO.ignoreModules.contains(moduleHomeDir2ModuleMap.get(modulePath))) {
                 //需要跳过的模块
                 continue;
@@ -777,6 +803,12 @@ public class ExportNCPatcherUtil {
             moduleOneSqls.add(moduleSqlOne);
             StringBuilder txt = new StringBuilder(80_0000);
             for (File f : fs) {
+                if (contentVO.indicator.isCanceled()) {
+                    return;
+                }
+
+                contentVO.indicator.setText("处理sql文件:" + f.getPath());
+
                 if (f.isDirectory() && (
                         f.getName().equals("dbcreate")
                                 || f.getName().equals("conf")

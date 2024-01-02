@@ -19,15 +19,19 @@ public class VisibilityConverter {
         return i;
     }
 
-    public static String getNameOfVisibility(int i) {
-        if (i == 0) {
-            return "public";
-        } else if (i == 1) {
-            return "protected";
-        } else if (2 == i) {
-            return "private";
-        } else {
-            return 3 == i ? "friendly" : "public";
+    public static String getNameOfVisibility(Integer i) {
+        if (i != null) {
+            if (i == 0) {
+                return "public";
+            } else if (i == 1) {
+                return "protected";
+            } else if (2 == i) {
+                return "private";
+            } else if (3 == i) {
+                return "friendly";
+            }
         }
+
+        return "public";
     }
 }
