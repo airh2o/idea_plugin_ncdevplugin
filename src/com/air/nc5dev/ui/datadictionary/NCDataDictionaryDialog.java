@@ -247,10 +247,10 @@ public class NCDataDictionaryDialog extends DialogWrapper {
 
             String str = JSON.toJSONString(agg, SerializerFeature.DisableCircularReferenceDetect);
 
-            try {
+            /*try {
                 FileUtil.writeUtf8String(str, new File("e:/temp/nc_data_dictionary.json"));// TODO FIXME 测试用，正式注释这行
             } catch (Throwable e) {
-            }
+            }*/
 
             String html = ProjectUtil.getResourceTemplatesUtf8Txt("nc_data_dictionary/index.html");
             html = html.replace("{{DataDictionaryAggVOJsonString}}", str);

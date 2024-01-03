@@ -17,6 +17,10 @@ import java.util.List;
 @Data
 public class ClassDTO2 extends ClassDTO {
     List<PropertyDTO> perperties;
+    String pk_billtypecode;
+    String billtypename;
+    String nodecode;
+
 
     public ClassDTO2() {
         super();

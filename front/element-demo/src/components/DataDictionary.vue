@@ -84,7 +84,8 @@
             </div>
 
             <div>
-              <el-tag>表格显示哪些列:</el-tag><br>
+              <el-tag>表格显示哪些列:</el-tag>
+              <br>
               <el-checkbox v-model="tableShowColumns.name">属性编码</el-checkbox>
               <el-checkbox v-model="tableShowColumns.displayName">属性名称</el-checkbox>
               <el-checkbox v-model="tableShowColumns.fieldName">字段编码</el-checkbox>
@@ -196,6 +197,25 @@
                       link
                       type="info"
                   >{{ `| Agg类: ${item.nowClass.aggFullClassName}` }}
+                  </el-link>
+
+                  <el-link
+                      v-if="item.nowClass && item.nowClass.pk_billtypecode"
+                      link
+                      type="danger"
+                  >{{ `| 单据编码: ${item.nowClass.pk_billtypecode}` }}
+                  </el-link>
+                  <el-link
+                      v-if="item.nowClass && item.nowClass.billtypename"
+                      link
+                      type="danger"
+                  >{{ `| 单据名称: ${item.nowClass.billtypename}` }}
+                  </el-link>
+                  <el-link
+                      v-if="item.nowClass && item.nowClass.nodecode"
+                      link
+                      type="info"
+                  >{{ `| 节点编码: ${item.nowClass.nodecode}` }}
                   </el-link>
 
                   <br/>
@@ -397,7 +417,15 @@ export default {
           v += data.name;
         } else if (this.treeSearchPlaces[i] == 3) {
           v += data.defaultTableName;
-        } else if (this.treeSearchPlaces[i] == 4) {
+        } else if (this.treeSearchPlaces[i] == 4 && data.fullClassName) {
+          v += data.fullClassName;
+        } else if (this.treeSearchPlaces[i] == 5 && this.agg.classMap[data.id]) {
+          v += this.agg.classMap[data.id].pk_billtypecode;
+        } else if (this.treeSearchPlaces[i] == 6 && this.agg.classMap[data.id]) {
+          v += this.agg.classMap[data.id].billtypename;
+        } else if (this.treeSearchPlaces[i] == 7 && this.agg.classMap[data.id]) {
+          v += this.agg.classMap[data.id].nodecode;
+        } else if (this.treeSearchPlaces[i] == 8) {
           v += ps ? JSON.stringify(ps) : "";
         }
       }
@@ -407,7 +435,26 @@ export default {
         value = value.toLowerCase();
       }
 
-      return v.indexOf(value) != -1;
+      let vs = value.trim()
+          .replaceAll('\t', ' ')
+          .replaceAll('\n', ' ')
+          .replaceAll('\r', ' ')
+          .split(' ');
+
+      let i =0;
+      let m = 0;
+      for (let s of vs) {
+        if (!s) {
+          continue
+        }
+        ++i;
+
+        if (v.indexOf(s) != -1) {
+          ++m;
+        }
+      }
+
+      return i == m && m != 0;
     },
     /**
      * 属性表格 点击了 跳转某个 关联class
@@ -778,7 +825,7 @@ export default {
         description: true,
       },
       searchIncloudProperts: true,
-      treeShowNames: ["displayname", "name", "defaultTableName"],
+      treeShowNames: ["displayname", "defaultTableName"],
       treeShowNamesOptions: [
         {
           value: "type",
@@ -801,7 +848,7 @@ export default {
           label: "ID",
         },
       ],
-      treeSearchPlaces: [1, 2, 3],
+      treeSearchPlaces: [1, 2, 3, 4, 5, 6, 7],
       treeSearchPlacesOptions: [
         {
           value: 1,
@@ -817,6 +864,22 @@ export default {
         },
         {
           value: 4,
+          label: "VO类",
+        },
+        {
+          value: 5,
+          label: "单据编码",
+        },
+        {
+          value: 6,
+          label: "单据名称",
+        },
+        {
+          value: 7,
+          label: "节点编码",
+        },
+        {
+          value: 8,
           label: "属性列表",
         },
       ],

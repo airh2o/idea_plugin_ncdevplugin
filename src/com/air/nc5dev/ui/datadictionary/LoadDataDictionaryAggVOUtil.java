@@ -1,14 +1,26 @@
 package com.air.nc5dev.ui.datadictionary;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
-import com.air.nc5dev.util.*;
+import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.IoUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.ReflectUtil;
+import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.util.V;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
+import com.air.nc5dev.util.jdbc.resulthandel.ArrayListMapResultSetExtractor;
 import com.air.nc5dev.util.jdbc.resulthandel.VOArrayListResultSetExtractor;
 import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
 import com.air.nc5dev.vo.DataDictionaryAggVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
-import com.air.nc5dev.vo.meta.*;
+import com.air.nc5dev.vo.meta.ClassDTO;
+import com.air.nc5dev.vo.meta.ClassDTO2;
+import com.air.nc5dev.vo.meta.EnumValueDTO;
+import com.air.nc5dev.vo.meta.PropertyDTO;
+import com.air.nc5dev.vo.meta.SearchComponentVO;
+import com.air.nc5dev.vo.meta.SearchComponentVO2;
 import com.alibaba.fastjson.JSON;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
@@ -19,7 +31,12 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -157,13 +174,12 @@ public class LoadDataDictionaryAggVOUtil {
             agg.setProjectName(getProject().getName());
             agg.setNcHome(ProjectNCConfigUtil.getNCHomePath(getProject()));
             agg.setModules(modules);
-
             agg.getCompomentIdMap().clear();
             for (SearchComponentVO c : coms) {
                 if (c.getClassDTOS() != null) {
                     ArrayList<ClassDTO> ncas = new ArrayList<>();
                     for (ClassDTO ca : c.getClassDTOS()) {
-                        ClassDTO nca = new ClassDTO();
+                        ClassDTO2 nca = new ClassDTO2();
                         nca.setId(ca.getId());
                         nca.setName(ca.getName());
                         nca.setDisplayName(ca.getDisplayName());
@@ -267,9 +283,27 @@ public class LoadDataDictionaryAggVOUtil {
                 agg.getId2ModuleMap().put(m.getId(), m);
             }
 
+            ArrayListMapResultSetExtractor arrayListMapResultSetExtractor = new ArrayListMapResultSetExtractor();
+            Map<String, Object> billType = null;
+            try {
+                rs = st.executeQuery(String.format("select pk_billtypecode,billtypename,nodecode from " +
+                                "bd_billtype" +
+                                " where istransaction='N' and component='%s'\n" +
+                                " union all\n" +
+                                " select pk_billtypecode,billtypename,nodecode from bd_billtype where " +
+                                "component='%s'",
+                        c.getName(), c.getName()));
+                billType = CollUtil.getFirst(arrayListMapResultSetExtractor.extractData(rs));
+                IoUtil.close(rs);
+            } catch (Exception e) {
+            }
+
             // m.getMetas().add(com);
             //立即放入map中，防止下个元数据 又依赖他的实体！
             for (ClassDTO2 cla : cs) {
+                if (CollUtil.isNotEmpty(billType)) {
+                    ReflectUtil.copy2VO(billType, cla);
+                }
                 agg.getClassMap().put(cla.getId(), cla);
             }
 

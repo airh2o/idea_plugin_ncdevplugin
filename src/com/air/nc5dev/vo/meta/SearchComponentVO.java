@@ -27,6 +27,8 @@ public class SearchComponentVO extends ComponentDTO implements Serializable, Clo
     String fileName;
     String filePath;
 
+
+
     //实体的信息
     transient String classId;
     transient String className;
