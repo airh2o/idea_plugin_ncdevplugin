@@ -286,13 +286,32 @@ public class LoadDataDictionaryAggVOUtil {
             ArrayListMapResultSetExtractor arrayListMapResultSetExtractor = new ArrayListMapResultSetExtractor();
             Map<String, Object> billType = null;
             try {
-                rs = st.executeQuery(String.format("select pk_billtypecode,billtypename,nodecode from " +
+                sql = String.format("select pk_billtypecode,billtypename,nodecode from " +
                                 "bd_billtype" +
                                 " where istransaction='N' and component='%s'\n" +
                                 " union all\n" +
                                 " select pk_billtypecode,billtypename,nodecode from bd_billtype where " +
                                 "component='%s'",
-                        c.getName(), c.getName()));
+                        c.getName(), c.getName());
+                if (NcVersionEnum.isNCCOrBIP(ncVersion)
+                        || NcVersionEnum.NC6.equals(ncVersion)) {
+                    sql = String.format("select b.pk_billtypecode,b.billtypename,b.nodecode,n.fun_name,np.paramvalue " +
+                                    "from bd_billtype b\n" +
+                                    "left join sm_funcregister n on n.funcode=b.nodecode\n" +
+                                    "left join sm_paramregister np on np.parentid=n.cfunid and np" +
+                                    ".paramname='BeanConfigFilePath'\n" +
+                                    "where istransaction='N' and component='%s'\n" +
+                                    "union all\n" +
+                                    "select b.pk_billtypecode,b.billtypename,b.nodecode,n.fun_name,np.paramvalue from" +
+                                    " bd_billtype b\n" +
+                                    "left join sm_funcregister n on n.funcode=b.nodecode\n" +
+                                    "left join sm_paramregister np on np.parentid=n.cfunid and np" +
+                                    ".paramname='BeanConfigFilePath'\n" +
+                                    "where component='%s'",
+                            c.getName(), c.getName());
+                }
+
+                rs = st.executeQuery(sql);
                 billType = CollUtil.getFirst(arrayListMapResultSetExtractor.extractData(rs));
                 IoUtil.close(rs);
             } catch (Exception e) {
@@ -304,6 +323,26 @@ public class LoadDataDictionaryAggVOUtil {
                 if (CollUtil.isNotEmpty(billType)) {
                     ReflectUtil.copy2VO(billType, cla);
                 }
+
+                if (ClassDTO.CLASSTYPE_ENTITY.equals(cla.getClassType())
+                        && NcVersionEnum.isNCCOrBIP(ncVersion)) {
+                    sql = String.format("select p.pagecode,p.pageurl from md_class c\n" +
+                                    "join sm_appregister a on c.id=a.mdid\n" +
+                                    "join sm_apppage p on p.parent_id=a.pk_appregister and p.isdefault='Y' and c" +
+                                    ".id='%s'\n" +
+                                    "union all\n" +
+                                    "select p.pagecode,p.pageurl from md_class c\n" +
+                                    "join sm_appregister a on c.id=a.mdid\n" +
+                                    "join sm_apppage p on p.parent_id=a.pk_appregister and c.id='%s'",
+                            cla.getId(), cla.getId());
+                    rs = st.executeQuery(sql);
+                    Map<String, Object> webinfo = CollUtil.getFirst(arrayListMapResultSetExtractor.extractData(rs));
+                    IoUtil.close(rs);
+                    if (CollUtil.isNotEmpty(webinfo)) {
+                        ReflectUtil.copy2VO(webinfo, cla);
+                    }
+                }
+
                 agg.getClassMap().put(cla.getId(), cla);
             }
 

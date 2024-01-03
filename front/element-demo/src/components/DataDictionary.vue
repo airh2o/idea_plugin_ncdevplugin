@@ -217,7 +217,30 @@
                       type="info"
                   >{{ `| 节点编码: ${item.nowClass.nodecode}` }}
                   </el-link>
-
+                  <el-link
+                      v-if="item.nowClass && item.nowClass.fun_name"
+                      link
+                      type="info"
+                  >{{ `| 重量端节点名: ${item.nowClass.fun_name}` }}
+                  </el-link>
+                  <el-link
+                      v-if="item.nowClass && item.nowClass.paramvalue"
+                      link
+                      type="info"
+                  >{{ `| 重量端XML配置: ${item.nowClass.paramvalue}` }}
+                  </el-link>
+                  <el-link
+                      v-if="item.nowClass && item.nowClass.pagecode"
+                      link
+                      type="info"
+                  >{{ `| 轻量端页码编码: ${item.nowClass.pagecode}` }}
+                  </el-link>
+                  <el-link
+                      v-if="item.nowClass && item.nowClass.pageurl"
+                      link
+                      type="info"
+                  >{{ `| 轻量端页码地址: ${item.nowClass.pageurl}` }}
+                  </el-link>
                   <br/>
 
                   <div
@@ -412,21 +435,29 @@ export default {
 
       for (let i = 0; i < this.treeSearchPlaces.length; i++) {
         if (this.treeSearchPlaces[i] == 1) {
-          v += data.displayname;
+          v += data.displayname || '';
         } else if (this.treeSearchPlaces[i] == 2) {
-          v += data.name;
+          v += data.name || '';
         } else if (this.treeSearchPlaces[i] == 3) {
-          v += data.defaultTableName;
+          v += data.defaultTableName || '';
         } else if (this.treeSearchPlaces[i] == 4 && data.fullClassName) {
-          v += data.fullClassName;
+          v += data.fullClassName || '';
         } else if (this.treeSearchPlaces[i] == 5 && this.agg.classMap[data.id]) {
-          v += this.agg.classMap[data.id].pk_billtypecode;
+          v += this.agg.classMap[data.id].pk_billtypecode || '';
         } else if (this.treeSearchPlaces[i] == 6 && this.agg.classMap[data.id]) {
-          v += this.agg.classMap[data.id].billtypename;
+          v += this.agg.classMap[data.id].billtypename || '';
         } else if (this.treeSearchPlaces[i] == 7 && this.agg.classMap[data.id]) {
-          v += this.agg.classMap[data.id].nodecode;
+          v += this.agg.classMap[data.id].nodecode || '';
         } else if (this.treeSearchPlaces[i] == 8) {
           v += ps ? JSON.stringify(ps) : "";
+        } else if (this.treeSearchPlaces[i] == 9 && this.agg.classMap[data.id]) {
+          v += this.agg.classMap[data.id].fun_name || '';
+        } else if (this.treeSearchPlaces[i] == 10 && this.agg.classMap[data.id]) {
+          v += this.agg.classMap[data.id].paramvalue || '';
+        } else if (this.treeSearchPlaces[i] == 11 && this.agg.classMap[data.id]) {
+          v += this.agg.classMap[data.id].pagecode || '';
+        } else if (this.treeSearchPlaces[i] == 12 && this.agg.classMap[data.id]) {
+          v += this.agg.classMap[data.id].pageurl || '';
         }
       }
 
@@ -441,7 +472,7 @@ export default {
           .replaceAll('\r', ' ')
           .split(' ');
 
-      let i =0;
+      let i = 0;
       let m = 0;
       for (let s of vs) {
         if (!s) {
@@ -881,6 +912,22 @@ export default {
         {
           value: 8,
           label: "属性列表",
+        },
+        {
+          value: 9,
+          label: "重量端节点名",
+        },
+        {
+          value: 10,
+          label: "重量端XML配置",
+        },
+        {
+          value: 11,
+          label: "轻量端页码编码",
+        },
+        {
+          value: 12,
+          label: "轻量端页码地址",
         },
       ],
       searchAutoLower: true,

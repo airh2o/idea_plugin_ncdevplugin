@@ -17,9 +17,16 @@ import java.util.List;
 @Data
 public class ClassDTO2 extends ClassDTO {
     List<PropertyDTO> perperties;
+    //单据信息
     String pk_billtypecode;
     String billtypename;
     String nodecode;
+    //NC6 xml配置信息
+    String fun_name;
+    String paramvalue;
+    //NCC 前端页面信息
+    String pagecode;
+    String pageurl;
 
 
     public ClassDTO2() {
