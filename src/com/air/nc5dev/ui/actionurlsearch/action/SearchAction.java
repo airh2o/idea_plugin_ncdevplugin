@@ -3,7 +3,6 @@ package com.air.nc5dev.ui.actionurlsearch.action;
 import com.air.nc5dev.ui.actionurlsearch.NCCActionURLSearchUI;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.util.IconLoader;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 

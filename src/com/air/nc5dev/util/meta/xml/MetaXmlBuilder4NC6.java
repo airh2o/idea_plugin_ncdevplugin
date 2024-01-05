@@ -3,9 +3,14 @@ package com.air.nc5dev.util.meta.xml;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.V;
 import com.air.nc5dev.util.XmlUtil;
-import com.air.nc5dev.util.meta.consts.DataTypeStyleConverter;
-import com.air.nc5dev.util.meta.consts.VisibilityConverter;
-import com.air.nc5dev.vo.meta.*;
+import com.air.nc5dev.vo.meta.AssociationDTO;
+import com.air.nc5dev.vo.meta.BizItfMapDTO;
+import com.air.nc5dev.vo.meta.BusiitfconnectionDTO;
+import com.air.nc5dev.vo.meta.ClassDTO;
+import com.air.nc5dev.vo.meta.ComponentAggVO;
+import com.air.nc5dev.vo.meta.ComponentDTO;
+import com.air.nc5dev.vo.meta.PropertyDTO;
+import com.air.nc5dev.vo.meta.ReferenceDTO;
 import com.google.common.collect.Sets;
 import lombok.Data;
 import org.dom4j.Document;
@@ -14,7 +19,11 @@ import org.dom4j.Element;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * NC6系列 </br>

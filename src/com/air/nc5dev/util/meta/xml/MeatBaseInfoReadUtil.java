@@ -1,21 +1,24 @@
 package com.air.nc5dev.util.meta.xml;
 
-import cn.hutool.core.exceptions.UtilException;
-import com.air.nc5dev.exception.BusinessException;
 import com.air.nc5dev.util.ReflectUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.XmlUtil;
 import com.air.nc5dev.vo.meta.ClassDTO;
 import com.air.nc5dev.vo.meta.ComponentDTO;
 import com.air.nc5dev.vo.meta.PropertyDTO;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * </br>

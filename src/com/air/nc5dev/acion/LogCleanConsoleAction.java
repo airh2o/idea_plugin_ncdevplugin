@@ -25,7 +25,7 @@ import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 /**
  * 按钮： 清空 日志窗口

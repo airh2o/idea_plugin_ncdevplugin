@@ -1,13 +1,9 @@
 package com.air.nc5dev.acion;
 
-import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
 import com.air.nc5dev.util.CollUtil;
-import com.air.nc5dev.util.ExceptionUtil;
-import com.air.nc5dev.util.ExportNCPatcherUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.idea.LogUtil;
-import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.util.ncutils.BmfTableInfo2ExcelUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -15,9 +11,8 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import javax.swing.JFileChooser;
 import java.io.File;
-import java.util.jar.Manifest;
 
 /**
  * </br>

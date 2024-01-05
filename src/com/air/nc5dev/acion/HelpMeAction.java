@@ -5,8 +5,7 @@ import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 
-import java.awt.*;
-import java.io.IOException;
+import java.awt.Desktop;
 import java.net.URI;
 import java.net.URL;
 

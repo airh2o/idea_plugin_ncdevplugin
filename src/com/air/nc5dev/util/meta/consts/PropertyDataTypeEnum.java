@@ -1,6 +1,5 @@
 package com.air.nc5dev.util.meta.consts;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**

@@ -1,7 +1,6 @@
 package com.air.nc5dev.ui;
 
 import com.air.nc5dev.ui.actionurlsearch.NCCActionURLSearchWindowFactory;
-import com.air.nc5dev.ui.datadictionary.NCDataDictionaryWindowFactory;
 import com.air.nc5dev.ui.nccjsondecode.NCCJsonDecodeWindowFactory;
 import com.air.nc5dev.ui.searchdatabasefull.SearchFullDataBaseWindowFactory;
 import com.air.nc5dev.util.idea.ProjectUtil;

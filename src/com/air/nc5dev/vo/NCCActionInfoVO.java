@@ -1,7 +1,9 @@
 package com.air.nc5dev.vo;
 
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.util.V;
 import com.intellij.pom.Navigatable;
-import com.intellij.psi.PsiClass;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -55,7 +57,7 @@ public class NCCActionInfoVO implements Serializable, Cloneable {
      */
     public static final int TYPE_JAXRS = 4;
 
-
+    public String simplename;
     public String name;
     public String label;
     public String clazz;
@@ -88,21 +90,32 @@ public class NCCActionInfoVO implements Serializable, Cloneable {
     @Builder.Default
     public ArrayList<Navigatable> navigatables = new ArrayList<>();
 
-
     @Override
     public String toString() {
-        return "NCCActionInfoVO{" +
-                "name='" + name + '\'' +
-                ", label='" + label + '\'' +
-                ", clazz='" + clazz + '\'' +
-                ", appcode='" + appcode + '\'' +
-                ", xmlPath='" + xmlPath + '\'' +
-                ", project='" + project + '\'' +
-                ", from=" + from +
-                ", type=" + type +
-                ", column=" + column +
-                ", row=" + row +
-                ", score=" + score +
-                '}';
+        return
+                clazz +
+                        " |来自:" + (from == FROM_HOME ? "NCHOME" : "工程项目") +
+                        " |URL:" + getSimplename() +
+                        " |名称:" + V.get(label) +
+                        " |其他信息:" + V.get(appcode) +
+                        " " + V.get(xmlPath) +
+                        " " + score
+                ;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+
+        getSimplename();
+    }
+
+    public String getSimplename(){
+        if (simplename != null) {
+            return simplename;
+        }
+
+        simplename = StringUtil.removeStart(StringUtil.removeStart(name,
+                ProjectNCConfigUtil.getNCClientIP()), ":" + ProjectNCConfigUtil.getNCClientPort());
+        return simplename;
     }
 }

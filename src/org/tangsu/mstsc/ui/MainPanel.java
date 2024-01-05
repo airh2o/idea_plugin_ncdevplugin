@@ -5,7 +5,6 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.util.CollUtil;
-import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.alibaba.fastjson.JSON;
@@ -38,7 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Data
 public class MainPanel extends JBPanel {
-    MstscListTable table;
+    BaseSimpleListTable table;
     JTextField textField_search;
     JTextField textField_code;
     JTextField textField_name;
@@ -385,7 +384,7 @@ public class MainPanel extends JBPanel {
 
     private void tablePanel() {
         tableModel = new DefaultTableModel(null, tableNames);
-        table = new MstscListTable(tableModel);
+        table = new BaseSimpleListTable(tableModel);
         pane_table = new JScrollPane(table);
         pane_table.setAutoscrolls(true);
         pane_table.setBounds(1, 1, getWidth() - 50, 330);

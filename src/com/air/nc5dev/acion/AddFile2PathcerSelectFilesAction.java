@@ -3,6 +3,8 @@ package com.air.nc5dev.acion;
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
 import com.air.nc5dev.ui.PatcherDialog;
 import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.vo.PatcherSelectFileVO;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Editor;
@@ -13,17 +15,25 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.JOptionPane;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class AddFile2PathcerSelectFilesAction extends AbstractIdeaAction {
     @Override
     protected void doHandler(AnActionEvent e) {
         List<VirtualFile> vs = getSelectedFile(e);
         if (CollUtil.isNotEmpty(vs)) {
+            String txt = StringUtil.get(JOptionPane.showInputDialog("请输入备注内容(取消视为空内容)"));
+
             for (VirtualFile v : vs) {
-                PatcherDialog.addForceAddSelectFile(e.getProject(), v);
+                PatcherDialog.addForceAddSelectFile(e.getProject()
+                        , PatcherSelectFileVO.builder()
+                                .file(v)
+                                .path(v.getPath())
+                                .memo(txt)
+                                .build()
+                );
             }
         }
     }
@@ -68,6 +78,13 @@ public class AddFile2PathcerSelectFilesAction extends AbstractIdeaAction {
 
         VirtualFile f = CollUtil.getFirst(getSelectedFile(e));
 
-        e.getPresentation().setEnabled(!PatcherDialog.containsForceAddSelectFile(e.getProject(), f));
+        e.getPresentation().setEnabled(
+                !PatcherDialog.containsForceAddSelectFile(e.getProject()
+                        , PatcherSelectFileVO.builder()
+                                .file(f)
+                                .path(f.getPath())
+                                .build()
+                )
+        );
     }
 }

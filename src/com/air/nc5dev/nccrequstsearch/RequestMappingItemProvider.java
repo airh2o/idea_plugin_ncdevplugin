@@ -2,25 +2,34 @@ package com.air.nc5dev.nccrequstsearch;
 
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.NCCActionRefreshUtil;
-import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.util.V;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.vo.NCCActionInfoVO;
 import com.google.common.base.Joiner;
+import com.intellij.ide.actions.searcheverywhere.FoundItemDescriptor;
 import com.intellij.ide.util.gotoByName.ChooseByNameBase;
 import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider;
 import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
 import com.intellij.ide.util.gotoByName.ChooseByNameViewModel;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.NlsContexts;
 import com.intellij.util.Processor;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -131,22 +140,10 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         return new ArrayList<>();
     }
 
-    /**
-     * 搜索
-     *
-     * @param chooseByNameBase
-     * @param inputStr
-     * @param everwhere
-     * @param cancelled
-     * @param processor
-     * @return
-     */
-    private List<NCCActionInfoVO> search(Project project, String inputStr
-            , boolean everwhere, ProgressIndicator cancelled, Processor<Object> processor) {
-        return search(project, inputStr, everwhere);
+    public List<NCCActionInfoVO> search(Project project, String inputStr, boolean everwhere) {
+        return search(project, inputStr, everwhere, null, null);
     }
 
-
     /**
      * 搜索
      *
@@ -157,8 +154,19 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
      * @param processor
      * @return
      */
-    public List<NCCActionInfoVO> search(Project project, String inputStr, boolean everwhere) {
+    public List<NCCActionInfoVO> search(Project project, String inputStr, boolean everwhere
+            , ProgressIndicator progressIndicator
+            , Processor consumer) {
+        progressIndicator = V.get(progressIndicator, new NullProgressIndicator());
+        consumer = V.get(consumer, new NullProcessor());
+
+        if (progressIndicator.isCanceled()) {
+            return EMPTY_LIST;
+        }
+
+        progressIndicator.setText("扫描工程项目action中...");
         initScan(project);
+        progressIndicator.setText("正在搜索中...");
 
         if (StringUtil.isBlank(inputStr)) {
             return EMPTY_LIST;
@@ -194,14 +202,31 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         final String str = warpKey(inputStr);
 
         final List<NCCActionInfoVO> matchs = new ArrayList<>(1000);
-        all.forEach((k, v) -> {
-            v.forEach((name, vo) -> {
+
+        Set<String> keys = all.keySet();
+        for (String key : keys) {
+            progressIndicator.setText("正在搜索中..." + key);
+            if (progressIndicator.isCanceled()) {
+                return matchs;
+            }
+
+            Map<String, NCCActionInfoVO> vs = all.get(key);
+            Set<String> keys2 = vs.keySet();
+            for (String name : keys2) {
+                progressIndicator.setText("正在搜索中..." + name);
+                if (progressIndicator.isCanceled()) {
+                    return matchs;
+                }
+
+                NCCActionInfoVO vo = vs.get(name);
                 String matchStr = like(name, vo, str);
                 if (matchStr != null) {
                     matchs.add(vo);
+
+                    consumer.process(new FoundItemDescriptor(vo, vo.getScore()));
                 }
-            });
-        });
+            }
+        }
 
         matchs.sort((c1, c2) -> c2.getScore() - c1.getScore());
         return matchs;
@@ -466,4 +491,122 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         txt = txt.toLowerCase();
         return txt;
     }
+
+
+    public static class NullProgressIndicator implements ProgressIndicator {
+
+        @Override
+        public void start() {
+
+        }
+
+        @Override
+        public void stop() {
+
+        }
+
+        @Override
+        public boolean isRunning() {
+            return true;
+        }
+
+        @Override
+        public void cancel() {
+
+        }
+
+        @Override
+        public boolean isCanceled() {
+            return false;
+        }
+
+        @Override
+        public void setText(@NlsContexts.ProgressText String s) {
+
+        }
+
+        @Override
+        public @NlsContexts.ProgressText String getText() {
+            return "";
+        }
+
+        @Override
+        public void setText2(@NlsContexts.ProgressDetails String s) {
+
+        }
+
+        @Override
+        public @NlsContexts.ProgressDetails String getText2() {
+            return null;
+        }
+
+        @Override
+        public double getFraction() {
+            return 0;
+        }
+
+        @Override
+        public void setFraction(double v) {
+
+        }
+
+        @Override
+        public void pushState() {
+
+        }
+
+        @Override
+        public void popState() {
+
+        }
+
+        @Override
+        public boolean isModal() {
+            return false;
+        }
+
+        @Override
+        public @NotNull
+        ModalityState getModalityState() {
+            return null;
+        }
+
+        @Override
+        public void setModalityProgress(@Nullable ProgressIndicator progressIndicator) {
+
+        }
+
+        @Override
+        public boolean isIndeterminate() {
+            return false;
+        }
+
+        @Override
+        public void setIndeterminate(boolean b) {
+
+        }
+
+        @Override
+        public void checkCanceled() {
+
+        }
+
+        @Override
+        public boolean isPopupWasShown() {
+            return false;
+        }
+
+        @Override
+        public boolean isShowing() {
+            return false;
+        }
+    }
+
+    public static class NullProcessor implements Processor {
+        @Override
+        public boolean process(Object o) {
+            return true;
+        }
+    }
+
 }

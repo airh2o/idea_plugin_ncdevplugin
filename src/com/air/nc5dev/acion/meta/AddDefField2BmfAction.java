@@ -1,23 +1,12 @@
 package com.air.nc5dev.acion.meta;
 
 import com.air.nc5dev.acion.AddFile2PathcerSelectFilesAction;
-import com.air.nc5dev.acion.base.AbstractIdeaAction;
-import com.air.nc5dev.ui.PatcherDialog;
 import com.air.nc5dev.ui.adddeffiled.AddDefField2BmfDialog;
-import com.air.nc5dev.ui.exportbmf.ExportbmfDialog;
-import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 元数据文件快速 新增自定义项

@@ -1,16 +1,26 @@
 package com.air.nc5dev.ui;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
-import com.air.nc5dev.util.*;
+import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.ConvertUtil;
+import com.air.nc5dev.util.ExceptionUtil;
+import com.air.nc5dev.util.ExecUtil;
+import com.air.nc5dev.util.ExportNCPatcherUtil;
+import com.air.nc5dev.util.IoUtil;
+import com.air.nc5dev.util.NCPropXmlUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.ReflectUtil;
+import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.util.V;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.vo.ExportContentVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
+import com.air.nc5dev.vo.PatcherSelectFileVO;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -23,13 +33,32 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.ui.components.*;
+import com.intellij.ui.components.JBCheckBox;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.JBTabbedPane;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.table.JBTable;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -40,12 +69,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -465,6 +496,7 @@ public class PatcherDialog extends DialogWrapper {
             Vector heads = new Vector();
             heads.add("选择");
             heads.add("路径");
+            heads.add("备注");
             defaultTableModel = new DefaultTableModel(heads, 0);
             updateSelectFileTable();
             selectTable = new JBTable(defaultTableModel);
@@ -617,7 +649,8 @@ public class PatcherDialog extends DialogWrapper {
                     JMenuItem item = new JMenuItem("查找");
                     popup.add(item);
                     item.addActionListener(event -> {
-                        new SearchTableFieldDialog(getPatcherDialog().getFromUI().getProject(), patcherDialog.getSelectTable()).show();
+                        new SearchTableFieldDialog(getPatcherDialog().getFromUI().getProject(),
+                                patcherDialog.getSelectTable()).show();
                     });
 
                     JMenuItem selectAllOrNot = new JMenuItem("全选/全消");
@@ -689,14 +722,14 @@ public class PatcherDialog extends DialogWrapper {
         }
     }
 
-    public static List<VirtualFile> getForceAddSelectFiles(Project project) {
-        List<VirtualFile> vs = loadForceAddSelectFiles(project);
+    public static List<PatcherSelectFileVO> getForceAddSelectFiles(Project project) {
+        List<PatcherSelectFileVO> vs = loadForceAddSelectFiles(project);
 
         return vs;
     }
 
-    public static boolean addForceAddSelectFile(Project project, VirtualFile f) {
-        List<VirtualFile> vs = getForceAddSelectFiles(project);
+    public static boolean addForceAddSelectFile(Project project, PatcherSelectFileVO f) {
+        List<PatcherSelectFileVO> vs = getForceAddSelectFiles(project);
         try {
             if (vs.contains(f)) {
                 return false;
@@ -708,12 +741,12 @@ public class PatcherDialog extends DialogWrapper {
         }
     }
 
-    public static boolean containsForceAddSelectFile(Project project, VirtualFile f) {
+    public static boolean containsForceAddSelectFile(Project project, PatcherSelectFileVO f) {
         return getForceAddSelectFiles(project).contains(f);
     }
 
     public static boolean removeForceAddSelectFile(Project project, VirtualFile f) {
-        List<VirtualFile> vs = getForceAddSelectFiles(project);
+        List<PatcherSelectFileVO> vs = getForceAddSelectFiles(project);
         try {
             return vs.remove(f);
         } finally {
@@ -721,29 +754,53 @@ public class PatcherDialog extends DialogWrapper {
         }
     }
 
-    private static void flushForceAddSelectFiles(Project project, List<VirtualFile> vs) {
-        FileUtil.writeUtf8String(JSON.toJSONString(
-                        vs.stream().map(v -> v.getUrl()).collect(Collectors.toSet()))
-                , new File(new File(project.getBasePath(), ".idea"), "ForceAddSelectFiles.json"));
+    public static boolean removeForceAddSelectFile(Project project, PatcherSelectFileVO f) {
+        List<PatcherSelectFileVO> vs = getForceAddSelectFiles(project);
+        try {
+            return vs.remove(f);
+        } finally {
+            flushForceAddSelectFiles(project, vs);
+        }
     }
 
-    public static List<VirtualFile> loadForceAddSelectFiles(Project project) {
-        List<String> pts = null;
+    public static void setSelectFiles(Project project, List<PatcherSelectFileVO> vs) {
+        flushForceAddSelectFiles(project, vs);
+    }
+
+    private static void flushForceAddSelectFiles(Project project, List<PatcherSelectFileVO> vs) {
+        FileUtil.writeUtf8String(JSON.toJSONString(vs)
+                , new File(new File(project.getBasePath(), ".idea")
+                        , "ForceAddSelectFiles.json"));
+    }
+
+    public static List<PatcherSelectFileVO> loadForceAddSelectFiles(Project project) {
+        List<PatcherSelectFileVO> pts = null;
         try {
-            String json = FileUtil.readUtf8String(new File(new File(project.getBasePath(), ".idea"), "ForceAddSelectFiles.json"));
-            pts = JSON.parseArray(json, String.class);
+            String json = FileUtil.readUtf8String(new File(new File(project.getBasePath(), ".idea"),
+                    "ForceAddSelectFiles.json"));
+            pts = JSON.parseArray(json, PatcherSelectFileVO.class);
+
+            if (pts != null) {
+                for (PatcherSelectFileVO pt : pts) {
+                    if (pt.getSort() != null) {
+                        pt.setSort(0);
+                    }
+                }
+                pts = pts.stream().sorted((a, b) -> b.getSort().compareTo(a.getSort())).collect(Collectors.toList());
+            }
         } catch (Throwable e) {
         }
 
-        List<VirtualFile> vs = new CopyOnWriteArrayList<>();
+        List<PatcherSelectFileVO> vs = new CopyOnWriteArrayList<>();
         VirtualFileManager vm = VirtualFileManager.getInstance();
         if (CollUtil.isNotEmpty(pts)) {
-            for (String pt : pts) {
-                VirtualFile f = vm.findFileByUrl(pt);
+            for (PatcherSelectFileVO pt : pts) {
+                VirtualFile f = vm.findFileByNioPath(Path.of(pt.getPath()));
                 if (f == null) {
                     continue;
                 }
-                vs.add(f);
+                pt.setFile(f);
+                vs.add(pt);
             }
         }
 
@@ -751,7 +808,7 @@ public class PatcherDialog extends DialogWrapper {
     }
 
     public static void clearForceAddSelectFile(Project project) {
-        List<VirtualFile> vs = getForceAddSelectFiles(project);
+        List<PatcherSelectFileVO> vs = getForceAddSelectFiles(project);
         try {
             vs.clear();
         } finally {
@@ -765,26 +822,15 @@ public class PatcherDialog extends DialogWrapper {
         if (selectExport.isSelected()) {
             VirtualFile[] selects = V.get(LangDataKeys.VIRTUAL_FILE_ARRAY.getData(event.getDataContext()),
                     new VirtualFile[0]);
-            List<VirtualFile> vs = getForceAddSelectFiles(event.getProject());
+            List<PatcherSelectFileVO> vs = getForceAddSelectFiles(event.getProject());
             for (VirtualFile select : selects) {
-                rows.add(SelectDTO.builder()
-                        .select(true)
-                        .path(select.getPath())
-                        .file(select)
-                        .build());
+                rows.add(ReflectUtil.copy2VO(select, SelectDTO.class));
             }
-            for (VirtualFile select : vs) {
-                rows.add(SelectDTO.builder()
-                        .select(true)
-                        .path(select.getPath())
-                        .file(select)
-                        .build());
+            for (PatcherSelectFileVO select : vs) {
+                rows.add(ReflectUtil.copy2VO(select, SelectDTO.class));
             }
         } else {
-            rows.add(SelectDTO.builder()
-                    .select(true)
-                    .path("全部")
-                    .build());
+            rows.add(new SelectDTO().path("全部"));
         }
 
         setSelectTableDatas(rows);
@@ -794,33 +840,35 @@ public class PatcherDialog extends DialogWrapper {
         ArrayList<SelectDTO> rows = Lists.newArrayList();
         selectExport.setSelected(false);
         if (selectExport2.isSelected()) {
-            List<VirtualFile> vs = getForceAddSelectFiles(event.getProject());
-            for (VirtualFile select : vs) {
-                rows.add(SelectDTO.builder()
-                        .select(true)
-                        .path(select.getPath())
-                        .file(select)
-                        .build());
+            List<PatcherSelectFileVO> vs = getForceAddSelectFiles(event.getProject());
+            for (PatcherSelectFileVO select : vs) {
+                rows.add(ReflectUtil.copy2VO(select, SelectDTO.class));
             }
         } else {
-            rows.add(SelectDTO.builder()
-                    .select(true)
-                    .path("全部")
-                    .build());
+            rows.add(new SelectDTO().path("全部"));
         }
 
         setSelectTableDatas(rows);
     }
 
     @lombok.Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Builder
-    public static class SelectDTO {
-        @Builder.Default
+    public static class SelectDTO extends PatcherSelectFileVO {
         boolean select = true;
-        String path;
-        VirtualFile file;
+
+        public SelectDTO path(String path) {
+            setPath(path);
+            return this;
+        }
+
+        public SelectDTO file(VirtualFile f) {
+            setFile(f);
+            return this;
+        }
+
+        public SelectDTO setSelect(boolean select) {
+            this.select = select;
+            return this;
+        }
     }
 
     List<SelectDTO> selectDtos;
@@ -836,6 +884,7 @@ public class PatcherDialog extends DialogWrapper {
             Vector v = new Vector();
             v.add(row.isSelect());
             v.add(row.getPath());
+            v.add(row.getMemo());
             defaultTableModel.addRow(v);
         }
 

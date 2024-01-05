@@ -10,9 +10,8 @@ import com.air.nc5dev.vo.NCDataSourceVO;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.jz.dialog.ExportDlg;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * 导出NC6X单据所有SQL脚本        </br>

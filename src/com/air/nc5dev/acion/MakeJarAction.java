@@ -7,8 +7,7 @@ import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFileChooser;
 import java.io.File;
 import java.util.jar.Manifest;
 

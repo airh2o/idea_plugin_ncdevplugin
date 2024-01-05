@@ -3,7 +3,7 @@ package com.air.nc5dev.ui.listener;
 import com.air.nc5dev.ui.ResetNCUserPassWordPanel;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 
-import javax.swing.*;
+import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

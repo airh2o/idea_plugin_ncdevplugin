@@ -1,13 +1,11 @@
 package com.air.nc5dev.acion;
 
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
-import com.air.nc5dev.ui.MstscDialog;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.tangsu.mstsc.dao.BaseDao;
 
 import java.io.File;
-import java.io.IOException;
 
 public class MstscOpenLastAction extends AbstractIdeaAction {
     @Override

@@ -1,23 +1,11 @@
 package com.air.nc5dev.ui.adddeffiled;
 
-import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.ui.SearchTableFieldDialog;
-import com.air.nc5dev.ui.actionurlsearch.ActionResultListTable;
-import com.air.nc5dev.util.CollUtil;
-import com.air.nc5dev.util.IoUtil;
-import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
-import com.air.nc5dev.vo.meta.PropertyDTO;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
-import nc.vo.pub.VOStatus;
 
-import javax.swing.*;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
-import java.util.List;
 
 public class ClassListTableMouseListenerImpl implements MouseListener {
     AddDefField2BmfDialog mainPanel;

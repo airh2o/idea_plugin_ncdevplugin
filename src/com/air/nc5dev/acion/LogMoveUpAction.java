@@ -27,7 +27,7 @@ import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 /**
  *

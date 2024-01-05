@@ -1,7 +1,6 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.idea.ApplicationLibraryUtil;
@@ -10,6 +9,7 @@ import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.util.idea.RunConfigurationUtil;
 import com.air.nc5dev.vo.ExportConfigVO;
 import com.air.nc5dev.vo.ExportContentVO;
+import com.intellij.compiler.options.CompileStepBeforeRun;
 import com.intellij.execution.ShortenCommandLine;
 import com.intellij.execution.application.ApplicationConfiguration;
 import com.intellij.execution.application.ApplicationConfigurationType;
@@ -23,7 +23,12 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.*;
+import com.intellij.openapi.roots.CompilerModuleExtension;
+import com.intellij.openapi.roots.ContentEntry;
+import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.ModuleRootModificationUtil;
+import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.roots.impl.ModifiableModelCommitter;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx;
 import com.intellij.openapi.roots.ui.configuration.ModuleEditor;
@@ -43,7 +48,11 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Stream;
 
 /***
@@ -250,6 +259,11 @@ public class IdeaProjectGenerateUtil {
                     envs.put("FIELD_CLINET_PORT", ProjectNCConfigUtil.getNCClientPort());
                     conf.setEnvs(envs);
                     conf.setWorkingDirectory(ncHome.getPath());
+
+                    if (conf.getBeforeRunTasks() == null) {
+                        conf.setBeforeRunTasks(new ArrayList<>());
+                    }
+                    conf.getBeforeRunTasks().add(new CompileStepBeforeRun.MakeBeforeRunTask());
                 } else if (clientClass.equals(((ApplicationConfiguration) rc).MAIN_CLASS_NAME)) {
                     hasNc[1] = 1;
                     //更新配置
@@ -262,6 +276,11 @@ public class IdeaProjectGenerateUtil {
                     envs.put("FIELD_NC_HOME", ProjectNCConfigUtil.getNCHomePath());
                     conf.setEnvs(envs);
                     conf.setWorkingDirectory(ncHome.getPath());
+
+                    if (conf.getBeforeRunTasks() == null) {
+                        conf.setBeforeRunTasks(new ArrayList<>());
+                    }
+                    conf.getBeforeRunTasks().add(new CompileStepBeforeRun.MakeBeforeRunTask());
                 }
             });
         }
@@ -317,6 +336,11 @@ public class IdeaProjectGenerateUtil {
             conf.setShowConsoleOnStdErr(true);
             conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
 
+            if (conf.getBeforeRunTasks() == null) {
+                conf.setBeforeRunTasks(new ArrayList<>());
+            }
+            conf.getBeforeRunTasks().add(new CompileStepBeforeRun.MakeBeforeRunTask());
+
             RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf, true, true);
         }
 
@@ -346,6 +370,12 @@ public class IdeaProjectGenerateUtil {
             conf.setWorkingDirectory(ncHome.getPath());
             conf.setShowConsoleOnStdErr(true);
             conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
+
+            if (conf.getBeforeRunTasks() == null) {
+                conf.setBeforeRunTasks(new ArrayList<>());
+            }
+            conf.getBeforeRunTasks().add(new CompileStepBeforeRun.MakeBeforeRunTask());
+
             RunConfigurationUtil.addRunJavaApplicationMenu(ProjectUtil.getDefaultProject(), conf, false, true);
         }
     }

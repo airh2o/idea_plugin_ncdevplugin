@@ -1,24 +1,15 @@
 package com.air.nc5dev.ui.actionurlsearch;
 
-import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.acion.GoToNCRequestMappingAction;
 import com.air.nc5dev.ui.ToolWindowFactory;
-import com.air.nc5dev.util.ExceptionUtil;
-import com.air.nc5dev.util.ExportNCPatcherUtil;
-import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
 
 public class NCCActionURLSearchWindowFactory extends ToolWindowFactory {
     @Override

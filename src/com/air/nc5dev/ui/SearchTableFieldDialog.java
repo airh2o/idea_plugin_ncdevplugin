@@ -1,22 +1,21 @@
 package com.air.nc5dev.ui;
 
-import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
-import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
-import com.air.nc5dev.vo.meta.PropertyDTO;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.ui.JBIntSpinner;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.JViewport;
+import java.awt.AWTEvent;
+import java.awt.Point;
+import java.awt.Rectangle;
 
 /***
  *     弹框UI        </br>

@@ -1,6 +1,10 @@
 package com.air.nc5dev.util.jdbc;
 
-import com.air.nc5dev.util.*;
+import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.ExceptionUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.ReflectUtil;
+import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.ncutils.AESEncode;
 import com.air.nc5dev.vo.ExportContentVO;
@@ -18,7 +22,11 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 数据库 连接工具类 <br/>

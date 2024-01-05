@@ -24,7 +24,7 @@ import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 
-import javax.swing.*;
+import javax.swing.Icon;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**

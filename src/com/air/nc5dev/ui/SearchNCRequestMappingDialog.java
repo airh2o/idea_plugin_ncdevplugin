@@ -1,23 +1,13 @@
 package com.air.nc5dev.ui;
 
-import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.ui.actionurlsearch.NCCActionURLSearchView;
-import com.air.nc5dev.util.BmfUtil;
-import com.air.nc5dev.util.ExceptionUtil;
-import com.air.nc5dev.util.ProjectNCConfigUtil;
-import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
-import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBTextField;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
 /***
  *     弹框UI        </br>

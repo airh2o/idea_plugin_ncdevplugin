@@ -1,6 +1,11 @@
 package com.air.nc5dev.ui;
 
-import javax.swing.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 public class SetingRemindPanel extends JPanel {
 	public JTextArea textArea_title;

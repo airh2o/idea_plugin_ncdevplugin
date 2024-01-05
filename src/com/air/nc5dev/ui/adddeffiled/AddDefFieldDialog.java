@@ -1,34 +1,18 @@
 package com.air.nc5dev.ui.adddeffiled;
 
-import cn.hutool.core.io.FileUtil;
-import com.air.nc5dev.ui.exportbmf.ExportbmfDialog;
-import com.air.nc5dev.util.CollUtil;
-import com.air.nc5dev.util.ReflectUtil;
-import com.air.nc5dev.util.StringUtil;
-import com.air.nc5dev.util.V;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
-import com.air.nc5dev.util.meta.xml.MeatBaseInfoReadUtil;
-import com.air.nc5dev.vo.meta.ClassDTO;
-import com.air.nc5dev.vo.meta.ComponentDTO;
 import com.air.nc5dev.vo.meta.PropertyDTO;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBIntSpinner;
-import com.intellij.ui.JBSplitter;
-import com.intellij.ui.components.*;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBTextField;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.*;
-import java.util.stream.Collectors;
+import javax.swing.JComponent;
 
 /***
  *     弹框UI        </br>

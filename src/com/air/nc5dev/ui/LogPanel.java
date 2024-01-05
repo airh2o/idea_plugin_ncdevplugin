@@ -18,7 +18,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.tools.SimpleActionGroup;
 
-import javax.swing.*;
+import javax.swing.Box;
 
 public class LogPanel extends SimpleToolWindowPanel {
   public static final String ID = "ToolWindowFactory";

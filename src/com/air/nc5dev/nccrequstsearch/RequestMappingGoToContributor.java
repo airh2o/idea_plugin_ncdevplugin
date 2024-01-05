@@ -1,34 +1,26 @@
 package com.air.nc5dev.nccrequstsearch;
 
-import com.air.nc5dev.acion.GoToNCRequestMappingAction;
 import com.air.nc5dev.ui.actionurlsearch.ActionResultDTO;
 import com.air.nc5dev.ui.actionurlsearch.ActionResultListTable;
 import com.air.nc5dev.util.ReflectUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.vo.NCCActionInfoVO;
-import com.google.common.collect.Lists;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.actions.SearchEverywherePsiRenderer;
-import com.intellij.ide.actions.searcheverywhere.AbstractGotoSEContributor;
 import com.intellij.ide.actions.searcheverywhere.FoundItemDescriptor;
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributor;
 import com.intellij.ide.actions.searcheverywhere.WeightedSearchEverywhereContributor;
-import com.intellij.ide.util.gotoByName.FilteringGotoByModel;
-import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
 import com.intellij.util.Processor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.ListCellRenderer;
 import java.util.List;
 
 /**

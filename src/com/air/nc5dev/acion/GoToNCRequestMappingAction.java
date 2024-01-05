@@ -10,41 +10,9 @@ import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.extensions.ExtensionPointName;
-import com.intellij.openapi.project.Project;
-
-import java.util.ArrayList;
-
-
-import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
-import com.air.nc5dev.nccrequstsearch.RequestMappingModel;
-import com.air.nc5dev.util.ProjectNCConfigUtil;
-import com.air.nc5dev.util.idea.LogUtil;
-import com.air.nc5dev.util.idea.ProjectUtil;
-import com.intellij.ide.actions.GotoActionBase;
-import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-
-import com.air.nc5dev.acion.base.AbstractIdeaAction;
-import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
-import com.air.nc5dev.nccrequstsearch.RequestMappingModel;
-import com.air.nc5dev.ui.actionurlsearch.NCCActionURLSearchUI;
-import com.air.nc5dev.ui.actionurlsearch.NCCActionURLSearchView;
-import com.air.nc5dev.util.ProjectNCConfigUtil;
-import com.air.nc5dev.util.idea.LogUtil;
-import com.air.nc5dev.util.idea.ProjectUtil;
-import com.intellij.ide.actions.GotoActionBase;
-import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.extensions.ExtensionPointName;
-import com.intellij.openapi.project.Project;
 
 import java.util.ArrayList;
 

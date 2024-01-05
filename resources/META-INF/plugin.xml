@@ -137,9 +137,14 @@
                 description="清空NC插件日志窗口内容">
         </action>
 
+        <action id="GoToNCRequestMappingFastAction" class="com.air.nc5dev.acion.GoToNCRequestMappingFastAction"
+                text="快速搜索NCC请求地址Action">
+            <add-to-group group-id="GoToMenu" anchor="after" relative-to-action="GotoFile"/>
+        </action>
+
         <action id="GoToNCRequestMapping" class="com.air.nc5dev.acion.GoToNCRequestMappingAction"
                 text="快速搜索NCC请求地址Action" description="精简界面-快速查找">
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>
+<!--            <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>-->
             <!--            BACK_SLASH-->
         </action>
         <action id="SearchNCRequestMapping" class="com.air.nc5dev.acion.SearchNCRequestMappingAction"
@@ -576,7 +581,8 @@
                            id="CheckStyleIDEALogOnlyGroup"
                            key="plugin.notification.logging"/>
 
-
+        <searchEverywhereContributor
+                implementation="com.air.nc5dev.util.GoToNCRequestMappingFastActionSearchEverywhereContributorFactory"/>
     </extensions>
 
     <depends optional="true">com.jetbrains.restClient</depends>

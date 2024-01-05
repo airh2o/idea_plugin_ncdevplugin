@@ -2,7 +2,7 @@ package com.air.nc5dev.editor.bmf.languageinfo;
 
 import com.intellij.openapi.util.IconLoader;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 /**
  * bmf 文件图标</br>

@@ -3,14 +3,19 @@ package com.air.nc5dev.ui.adddeffiled;
 import com.air.nc5dev.util.StringUtil;
 import com.intellij.ui.table.JBTable;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JTable;
 import javax.swing.border.BevelBorder;
-import javax.swing.table.*;
-import java.awt.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 

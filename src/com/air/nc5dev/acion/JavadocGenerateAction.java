@@ -1,13 +1,22 @@
 package com.air.nc5dev.acion;
 
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
-import com.air.nc5dev.util.docgenerate.*;
+import com.air.nc5dev.util.docgenerate.ClassJavaDocGenerator;
+import com.air.nc5dev.util.docgenerate.FieldJavaDocGenerator;
+import com.air.nc5dev.util.docgenerate.JavaDocGenerator;
+import com.air.nc5dev.util.docgenerate.MethodJavaDocGenerator;
+import com.air.nc5dev.util.docgenerate.PsiUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiComment;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

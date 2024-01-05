@@ -2,7 +2,11 @@ package com.air.nc5dev.ui.adddeffiled;
 
 import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.ui.exportbmf.ExportbmfDialog;
-import com.air.nc5dev.util.*;
+import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.ReflectUtil;
+import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.util.V;
+import com.air.nc5dev.util.XmlUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
 import com.air.nc5dev.util.meta.xml.MeatBaseInfoReadUtil;
@@ -10,35 +14,33 @@ import com.air.nc5dev.vo.meta.ClassDTO;
 import com.air.nc5dev.vo.meta.ComponentDTO;
 import com.air.nc5dev.vo.meta.PropertyDTO;
 import com.google.common.collect.Maps;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.components.*;
-import lombok.Data;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.JBTabbedPane;
 import lombok.Getter;
 import lombok.Setter;
 import nc.vo.pub.VOStatus;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 
-import javax.swing.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.ByteArrayInputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 import java.util.stream.Collectors;
 
 /***
@@ -56,10 +58,12 @@ import java.util.stream.Collectors;
 public class AddDefField2BmfDialog extends DialogWrapper {
     public static String[] tableNames = new String[]{
             "序号", "组件名", "组件显示名", "模块", "名称空间"
+            , "表名", "类名", "主实体"
             , "ID", "文件版本号", "文件名", "组件类型", "文件路径"
     };
     public static String[] tableAttrs = new String[]{
             "order1", "name", "displayName", "ownModule", "namespace"
+            , "defaultTableName", "fullClassName", "isPrimary"
             , "id", "fileVersion", "fileName", "metaType", "filePath"
     };
 
@@ -232,7 +236,8 @@ public class AddDefField2BmfDialog extends DialogWrapper {
                 attributelist = e.addElement("attributelist");
             }
 
-            Map<Integer, List<PropertyDTO>> state2ProsMap = vs.stream().collect(Collectors.groupingBy(v -> v.getState()));
+            Map<Integer, List<PropertyDTO>> state2ProsMap =
+                    vs.stream().collect(Collectors.groupingBy(v -> v.getState()));
             List<PropertyDTO> ps = state2ProsMap.get(VOStatus.DELETED);
             if (CollUtil.isNotEmpty(ps)) {
                 for (PropertyDTO p : ps) {

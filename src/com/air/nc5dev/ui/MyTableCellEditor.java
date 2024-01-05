@@ -3,10 +3,20 @@ package com.air.nc5dev.ui;
 import com.intellij.openapi.ui.DialogWrapper;
 import lombok.Data;
 
-import javax.swing.*;
+import javax.swing.AbstractCellEditor;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.table.TableCellEditor;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
 import java.io.Serializable;
 import java.util.EventObject;
 

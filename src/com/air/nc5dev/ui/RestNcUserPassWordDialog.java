@@ -2,7 +2,12 @@ package com.air.nc5dev.ui;
 
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.exception.BusinessException;
-import com.air.nc5dev.util.*;
+import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.IoUtil;
+import com.air.nc5dev.util.NCPassWordUtil;
+import com.air.nc5dev.util.NCPropXmlUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.V;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.util.jdbc.resulthandel.NoValueResultSetExtractor;
@@ -21,8 +26,8 @@ import com.intellij.openapi.ui.Messages;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import java.awt.Dimension;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;

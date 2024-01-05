@@ -6,8 +6,14 @@ import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.intellij.openapi.project.Project;
 import lombok.Data;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import java.awt.Color;
+import java.awt.Font;
 
 @Data
 public class NC5HomeConfigDiaLogPanel extends JScrollPane {

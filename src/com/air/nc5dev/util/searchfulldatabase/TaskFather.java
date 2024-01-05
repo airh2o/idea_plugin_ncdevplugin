@@ -5,7 +5,8 @@ import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import lombok.Data;
 
-import javax.swing.*;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;

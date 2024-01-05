@@ -18,7 +18,7 @@ import java.util.List;
  * @Version
  */
 @Data
-public class ClassComboxDTO {
+public class ClassComboxDTO extends ClassDTO {
     int order1;
     String name;
     String displayName;
@@ -45,6 +45,13 @@ public class ClassComboxDTO {
 
     @Override
     public String toString() {
-        return String.format("%s-%s-%s", ownModule, name, displayName);
+        return String.format("%s-%s-%s-%s-主实体(%s)-%s"
+                , ownModule
+                , name
+                , displayName
+                , getDefaultTableName()
+                , getIsPrimary()
+                , getFullClassName()
+        );
     }
 }

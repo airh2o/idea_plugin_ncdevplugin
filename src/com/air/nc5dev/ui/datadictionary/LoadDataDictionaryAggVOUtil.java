@@ -1,6 +1,5 @@
 package com.air.nc5dev.ui.datadictionary;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.CollUtil;
@@ -24,7 +23,6 @@ import com.air.nc5dev.vo.meta.SearchComponentVO2;
 import com.alibaba.fastjson.JSON;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.sql.Connection;

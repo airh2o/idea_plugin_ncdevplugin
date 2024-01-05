@@ -1,14 +1,15 @@
 package com.air.nc5dev.util.searchfulldatabase;
 
 import com.air.nc5dev.util.ExceptionUtil;
-import com.air.nc5dev.util.NCPropXmlUtil;
 import com.air.nc5dev.util.StringUtil;
-import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import lombok.Data;
 
-import javax.swing.*;
-import java.sql.*;
+import javax.swing.JProgressBar;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

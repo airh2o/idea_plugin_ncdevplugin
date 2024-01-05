@@ -21,7 +21,7 @@ package com.air.nc5dev.util;
 
 import com.intellij.openapi.util.IconLoader;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 public class Icons {
   public static final Icon PLAY = IconLoader.getIcon("/images/execute.png");
