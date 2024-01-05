@@ -70,7 +70,7 @@ public class GoToNCRequestMappingFastActionSearchEverywhereContributor extends C
 
     @Override
     public String getGroupName() {
-        return "搜索NCC请求地址Action";
+        return "搜索"+V.get(V.str4Obj(ProjectNCConfigUtil.getNCVersion(myProject)))+"Action";
     }
 
     @Override
