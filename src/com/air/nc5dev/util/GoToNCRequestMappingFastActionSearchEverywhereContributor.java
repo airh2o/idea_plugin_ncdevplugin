@@ -70,16 +70,18 @@ public class GoToNCRequestMappingFastActionSearchEverywhereContributor extends C
 
     @Override
     public String getGroupName() {
-        return "搜索"+V.get(V.str4Obj(ProjectNCConfigUtil.getNCVersion(myProject)))+"Action";
+        return "搜索 " + V.get(V.str4Obj(ProjectNCConfigUtil.getNCVersion(myProject))) + " Action";
     }
 
     @Override
     public boolean processSelectedItem(@NotNull Object selected, int modifiers, @NotNull String searchText) {
         if (selected instanceof NCCActionInfoVO) {
             NCCActionInfoVO v = (NCCActionInfoVO) selected;
-            ActionResultListTable.openClass(null,myProject,ReflectUtil.copy2VO(v, ActionResultDTO.class));
+            ActionResultListTable.openClass(null, myProject, ReflectUtil.copy2VO(v, ActionResultDTO.class));
+        } else if (selected instanceof com.intellij.navigation.NavigationItem) {
+            return super.processSelectedItem(selected, modifiers, searchText);
         }
 
-        return super.processSelectedItem(selected, modifiers, searchText);
+        return false;
     }
 }

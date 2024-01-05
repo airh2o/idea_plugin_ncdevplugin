@@ -260,7 +260,9 @@ public class IdeaProjectGenerateUtil {
                     conf.setEnvs(envs);
                     conf.setWorkingDirectory(ncHome.getPath());
 
-                    if (conf.getBeforeRunTasks() == null) {
+                    if (conf.getBeforeRunTasks() != null) {
+                        conf.setBeforeRunTasks(new ArrayList<>(conf.getBeforeRunTasks()));
+                    } else {
                         conf.setBeforeRunTasks(new ArrayList<>());
                     }
                     conf.getBeforeRunTasks().add(new CompileStepBeforeRun.MakeBeforeRunTask());
@@ -277,7 +279,9 @@ public class IdeaProjectGenerateUtil {
                     conf.setEnvs(envs);
                     conf.setWorkingDirectory(ncHome.getPath());
 
-                    if (conf.getBeforeRunTasks() == null) {
+                    if (conf.getBeforeRunTasks() != null) {
+                        conf.setBeforeRunTasks(new ArrayList<>(conf.getBeforeRunTasks()));
+                    } else {
                         conf.setBeforeRunTasks(new ArrayList<>());
                     }
                     conf.getBeforeRunTasks().add(new CompileStepBeforeRun.MakeBeforeRunTask());
@@ -319,24 +323,29 @@ public class IdeaProjectGenerateUtil {
                             NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion()) ?
                                     " -Dfile.encoding=UTF-8 "
                                     : (
-                                    " -Xmx768m -XX:MaxPermSize=256m "
+                                    " -Xmx1024m -XX:MaxPermSize=256m "
                                             + " -Dfile.encoding=GBK "
                             )
                     )
                             // + " -Xdebug -Xrunjdwp:transport=dt_socket,address=" + RandomUtil.randomInt(25000,
                             // 55000) + ",server=y,suspend=n "
-                            + " -Dnc.server.name= "
+                          /*  + " -Dnc.server.name= "
                             + " -Dnc.server.startCount=0 "
                             + " -Dnc.bs.logging.format=text "
                             + " -Drun.side=server "
-                            + " -Dnc.run.side=server "
+                            + " -Dnc.run.side=server "*/
+                            + " -Dnc.fi.autogenfile=N "
+                            + " -Duap.disable.codescan=false "
+                            + " -Dlocal.exclude.modules= "
             );
             conf.setWorkingDirectory(ncHome.getPath());
             conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
             conf.setShowConsoleOnStdErr(true);
             conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
 
-            if (conf.getBeforeRunTasks() == null) {
+            if (conf.getBeforeRunTasks() != null) {
+                conf.setBeforeRunTasks(new ArrayList<>(conf.getBeforeRunTasks()));
+            } else {
                 conf.setBeforeRunTasks(new ArrayList<>());
             }
             conf.getBeforeRunTasks().add(new CompileStepBeforeRun.MakeBeforeRunTask());
@@ -371,7 +380,9 @@ public class IdeaProjectGenerateUtil {
             conf.setShowConsoleOnStdErr(true);
             conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
 
-            if (conf.getBeforeRunTasks() == null) {
+            if (conf.getBeforeRunTasks() != null) {
+                conf.setBeforeRunTasks(new ArrayList<>(conf.getBeforeRunTasks()));
+            } else {
                 conf.setBeforeRunTasks(new ArrayList<>());
             }
             conf.getBeforeRunTasks().add(new CompileStepBeforeRun.MakeBeforeRunTask());
