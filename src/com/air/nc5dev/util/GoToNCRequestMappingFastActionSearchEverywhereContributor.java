@@ -36,6 +36,10 @@ import java.util.Objects;
 public class GoToNCRequestMappingFastActionSearchEverywhereContributor extends ClassSearchEverywhereContributor {
     public GoToNCRequestMappingFastActionSearchEverywhereContributor(@NotNull AnActionEvent event) {
         super(event);
+        if (myProject != null) {
+            ProjectUtil.setProject(myProject);
+            ProjectNCConfigUtil.initConfigFile(myProject);
+        }
     }
 
     @Override

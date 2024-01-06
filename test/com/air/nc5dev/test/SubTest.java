@@ -81,10 +81,7 @@ public class SubTest {
         printWriter.println("CreateDate" + ": " + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
                 .format(LocalDateTime.now()));
         printWriter.println("Created-By" + ": " + "");
-        printWriter.println("Created-ByIde" + ": " + "IDEA-plugin-nc5devtoolidea");
-        printWriter.println("  by air Email 209308343@qq.com,QQ 209308343");
-        printWriter.println("IDEA-plugin-nc5devtoolidea-github" + ": " + "https://");
-        printWriter.println(" gitee.com/yhlx/idea_plugin_nc5devplugin");
+        printWriter.println("Created-ByIde:power by air QQ:209308343@qq.com 微信:yongyourj 插件地址:https://gitee.com/yhlx/idea_plugin_nc5devplugin");
         printWriter.println("");
         printWriter.flush();
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());

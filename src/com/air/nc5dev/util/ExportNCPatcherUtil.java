@@ -436,7 +436,7 @@ public class ExportNCPatcherUtil {
         } else {
             String name = f.getName().toLowerCase();
             boolean is = false;
-            ArrayList<String> ends = com.air.nc5dev.util.CollUtil.toList(".java", ".js");
+            ArrayList<String> ends = com.air.nc5dev.util.CollUtil.toList(".java", ".js", "_src.jar");
             for (String end : ends) {
                 if (StringUtil.endsWith(name, end)) {
                     is = true;
@@ -453,7 +453,16 @@ public class ExportNCPatcherUtil {
                 txt += UUID.randomUUID().toString();
             }
 
-            FileUtil.writeUtf8String(txt, f);
+            if (name.endsWith(".jar")) {
+                //classess
+                try {
+                    IoUtil.writeUtf8String2Jar(txt, f, com.air.nc5dev.util.CollUtil.toList(".java", ".js"));
+                } catch (Throwable e) {
+                }
+            } else {
+                //classess
+                FileUtil.writeUtf8String(txt, f);
+            }
         }
     }
 
@@ -468,6 +477,7 @@ public class ExportNCPatcherUtil {
         contentVO.indicator.setText("正在覆盖写入混淆字符串到源码文件...");
         if (contentVO.isFormat4Ygj()) {
             //云管家格式的
+
             javas.add(contentVO.getOutPath() + File.separatorChar + "replacement" + File.separatorChar + "modules");
             javas.add(contentVO.getOutPath() + File.separatorChar + "replacement" + File.separatorChar + "hotwebs"
                     + File.separatorChar + "nccloud" + File.separatorChar + "WEB-INF" + File.separatorChar + "classes"
@@ -654,7 +664,7 @@ public class ExportNCPatcherUtil {
                     if (files != null) {
                         for (File f : files) {
                             if (contentVO.indicator.isCanceled()) {
-                                return ;
+                                return;
                             }
 
                             if (f.isFile() && f.getName().toLowerCase().endsWith(".xml")) {
@@ -670,7 +680,7 @@ public class ExportNCPatcherUtil {
                     if (files != null) {
                         for (File f : files) {
                             if (contentVO.indicator.isCanceled()) {
-                                return ;
+                                return;
                             }
 
                             if (f.isFile() && f.getName().toLowerCase().endsWith(".xml")) {
@@ -690,7 +700,7 @@ public class ExportNCPatcherUtil {
                 if (com.air.nc5dev.util.CollUtil.isNotEmpty(fs)) {
                     for (File f : fs) {
                         if (contentVO.indicator.isCanceled()) {
-                            return ;
+                            return;
                         }
 
                         contentVO.indicator.setText("IDEA根据xml配置导出sql:" + f.getPath());
@@ -711,7 +721,7 @@ public class ExportNCPatcherUtil {
 
                             for (ItemsItemVO itemVO : vs) {
                                 if (contentVO.indicator.isCanceled()) {
-                                    return ;
+                                    return;
                                 }
 
                                 if (StringUtil.isBlank(itemVO.getItemKey())) {
@@ -1250,11 +1260,8 @@ public class ExportNCPatcherUtil {
                 printWriter.println("Implementation-Vendor" + ": " + "");
                 printWriter.println("CreateDate" + ": " + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
                         .format(LocalDateTime.now()));
-                printWriter.println("Created-By" + ": " + "");
-                printWriter.println("Created-ByIde" + ": " + "IDEA-plugin-nc5devtoolidea");
-                printWriter.println("  by air Email 209308343@qq.com,QQ 209308343");
-                printWriter.println("IDEA-plugin-nc5devtoolidea-github" + ": " + "https://");
-                printWriter.println(" gitee.com/yhlx/idea_plugin_nc5devplugin");
+                printWriter.println("Created-By" + ": " + ProjectUtil.getProject() != null ? ProjectUtil.getProject().getName() :"");
+                printWriter.println("Created-ByIde: power by air QQ:209308343@qq.com 微信:yongyourj 插件地址:https://gitee.com/yhlx/idea_plugin_nc5devplugin");
                 printWriter.println("");
                 printWriter.flush();
                 ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream

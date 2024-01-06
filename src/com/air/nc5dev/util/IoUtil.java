@@ -19,15 +19,19 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -974,7 +978,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         try {
             jos = new JarOutputStream(new FileOutputStream(outputFile), minf);
             // 设置压缩包注释
-            jos.setComment("create by idea plugin , power by air 209308343@qq.com");
+            jos.setComment("power by air QQ:209308343@qq.com 微信:yongyourj 插件地址:https://gitee.com/yhlx/idea_plugin_nc5devplugin");
 
             List<File> allFiles = getAllFiles(dir, true);
             if (skipSuffixs == null) {
@@ -1059,7 +1063,7 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
                 zos = new ZipOutputStream(new FileOutputStream(outputFile));
             }
             // 设置压缩包注释
-            zos.setComment("create by idea plugin , power by air 209308343@qq.com");
+            zos.setComment("power by air QQ:209308343@qq.com 微信:yongyourj 插件地址:https://gitee.com/yhlx/idea_plugin_nc5devplugin");
             zipFile(zos, inputFile, null, skipSuffixs);
 
             //2次调用 保证字节完全写入磁盘。
@@ -1348,6 +1352,63 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
 //        f.mkdirs();
 //        f.deleteOnExit();
         dir.mkdirs();
+    }
+
+    /**
+     * 往jar文件里，所有指定ends结尾的后缀文件，写入指定的txt内容！
+     *
+     * @param txt
+     * @param jarfile
+     * @param ends
+     */
+    public static void writeUtf8String2Jar(String txt, File jarfile, ArrayList<String> ends) throws IOException {
+        if (jarfile == null || !jarfile.isFile() || CollUtil.isEmpty(ends)) {
+            return;
+        }
+
+        File tempDir = new File(System.getProperty("java.io.tmpdir")
+                , jarfile.getName().substring(0, jarfile.getName().lastIndexOf('.')));
+        File tempJar = new File(tempDir, jarfile.getName());
+        IoUtil.deleteFileAll(tempDir);
+        tempDir.mkdirs();
+
+        //解压jar
+        JarFile in = new JarFile(jarfile);
+        JarOutputStream out = new JarOutputStream(new FileOutputStream(tempJar));
+        out.setComment("power by air QQ:209308343@qq.com 微信:yongyourj 插件地址:https://gitee.com/yhlx/idea_plugin_nc5devplugin");
+        try {
+            Enumeration<JarEntry> es = in.entries();
+            while (es.hasMoreElements()) {
+                JarEntry e = es.nextElement();
+                ZipEntry ze = new ZipEntry(e.getName());
+                ze.setTime(e.getTime());
+                ze.setComment(e.getComment());
+                ze.setSize(e.getSize());
+                ze.setTimeLocal(e.getTimeLocal());
+                out.putNextEntry(ze);
+
+                boolean is = false;
+                for (String end : ends) {
+                    if (e.getName().toLowerCase().endsWith(end)) {
+                        is = true;
+                        break;
+                    }
+                }
+
+                if (is) {
+                    out.write(txt.getBytes());
+                } else {
+                    out.write(IoUtil.readBytes(in.getInputStream(e)));
+                }
+            }
+        } finally {
+            IoUtil.close(out);
+            IoUtil.close(in);
+        }
+
+        //修改文件内容
+        FileUtil.move(tempJar, jarfile, true);
+        //重新打包jar
     }
 }
 
