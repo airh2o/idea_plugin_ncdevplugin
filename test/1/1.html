@@ -1,0 +1,177 @@
+<html lang="zh-cn" class="os-windows screen-desktop-wide device-desktop">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NC数据字典</title>
+
+    <link rel="stylesheet" href="js/zui.min.css">
+    <script src="js/jquery.js"></script>
+    <script src="js/zui.min.js"></script>
+    <link href="js/zui.datagrid.min.css" rel="stylesheet">
+    <script src="js/zui.datagrid.min.js"></script>
+    <link href="js/doc.min.css" rel="stylesheet"/>
+    <script type="text/javascript" src="js/jtree.js"></script>
+    <script type="text/javascript" src="js/uitool.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <link rel="stylesheet" href="js/all.css">
+
+    <script type="text/javascript">
+        function memu1click(id) {
+            var memu1 = document.getElementById(id);
+            if (memu1.classList.contains('open')) {
+                memu1.classList.remove('open');
+            } else {
+                memu1.classList.add('open');
+            }
+        }
+
+        function memu2click(id) {
+            let agg = window.agg;
+
+            let memu1 = document.getElementById("rightContentTitle").textContent = id;
+
+            $('#datagridSortExample').datagrid({
+                dataSource: {
+                    cols: [
+                        {name: 'time', label: '对局时间', width: 132},
+                        {name: 'hero', label: '英雄', width: 134},
+                        {name: 'action', label: '动作', width: 109},
+                        {name: 'target', label: '目标', width: 109},
+                        {name: 'desc', label: '描述', width: 287}
+                    ],
+                    array: [
+                        {time: '00:11:12', hero: '幻影刺客', action: '击杀', target: '斧王', desc: '幻影刺客击杀了斧王。'},
+                        {time: '00:13:22', hero: '幻影刺客', action: '购买了', target: '隐刀', desc: '幻影刺客购买了隐刀。'},
+                        {time: '00:19:36', hero: '斧王', action: '购买了', target: '黑皇杖', desc: '斧王购买了黑皇杖。'},
+                        {time: '00:21:43', hero: '力丸', action: '购买了', target: '隐刀', desc: '力丸购买了隐刀。'}
+                    ]
+                },
+                sortable: true,
+                width: '98%',
+                height: '98%',
+                hoverCell: true,
+                onClickCell: function (event, cell, $cell) {
+                    console.log('点击了单元格第', cell.rowIndex, '行', cell.colIndex, '列');
+                },
+                configs: {
+                    //第一行，第一列
+                    R1C1: {
+                        style: {
+                            color: '#00b8d4',
+                            backgroundColor: '#e0f7fa',
+                            cursor: 'pointer'
+                        }
+                    }
+                }
+            });
+        }
+
+
+        // window.agg = JSON.parse("{{'aggJsonString':'aggJsonString'}}");
+
+        //初始化左侧树
+        $('#myLeftTreeUL').tree({
+            data: [{
+                title: '水果',
+                url: 'http://openzui.com',
+                open: true,
+                children: [
+                    {title: '橘子'},
+                    {
+                        title: '瓜',
+                        children: [
+                            {title: '西瓜'},
+                            {title: '黄瓜'}
+                        ]
+                    }
+                ]
+            }, {
+                title: '坚果',
+                children: [
+                    {title: '向日葵'},
+                    {title: '瓜子'}
+                ]
+            }, {
+                title: '蔬菜'
+            }]
+        });
+    </script>
+
+</head>
+<body class="ad-xuanxuan view-double page-open compact-mode compact-mode-in page-show page-show-in" style=""
+      data-page-accent="primary" data-page="basic-responsive">
+
+<!-- 新开子页面 -->
+<div id="page" class="">
+    <div id="pageHeader">
+        <div class="wrapper container">
+            <h2><a class="name" id="rightContentTitle">响应式设计</a></h2>
+        </div>
+    </div>
+    <div id="pageBody" class="scrollbar-hover">
+        <div class="container">
+            <div id="pageContent">
+                <div id="datagridSortExample" class="datagrid  datagrid-striped "></div>
+            </div>
+            <nav></nav>
+        </div>
+    </div>
+</div>
+
+<!-- 内容目录 -->
+<div id="grid" class="scrollbar-hover  " style="top: 1px;">
+    <div class="container">
+        <div class="row">
+            <div class="col col-md-d5 col-sm-6">
+                <div class="chapter" id="chapter-basic" data-id="basic" data-accent="primary">
+                    <div class="chapter-body" id="sections-basic">
+
+                        <div class="toggleCollapse">
+                            <div class="navigationbar">
+                                <div id="searchMenu">
+                                    <input id="searchTree" type="text" class="span2" data-autofocus="autofocus"
+                                           x-webkit-speech="" lang="zh-CN" x-webkit-grammar="builtin:translate"
+                                           onwebkitspeechchange="$('#searchTreeBtn').trigger('click')">
+                                    <a id="searchTreeClose" title="清除条件" class="treeclosebtn hide"><i
+                                            class="tree-close"></i></a> <a
+                                        id="searchTreeBtn"
+                                        title="搜索菜单"
+                                        class="treesearchbtn"><i
+                                        class=" tree-search"></i>搜索</a></div>
+                                <div id="searchMenuBar" style="line-height: 30px">
+                                    <a title="折叠全部" onClick="$('ul.tree').colExpAll({clickType:'expAll'})"
+                                       id="expandBtn"
+                                       class="treebar">折叠<i class="collapse-all"></i></a>
+                                    <a title="展开全部" onClick="$('ul.tree').colExpAll({clickType:'colAll'})"
+                                       id="collapseBtn" class="treebar">展开<i
+                                            class="expand-all"></i></a></div>
+                            </div>
+                        </div>
+
+
+                        <div class="leftTreeDiv">
+                            <ul id="a" class="tree treeFolder collapse tree-lines myLeftTreeUL" data-animate="true"
+                                data-ride="tree"></ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <hr>
+        <p class="text-muted small">版本<span class="doc-version">1</span><span
+                class="text-page-count"></span><span class="text-external-count"></span> <span
+                style="opacity:.5">|</span> <a id="beian" href="https://beian.miit.gov.cn/#/Integrated/index"
+                                               target="_blank">By QQ:209308043微信:yongyourj 欢迎私活联系</a></p>
+    </div>
+</footer>
+
+
+</body>
+</html>

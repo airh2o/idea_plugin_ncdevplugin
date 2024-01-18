@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<packmetadata>
+    <canAppliedMiddleware>Weblogic,Websphere 7.0,Yonyou Middleware V5,Yonyou Middleware V6</canAppliedMiddleware>
+    <canAppliedDB>DB2 V9.7,SQL Server 2008 R2,Oracle 10,Oracle 11</canAppliedDB>
+    <patchType>新增功能补丁</patchType>
+    <modifiedJavaClasses></modifiedJavaClasses>
+    <description/>
+    <modifiedModules/>
+    <needRecreatedLoginJar>true</needRecreatedLoginJar>
+    <applyVersion>5.0,5.01,5.011,5.02,5.3,5.5,5.6,5.7,5.75,6.0,6.1,6.3</applyVersion>
+    <patchName></patchName>
+    <bugs/>
+    <provider>209308343@qq.com</provider>
+    <patchPriority>高危补丁</patchPriority>
+    <patchVersion/>
+    <dependInfo/>
+    <canAppliedOS>Linux,Windows,AIX,Solaris</canAppliedOS>
+    <id></id>
+    <time></time>
+    <department>air QQ 209308343, 微信: yongyourj</department>
+    <needDeploy>false</needDeploy>
+    <searchKeys/>
+</packmetadata>

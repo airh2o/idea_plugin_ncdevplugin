@@ -1,0 +1,45 @@
+#导出补丁选项参数
+config-notest=true
+config-exportsourcefile=true
+config-compressjar=true
+config-compressEndDeleteClass=true
+#如果打包jar，那么 META-INF.MF 文件模板磁盘全路径
+config-ManifestFilePath=
+#是否猜测模块，默认true，开启后 如果配置文件没有指明的类会根据包名第三个判断模块
+# （比如 nc.ui.pub.ButtonBar 第三个是pub 所以认为模块是 pub）
+config-guessModule=false
+#关闭使用JAVAP方式判断 源码文件对应,默认false
+config-closeJavaP=true
+
+
+nc.bs.pub.action.N_21_UNAPPROVE=pu
+nc.bs.pub.action.N_23_SAVEBASE=pu
+nc.bs.pub.action.N_25_DISCARD=pu
+nc.bs.po.OrderPubImpl=pu
+
+
+
+nc.bs.pub.action.N_45_CANCELSIGN=ic
+nc.bs.pub.action.N_45_SIGN=ic
+nc.ui.ic.pub.vmi.SumClientUI=ic
+
+nc.jdbc.framework.BeanResultVOProcessor=uap
+nc.jdbc.framework.JdbcPersistenceManager=uap
+nc.bs.uap=uap
+
+
+nc.bs.arap.verify.VerifyBO=arap
+
+
+
+
+
+
+
+
+
+
+
+
+
+

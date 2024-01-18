@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding='gb2312'?>
+<items docType="SDP_SCRIPT_ITEM">
+    <!--    下面有部分表，配置了and 1=2 要你自己根据情况手工调整！！！！！-->
+
+    <!--    变量列表， name 变量名， 下面使用通过 {变量名}  ，变量本身也可以引用其他变量-->
+    <vars>
+        <!--        模块-->
+        <var name="module">pcm</var>
+        <!--        单据类型编码-->
+        <var name="billtype">P6</var>
+        <!--        功能注册 编码-->
+        <var name="node">4820200200%</var>
+        <!--        菜单编码-->
+        <var name="menu">48207020%</var>
+        <!--        元数据 里 表组件 名称列表-->
+        <var name="metaNames">'P6HVO','P6BVO'</var>
+        <!--        元数据里 表组件 id列表 -->
+        <var name="metaIds">select id from md_class where name in({metaNames})</var>
+    </vars>
+
+    <item>
+        <itemKey>sm_funcregister</itemKey>
+        <itemName>sm_funcregister</itemName>
+        <itemRule>sm_funcregister</itemRule>
+        <sysField></sysField>
+        <corpField></corpField>
+        <!-- 支持sql标签，如果里面写了sql语句 直接使用这个sql执行 的结果导出插入语句，而不会根据itemKey和fixedWhere来查询。-->
+        <sql></sql>
+        <grpField></grpField>
+        <fixedWhere>
+            funcode like '{node}'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>sm_paramregister</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            parentid in(select cfunid from sm_funcregister where funcode like '{node}')
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>sm_menuitemreg</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            menuitemcode like '{menu}'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billtemplet</itemKey>
+        <sql></sql>
+        <fixedWhere>
+             (nodecode like '{node}' or pk_billtypecode in({billtype})
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billtemplet_b</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            pk_billtemplet in( select pk_billtemplet from pub_billtemplet where  (nodecode like '{node}' or pk_billtypecode in({billtype}) )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billtemplet_t</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            pk_billtemplet in( select pk_billtemplet from pub_billtemplet where  (nodecode like '{node}' or pk_billtypecode in({billtype}) )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_systemplate_base</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            templateid in( select pk_billtemplet from pub_billtemplet where  (nodecode like '{node}' or pk_billtypecode in({billtype}) )
+            or templateid in( select id from pub_query_templet where node_code like '{node}' )
+            or templateid in( select ctemplateid from pub_print_template where v (nodecode like '{node}' or pk_billtypecode in({billtype}) )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_query_templet</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            node_code like '{node}'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_query_condition</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            pk_templet in( select id from pub_query_templet where node_code like '{node}' )
+        </fixedWhere>
+    </item>
+
+    <item>
+        <itemKey>pub_print_template</itemKey>
+        <sql></sql>
+        <fixedWhere>
+             (nodecode like '{node}' or pk_billtypecode in({billtype})
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_print_cell</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            ctemplateid in( select ctemplateid from pub_print_template where v (nodecode like '{node}' or pk_billtypecode in({billtype}) )
+        </fixedWhere>
+    </item>
+
+    <item>
+        <itemKey>bd_billtype</itemKey>
+        <sql></sql>
+        <fixedWhere>
+             (nodecode like '{node}' or pk_billtypecode in({billtype})
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_billaction</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            pk_billtypeid in( select pk_billtypeid from bd_billtype where  (nodecode like '{node}' or pk_billtypecode in({billtype}) )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_busiclass</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            pk_billtypeid in( select pk_billtypeid from bd_billtype where  (nodecode like '{node}' or pk_billtypecode in({billtype}) )
+        </fixedWhere>
+    </item>
+
+    <item>
+        <itemKey>pub_bcr_nbcr</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            metaid in( {metaIds} )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_bcr_rulebase</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            nbcrcode ='{billtype}'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_bcr_elem</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            pk_billcodebase in( select pk_billcodebase from pub_bcr_rulebase where nbcrcode ='{billtype}' )
+        </fixedWhere>
+    </item>
+
+    <item>
+        <itemKey>pub_vochange</itemKey>
+        <fixedWhere>
+            dest_billtype='{billtype}' or src_billtype='{billtype}'
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_vochange_b</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            pk_vochange in( select pk_vochange from pub_vochange where dest_billtype='{billtype}' or src_billtype='{billtype}' )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_vochange_b_upgrade</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            pk_vochange in( select pk_vochange from pub_vochange where dest_billtype='{billtype}' or src_billtype='{billtype}' )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_vochange_s</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            pk_vochange in( select pk_vochange from pub_vochange where dest_billtype='{billtype}' or src_billtype='{billtype}' )
+        </fixedWhere>
+    </item>
+    <item>
+        <itemKey>pub_vochange_s_upgrade</itemKey>
+        <sql></sql>
+        <fixedWhere>
+            pk_vochange in( select pk_vochange from pub_vochange where dest_billtype='{billtype}' or src_billtype='{billtype}' )
+        </fixedWhere>
+    </item>
+
+
+</items>

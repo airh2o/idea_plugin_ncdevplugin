@@ -1,0 +1,20 @@
+{
+  parserClass="com.simpleplugin.parser.SimpleParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="bmf"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.air.nc5dev.editor.bmf.languageinfo.psi"
+  psiImplPackage="com.simpleplugin.psi.impl"
+
+  elementTypeHolderClass="com.air.nc5dev.editor.bmf.languageinfo.BmfMDPFileType"
+  elementTypeClass="com.air.nc5dev.editor.bmf.languageinfo.psi.BmfElementType"
+  tokenTypeClass="com.air.nc5dev.editor.bmf.languageinfo.psi.BmfTokenType"
+}
+
+simpleFile ::= item_*
+
+private item_ ::= (property|COMMENT|CRLF)
+
+property ::= (KEY? SEPARATOR VALUE?) | KEY

@@ -1,0 +1,743 @@
+<idea-plugin>
+    <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
+    <name>Yonyou NC Dev Tool</name>
+    <version>v4.0.3</version>
+    <vendor email="209308343@qq.com" url="https://gitee.com/yhlx/idea_plugin_nc5devplugin">Air 209308043@qq.com 微信: yongyourj 欢迎私活联系</vendor>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="211.7628.21"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- Other product support activated in plugin page during upload at https://plugins.jetbrains.com -->
+    <!--    <depends optional="true" config-file="plugin-java.xml">com.intellij.modules.java</depends>-->
+
+    <actions>
+        <action id="nc5dev.config.nchome" class="com.air.nc5dev.acion.NC5HomePathConfigAction" text="配置NC HOME"
+                description="设置NC5的HOME主路径">
+        </action>
+        <action id="nc5dev.config.updateclasspath" class="com.air.nc5dev.acion.UpdateProjectNCDependencyAction"
+                text="更新NC库依赖" description="立即更新当前设置的NC HOME的所有NC类依赖(耗时可能会较长,请耐心等待反应)">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift u"/>
+        </action>
+        <action id="nc5dev.config.AddDataSource2DbnToolAction" class="com.air.nc5dev.acion.AddDataSource2DbnToolAction"
+                text="添加数据源到Databse连接列表" description="把NC的数据源直接添加到右侧Database官方管理插件的数据连接里面去">
+        </action>
+        <action id="nc5dev.config.addRunConfig" class="com.air.nc5dev.acion.AddProjectNCRunConfig" text="生成默认NC运行配置"
+                description="生成默认的2个NC运行配置，一个服务端，一个客户端(如果已经有了会跳过)">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift r"/>
+        </action>
+        <action id="nc5dev.export.exportncpatcher" class="com.air.nc5dev.acion.ExportNCPatcherAction"
+                text="导出NC补丁包" description="导出项目为NC的补丁包">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift e"/>
+        </action>
+        <action id="nc5dev.export.RestNcUserPassWordAction" class="com.air.nc5dev.acion.RestNcUserPassWordAction"
+                text="重置NC操作员密码" description="重置NC操作员密码">
+        </action>
+        <action id="nc5dev.info.about" class="com.air.nc5dev.acion.AboutMeAction" text="关于我" description="插件信息">
+        </action>
+        <action id="nc5dev.info.help" class="com.air.nc5dev.acion.HelpMeAction" text="使用帮助" description="打开使用帮助">
+        </action>
+
+        <action id="nc5dev.info.opennchome" class="com.air.nc5dev.acion.OpenNCHomeAction"
+                text="打开NC HOME" description="资源管理器中打开NC根目录">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift h"/>
+        </action>
+        <action id="nc5dev.info.opennchomeierpbin" class="com.air.nc5dev.acion.OpenNCHomeIerpBinAction"
+                text="打开NC ierp\bin" description="资源管理器中打开NC ierp\bin目录">
+        </action>
+        <action id="nc5dev.info.deletenclogs" class="com.air.nc5dev.acion.DeleteNCLogsAction"
+                text="清理NC 日志文件" description="删除NC HOME中nclogs下的日志文件">
+        </action>
+        <action id="nc5dev.info.openncconfigwindow" class="com.air.nc5dev.acion.OpenNCConfigWindowAction"
+                text="打开NC 配置窗口" description="打开NCHOME bin中NC服务器的配置脚本">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift b"/>
+        </action>
+        <action id="nc5dev.info.opennclogconfigfile" class="com.air.nc5dev.acion.OpenNCLogConfigFileAction"
+                text="打开NC 日志配置文件" description="打开NC 日志配置文件">
+        </action>
+        <action id="nc5dev.info.openncdataconfigfile" class="com.air.nc5dev.acion.OpenNCDataConfigFileAction"
+                text="打开NC 数据源配置文件" description="打开NC 数据源配置文件">
+        </action>
+        <action id="nc5dev.info.OpenNCCDevWebAction" class="com.air.nc5dev.acion.OpenNCCDevWebAction"
+                text="打开NCC开发论坛" description="打开NCC开发论坛">
+        </action>
+        <action id="nc5dev.info.OpenNCCUIWebAction" class="com.air.nc5dev.acion.OpenNCCUIWebAction"
+                text="打开NCC-UI官网" description="打开NCC-UI">
+        </action>
+        <action id="nc5dev.info.OpenCopyWebAction" class="com.air.nc5dev.acion.OpenCopyWebAction"
+                text="打开在线粘贴板" description="打开在线粘贴板-无需登录-可以在线临时保存文字和文件到网站">
+        </action>
+        <action id="nc5dev.info.OpenYonbipDevWebAction" class="com.air.nc5dev.acion.OpenYonbipDevWebAction"
+                text="打开Yonbip开发论坛" description="打开Yonbip开发论坛">
+        </action>
+        <action id="nc5dev.info.SearchFullDataBaseAction" class="com.air.nc5dev.acion.SearchFullDataBaseAction"
+                text="数据库全局搜索" description="数据库全局搜索">
+        </action>
+        <action id="nc5dev.info.MstscManggerUIAction" class="com.air.nc5dev.acion.MstscManggerUIAction"
+                text="Mstsc远程桌面管理" description="Mstsc远程桌面管理">
+        </action>
+        <action id="nc5dev.info.MstscOpenLastAction" class="com.air.nc5dev.acion.MstscOpenLastAction"
+                text="打开最后一次MSTSC连接" description="打开最后一次MSTSC连接">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift l"/>
+        </action>
+        <action id="nc5dev.info.MakeExcelByBmfFile" class="com.air.nc5dev.acion.MakeExcelByBmfFileAction"
+                text="元数据文件转字段Excel文档" description="根据bmf元数据文件生成Excel的单据字段文档">
+        </action>
+        <action id="nc5dev.info.NCCJsonDecodeAction" class="com.air.nc5dev.acion.NCCJsonDecodeAction"
+                text="NCC(BIP)前端请求解码" description="NCC(BIP)前端请求解码">
+        </action>
+        <action id="nc5dev.info.NCDataDictionaryAction" class="com.air.nc5dev.acion.NCDataDictionaryAction"
+                text="NC数据字典" description="NC当前数据源的数字字典">
+        </action>
+        <action id="nc5dev.info.openjconsole" class="com.air.nc5dev.acion.OpenJconsoleAction"
+                text="打开 Jconsole" description="打开Jconsole">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift j"/>
+        </action>
+        <action id="nc5dev.info.openjvisualvm" class="com.air.nc5dev.acion.OpenJvisualvmAction"
+                text="打开 Jvisualvm" description="打开jvisualvm">
+        </action>
+        <action id="nc5dev.info.showlocalncjavaexe" class="com.air.nc5dev.acion.ShowLocalNCProcessAction"
+                text="显示 本机NC进程列表" description="显示 本机NC后端和Swing端进程列表">
+            <!--            <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>-->
+        </action>
+        <action id="nc5dev.info.makejarfile" class="com.air.nc5dev.acion.MakeJarAction"
+                text="文件夹转Jar文件" description="把一个文件夹 比如class文件夹 转换成Jar包">
+        </action>
+        <action id="nc5dev.info.ShowNCDBUserListAction" class="com.air.nc5dev.acion.ShowNCDBUserListAction"
+                text="显示数据源和密码列表" description="显示当前NC的数据库数据源列表和密码">
+        </action>
+        <action id="nc5dev.info.makeNcModulejarfile" class="com.air.nc5dev.acion.MakeNcModuleJarAction"
+                text="NC补丁模块转Jar文件" description="把一个NC补丁的模块文件夹  转换成Jar包">
+        </action>
+        <action id="nc5dev.info.exportBillAll" class="com.air.nc5dev.acion.ExportBillAllAction"
+                text="导出NC6X单据所有脚本(此功能不确定是否完善,暂不维护!请使用导出补丁弹框的IDEA强制连接数据库导出SQL功能)"
+                description="导出NC6X单据所有SQL脚本(不确定这个是否导出完整)">
+        </action>
+        <action id="nc5dev.info.copyMateFile2NewFile" class="com.air.nc5dev.acion.CopyMateFile2NewFileAction"
+                text="复制元数据文件" description="把一个NC元数据文件复制成新的文件且重置里面的各种id等">
+        </action>
+        <action id="nc5dev.info.SetRemind" class="com.air.nc5dev.acion.SetingRemindAction"
+                text="设置定时提醒" description="设置定时提醒">
+        </action>
+        <action id="nc5dev.info.ClearRemind" class="com.air.nc5dev.acion.ClearRemindAction"
+                text="清空定时提醒" description="清空定时提醒">
+        </action>
+        <!--<action id="nc5dev.export.openbmf" class="com.air.nc5dev.acion.EditBmfFileAction"
+                text="编辑元数据" description="打开NC元数据文件">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="before" relative-to-action="CutCopyPasteGroup"/>
+        </action>
+        <action id="nc5dev.export.addwsdl" class="com.air.nc5dev.acion.NewWsdlFilesAction"
+                text="新增WSDL接口" description="新增WSDL接口">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="before" relative-to-action="CutCopyPasteGroup"/>
+        </action>-->
+        <action id="SonarLint.toolwindow.Cancel"
+                class="com.air.nc5dev.acion.LogCleanConsoleAction"
+                text="清空NC插件日志窗口内容"
+                description="清空NC插件日志窗口内容">
+        </action>
+
+        <action id="GoToNCRequestMappingFastAction" class="com.air.nc5dev.acion.GoToNCRequestMappingFastAction"
+                text="快速搜索NCC请求地址Action">
+            <add-to-group group-id="GoToMenu" anchor="after" relative-to-action="GotoFile"/>
+        </action>
+
+        <action id="GoToNCRequestMapping" class="com.air.nc5dev.acion.GoToNCRequestMappingAction"
+                text="快速搜索NCC请求地址Action" description="精简界面-快速查找">
+<!--            <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>-->
+            <!--            BACK_SLASH-->
+        </action>
+        <action id="SearchNCRequestMapping" class="com.air.nc5dev.acion.SearchNCRequestMappingAction"
+                text="搜索NCC-BIP请求地址Action界面" description="完整界面来高级搜索Action情况">
+        </action>
+        <action id="ReDeployAction" class="com.air.nc5dev.acion.ReDeployAction"
+                text="立即部署更新项目配置到HOME" description="比如ncc的xml文件和重新加载各种项目里的xml信息">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift m"/>
+        </action>
+        <action id="nc5dev.info.ReConfigModuleAction" class="com.air.nc5dev.acion.ReConfigModuleAction"
+                text="重新配置模块结构(对模块右键 只配置此模块，否则配置整个所有模块)" description="立即重新自动设置模块的依赖结构和源文件夹等配置(对模块右键 只配置此模块，否则配置整个所有模块)">
+        </action>
+        <action id="nc5dev.info.ReConfigProjectAction" class="com.air.nc5dev.acion.ReConfigProjectAction"
+                text="重新配置整个项目NC结构" description="自动生成所有NC文件夹和模块配置文件以及配置源码文件夹等">
+        </action>
+
+        <action id="nc5dev.info.meta.MakeBmf4OneHeadOneBodyBillAction"
+                class="com.air.nc5dev.acion.meta.MakeBmf4OneHeadOneBodyBillAction"
+                text="NC主子表单据" description="生成模板元数据文件(参考.感谢www.uapdev.com)">
+        </action>
+        <action id="nc5dev.info.meta.MakeBmf41zBillAction"
+                class="com.air.nc5dev.acion.meta.MakeBmf41zBillAction"
+                text="NC单表单据" description="生成模板元数据文件">
+        </action>
+        <action id="nc5dev.info.meta.MakeBmf41bBillAction"
+                class="com.air.nc5dev.acion.meta.MakeBmf41bBillAction"
+                text="NC单子表单据" description="生成模板元数据文件">
+        </action>
+        <action id="nc5dev.info.meta.MakeBmf4skBillAction"
+                class="com.air.nc5dev.acion.meta.MakeBmf4skBillAction"
+                text="NC树卡单据" description="生成模板元数据文件">
+        </action>
+        <action id="nc5dev.info.meta.MakeBmf4Lfw1z1zBillAction"
+                class="com.air.nc5dev.acion.meta.MakeBmf4Lfw1z1zBillAction"
+                text="LFW主子表单据" description="生成模板元数据文件">
+        </action>
+        <action id="nc5dev.info.meta.TakeBmfFromDatabaseAction"
+                class="com.air.nc5dev.acion.meta.TakeBmfFromDatabaseAction"
+                text="抽取数据库导出BMF文件" description="从数据库里元数据表数据导出BMF元数据文件-主要用做元数据文件不是最新而要从数据库抽取">
+        </action>
+        <action id="nc5dev.info.meta.AddDefField2BmfAction"
+                class="com.air.nc5dev.acion.meta.AddDefField2BmfAction"
+                text="快速新增或复制元数据字段" description="快速新增元数据文件中的自定义项目">
+
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+
+        <action id="nc5dev.info.JavadocGenerateAction" class="com.air.nc5dev.acion.JavadocGenerateAction"
+                text="生成Java Doc注释" description="根据方法名或属性名等翻译后生成注释">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift 1"/>
+            <!--            <add-to-group group-id="GenerateGroup" anchor="last"/>-->
+        </action>
+        <action id="SerializeGenerator" class="com.air.nc5dev.util.docgenerate.SerializeGenerator"
+                text="生成Serialize ID" description="Generate SerialVersionUID">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift s"/>
+            <!--            <add-to-group group-id="GenerateGroup" anchor="last"/>-->
+        </action>
+        <action id="GenerateGetSetAction" class="com.air.nc5dev.util.docgenerate.GenerateGetSetAction"
+                text="生成get set方法" description="Getter and Setter With Comment">
+            <!--            <add-to-group group-id="GenerateGroup" anchor="last"/>-->
+        </action>
+        <action id="GenerateGetAction" class="com.air.nc5dev.util.docgenerate.GenerateGetAction"
+                text="生成get方法" description="Getter With Comment">
+            <!--            <add-to-group group-id="GenerateGroup" anchor="last"/>-->
+        </action>
+        <action id="GenerateSetAction" class="com.air.nc5dev.util.docgenerate.GenerateSetAction"
+                text="生成set方法" description="Setter With Comment">
+            <!--            <add-to-group group-id="GenerateGroup" anchor="last"/>-->
+        </action>
+        <action id="NCCodeCheckAction" class="com.air.nc5dev.acion.NCCodeCheckAction"
+                text="立即运行NC代码检查" description="检查代码是否符合最低NC规范要求">
+        </action>
+
+        <action id="ShowPathcerSelectFilesListAction"
+                class="com.air.nc5dev.acion.ShowPathcerSelectFilesListAction"
+                text="查看文件列表(补丁导出选定的文件列表)"
+                description="查看文件列表补丁导出选定的文件列表"
+        >
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+        <action id="AddFile2PathcerSelectFilesAction"
+                class="com.air.nc5dev.acion.AddFile2PathcerSelectFilesAction"
+                text="当前文件加入(补丁导出选定的文件列表)"
+                description="当前文件加入补丁导出选定的文件列表"
+        >
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+        <action id="RemoveFile2PathcerSelectFilesAction"
+                class="com.air.nc5dev.acion.RemoveFile2PathcerSelectFilesAction"
+                text="当前文件移出(补丁导出选定的文件列表)"
+                description="当前文件移出补丁导出选定的文件列表"
+        >
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+        <action id="ClearFile2PathcerSelectFilesAction"
+                class="com.air.nc5dev.acion.ClearFile2PathcerSelectFilesAction"
+                text="清空全部(补丁导出选定的文件列表)"
+                description="清空添加的补丁导出选定的文件列表"
+        >
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+
+        <group id="nc5devtool" text="NC 开发插件配置" popup="true" description="配置NC开发插件"
+               icon="/META-INF/nc-logo.png">
+            <reference ref="nc5dev.config.nchome"/>
+            <reference ref="nc5dev.config.updateclasspath"/>
+            <reference ref="nc5dev.config.addRunConfig"/>
+            <reference ref="nc5dev.config.AddDataSource2DbnToolAction"/>
+            <separator/>
+
+            <reference ref="nc5dev.export.exportncpatcher"/>
+            <reference ref="nc5dev.export.RestNcUserPassWordAction"/>
+            <separator/>
+            <!-- 方便使用的小功能 -->
+            <!-- <group id="nc5devtoolRemind" text="久坐定时提醒"
+                    popup="true" description="一个简单的定时提醒弹框">
+                 <reference ref="nc5dev.info.SetRemind"/>
+                 <reference ref="nc5dev.info.ClearRemind"/>
+             </group>-->
+            <separator/>
+
+            <group id="nc5devtoolMatabmfEdit" text="快速新增元数据文件"
+                   popup="true" description="快速新增或处理元数据文件的各种功能">
+                <reference ref="nc5dev.info.meta.MakeBmf4OneHeadOneBodyBillAction"/>
+                <reference ref="nc5dev.info.meta.MakeBmf41zBillAction"/>
+                <reference ref="nc5dev.info.meta.MakeBmf41bBillAction"/>
+                <reference ref="nc5dev.info.meta.MakeBmf4skBillAction"/>
+                <reference ref="nc5dev.info.meta.MakeBmf4Lfw1z1zBillAction"/>
+                <reference ref="nc5dev.info.meta.TakeBmfFromDatabaseAction"/>
+
+                <reference ref="nc5dev.info.copyMateFile2NewFile"/>
+
+                <reference ref="nc5dev.info.meta.AddDefField2BmfAction"/>
+            </group>
+            <separator/>
+
+            <reference ref="nc5dev.info.opennchome"/>
+            <reference ref="nc5dev.info.opennclogconfigfile"/>
+            <reference ref="nc5dev.info.openncdataconfigfile"/>
+            <reference ref="nc5dev.info.NCDataDictionaryAction"/>
+
+            <group id="nc5devtoolOtherTools" text="其他小功能"
+                   popup="true" description="其他小功能">
+                <reference ref="nc5dev.info.deletenclogs"/>
+
+                <reference ref="nc5dev.info.opennchomeierpbin"/>
+                <reference ref="nc5dev.info.openncconfigwindow"/>
+                <reference ref="nc5dev.info.OpenNCCDevWebAction"/>
+                <reference ref="nc5dev.info.OpenNCCUIWebAction"/>
+                <reference ref="nc5dev.info.OpenCopyWebAction"/>
+                <reference ref="nc5dev.info.OpenYonbipDevWebAction"/>
+                <reference ref="nc5dev.info.SearchFullDataBaseAction"/>
+                <reference ref="nc5dev.info.MstscManggerUIAction"/>
+                <reference ref="nc5dev.info.MakeExcelByBmfFile"/>
+                <reference ref="nc5dev.info.MstscOpenLastAction"/>
+                <reference ref="nc5dev.info.NCCJsonDecodeAction"/>
+
+                <reference ref="nc5dev.info.makejarfile"/>
+                <reference ref="nc5dev.info.makeNcModulejarfile"/>
+
+                <reference ref="nc5dev.info.JavadocGenerateAction"/>
+                <reference ref="GenerateGetSetAction"/>
+                <reference ref="GenerateGetAction"/>
+                <reference ref="GenerateSetAction"/>
+
+                <group id="nc5devtoolExportBillAll" text="导出已有节点单据SQL脚本"
+                       popup="true" description="导出已有节点单据SQL脚本">
+                    <reference ref="nc5dev.info.exportBillAll"/>
+                </group>
+            </group>
+            <separator/>
+
+            <reference ref="nc5dev.info.showlocalncjavaexe"/>
+            <reference ref="nc5dev.info.ShowNCDBUserListAction"/>
+            <separator/>
+
+            <reference ref="SearchNCRequestMapping"/>
+            <reference ref="GoToNCRequestMapping"/>
+            <reference ref="ReDeployAction"/>
+            <separator/>
+
+            <reference ref="nc5dev.info.openjconsole"/>
+            <reference ref="nc5dev.info.openjvisualvm"/>
+            <separator/>
+
+            <reference ref="nc5dev.info.ReConfigModuleAction"/>
+            <reference ref="nc5dev.info.ReConfigProjectAction"/>
+            <separator/>
+
+            <reference ref="SerializeGenerator"/>
+
+            <!--            <reference ref="NCCodeCheckAction"/>-->
+            <separator/>
+
+            <!--            代码检查-->
+            <separator/>
+            <group id="CheckStylePluginTreeActions" text="Filter" popup="true">
+                <action id="CheckStyleScrollToSourceAction"
+                        class="org.infernus.idea.checkstyle.actions.ScrollToSource"
+                        text="Autoscroll to Source"
+                        description="Auto-scroll to the source location of errors and warnings"
+                        icon="/general/autoscrollToSource.svg"/>
+
+                <action id="CheckStyleExpandAllAction"
+                        class="org.infernus.idea.checkstyle.actions.ExpandAll"
+                        text="Expand All"
+                        description="Expand all elements in the tool window"
+                        icon="/actions/expandall.svg"/>
+
+                <action id="CheckStyleCollapseAllAction"
+                        class="org.infernus.idea.checkstyle.actions.CollapseAll"
+                        text="Collapse All"
+                        description="Collapse all elements in the tool window"
+                        icon="/actions/collapseall.svg"/>
+
+                <separator/>
+
+                <action id="CheckStyleDisplayErrorsAction"
+                        class="org.infernus.idea.checkstyle.actions.DisplayErrors"
+                        text="Display Errors"
+                        description="Display error results"
+                        icon="/general/error.svg"/>
+
+                <action id="CheckStyleDisplayWarningsAction"
+                        class="org.infernus.idea.checkstyle.actions.DisplayWarnings"
+                        text="Display Warnings"
+                        description="Display warning results"
+                        icon="/general/warning.svg"/>
+
+                <action id="CheckStyleDisplayInfoAction"
+                        class="org.infernus.idea.checkstyle.actions.DisplayInfo"
+                        text="Display Information Results"
+                        description="Display information results"
+                        icon="/general/information.svg"/>
+            </group>
+
+            <group id="CheckStylePluginActions" text="NC代码规范检查(Air 209308043@qq.com 微信: yongyourj 欢迎私活联系)" popup="true">
+                <action id="CheckStyleCloseAction"
+                        class="org.infernus.idea.checkstyle.actions.Close"
+                        text="关闭NC代码规范检查窗口"
+                        description="Close the CheckStyle tool window"
+                        icon="/actions/cancel.svg"/>
+
+                <action id="CheckStyleStopCheck"
+                        class="org.infernus.idea.checkstyle.actions.StopCheck"
+                        text="Stop the Running Scan"
+                        description="Stop the scan currently being run"
+                        icon="/actions/suspend.svg">
+                </action>
+
+                <separator/>
+
+                <action id="CheckStyleCurrentFileAction"
+                        class="org.infernus.idea.checkstyle.actions.ScanCurrentFile"
+                        text="检查当前文件的NC代码规范(不出结果多点几次检查-因为要全局扫描会比较慢)"
+                        description="Run Checkstyle on the current file in the editor"
+                        icon="/actions/execute.svg">
+
+                    <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+                </action>
+
+                <separator/>
+
+                <action id="CheckStyleModuleFilesAction"
+                        class="org.infernus.idea.checkstyle.actions.ScanModule"
+                        text="Check Module"
+                        description="Run Checkstyle on all files in the current module"
+                        icon="/nodes/ideaModule.svg">
+                </action>
+
+                <action id="CheckStyleProjectFilesAction"
+                        class="org.infernus.idea.checkstyle.actions.ScanProject"
+                        text="Check Project"
+                        description="Run Checkstyle on all files in the current project"
+                        icon="/nodes/ideaProject.svg">
+                </action>
+
+                <action id="CheckStyleModifiedFilesAction"
+                        class="org.infernus.idea.checkstyle.actions.ScanModifiedFiles"
+                        text="Check All Modified Files"
+                        description="Run Checkstyle on all modified files"
+                        icon="/actions/listChanges.svg">
+                </action>
+
+                <action id="CheckStyleDefaultChangeListAction"
+                        class="org.infernus.idea.checkstyle.actions.ScanCurrentChangeList"
+                        text="Check Files in the Current Change List"
+                        description="Run Checkstyle on the current change list"
+                        icon="/vcs/patch.svg">
+                </action>
+
+                <separator/>
+
+                <action id="CheckStyleClearCheckCacheAction"
+                        class="org.infernus.idea.checkstyle.actions.ResetLoadedRulesFiles"
+                        text="Reload Rules Files"
+                        description="Clear the rules file cache and blocked configurations, forcing a reload of changed rules"
+                        icon="/actions/refresh.svg">
+                </action>
+            </group>
+
+            <reference ref="nc5dev.info.about"/>
+            <reference ref="nc5dev.info.help"/>
+            <separator/>
+
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+            <add-to-group group-id="MainToolBarSettings" anchor="first"/>
+
+            <!--            加入 右键菜单-->
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+            <add-to-group group-id="MainMenu" anchor="before" relative-to-action="HelpMenu"/>
+            <add-to-group group-id="MainToolBar" anchor="last"/>
+        </group>
+
+    </actions>
+
+    <!-- 已经使用打开项目后初始化监听的方式   <application-components>
+            <component>
+                <implementation-class>com.air.nc5dev.component.SubscribeEventAutoCopyNccClientFilesComponent
+                </implementation-class>
+            </component>
+        </application-components>-->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!--     <fileTypeFactory implementation="com.air.nc5dev.editor.bmf.languageinfo.BmfMDPFileTypeFactory"/>-->
+
+        <!-- 日志输出窗口服务注册 -->
+        <projectService serviceInterface="com.air.nc5dev.service.ui.IMeassgeConsole"
+                        serviceImplementation="com.air.nc5dev.service.ui.impl.MeassgeConsoleImpl"/>
+        <!--  &lt;!&ndash; 日志输出窗口界面注册 &ndash;&gt;
+          <toolWindow id="NC插件日志" anchor="bottom" factoryClass="com.air.nc5dev.ui.ToolWindowFactory"/>
+
+          &lt;!&ndash;        action搜索窗口    &ndash;&gt;
+          <toolWindow id="NCC Action URL搜索" secondary="false" anchor="bottom"
+                      factoryClass="com.air.nc5dev.ui.actionurlsearch.NCCActionURLSearchWindowFactory"/>
+
+          &lt;!&ndash;  数据库全局搜索   &ndash;&gt;
+          <toolWindow id="数据库全局搜索" secondary="false" anchor="bottom"
+                      factoryClass="com.air.nc5dev.ui.searchdatabasefull.SearchFullDataBaseWindowFactory"/>
+
+          &lt;!&ndash;  MSTSC远程管理   &ndash;&gt;
+          <toolWindow id="MSTSC远程管理" secondary="false" anchor="bottom"
+                      factoryClass="com.air.nc5dev.ui.MstscManggerWindowFactory"/>
+          -->
+        <!--  开发常用工具窗口   -->
+        <toolWindow id="NC 开发常用工具窗口" secondary="false" anchor="bottom"
+                    factoryClass="com.air.nc5dev.ui.MyGroupWindowFactory"/>
+
+
+        <projectService serviceImplementation="com.air.nc5dev.util.Actions"/>
+
+        <!-- 生成对象所有的set方法调用 -->
+        <!--        <intentionAction>-->
+        <!--            <className>com.air.nc5dev.acion.GenerateAllSetterAction</className>-->
+        <!--        </intentionAction>-->
+
+        <!--        <searchEverywhereContributor implementation="com.air.nc5dev.nccrequstsearch.RequestMappingGoToContributor"/>-->
+
+        <!--        日志-->
+        <notificationGroup id="com.air.nc5dev.tool.plugin.nc5devtool" displayType="STICKY_BALLOON"/>
+        <!--        监听项目打开操作-->
+        <postStartupActivity implementation="com.air.nc5dev.listeners.ProjectOpenListener"/>
+
+        <!--        搜索NCC URL路径的窗口注册
+        <toolWindow id="NCCloud Action请求地址映射搜索" anchor="right"
+                    factoryClass="com.air.nc5dev.ui.nccactionsearch.NccActionSearchToolWindow" secondary="true"/>
+        <applicationService
+                serviceImplementation="com.air.nc5dev.util.docgenerate.TemplatePersistentConfiguration"/>
+        <applicationConfigurable groupId="tools" displayName="Getter Setter Template" id="Xstudio.Plugin.SpringJava"
+                                 instance="com.xstudio.plugin.idea.sj.getset.TemplateConfigurable"/>
+-->
+
+
+        <!--        代码 合法性 检查！-->
+        <checkinHandlerFactory implementation="com.air.nc5dev.codecheck.NCCheckinHandlerFactoryImpl"
+                               order="first"/>
+        <inspectionToolProvider implementation="com.air.nc5dev.codecheck.NCLocalInspectionToolProvider"/>
+
+
+        <!--        codecheck 项目参考-->
+        <applicationService serviceImplementation="org.infernus.idea.checkstyle.config.ApplicationConfigurationState"/>
+
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.StaticScanner"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.checker.CheckerFactoryCache"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.checker.CheckerFactory"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.checker.ModuleClassPathBuilder"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.model.ConfigurationLocationFactory"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.CheckstyleProjectService"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.config.ConfigurationLocationSource"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.config.PluginConfigurationManager"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.config.ProjectConfigurationState"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.CheckstylePluginApi"/>
+        <projectService serviceImplementation="org.infernus.idea.checkstyle.util.ProjectFilePaths"/>
+
+        <postStartupActivity implementation="org.infernus.idea.checkstyle.startup.NotifyUserIfPluginUpdated"/>
+        <postStartupActivity implementation="org.infernus.idea.checkstyle.startup.DisableCheckstyleLogging"/>
+
+        <projectConfigurable instance="org.infernus.idea.checkstyle.CheckStyleConfigurable" parentId="tools"/>
+
+        <moduleConfigurationEditorProvider
+                implementation="org.infernus.idea.checkstyle.CheckstyleModuleConfigurationEditorProvider"/>
+
+        <moduleService serviceImplementation="org.infernus.idea.checkstyle.config.ModuleConfigurationState"/>
+
+        <localInspection implementationClass="org.infernus.idea.checkstyle.CheckStyleInspection"
+                         bundle="org.infernus.idea.checkstyle.CheckStyleBundle"
+                         key="inspection.display-name"
+                         groupKey="inspection.group"
+                         level="WARNING"
+                         enabledByDefault="true"
+                         runForWholeFile="true"
+                         language=""/>
+
+        <checkinHandlerFactory id="CheckStyleIDEACheckInHandlerFactory"
+                               implementation="org.infernus.idea.checkstyle.handlers.ScanFilesBeforeCheckinHandlerFactory"/>
+
+        <toolWindow id="NC代码检查"
+                    anchor="bottom"
+                    canCloseContents="false"
+                    factoryClass="org.infernus.idea.checkstyle.toolwindow.CheckStyleToolWindowFactory"
+                    icon="/org/infernus/idea/checkstyle/images/checkstyle13.png"/>
+        <schemeImporter name="NC代码检查 配置"
+                        schemeClass="com.intellij.psi.codeStyle.CodeStyleScheme"
+                        implementationClass="org.infernus.idea.checkstyle.importer.CheckStyleCodeStyleImporter"/>
+
+        <notificationGroup displayType="BALLOON"
+                           id="CheckStyleIDEABalloonGroup"
+                           key="plugin.notification.alerts"/>
+        <notificationGroup displayType="NONE"
+                           id="CheckStyleIDEALogOnlyGroup"
+                           key="plugin.notification.logging"/>
+
+        <searchEverywhereContributor
+                implementation="com.air.nc5dev.util.GoToNCRequestMappingFastActionSearchEverywhereContributorFactory"/>
+    </extensions>
+
+    <depends optional="true">com.jetbrains.restClient</depends>
+
+    <description><![CDATA[
+      <p>Yonyou U8Cloud, NC5 NC6 NCCloud YonBip and other series of software development tools</p>
+        <p>English: </p>
+        If you do not need to edit metadata and new document development can directly create idea ordinary projects.
+        You can change the name of the old project folder and create a new folder with the same path, and then copy the files in the folder.
+        <ul>
+            <li>First time opening project - Required steps:</li>
+                <li>1. Tools -> Configure NC HOME.</li>
+                <li>2. Tools -> update NC library dependencies execute dependency update!</li>
+                <li>3. Tools -> generate default NC run configuration!</li>
+                <li>4. After you perform the preceding steps for the first time, the project will generate the default client public Private test several source folders. Manually modify the IDEA attribute of several folders in the project structure to correct values</li>
+                <li>5. Select Use Module path to set the output path of test class and non-test class respectively.</li>
+        </ul>
+
+        <p>Chinese: </p>
+      如果不需要元数据编辑和新单据开发的 可以直接新建idea普通的项目就行。如果需要的 可以用eclipse新建好项目和组件以后，用idea打开项目，<br>
+      因为idea有时候有bug打不开eclipse项目 可以老项目文件夹改革个名称 然后idea新建一个同路径的，然后吧文件夹文件复制进来(机智不)。 <br>
+           <ul>
+              <li>第一次打开项目-必须步骤：</li>
+                    <li>1. Tools -> 配置NC HOME   进行NC HOME配置！ </li>
+                    <li>2. Tools -> 更新NC 库依赖 执行依赖更新! (第一步如果自动配置了 就不用再点，如果切换了home或者home里代码文件变动了 要在点一下更新)</li>
+                    <li>3. Tools -> 生成默认NC运行配置!(如果重启IDEA后丢失了运行配置或者改了HOME 再次执行这个)    </li>
+                    <li>4. 如果不想自己配置项目结构和新建src这些文件夹，可以在模块上右键 点击 重新配置模块结构</li>
+                    <li>5. 如果有特殊需求可以直接修改 .idea文件夹里的 nc.properties 文件里配置内容，重启idea生效。</li>
+         </ul>
+
+    ]]></description>
+
+    <change-notes><![CDATA[
+       <em>4.0.1 版本 更新:</em> <br>
+      <ul>
+          <li>中文:</li>
+              <li>1. 新增 生成数据字典！</li>
+              <li>2. 修复 可能报错的部分清空！</li>
+      </ul>
+
+     <em>4.0 版本 更新:</em> <br>
+      <ul>
+          <li>english:</li>
+            <li>1. add Export BMF metadata based on the latest data in database tables futuers </li>
+            <li>2. Optimized the function of exporting specified files </li>
+
+          <li>中文:</li>
+              <li>1. 新增 根据数据库表最新数据导出BMF元数据功能！</li>
+              <li>2. 优化 导出指定文件功能！</li>
+      </ul>
+
+    <em>3.9 版本 更新:</em> <br>
+      <ul>
+          <li>english:</li>
+            <li>1. add metafile futuers </li>
+
+          <li>中文:</li>
+              <li>1. 新增快速新建模板元数据文件</li>
+      </ul>
+
+    <em>3.7 版本 更新:</em> <br>
+      <ul>
+          <li>english:</li>
+            <li>1. New database global search </li>
+            <li>2. Added MSTSC Remote Desktop Management </li>
+            <li>3. Rewrite NCC's Action class and UPM's servlet search function </li>
+            <li>4. Add the IDEA sidebar interface for the convenience of users who do not want to pop-up </li>
+
+          <li>中文:</li>
+              <li>1. 新增数据库全局搜索</li>
+              <li>2. 新增MSTSC远程桌面管理</li>
+              <li>3. 重写优化NCC的Action类和UPM的servlet搜索功能</li>
+              <li>4. 大量弹框增加IDEA侧边栏界面，方便不想要弹框的用户</li>
+      </ul>
+
+     <em>version 3.3 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+           <li>1. add feature: check nc code style.</li>
+
+          <li>中文:</li>
+          <li>1. 新增NC代码规范检查功能，可支持检查是否client private public 导包存在错误..</li>
+
+      </ul>
+
+
+      <em>version 3.2.1 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+           <li>1. suport Yunguanjia.</li>
+           <li>2. export patcher auto zip.</li>
+           <li>3. export patcher select files.</li>
+
+          <li>中文:</li>
+          <li>1. 支持导出补丁构建成云管家格式.</li>
+          <li>2. 支持导出补丁自动打包成zip.</li>
+          <li>3. 支持导出补丁选择要导出的文件.</li>
+
+      </ul>
+
+      <em>version 3.0 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+           <li>1. suport NCC.</li>
+
+          <li>中文:</li>
+          <li>1. 支持导出补丁构建成NCC特有结构(前后端，前端要自己先build好).</li>
+          <li>1. 支持自动合并和过滤SQL脚本(
+                    nc.prop配置:
+                        filtersql 是否过滤完全重复SQL语句 默认 true ,<br>
+                        rebuildsql 是否无视iuap导出的SQL采用IDEA插件自动根据items.xml导出SQL 默认 false ,<br>
+                        data_source_index idea导出SQL使用的数据源索引 默认 0 ,<br>
+                        enableSubResultSet 是否支持iuap自带的子表导出 默认 true -此功能暂时不支持，如果用idea强制导出 那么必须手工配置子表到 items-idea.xml(和items.xml一个文件夹里)中 ,<br>
+                        includeDeletes 是否导出delete删除已存在数据的语句 默认 false .<br>
+              )
+          </li>
+      </ul>
+
+     <em>version 2.5.7 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+          <li>1. Add the mandatory NC version:<br>
+                In the nc.prop file in the. Idea folder, set the Nc. version parameter to NC5, NC6, NCC, U8Cloud.
+           </li>
+          <li>2. Added special support for NCC (special Hotwebs path and profile path and patch structure)</li>
+          <li>3. Optimize the generation parameters of the operation configuration</li>
+          <li>4. Periodic reminders and metadata replication cannot be used normally and are not useful until repaired</li>
+          <li>5. Fixed the plug-in error in some cases</li>
+
+          <li>中文:</li>
+          <li>1. 修复部分NCC的支持性问题.
+      </ul>
+
+     <em>version 2.5.0 updated:</em> <br>
+      <ul>
+          <li>english:</li>
+          <li>1. Add the mandatory NC version:<br>
+                In the nc.prop file in the. Idea folder, set the Nc. version parameter to NC5, NC6, NCC, U8Cloud.
+           </li>
+          <li>2. Added special support for NCC (special Hotwebs path and profile path and patch structure)</li>
+          <li>3. Optimize the generation parameters of the operation configuration</li>
+          <li>4. Periodic reminders and metadata replication cannot be used normally and are not useful until repaired</li>
+          <li>5. Fixed the plug-in error in some cases</li>
+
+          <li>中文:</li>
+          <li>1. 新增强行指定NC版本: <br>
+                    在.idea文件夹的nc.prop文件配置 nc.version参数为 NC5, NC6,  NCC,  U8Cloud 几种即可。
+               </li>
+              <li>2. 增加对NCC的特殊支持(特殊的hotwebs路径和配置文件路径和补丁结构)</li>
+              <li>3. 优化运行等配置的生成参数</li>
+              <li>4. 定时提醒和元数据复制无法正常使用，暂不修复，用处不大</li>
+              <li>5. 修复部分情况下插件报错的问题</li>
+      </ul>
+
+    ]]>
+    </change-notes>
+
+</idea-plugin>
