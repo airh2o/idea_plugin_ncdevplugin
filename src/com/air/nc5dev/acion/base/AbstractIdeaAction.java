@@ -43,7 +43,7 @@ public abstract class AbstractIdeaAction extends AnAction {
             ProjectNCConfigUtil.initConfigFile(e.getProject());
 
             if (showConform()) {
-                int re = Messages.showYesNoDialog(getConformTxt()
+                int re = Messages.showYesNoDialog(getConformTxt(e)
                         , "询问", Messages.getQuestionIcon());
                 if (re != Messages.OK) {
                     return;
@@ -56,7 +56,7 @@ public abstract class AbstractIdeaAction extends AnAction {
         }
     }
 
-    public String getConformTxt() {
+    public String getConformTxt(AnActionEvent e) {
         return "是否确认执行该操作?";
     }
 

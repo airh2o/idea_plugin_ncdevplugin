@@ -2,6 +2,7 @@ package com.air.nc5dev.util;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import com.air.nc5dev.util.idea.LogUtil;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -77,12 +78,9 @@ public final class XmlUtil extends cn.hutool.core.util.XmlUtil {
             DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             org.w3c.dom.Document parse = documentBuilder.parse(xml);
             return parse;
-        } catch (ParserConfigurationException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            LogUtil.error(e.getMessage(), e);
         }
 
         return null;

@@ -84,12 +84,7 @@ public class ProjectNCConfigUtil {
         ProjectUtil.setProject(project);
         initConfigFile(project);
 
-        return hasSetNCHOME(project);
-    }
-
-    @Deprecated
-    public static boolean hasSetNCHOME() {
-        File f = getNCHome();
+        File f = getNCHome(project);
         if (f == null) {
             return false;
         }
@@ -99,6 +94,11 @@ public class ProjectNCConfigUtil {
         }
 
         return false;
+    }
+
+    @Deprecated
+    public static boolean hasSetNCHOME() {
+        return hasSetNCHOME(ProjectUtil.getProject());
     }
 
     /**

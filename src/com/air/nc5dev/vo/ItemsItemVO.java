@@ -42,10 +42,11 @@ public class ItemsItemVO {
     public String grpField;
     public String fixedWhere;
     public String sql;
+    public String schema;
 
     public static List<ItemsItemVO> read(File xml, Project project, Module module) {
         List<ItemsItemVO> vs = read0(xml, project, module);
-        vs.addAll(read0(new File(xml.getParentFile(), "items_idea.xml"), project, module));
+        // vs.addAll(read0(new File(xml.getParentFile(), "items_idea.xml"), project, module));
         return vs;
     }
 
@@ -61,6 +62,18 @@ public class ItemsItemVO {
         vars.put("module", module.getName());
 
         Document doc = XmlUtil.xmlFile2Document2(xml);
+
+        String schema = null;
+        NodeList env = doc.getElementsByTagName("env");
+        if (env != null && env.getLength() > 0) {
+            Element e = (Element) env.item(0);
+            NodeList schemaNode = e.getElementsByTagName("schema");
+            if (schemaNode != null && schemaNode.getLength() > 0) {
+                Element schemaItem = (Element) schemaNode.item(0);
+                schema = schemaItem.getTextContent();
+            }
+        }
+
         //读取自定义变量
         NodeList varsList = doc.getElementsByTagName("vars");
         if (varsList != null && varsList.getLength() > 0) {
@@ -114,6 +127,7 @@ public class ItemsItemVO {
                     .grpField(getValueIfull2EmtpyStr(n, "grpField"))
                     .fixedWhere(getValueIfull2EmtpyStr(n, "fixedWhere"))
                     .sql(getValueIfull2EmtpyStr(n, "sql"))
+                    .schema(schema)
                     .build();
 
             //处理变量填充
@@ -126,6 +140,7 @@ public class ItemsItemVO {
                 e.setGrpField(StrUtil.replace(e.getGrpField(), "{" + key + "}", vars.get(key)));
                 e.setFixedWhere(StrUtil.replace(e.getFixedWhere(), "{" + key + "}", vars.get(key)));
                 e.setSql(StrUtil.replace(e.getSql(), "{" + key + "}", vars.get(key)));
+                e.setSchema(StrUtil.replace(e.getSchema(), "{" + key + "}", vars.get(key)));
             }
 
             vs.add(e);

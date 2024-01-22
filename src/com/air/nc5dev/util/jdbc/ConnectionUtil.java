@@ -23,11 +23,9 @@ import nc.uap.studio.pub.db.script.export.SqlQueryInserts;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import java.awt.Component;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Connection;
@@ -152,8 +150,8 @@ public class ConnectionUtil {
                                  ExportContentVO contentVO) {
         try {
             ITable iTable = SqlUtil.retrieveTable(itemVO.getItemKey(), null, con);
-            SqlQueryResultSet rs = StringUtil.isBlank(itemVO.getSql()) ? SqlUtil.queryResults(iTable,
-                    itemVO.getFixedWhere(), con)
+            SqlQueryResultSet rs = StringUtil.isBlank(itemVO.getSql())
+                    ? SqlUtil.queryResults(iTable, itemVO.getFixedWhere(), con)
                     : SqlUtil.queryResultsByFullSql(iTable, itemVO.getSql(), con);
             if (rs == null) {
                 return;
@@ -166,8 +164,10 @@ public class ConnectionUtil {
                 subs(iTable, subResultSets);
             }
 
-            SqlQueryInserts sqls = convert2InsertSQLs(rs, "true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue(
-                    "includeDeletes")));
+            SqlQueryInserts sqls = convert2InsertSQLs(rs
+                    , "true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("includeDeletes"))
+                    , itemVO
+            );
 
             apend(con, itemVO, txt, exsitSqlSet, contentVO, sqls);
         } catch (Exception e) {
@@ -209,39 +209,46 @@ public class ConnectionUtil {
         }
     }
 
-    public static SqlQueryInserts convert2InsertSQLs(SqlQueryResultSet rs, boolean includeDeletes) {
+    public static SqlQueryInserts convert2InsertSQLs(SqlQueryResultSet rs
+            , boolean includeDeletes
+            , ItemsItemVO itemVO) {
         if (rs == null) {
             return null;
-        } else {
-            SqlQueryInserts inserts = getInserts(rs, ";", includeDeletes);
-            if (rs.getSubResultSets() != null) {
-                Iterator it = rs.getSubResultSets().iterator();
+        }
 
-                while (it.hasNext()) {
-                    SqlQueryResultSet resultSet = (SqlQueryResultSet) it.next();
-                    fillSqls(inserts, resultSet, ";", includeDeletes);
-                }
-            }
-
+        SqlQueryInserts inserts = getInserts(rs, ";", includeDeletes, itemVO);
+        if (rs.getSubResultSets() == null) {
             return inserts;
         }
+
+        Iterator it = rs.getSubResultSets().iterator();
+
+        while (it.hasNext()) {
+            SqlQueryResultSet resultSet = (SqlQueryResultSet) it.next();
+            fillSqls(inserts, resultSet, ";", includeDeletes, itemVO);
+        }
+
+        return inserts;
     }
 
-    public static SqlQueryInserts getInserts(SqlQueryResultSet resultSet, String separator, boolean includeDeletes) {
+    public static SqlQueryInserts getInserts(SqlQueryResultSet resultSet
+            , String separator
+            , boolean includeDeletes
+            , ItemsItemVO itemVO) {
         ITable table = resultSet.getTable();
         SqlQueryInserts inserts = new SqlQueryInserts(table);
         inserts.setResults(new ArrayList());
-        Iterator var7 = resultSet.getResults().iterator();
+        Iterator iterator = resultSet.getResults().iterator();
 
-        while (var7.hasNext()) {
-            Map<String, Object> result = (Map) var7.next();
-            String sql;
+        String sql;
+        while (iterator.hasNext()) {
+            Map<String, Object> result = (Map) iterator.next();
             if (includeDeletes) {
-                sql = ScriptHelper.convert2DeleteSql(table, result, separator);
+                sql = ScriptHelper.convert2DeleteSql(table, result, separator, itemVO);
                 inserts.getResults().add(sql);
             }
 
-            sql = ScriptHelper.convert2InsertSqls(table, result, separator, null);
+            sql = ScriptHelper.convert2InsertSqls(table, result, separator, null, itemVO);
             inserts.getResults().add(sql);
         }
 
@@ -249,16 +256,19 @@ public class ConnectionUtil {
         return inserts;
     }
 
-    public static void fillSqls(SqlQueryInserts parentInserts, SqlQueryResultSet rs, String separator,
-                                boolean includeDeletes) {
-        SqlQueryInserts inserts = getInserts(rs, separator, includeDeletes);
+    public static void fillSqls(SqlQueryInserts parentInserts
+            , SqlQueryResultSet rs
+            , String separator
+            , boolean includeDeletes
+            , ItemsItemVO itemVO) {
+        SqlQueryInserts inserts = getInserts(rs, separator, includeDeletes, itemVO);
         parentInserts.getSubInserts().add(inserts);
         if (rs.getSubResultSets() != null) {
             Iterator it = rs.getSubResultSets().iterator();
 
             while (it.hasNext()) {
                 SqlQueryResultSet resultSet = (SqlQueryResultSet) it.next();
-                fillSqls(inserts, resultSet, separator, includeDeletes);
+                fillSqls(inserts, resultSet, separator, includeDeletes, itemVO);
             }
         }
 

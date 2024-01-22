@@ -313,9 +313,9 @@ public class V {
                 break;
             }
 
-            if(chars[i] >= '0' && chars[i] <= '9'){
-                switch (level){
-                    case 0 :
+            if (chars[i] >= '0' && chars[i] <= '9') {
+                switch (level) {
+                    case 0:
                         //小时
                         h.add(chars[i]);
                         break;
@@ -332,8 +332,8 @@ public class V {
                         ss.add(chars[i]);
                         break;
                 }
-            }else{
-                ++ level;
+            } else {
+                ++level;
             }
         }
 
@@ -848,4 +848,16 @@ public class V {
         return toBigDecimal(value, 8);
     }
 
+    public static boolean isTrue(Object v) {
+        if (v == null) {
+            return false;
+        }
+
+        if (v instanceof Boolean) {
+            return ((Boolean) v).booleanValue();
+        }
+
+        String s = v.toString().toLowerCase();
+        return "1".equals(s) || "true".equals(s) || "y".equals(s);
+    }
 }

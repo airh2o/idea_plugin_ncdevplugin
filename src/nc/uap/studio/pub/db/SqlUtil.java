@@ -13,8 +13,20 @@ import nc.uap.studio.pub.db.query.IQueryInfo;
 import nc.uap.studio.pub.db.query.SqlQueryResultSet;
 import org.apache.commons.lang3.StringUtils;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SqlUtil {
     private static final String DB_TYPE_ORACLE = "Oracle";
@@ -155,110 +167,108 @@ public class SqlUtil {
     public static SqlQueryResultSet queryResults(ITable table, String whereCondition, Connection conn) throws DatabaseRuntimeException {
         if (table == null) {
             throw new DatabaseRuntimeException(Messages.SqlUtil_2);
-        } else {
-            checkTable(table);
-            String sql = getSql(table, whereCondition);
-            if (Logger.isDebugEnabled()) {
-                Logger.debug(String.format("Query: %s", sql));
+        }
+
+        checkTable(table);
+        String sql = getSql(table, whereCondition);
+        if (Logger.isDebugEnabled()) {
+            Logger.debug(String.format("Query: %s", sql));
+        }
+
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            SqlQueryResultSet sqlQueryResultSet = new SqlQueryResultSet(table);
+
+            while (rs.next()) {
+                Map<String, Object> colNameValueMap = new LinkedHashMap();
+                Iterator iterator = table.getAllColumns().iterator();
+
+                while (iterator.hasNext()) {
+                    IColumn col = (IColumn) iterator.next();
+                    colNameValueMap.put(col.getName(), rs.getObject(col.getName()));
+                }
+
+                sqlQueryResultSet.getResults().add(colNameValueMap);
             }
 
-            Statement stmt = null;
-            ResultSet rs = null;
-
-            try {
-                stmt = conn.createStatement();
-                rs = stmt.executeQuery(sql);
-                SqlQueryResultSet sqlQueryResultSet = new SqlQueryResultSet(table);
-
-                while (rs.next()) {
-                    Map<String, Object> colNameValueMap = new LinkedHashMap();
-                    Iterator var9 = table.getAllColumns().iterator();
-
-                    while (var9.hasNext()) {
-                        IColumn col = (IColumn) var9.next();
-                        colNameValueMap.put(col.getName(), rs.getObject(col.getName()));
-                    }
-
-                    sqlQueryResultSet.getResults().add(colNameValueMap);
+            return sqlQueryResultSet;
+        } catch (SQLException e) {
+            Logger.error(Messages.SqlUtil_0, e);
+            DatabaseRuntimeException e1 = new DatabaseRuntimeException(e.toString() + "  sql=" + sql);
+            e1.setStackTrace(e.getStackTrace());
+            throw e1;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException var19) {
                 }
-
-                SqlQueryResultSet var11 = sqlQueryResultSet;
-                return var11;
-            } catch (SQLException e) {
-                Logger.error(Messages.SqlUtil_0, e);
-                DatabaseRuntimeException e1 = new DatabaseRuntimeException(e.toString() + "  sql=" + sql);
-                e1.setStackTrace(e.getStackTrace());
-                throw e1;
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException var19) {
-                    }
-                }
-
-                if (stmt != null) {
-                    try {
-                        stmt.close();
-                    } catch (SQLException var18) {
-                    }
-                }
-
             }
+
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException var18) {
+                }
+            }
+
         }
     }
 
     public static SqlQueryResultSet queryResultsByFullSql(ITable table, String fullsql, Connection conn) throws DatabaseRuntimeException {
         if (table == null) {
             throw new DatabaseRuntimeException(Messages.SqlUtil_2);
-        } else {
-            checkTable(table);
-            String sql = fullsql;
-            if (Logger.isDebugEnabled()) {
-                Logger.debug(String.format("Query: %s", sql));
+        }
+
+        checkTable(table);
+        String sql = fullsql;
+        if (Logger.isDebugEnabled()) {
+            Logger.debug(String.format("Query: %s", sql));
+        }
+
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            SqlQueryResultSet sqlQueryResultSet = new SqlQueryResultSet(table);
+
+            while (rs.next()) {
+                Map<String, Object> colNameValueMap = new LinkedHashMap();
+                Iterator var9 = table.getAllColumns().iterator();
+
+                while (var9.hasNext()) {
+                    IColumn col = (IColumn) var9.next();
+                    colNameValueMap.put(col.getName(), rs.getObject(col.getName()));
+                }
+
+                sqlQueryResultSet.getResults().add(colNameValueMap);
             }
 
-            Statement stmt = null;
-            ResultSet rs = null;
-
-            try {
-                stmt = conn.createStatement();
-                rs = stmt.executeQuery(sql);
-                SqlQueryResultSet sqlQueryResultSet = new SqlQueryResultSet(table);
-
-                while (rs.next()) {
-                    Map<String, Object> colNameValueMap = new LinkedHashMap();
-                    Iterator var9 = table.getAllColumns().iterator();
-
-                    while (var9.hasNext()) {
-                        IColumn col = (IColumn) var9.next();
-                        colNameValueMap.put(col.getName(), rs.getObject(col.getName()));
-                    }
-
-                    sqlQueryResultSet.getResults().add(colNameValueMap);
+            return sqlQueryResultSet;
+        } catch (SQLException e) {
+            Logger.error(Messages.SqlUtil_0, e);
+            throw new DatabaseRuntimeException(Messages.SqlUtil_1 + sql);
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
                 }
-
-                SqlQueryResultSet var11 = sqlQueryResultSet;
-                return var11;
-            } catch (SQLException var20) {
-                Logger.error(Messages.SqlUtil_0, var20);
-                throw new DatabaseRuntimeException(Messages.SqlUtil_1 + sql);
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException var19) {
-                    }
-                }
-
-                if (stmt != null) {
-                    try {
-                        stmt.close();
-                    } catch (SQLException var18) {
-                    }
-                }
-
             }
+
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex3) {
+                }
+            }
+
         }
     }
 

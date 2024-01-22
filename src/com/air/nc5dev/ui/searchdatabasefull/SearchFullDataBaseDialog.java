@@ -144,49 +144,37 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
             jtab.addTab("配置", jbxx);
 
             JLabel label = new JBLabel("进度:");
-            label.setBounds(x, y, 82, height);
+            label.setBounds(x, y, 60, height);
             jbxxp.add(label);
             threadProgressBar = new JProgressBar();
-            threadProgressBar.setBounds(x + 85, y, 480, height);
+            threadProgressBar.setBounds(x + 85, y, 800, height);
             // threadProgressBar.setForeground(Color.BLACK);
             threadProgressBar.setStringPainted(true);
             jbxxp.add(threadProgressBar);
 
-            label = new JBLabel("日志:");
-            label.setBounds(x, y += height + 5, 82, height);
-            jbxxp.add(label);
-            textArea_msg = new JBTextArea();
-            JBScrollPane jbScrollPane = new JBScrollPane(textArea_msg);
-            jbScrollPane.setAutoscrolls(true);
-            jbScrollPane.setBounds(x, y += height + 5, 650, 120);
-            textArea_msg.setEnabled(true);
-            textArea_msg.setEditable(true);
-            textArea_msg.setLineWrap(true);
-            jbxxp.add(jbScrollPane);
-
             label = new JBLabel("搜索内容:");
-            label.setBounds(x, y += 120 + 5, 180, height);
+            label.setBounds(x, y = threadProgressBar.getY() + threadProgressBar.getHeight() + 2, 80, height);
             jbxxp.add(label);
             textField_key = new JBTextField();
-            textField_key.setBounds(x + 180, y, 600, height);
+            textField_key.setBounds(label.getX() + label.getWidth() + 2, y, 800, height);
             jbxxp.add(textField_key);
 
             label = new JBLabel("查询数据库所有表名称的sql:");
             label.setBounds(x, y += height + 5, 180, height);
             jbxxp.add(label);
             textField_selectAllTableSql = new JBTextField();
-            textField_selectAllTableSql.setBounds(x + 180, y, 462, height);
+            textField_selectAllTableSql.setBounds(label.getX() + label.getWidth() + 2, y, 800, height);
             jbxxp.add(textField_selectAllTableSql);
 
             label = new JBLabel("跳过列名(列名的某部分contains判断)多个用英文,隔开:");
-            label.setBounds(x, y += height + 5, 340, height);
+            label.setBounds(x, y += height + 5, 200, height);
             jbxxp.add(label);
             textField_skipColumns = new JBTextField();
-            textField_skipColumns.setBounds(x + 340, y, 400, height);
+            textField_skipColumns.setBounds(label.getX() + label.getWidth() + 2, y, 800, height);
             jbxxp.add(textField_skipColumns);
 
             label = new JBLabel("数据源:");
-            label.setBounds(x, y += height + 5, 82, height);
+            label.setBounds(x, y += height + 5, 60, height);
             jbxxp.add(label);
             final List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS(getProject());
             comboBox_dataSourceIndex = new JComboBox(new Vector(
@@ -210,7 +198,7 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
                     textField_selectAllTableSql.setText(" show tables ");
                 }
             });
-            comboBox_dataSourceIndex.setBounds(x + 85, y, 300, height);
+            comboBox_dataSourceIndex.setBounds(label.getX() + label.getWidth() + 2, y, 250, height);
             jbxxp.add(comboBox_dataSourceIndex);
             JButton button_TestDb = new JButton("测试连接");
             button_TestDb.addActionListener(new ActionListener() {
@@ -237,47 +225,48 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
                     }
                 }
             });
-            button_TestDb.setBounds(x + 400, y, 85, height);
+            button_TestDb.setBounds(comboBox_dataSourceIndex.getX() + comboBox_dataSourceIndex.getWidth() + 2, y, 85,
+                    height);
             jbxxp.add(button_TestDb);
 
             label = new JBLabel("是否多线程查询(不建议):");
-            label.setBounds(x, y += height + 5, 150, height);
+            label.setBounds(button_TestDb.getX() + button_TestDb.getWidth() + 2, y, 140, height);
             jbxxp.add(label);
             checkBox_async = new JBCheckBox();
             checkBox_async.setSelected(false);
             checkBox_async.addActionListener(e -> textField_threadNum.setEnabled(checkBox_async.isSelected()));
-            checkBox_async.setBounds(x + 160, y, 200, height);
+            checkBox_async.setBounds(label.getX() + label.getWidth() + 2, y, 30, height);
             jbxxp.add(checkBox_async);
 
             label = new JBLabel("线程数量:");
-            label.setBounds(x, y += height + 5, 82, height);
+            label.setBounds(checkBox_async.getX() + checkBox_async.getWidth() + 2, y, 60, height);
             jbxxp.add(label);
             textField_threadNum = new JBTextField();
-            textField_threadNum.setBounds(x + 85, y, 300, height);
+            textField_threadNum.setBounds(label.getX() + label.getWidth() + 2, y, 70, height);
             textField_threadNum.setEnabled(false);
             jbxxp.add(textField_threadNum);
             textField_threadNum.setColumns(10);
 
             label = new JBLabel("Like语句匹配类型:");
-            label.setBounds(x, y += height + 5, 100, height);
+            label.setBounds(textField_threadNum.getX() + textField_threadNum.getWidth() + 2, y, 100, height);
             jbxxp.add(label);
             comboBox_LikeType = new JComboBox(new Vector(
                     CollUtil.newArrayList("like '%内容%'", "like '内容%'", "like '%内容'", "='内容'")
             ));
             comboBox_LikeType.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue(
                     "data_source_index"), 0));
-            comboBox_LikeType.setBounds(x + 100, y, 300, height);
+            comboBox_LikeType.setBounds(label.getX() + label.getWidth() + 2, y, 150, height);
             jbxxp.add(comboBox_LikeType);
 
             label = new JBLabel("是否快速查询(不分开查询每个列):");
-            label.setBounds(x, y += height + 5, 82, height);
+            label.setBounds(comboBox_LikeType.getX() + comboBox_LikeType.getWidth() + 2, y, 180, height);
             jbxxp.add(label);
             checkBox_fastQuery = new JBCheckBox();
-            checkBox_fastQuery.setBounds(x + 85, y, 200, height);
+            checkBox_fastQuery.setBounds(label.getX() + label.getWidth() + 2, y, 30, height);
             jbxxp.add(checkBox_fastQuery);
 
             label = new JBLabel("查询结果:");
-            label.setBounds(x, y = y + height + 5, 280, height);
+            label.setBounds(x, y = y + height + 5, 80, height);
             jbxxp.add(label);
             Vector heads = new Vector();
             heads.add("选择");
@@ -287,7 +276,7 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
             heads.add("SQL语句");
             defaultTableModel = new DefaultTableModel(heads, 0);
             selectTable = new JBTable(defaultTableModel);
-            jbScrollPane = new JBScrollPane(selectTable);
+            JBScrollPane jbScrollPane = new JBScrollPane(selectTable);
             jbScrollPane.setAutoscrolls(true);
             selectTable.setBorder(LineBorder.createBlackLineBorder());
             selectTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -310,7 +299,7 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
                     onOK();
                 }
             });
-            button_Search.setBounds(x + 400, y - height - 30, 150, 40);
+            button_Search.setBounds(label.getX() + label.getWidth() + 2, label.getY(), 150, 30);
             jbxxp.add(button_Search);
 
             JButton button_CloseDB = new JButton("关闭数据库");
@@ -320,8 +309,20 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
                             // new DbConnectionFactory().closeDBAll();
                         });
             });
-            button_CloseDB.setBounds(x + 560, y - height - 30, 150, 40);
+            button_CloseDB.setBounds(button_Search.getX() + button_Search.getWidth() + 2, label.getY(), button_Search.getWidth(), button_Search.getHeight());
             jbxxp.add(button_CloseDB);
+
+            label = new JBLabel("日志:");
+            label.setBounds(x, jbScrollPane.getY() + jbScrollPane.getHeight() + 2, 60, height);
+            jbxxp.add(label);
+            textArea_msg = new JBTextArea();
+            jbScrollPane = new JBScrollPane(textArea_msg);
+            jbScrollPane.setAutoscrolls(true);
+            jbScrollPane.setBounds(label.getX(), label.getY() + label.getHeight() + 2, 800, 120);
+            textArea_msg.setEnabled(true);
+            textArea_msg.setEditable(true);
+            textArea_msg.setLineWrap(true);
+            jbxxp.add(jbScrollPane);
         }
 
         //设置点默认值

@@ -255,7 +255,7 @@ public class PatcherDialog extends DialogWrapper {
             panel2 = new JBPanel();
             //panel2.setBorder(LineBorder.createGrayLineBorder());
             panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-            panel2.setBounds(x, y = y + height + 5, width, height);
+            panel2.setBounds(x, y = y + height + 5, 140, height);
             panel2.add(label_2);
             panel2.add(exportSql);
             jbxxp.add(panel2);
@@ -266,7 +266,7 @@ public class PatcherDialog extends DialogWrapper {
             JBPanel panel4 = new JBPanel();
             //  panel4.setBorder(LineBorder.createGrayLineBorder());
             panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
-            panel4.setBounds(x, y = y + height + 5, width, height);
+            panel4.setBounds(panel2.getX() + panel2.getWidth() + 2, y, 260, height);
             panel4.add(label_5);
             panel4.add(ncVersion);
             jbxxp.add(panel4);
@@ -278,7 +278,7 @@ public class PatcherDialog extends DialogWrapper {
             panel5 = new JBPanel();
             //  panel5.setBorder(LineBorder.createGrayLineBorder());
             panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
-            panel5.setBounds(x, y = y + height + 5, width, height);
+            panel5.setBounds(x, y = panel4.getY() + panel4.getHeight() + 2, 200, height);
             panel5.add(label_6);
             panel5.add(exportResources);
             jbxxp.add(panel5);
@@ -286,13 +286,13 @@ public class PatcherDialog extends DialogWrapper {
             label_6 = new JBLabel("是否导出client:");
             exportHotwebsClass = new JBCheckBox();
             exportHotwebsClass.setSelected(true);
-            panel5 = new JBPanel();
+            panel4 = new JBPanel();
             //  panel5.setBorder(LineBorder.createGrayLineBorder());
-            panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
-            panel5.setBounds(x, y = y + height + 5, width, height);
-            panel5.add(label_6);
-            panel5.add(exportHotwebsClass);
-            jbxxp.add(panel5);
+            panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
+            panel4.setBounds(panel5.getX() + panel5.getWidth() + 2, y, 120, height);
+            panel4.add(label_6);
+            panel4.add(exportHotwebsClass);
+            jbxxp.add(panel4);
 
             label_6 = new JBLabel("是否导出public和private:");
             exportModules = new JBCheckBox();
@@ -301,7 +301,7 @@ public class PatcherDialog extends DialogWrapper {
             panel5 = new JBPanel();
             //  panel5.setBorder(LineBorder.createGrayLineBorder());
             panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
-            panel5.setBounds(x, y = y + height + 5, width, height);
+            panel5.setBounds(panel4.getX() + panel4.getWidth() + 2, y, 180, height);
             panel5.add(label_6);
             panel5.add(exportModules);
             jbxxp.add(panel5);
@@ -323,67 +323,67 @@ public class PatcherDialog extends DialogWrapper {
             panel7 = new JBPanel();
             //  panel7.setBorder(LineBorder.createGrayLineBorder());
             panel7.setLayout(new BoxLayout(panel7, BoxLayout.X_AXIS));
-            panel7.setBounds(x, y = y + height + 5, width, height);
+            panel7.setBounds(x, y = y + height + 5, 170, height);
             panel7.add(label_10);
             panel7.add(saveConfig);
             jbxxp.add(panel7);
 
             label_10 = new JBLabel("是否强制不压缩类文件成为jar文件:");
             no2Jar = new JBCheckBox();
-            panel7 = new JBPanel();
+            panel4 = new JBPanel();
             //  panel7.setBorder(LineBorder.createGrayLineBorder());
-            panel7.setLayout(new BoxLayout(panel7, BoxLayout.X_AXIS));
-            panel7.setBounds(x, y = y + height + 5, width, height);
-            panel7.add(label_10);
-            panel7.add(no2Jar);
-            jbxxp.add(panel7);
+            panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
+            panel4.setBounds(panel7.getX() + panel7.getWidth() + 2, y, 220, height);
+            panel4.add(label_10);
+            panel4.add(no2Jar);
+            jbxxp.add(panel4);
 
             label_10 = new JBLabel("是否导出模块下的META-INF文件夹:");
             exportModuleMeteinfo = new JBCheckBox();
             panel7 = new JBPanel();
             //  panel7.setBorder(LineBorder.createGrayLineBorder());
             panel7.setLayout(new BoxLayout(panel7, BoxLayout.X_AXIS));
-            panel7.setBounds(x, y = y + height + 5, width, height);
+            panel7.setBounds(panel4.getX() + panel4.getWidth() + 2, y, 230, height);
             panel7.add(label_10);
             panel7.add(exportModuleMeteinfo);
             jbxxp.add(panel7);
 
             label_10 = new JBLabel("是否导出模块下的METADATA文件夹:");
             exportModuleMetadata = new JBCheckBox();
-            panel7 = new JBPanel();
+            panel4 = new JBPanel();
             //  panel7.setBorder(LineBorder.createGrayLineBorder());
-            panel7.setLayout(new BoxLayout(panel7, BoxLayout.X_AXIS));
-            panel7.setBounds(x, y = y + height + 5, width, height);
-            panel7.add(label_10);
-            panel7.add(exportModuleMetadata);
-            jbxxp.add(panel7);
+            panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
+            panel4.setBounds(x, y = y + height + 5, 250, height);
+            panel4.add(label_10);
+            panel4.add(exportModuleMetadata);
+            jbxxp.add(panel4);
 
             label_10 = new JBLabel("是否导出模块下的resources文件夹:");
             exportModuleResources = new JBCheckBox();
             panel7 = new JBPanel();
             //  panel7.setBorder(LineBorder.createGrayLineBorder());
             panel7.setLayout(new BoxLayout(panel7, BoxLayout.X_AXIS));
-            panel7.setBounds(x, y = y + height + 5, width, height);
+            panel7.setBounds(panel4.getX() + panel4.getWidth() + 2, y, 240, height);
             panel7.add(label_10);
             panel7.add(exportModuleResources);
             jbxxp.add(panel7);
 
             label_10 = new JBLabel("是否导出模块下的lib文件夹:");
             exportModuleLib = new JBCheckBox();
-            panel7 = new JBPanel();
+            panel4 = new JBPanel();
             //  panel7.setBorder(LineBorder.createGrayLineBorder());
-            panel7.setLayout(new BoxLayout(panel7, BoxLayout.X_AXIS));
-            panel7.setBounds(x, y = y + height + 5, width, height);
-            panel7.add(label_10);
-            panel7.add(exportModuleLib);
-            jbxxp.add(panel7);
+            panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
+            panel4.setBounds(panel7.getX() + panel7.getWidth() + 2, y, 220, height);
+            panel4.add(label_10);
+            panel4.add(exportModuleLib);
+            jbxxp.add(panel4);
         }
 
         {
             int x = 21;
             int y = 16;
             int height = 30;
-            int width = 600;
+            int width = 760;
             JBPanel qdp = new JBPanel();
             qdp.setLayout(null);
             JBScrollPane qd = new JBScrollPane(qdp);
@@ -397,7 +397,7 @@ public class PatcherDialog extends DialogWrapper {
             JBPanel panel1 = new JBPanel();
             //  panel1.setBorder(LineBorder.createGrayLineBorder());
             panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
-            panel1.setBounds(x, y, width, height);
+            panel1.setBounds(x, y, 220, height);
             panel1.add(label_3);
             panel1.add(filtersql);
             qdp.add(panel1);
@@ -409,7 +409,7 @@ public class PatcherDialog extends DialogWrapper {
             panel2 = new JBPanel();
             //panel2.setBorder(LineBorder.createGrayLineBorder());
             panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-            panel2.setBounds(x, y = y + height + 5, width, height);
+            panel2.setBounds(panel1.getX() + panel1.getWidth() + 2, y, 200, height);
             panel2.add(label_2);
             panel2.add(onleyFullSql);
             qdp.add(panel2);
@@ -417,13 +417,13 @@ public class PatcherDialog extends DialogWrapper {
             label_2 = new JBLabel("强制IDEA连接数据库导出SQL:");
             rebuild = new JBCheckBox();
             rebuild.setSelected("true".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue("rebuildsql", "false")));
-            panel2 = new JBPanel();
+            panel1 = new JBPanel();
             //panel2.setBorder(LineBorder.createGrayLineBorder());
-            panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-            panel2.setBounds(x, y = y + height + 5, width, height);
-            panel2.add(label_2);
-            panel2.add(rebuild);
-            qdp.add(panel2);
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+            panel1.setBounds(panel2.getX() + panel2.getWidth() + 2, y, 220, height);
+            panel1.add(label_2);
+            panel1.add(rebuild);
+            qdp.add(panel1);
 
             JLabel label_4 = new JBLabel("强制IDEA连接数据库导出SQL使用NC配置的数据源第几个(0开始):");
             try {
@@ -468,7 +468,7 @@ public class PatcherDialog extends DialogWrapper {
             JBPanel panel3 = new JBPanel();
             //  panel3.setBorder(LineBorder.createGrayLineBorder());
             panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
-            panel3.setBounds(x, y = y + height + 5, width, height);
+            panel3.setBounds(x, y = y + height + 5, 760, height);
             panel3.add(label_4);
             panel3.add(dataSourceIndex);
             panel3.add(button_TestDb);
@@ -505,7 +505,7 @@ public class PatcherDialog extends DialogWrapper {
             JBPanel panel6 = new JBPanel();
             //  panel6.setBorder(LineBorder.createGrayLineBorder());
             panel6.setLayout(new BoxLayout(panel6, BoxLayout.X_AXIS));
-            panel6.setBounds(x, y, width, height);
+            panel6.setBounds(x, y, 120, height);
             panel6.add(label_7);
             panel6.add(format4Ygj);
             jgp.add(panel6);
@@ -516,7 +516,7 @@ public class PatcherDialog extends DialogWrapper {
             JBPanel panel13 = new JBPanel();
             //  panel6.setBorder(LineBorder.createGrayLineBorder());
             panel13.setLayout(new BoxLayout(panel13, BoxLayout.X_AXIS));
-            panel13.setBounds(x, y = y + height + 5, width, height);
+            panel13.setBounds(panel6.getX() + panel6.getWidth() + 2, y, 130, height);
             panel13.add(label_13);
             panel13.add(zip);
             jgp.add(panel13);
@@ -532,7 +532,7 @@ public class PatcherDialog extends DialogWrapper {
             JBPanel panel12 = new JBPanel();
             //  panel6.setBorder(LineBorder.createGrayLineBorder());
             panel12.setLayout(new BoxLayout(panel12, BoxLayout.X_AXIS));
-            panel12.setBounds(x, y = y + height + 5, width, height);
+            panel12.setBounds(panel13.getX() + panel13.getWidth() + 2, y, 240, height);
             panel12.add(label_12);
             panel12.add(deleteDir);
             jgp.add(panel12);
@@ -543,7 +543,7 @@ public class PatcherDialog extends DialogWrapper {
             this.selectExport.addItemListener((e) -> updateSelectFileTable());
             JBPanel panel10 = new JBPanel();
             panel10.setLayout(new BoxLayout(panel10, BoxLayout.X_AXIS));
-            panel10.setBounds(x, y = y + height + 5, 220, height);
+            panel10.setBounds(panel12.getX() + panel12.getWidth() + 2, y, 180, height);
             panel10.add(label_8);
             panel10.add(selectExport);
             jgp.add(panel10);
@@ -552,12 +552,12 @@ public class PatcherDialog extends DialogWrapper {
             selectExport2 = new JBCheckBox();
             selectExport2.setSelected(ExportContentVO.EVENT_POPUP_CLICK.equals(event.getPlace()));
             selectExport2.addItemListener((e) -> updateSelectFileTable2());
-            panel10 = new JBPanel();
-            panel10.setLayout(new BoxLayout(panel10, BoxLayout.X_AXIS));
-            panel10.setBounds(x + 230, y, 220, height);
-            panel10.add(label_8);
-            panel10.add(selectExport2);
-            jgp.add(panel10);
+            panel12 = new JBPanel();
+            panel12.setLayout(new BoxLayout(panel12, BoxLayout.X_AXIS));
+            panel12.setBounds(panel10.getX() + panel10.getWidth() + 2, y, 180, height);
+            panel12.add(label_8);
+            panel12.add(selectExport2);
+            jgp.add(panel12);
 
             JLabel label_9 = new JBLabel("当前选中的要导出的内容:");
             label_9.setBounds(x, y = y + height + 5, 280, height);
@@ -727,6 +727,8 @@ public class PatcherDialog extends DialogWrapper {
         while (selectModuleTableTableModel.getRowCount() > 0) {
             selectModuleTableTableModel.removeRow(0);
         }
+
+        Vector<Vector> rows = new Vector();
         for (Module module : modules) {
             c.getModuleDirPath2ModuleMap().put(module.getName(), module);
             Vector v = new Vector();
@@ -752,9 +754,23 @@ public class PatcherDialog extends DialogWrapper {
             }
 
             v.add(module.getModuleFile().getParent().getPath());
+            rows.add(v);
+        }
 
+        rows.sort((a, b) -> {
+                    if (V.isTrue(a.get(0))) {
+                        return -1;
+                    } else if (V.isTrue(b.get(0))) {
+                        return 1;
+                    }
+                    return a.get(2).toString().compareTo(b.get(2).toString());
+                }
+        );
+
+        for (Vector v : rows) {
             selectModuleTableTableModel.addRow(v);
         }
+
         fitTableColumns(selectModuleTable);
 
         set2UI(c);

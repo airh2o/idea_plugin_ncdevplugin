@@ -2,7 +2,9 @@
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>Yonyou NC Dev Tool</name>
     <version>v4.0.3</version>
-    <vendor email="209308343@qq.com" url="https://gitee.com/yhlx/idea_plugin_nc5devplugin">Air 209308043@qq.com 微信: yongyourj 欢迎私活联系</vendor>
+    <vendor email="209308343@qq.com" url="https://gitee.com/yhlx/idea_plugin_nc5devplugin">Air 209308043@qq.com 微信:
+        yongyourj 欢迎私活联系
+    </vendor>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <idea-version since-build="211.7628.21"/>
@@ -81,6 +83,9 @@
                 text="打开最后一次MSTSC连接" description="打开最后一次MSTSC连接">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift l"/>
         </action>
+        <action id="nc5dev.info.RenameHomeClassIfInProjectSrcAction" class="com.air.nc5dev.acion.RenameHomeClassIfInProjectSrcAction"
+                text="根据项目源码重命名HOME中calss文件" description="根据项目中的源码文件，重命名Home里的对应class文件，防止不走工程的代码。">
+        </action>
         <action id="nc5dev.info.MakeExcelByBmfFile" class="com.air.nc5dev.acion.MakeExcelByBmfFileAction"
                 text="元数据文件转字段Excel文档" description="根据bmf元数据文件生成Excel的单据字段文档">
         </action>
@@ -144,7 +149,7 @@
 
         <action id="GoToNCRequestMapping" class="com.air.nc5dev.acion.GoToNCRequestMappingAction"
                 text="快速搜索NCC请求地址Action" description="精简界面-快速查找">
-<!--            <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>-->
+            <!--            <keyboard-shortcut keymap="$default" first-keystroke="alt shift q"/>-->
             <!--            BACK_SLASH-->
         </action>
         <action id="SearchNCRequestMapping" class="com.air.nc5dev.acion.SearchNCRequestMappingAction"
@@ -304,6 +309,7 @@
                 <reference ref="nc5dev.info.MstscManggerUIAction"/>
                 <reference ref="nc5dev.info.MakeExcelByBmfFile"/>
                 <reference ref="nc5dev.info.MstscOpenLastAction"/>
+                <reference ref="nc5dev.info.RenameHomeClassIfInProjectSrcAction"/>
                 <reference ref="nc5dev.info.NCCJsonDecodeAction"/>
 
                 <reference ref="nc5dev.info.makejarfile"/>
