@@ -162,10 +162,6 @@ public class ExportNCPatcherUtil {
                 continue;
             }
 
-            if (contentVO.isSelectExport()) {
-                continue;
-            }
-
             compilerModuleExtension = CompilerModuleExtension.getInstance(module.getModule());
 
             //读取自定义配置文件
