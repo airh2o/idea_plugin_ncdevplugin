@@ -5,6 +5,7 @@ import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.XmlUtil;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.openapi.project.Project;
@@ -114,18 +115,18 @@ public class NCCJsonDecodeDialog extends DialogWrapper {
             jbxxp.add(checkBox_format);
 
             checkBox_gzip = new JBCheckBox("是否启用流量压缩gzip");
-            checkBox_gzip.setBounds(x = 1, y += height + 5, w, height);
+            checkBox_gzip.setBounds(checkBox_format.getX() + checkBox_format.getWidth() + 3, y, w, height);
             jbxxp.add(checkBox_gzip);
 
             checkBox_mark = new JBCheckBox("是否启用数据加签");
-            checkBox_mark.setBounds(x = 1, y += height + 5, w, height);
+            checkBox_mark.setBounds(checkBox_gzip.getX() + checkBox_gzip.getWidth() + 3, y, w, height);
             jbxxp.add(checkBox_mark);
 
             checkBox_aes = new JBCheckBox("是否启用aes加解密");
-            checkBox_aes.setBounds(x = 1, y += height + 5, w, height);
+            checkBox_aes.setBounds(checkBox_mark.getX() + checkBox_mark.getWidth() + 3, y, w, height);
             jbxxp.add(checkBox_aes);
 
-            label = new JBLabel("前端F12窗口localStore里的cowboy(输入我了可以不用输入楼下的楼下↓↓这个叼毛):");
+            label = new JBLabel("前端F12窗口localStore里的cowboy(输入我了可以不用输入楼下的楼下↓↓这个):");
             label.setBounds(x = 1, y += height + 5, 500, height);
             jbxxp.add(label);
             textField_cowboy = new JBTextField(TEMP_COWBODY);
@@ -139,7 +140,7 @@ public class NCCJsonDecodeDialog extends DialogWrapper {
             textField_cowboyAesKey.setBounds(x + 500 + 5, y, 500, height);
             jbxxp.add(textField_cowboyAesKey);
 
-            label = new JBLabel("Session中的Aeskey(输入我了可以不用输入楼上↑这2个叼毛):");
+            label = new JBLabel("Session中的Aeskey(输入我了可以不用输入楼上↑这2个):");
             label.setBounds(x = 1, y += height + 5, 500, height);
             jbxxp.add(label);
             textField_aesKey = new JBTextField(TEMP_AESKEY);
@@ -396,6 +397,9 @@ public class NCCJsonDecodeDialog extends DialogWrapper {
 
     public void initDefualtValues() {
         checkBox_format.setSelected(true);
+        checkBox_aes.setSelected(true);
+        checkBox_gzip.setSelected(true);
+        checkBox_mark.setSelected(true);
         File home = ProjectNCConfigUtil.getNCHome();
         //D:\runtime\BIPV3_JETCOM\hotwebs\nccloud\WEB-INF
         File hotwebs = new File(home, "hotwebs");
@@ -415,6 +419,11 @@ public class NCCJsonDecodeDialog extends DialogWrapper {
                     checkBox_mark.setSelected("true".equalsIgnoreCase((String) mp.get("mark")));
                 }
             } catch (Throwable exception) {
+                LogUtil.error(exception.getMessage(), exception);
+                checkBox_format.setSelected(true);
+                checkBox_aes.setSelected(true);
+                checkBox_gzip.setSelected(true);
+                checkBox_mark.setSelected(true);
             } finally {
             }
         }

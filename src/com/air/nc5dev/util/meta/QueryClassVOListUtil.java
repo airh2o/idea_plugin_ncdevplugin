@@ -56,17 +56,30 @@ public class QueryClassVOListUtil {
             for (ClassDTO v : vs) {
                 if (ClassDTO.CLASSTYPE_ENTITY.equals(v.getClassType())) {
                     v.setDataType(v.getReturnType());
-                    v.setIsPrimary(Boolean.FALSE);
-                    v.setIsSource(false);
+                    if (v.getIsPrimary() == null) {
+                        v.setIsPrimary(Boolean.FALSE);
+                    }
+
+                    if (v.getIsSource() == null) {
+                        v.setIsSource(false);
+                    }
+
                     v.setDbtype(CollUtil.asMap("BS000010000100001004", "int").get(v.getDataType()));
+
                     if (StringUtil.isBlank(v.getDbtype())) {
                         v.setDbtype("varchar");
                         v.setTypeDisplayName("String");
                     } else {
                         v.setTypeDisplayName("Integer");
                     }
-                    v.setTypeName(v.getTypeDisplayName());
-                    v.setIsCreateSQL(null);
+
+                    if (v.getTypeName() == null) {
+                        v.setTypeName(v.getTypeDisplayName());
+                    }
+
+                    if (v.getIsCreateSQL() == null) {
+                        v.setIsCreateSQL(null);
+                    }
                 }
             }
 

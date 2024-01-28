@@ -45,7 +45,7 @@ public class ExportContentVO {
     /**
      * 触发操作的事件， 可能null
      */
-    public AnActionEvent event;
+    public transient AnActionEvent event;
     /**
      * 输出路径
      */
@@ -53,19 +53,19 @@ public class ExportContentVO {
     /**
      * 当前项目
      */
-    public Project project;
+    public transient Project project;
     /**
      * 所有的模块们
      */
-    public List<Module> modules;
+    public transient List<Module> modules;
     /**
      * 模块文件夹根路径 ： 模块对象
      */
-    public HashMap<String, Module> moduleHomeDir2ModuleMap = Maps.newHashMap();
+    public transient HashMap<String, Module> moduleHomeDir2ModuleMap = Maps.newHashMap();
     /**
      * key 模块， value 模块补丁导出配置文件
      */
-    public HashMap<Module, ExportConfigVO> module2ExportConfigVoMap = Maps.newHashMap();
+    public transient HashMap<Module, ExportConfigVO> module2ExportConfigVoMap = Maps.newHashMap();
 
     public ProgressIndicator indicator;
     /**
@@ -111,7 +111,7 @@ public class ExportContentVO {
     /**
      * key=模块文件夹路径， value=模块对象
      */
-    public Map<String, Module> moduleDirPath2ModuleMap = Maps.newHashMap();
+    public transient Map<String, Module> moduleDirPath2ModuleMap = Maps.newHashMap();
 
     /**
      * key=模块名， value=强制指定导出补丁的模块名称
@@ -120,11 +120,11 @@ public class ExportContentVO {
     /**
      * 选择的要导出的模块们
      */
-    public List<Module> selectExportModules = Lists.newArrayList();
+    public transient List<Module> selectExportModules = Lists.newArrayList();
     /**
      * key=选择的文件， value=文件所在模块
      */
-    public Map<String, Module> selectFile2ModuleMap = Maps.newHashMap();
+    public transient Map<String, Module> selectFile2ModuleMap = Maps.newHashMap();
     /**
      * 选择的要导出的指定的文件们
      */
@@ -195,23 +195,6 @@ public class ExportContentVO {
     String no;
     String v;
     //////////END
-
-    public ExportContentVO copyBaseInfo() {
-        ExportContentVO c = new ExportContentVO();
-
-        ReflectUtil.copy2VO(this, c);
-
-        c.module2ExportConfigVoMap = null;
-        c.moduleHomeDir2ModuleMap = null;
-        c.selectFile2ModuleMap = null;
-        c.moduleDirPath2ModuleMap = null;
-        c.indicator = null;
-        c.moduleName2ExportModuleNameMap = null;
-        c.selectExportModules = null;
-
-
-        return c;
-    }
 
     public void init() {
         if (isSelectExport()) {

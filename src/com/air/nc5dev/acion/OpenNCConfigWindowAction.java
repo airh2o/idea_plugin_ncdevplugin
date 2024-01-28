@@ -30,13 +30,25 @@ public class OpenNCConfigWindowAction extends AbstractIdeaAction {
             if (!bat.isFile()) {
                 bat = new File(binDir, "ncSysConfig.bat");
             }
+
+            if (!bat.isFile()) {
+                bat = new File(binDir, "sysConfig.sh");
+            }
+
+            if (!bat.isFile()) {
+                bat = new File(binDir, "u8cSysConfig.sh");
+            }
+
+            if (!bat.isFile()) {
+                bat = new File(binDir, "ncSysConfig.sh");
+            }
         }
 
         if (!bat.isFile()) {
             bat = new File(binDir, "sysConfig.sh");
 
             if (!bat.isFile()) {
-                bat = new File(binDir,  "u8cSysConfig.sh");
+                bat = new File(binDir, "u8cSysConfig.sh");
             }
 
             if (!bat.isFile()) {

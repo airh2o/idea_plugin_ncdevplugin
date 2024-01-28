@@ -94,7 +94,7 @@ public class ExportNCPatcherUtil {
 
     public static void saveConfig(Project pro, ExportContentVO contentVO) {
         try {
-            ExportContentVO c = contentVO.copyBaseInfo();
+            ExportContentVO c = contentVO;
             FileUtil.writeUtf8String(JSON.toJSONString(c), new File(new File(pro.getBasePath(), ".idea"),
                     "ExportContentVO.json"));
         } catch (Throwable e) {
