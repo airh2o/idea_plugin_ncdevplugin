@@ -1,7 +1,9 @@
 package com.air.nc5dev.ui.ExecuteSqlFile;
 
+import b.k.F;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
 import com.air.nc5dev.ui.MyTableCellEditor;
 import com.air.nc5dev.ui.MyTableRenderer;
 import com.air.nc5dev.ui.SearchTableFieldDialog;
@@ -68,8 +70,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
@@ -442,14 +446,14 @@ public class ExecuteSqlFileDialog extends DialogWrapper {
                 indicator.setIndeterminate(true);
                 long s = System.currentTimeMillis();
                 Statement statement = null;
-
+                List<String> sqlStrs = new LinkedList<>();
+                Set<Integer> okIndexs = new HashSet<>();
                 IoUtil.close(connection);
 
                 try {
                     button_execute.setEnabled(false);
 
                     indicator.setText("读取SQL文件内容中...");
-                    List<String> sqlStrs = new LinkedList<>();
                     for (File f : sqls) {
                         List<String> ls = FileUtil.readUtf8Lines(f);
                         indicator.setText("读取SQL文件内容中:" + f.getPath() + " ,行数:" + ls.size());
@@ -483,7 +487,7 @@ public class ExecuteSqlFileDialog extends DialogWrapper {
                         indicator.setText(sql);
                         try {
                             int x = statement.executeUpdate(sql);
-
+                            okIndexs.add(i);
                             SwingUtilities.invokeLater(() -> {
                                 Vector v = new Vector();
                                 v.add(tableModel_result.getRowCount() + 1);
@@ -551,6 +555,29 @@ public class ExecuteSqlFileDialog extends DialogWrapper {
                         return;
                     }
                     button_commit.setEnabled(true);
+
+                    try {
+                        File ok = null;
+                        File err = null;
+                        if (StringUtil.isNotBlank(textField_sucessFile.getText())) {
+                            ok = new File(textField_sucessFile.getText());
+                        }
+                        if (StringUtil.isNotBlank(textField_errorFile.getText())) {
+                            err = new File(textField_errorFile.getText());
+                        }
+                        for (int i = 0; i < sqlStrs.size(); i++) {
+                            if (okIndexs.contains(i)) {
+                                if (ok != null) {
+                                    FileUtil.appendUtf8String(sqlStrs.get(i), ok);
+                                }
+                            } else {
+                                if (err != null) {
+                                    FileUtil.appendUtf8String(sqlStrs.get(i), err);
+                                }
+                            }
+                        }
+                    } catch (Throwable e) {
+                    }
 
                     textArea_msg.append("执行结束\n");
                 }
