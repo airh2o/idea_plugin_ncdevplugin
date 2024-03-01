@@ -94,6 +94,9 @@
         <action id="nc5dev.info.MakeExcelByBmfFile" class="com.air.nc5dev.acion.MakeExcelByBmfFileAction"
                 text="元数据文件转字段Excel文档" description="根据bmf元数据文件生成Excel的单据字段文档">
         </action>
+        <action id="nc5dev.info.ExecuteSqlFileAction" class="com.air.nc5dev.acion.ExecuteSqlFileAction"
+                text="执行SQL脚本(必须一个语句一行)" description="执行SQL脚本">
+        </action>
         <action id="nc5dev.info.NCCJsonDecodeAction" class="com.air.nc5dev.acion.NCCJsonDecodeAction"
                 text="NCC(BIP)前端请求解码" description="NCC(BIP)前端请求解码">
         </action>
@@ -313,6 +316,7 @@
                 <reference ref="nc5dev.info.SearchFullDataBaseAction"/>
                 <reference ref="nc5dev.info.MstscManggerUIAction"/>
                 <reference ref="nc5dev.info.MakeExcelByBmfFile"/>
+                <reference ref="nc5dev.info.ExecuteSqlFileAction"/>
                 <reference ref="nc5dev.info.MstscOpenLastAction"/>
                 <reference ref="nc5dev.info.RenameHomeClassIfInProjectSrcAction"/>
                 <reference ref="nc5dev.info.GenerApifoxDocByMetaFromDataBaseAction"/>
