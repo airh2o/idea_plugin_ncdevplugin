@@ -173,10 +173,14 @@ public class ConnectionUtil {
         } catch (Exception e) {
             e.printStackTrace();
             LogUtil.error("导出表:" + itemVO.getItemKey() + " 出错!" + e.toString() + " ," + itemVO.getFixedWhere(), e);
-            throw new RuntimeException("导出表:" + itemVO.getItemKey() + " 出错!"
-                    + "sql= " + (StringUtil.isBlank(itemVO.getSql()) ? itemVO.getFixedWhere() : itemVO.getSql())
-                    + ExceptionUtil.toStringLines(ExceptionUtil.getTopCase(e), 30)
-                    + " ," + JSON.toJSONString(itemVO), e);
+            RuntimeException ex = new RuntimeException(
+                    "导出表:" + itemVO.getItemKey() + " 出错!"
+                            + "sql= " + (StringUtil.isBlank(itemVO.getSql()) ? itemVO.getFixedWhere() : itemVO.getSql())
+                            + "，错误栈:" + ExceptionUtil.toString(ExceptionUtil.getTopCase(e))
+                            + " ," + JSON.toJSONString(itemVO)
+                    , e);
+            ex.setStackTrace(e.getStackTrace());
+            throw ex;
         }
     }
 

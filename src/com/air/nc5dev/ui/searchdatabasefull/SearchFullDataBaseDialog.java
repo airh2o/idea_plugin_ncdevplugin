@@ -183,8 +183,11 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
                             .collect(Collectors.toList())
             ));
             if (comboBox_dataSourceIndex.getModel().getSize() > 0) {
-                comboBox_dataSourceIndex.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue(
-                        "data_source_index"), 0));
+                try {
+                    comboBox_dataSourceIndex.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue(
+                            "data_source_index"), 0));
+                } catch (Throwable e) {
+                }
             }
             comboBox_dataSourceIndex.addActionListener(e -> {
                 NCDataSourceVO dataSourceVO = dataSourceVOS.get(comboBox_dataSourceIndex.getSelectedIndex());
@@ -253,8 +256,11 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
             comboBox_LikeType = new JComboBox(new Vector(
                     CollUtil.newArrayList("like '%内容%'", "like '内容%'", "like '%内容'", "='内容'")
             ));
-            comboBox_LikeType.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue(
-                    "data_source_index"), 0));
+            try {
+                comboBox_LikeType.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue(
+                        "data_source_index"), 0));
+            } catch (Throwable e) {
+            }
             comboBox_LikeType.setBounds(label.getX() + label.getWidth() + 2, y, 150, height);
             jbxxp.add(comboBox_LikeType);
 
@@ -309,7 +315,8 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
                             // new DbConnectionFactory().closeDBAll();
                         });
             });
-            button_CloseDB.setBounds(button_Search.getX() + button_Search.getWidth() + 2, label.getY(), button_Search.getWidth(), button_Search.getHeight());
+            button_CloseDB.setBounds(button_Search.getX() + button_Search.getWidth() + 2, label.getY(),
+                    button_Search.getWidth(), button_Search.getHeight());
             jbxxp.add(button_CloseDB);
 
             label = new JBLabel("日志:");

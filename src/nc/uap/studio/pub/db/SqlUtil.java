@@ -1,5 +1,9 @@
 package nc.uap.studio.pub.db;
 
+import com.air.nc5dev.util.ExceptionUtil;
+import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.util.idea.LogUtil;
+import com.alibaba.fastjson.JSON;
 import nc.uap.studio.pub.db.exception.DatabaseRuntimeException;
 import nc.uap.studio.pub.db.model.IColumn;
 import nc.uap.studio.pub.db.model.IFkConstraint;
@@ -46,16 +50,22 @@ public class SqlUtil {
             metaData = conn.getMetaData();
             dbType = metaData.getDatabaseProductName();
             userName = metaData.getUserName();
-        } catch (SQLException var8) {
-            String message = tableName + "  " + var8.getMessage();
-            Logger.error(message, var8);
-            throw new DatabaseRuntimeException(message);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LogUtil.error("数据库出错:" + e.toString(), e);
+            RuntimeException ex = new RuntimeException(
+                    "数据库出错:" + e.toString()
+                            + "，错误栈:" + ExceptionUtil.toString(ExceptionUtil.getTopCase(e))
+                    , e);
+            ex.setStackTrace(e.getStackTrace());
+            throw ex;
         }
 
         return retrieveTable(tableName, fkColNames, metaData, dbType, userName);
     }
 
-    public static ITable retrieveTable(String tableName, List<String> fkColNames, DatabaseMetaData metaData, String dbType, String userName) throws DatabaseRuntimeException {
+    public static ITable retrieveTable(String tableName, List<String> fkColNames, DatabaseMetaData metaData,
+                                       String dbType, String userName) throws DatabaseRuntimeException {
         Table table = new Table();
         table.setName(tableName);
         String[] pkColNamesBySeq = new String[10];
@@ -63,14 +73,21 @@ public class SqlUtil {
         ResultSet pkRs = null;
 
         try {
-            for (pkRs = metaData.getPrimaryKeys(retriveCatelog(dbType), retriveSchema(dbType, userName), formatTableName(tableName, dbType)); pkRs.next(); ++nPos) {
+            for (pkRs = metaData.getPrimaryKeys(retriveCatelog(dbType), retriveSchema(dbType, userName),
+                    formatTableName(tableName, dbType)); pkRs.next(); ++nPos) {
                 String colName = pkRs.getString("COLUMN_NAME");
                 short seq = pkRs.getShort("KEY_SEQ");
                 pkColNamesBySeq[seq - 1] = colName;
             }
-        } catch (SQLException var46) {
-            Logger.error(tableName + "  " + var46.getMessage(), var46);
-            throw new DatabaseRuntimeException(String.format(Messages.SqlUtil_6, tableName));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LogUtil.error("数据库出错:" + e.toString() + " 表名=" + tableName, e);
+            RuntimeException ex = new RuntimeException(
+                    "数据库出错:" + e.toString() + " 表名=" + tableName
+                            + "，错误栈:" + ExceptionUtil.toString(ExceptionUtil.getTopCase(e))
+                    , e);
+            ex.setStackTrace(e.getStackTrace());
+            throw ex;
         } finally {
             if (pkRs != null) {
                 try {
@@ -113,7 +130,8 @@ public class SqlUtil {
         ResultSet colRs = null;
 
         try {
-            colRs = metaData.getColumns(retriveCatelog(dbType), retriveSchema(dbType, userName), formatTableName(tableName, dbType), "%");
+            colRs = metaData.getColumns(retriveCatelog(dbType), retriveSchema(dbType, userName),
+                    formatTableName(tableName, dbType), "%");
 
             while (true) {
                 while (colRs.next()) {
@@ -135,7 +153,8 @@ public class SqlUtil {
 
                 if (!allCols.isEmpty()) {
                     if (hasFkCols && fkConstraint.getColumns().isEmpty()) {
-                        throw new DatabaseRuntimeException(String.format(Messages.SqlUtil_7, tableName, StringUtils.join(fkColNames.iterator(), ",")));
+                        throw new DatabaseRuntimeException(String.format(Messages.SqlUtil_7, tableName,
+                                StringUtils.join(fkColNames.iterator(), ",")));
                     }
 
                     pkConstraint.getColumns().addAll(Arrays.asList(pkCols));
@@ -197,10 +216,14 @@ public class SqlUtil {
 
             return sqlQueryResultSet;
         } catch (SQLException e) {
-            Logger.error(Messages.SqlUtil_0, e);
-            DatabaseRuntimeException e1 = new DatabaseRuntimeException(e.toString() + "  sql=" + sql);
-            e1.setStackTrace(e.getStackTrace());
-            throw e1;
+            e.printStackTrace();
+            LogUtil.error("执行sql出错:" + e.toString() + "sql= " + sql, e);
+            RuntimeException ex = new RuntimeException(
+                    "执行sql出错:" + e.toString() + "sql= " + sql
+                            + "，错误栈:" + ExceptionUtil.toString(ExceptionUtil.getTopCase(e))
+                    , e);
+            ex.setStackTrace(e.getStackTrace());
+            throw ex;
         } finally {
             if (rs != null) {
                 try {
@@ -252,8 +275,14 @@ public class SqlUtil {
 
             return sqlQueryResultSet;
         } catch (SQLException e) {
-            Logger.error(Messages.SqlUtil_0, e);
-            throw new DatabaseRuntimeException(Messages.SqlUtil_1 + sql);
+            e.printStackTrace();
+            LogUtil.error("执行sql出错:" + e.toString() + "sql= " + sql, e);
+            RuntimeException ex = new RuntimeException(
+                    "执行sql出错:" + e.toString() + "sql= " + sql
+                            + "，错误栈:" + ExceptionUtil.toString(ExceptionUtil.getTopCase(e))
+                    , e);
+            ex.setStackTrace(e.getStackTrace());
+            throw ex;
         } finally {
             if (rs != null) {
                 try {
@@ -360,7 +389,8 @@ public class SqlUtil {
                         throw new DatabaseRuntimeException(String.format(Messages.SqlUtil_13, subTable.getName()));
                     }
 
-                    SqlQueryResultSet subResultSet = queryResults(subQryInfo, geneInClause(((IColumn) fkConstraint.getColumns().get(0)).getName(), pks), conn);
+                    SqlQueryResultSet subResultSet = queryResults(subQryInfo,
+                            geneInClause(((IColumn) fkConstraint.getColumns().get(0)).getName(), pks), conn);
                     if (subResultSet != null) {
                         sqlQueryResultSet.getSubResultSets().add(subResultSet);
                     }
@@ -409,7 +439,8 @@ public class SqlUtil {
         } else if ("Oracle".equalsIgnoreCase(dbType)) {
             return schema.toUpperCase();
         } else {
-            return !"DB2".equalsIgnoreCase(dbType) && !"DB2/NT64".equalsIgnoreCase(dbType) ? null : schema.toUpperCase();
+            return !"DB2".equalsIgnoreCase(dbType) && !"DB2/NT64".equalsIgnoreCase(dbType) ? null :
+                    schema.toUpperCase();
         }
     }
 
@@ -419,7 +450,8 @@ public class SqlUtil {
         } else if ("Oracle".equalsIgnoreCase(dbType)) {
             return tableName.toUpperCase();
         } else {
-            return !"DB2".equalsIgnoreCase(dbType) && !"DB2/NT64".equalsIgnoreCase(dbType) ? tableName : tableName.toUpperCase();
+            return !"DB2".equalsIgnoreCase(dbType) && !"DB2/NT64".equalsIgnoreCase(dbType) ? tableName :
+                    tableName.toUpperCase();
         }
     }
 }

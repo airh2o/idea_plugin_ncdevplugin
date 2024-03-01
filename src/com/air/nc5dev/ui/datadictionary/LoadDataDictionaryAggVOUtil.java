@@ -247,7 +247,7 @@ public class LoadDataDictionaryAggVOUtil {
                     || NcVersionEnum.NC5.equals(ncVersion)) {
                 defaulttablename = "(select name from md_table where id=md_class.id)";
                 attrlength = "length";
-                dynamic = "false";
+                dynamic = " 'false' ";
                 classOrderBy = " order by sequence ";
             }
 

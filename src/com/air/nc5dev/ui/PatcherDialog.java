@@ -433,8 +433,11 @@ public class PatcherDialog extends DialogWrapper {
                                 .map(v -> v.getDataSourceName() + '/' + v.getUser())
                                 .collect(Collectors.toList())
                 ));
-                dataSourceIndex.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue(
-                        "data_source_index"), 0));
+                try {
+                    dataSourceIndex.setSelectedIndex(ConvertUtil.toInt(ProjectNCConfigUtil.getConfigValue(
+                            "data_source_index"), 0));
+                } catch (Throwable e) {
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 LogUtil.error(e.getMessage(), e);
@@ -806,7 +809,10 @@ public class PatcherDialog extends DialogWrapper {
         zip.setSelected(c.zip);
         saveConfig.setSelected(c.saveConfig);
         no2Jar.setSelected(c.no2Jar);
-        dataSourceIndex.setSelectedIndex(c.data_source_index);
+        try {
+            dataSourceIndex.setSelectedIndex(c.data_source_index);
+        } catch (Throwable e) {
+        }
         exportModuleResources.setSelected(c.exportModuleResources);
         exportModuleLib.setSelected(c.exportModuleLib);
         exportModuleMeteinfo.setSelected(c.exportModuleMeteinfo);
