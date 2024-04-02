@@ -87,6 +87,10 @@
                 class="com.air.nc5dev.acion.RenameHomeClassIfInProjectSrcAction"
                 text="根据项目源码重命名HOME中calss文件" description="根据项目中的源码文件，重命名Home里的对应class文件，防止不走工程的代码。">
         </action>
+        <action id="nc5dev.info.UnRenameHomeClassIfInProjectSrcAction"
+                class="com.air.nc5dev.acion.UnRenameHomeClassIfInProjectSrcAction"
+                text="回滚根据项目源码重命名HOME中calss文件" description="回滚根据项目中的源码文件，重命名Home里的对应class文件，防止不走工程的代码。">
+        </action>
         <action id="nc5dev.info.GenerApifoxDocByMetaFromDataBaseAction"
                 class="com.air.nc5dev.acion.meta.GenerApifoxDocByMetaFromDataBaseAction"
                 text="根据数据库元数据生成Apifox接口文档" description="根据数据库元数据生成Apifox接口文档的json配置文本">
@@ -269,6 +273,7 @@
             <reference ref="nc5dev.config.nchome"/>
             <reference ref="nc5dev.config.updateclasspath"/>
             <reference ref="nc5dev.config.addRunConfig"/>
+            <reference ref="nc5dev.info.ReConfigProjectAction"/>
             <reference ref="nc5dev.config.AddDataSource2DbnToolAction"/>
             <separator/>
 
@@ -305,26 +310,31 @@
 
             <group id="nc5devtoolOtherTools" text="其他小功能"
                    popup="true" description="其他小功能">
-                <reference ref="nc5dev.info.deletenclogs"/>
+                <reference ref="nc5dev.info.SearchFullDataBaseAction"/>
+                <reference ref="nc5dev.info.MstscManggerUIAction"/>
+                <reference ref="nc5dev.info.MakeExcelByBmfFile"/>
+                <reference ref="nc5dev.info.GenerApifoxDocByMetaFromDataBaseAction"/>
+                <reference ref="nc5dev.info.ExecuteSqlFileAction"/>
+                <reference ref="nc5dev.info.MstscOpenLastAction"/>
+                <separator/>
 
+                <reference ref="nc5dev.info.RenameHomeClassIfInProjectSrcAction"/>
+                <reference ref="nc5dev.info.UnRenameHomeClassIfInProjectSrcAction"/>
+                <separator/>
+
+                <reference ref="nc5dev.info.deletenclogs"/>
+                <reference ref="nc5dev.info.ReConfigModuleAction"/>
                 <reference ref="nc5dev.info.opennchomeierpbin"/>
                 <reference ref="nc5dev.info.openncconfigwindow"/>
                 <reference ref="nc5dev.info.OpenNCCDevWebAction"/>
                 <reference ref="nc5dev.info.OpenNCCUIWebAction"/>
                 <reference ref="nc5dev.info.OpenCopyWebAction"/>
                 <reference ref="nc5dev.info.OpenYonbipDevWebAction"/>
-                <reference ref="nc5dev.info.SearchFullDataBaseAction"/>
-                <reference ref="nc5dev.info.MstscManggerUIAction"/>
-                <reference ref="nc5dev.info.MakeExcelByBmfFile"/>
-                <reference ref="nc5dev.info.ExecuteSqlFileAction"/>
-                <reference ref="nc5dev.info.MstscOpenLastAction"/>
-                <reference ref="nc5dev.info.RenameHomeClassIfInProjectSrcAction"/>
-                <reference ref="nc5dev.info.GenerApifoxDocByMetaFromDataBaseAction"/>
-                <reference ref="nc5dev.info.NCCJsonDecodeAction"/>
+                <separator/>
 
+                <reference ref="nc5dev.info.NCCJsonDecodeAction"/>
                 <reference ref="nc5dev.info.makejarfile"/>
                 <reference ref="nc5dev.info.makeNcModulejarfile"/>
-
                 <reference ref="nc5dev.info.JavadocGenerateAction"/>
                 <reference ref="GenerateGetSetAction"/>
                 <reference ref="GenerateGetAction"/>
@@ -348,10 +358,6 @@
 
             <reference ref="nc5dev.info.openjconsole"/>
             <reference ref="nc5dev.info.openjvisualvm"/>
-            <separator/>
-
-            <reference ref="nc5dev.info.ReConfigModuleAction"/>
-            <reference ref="nc5dev.info.ReConfigProjectAction"/>
             <separator/>
 
             <reference ref="SerializeGenerator"/>

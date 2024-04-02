@@ -24,7 +24,7 @@ public class GoToNCRequestMappingFastAction extends SearchEverywhereBaseAction {
     public void update(@NotNull AnActionEvent event) {
         super.update(event);
         if (event.getPresentation().isEnabledAndVisible()) {
-            if (StringUtil.isBlank(ProjectNCConfigUtil.getNCHomePath(event.getProject()))) {
+            if (event.getProject() != null && StringUtil.isBlank(ProjectNCConfigUtil.getNCHomePath(event.getProject()))) {
                 event.getPresentation().setEnabledAndVisible(false);
             }
         }

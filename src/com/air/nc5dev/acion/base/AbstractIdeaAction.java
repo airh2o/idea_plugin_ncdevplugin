@@ -106,4 +106,6 @@ public abstract class AbstractIdeaAction extends AnAction {
      * @Param [e]
      */
     protected abstract void doHandler(AnActionEvent e) throws Exception;
+
+
 }

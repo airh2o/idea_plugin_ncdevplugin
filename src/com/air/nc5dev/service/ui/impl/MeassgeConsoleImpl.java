@@ -103,7 +103,9 @@ public class MeassgeConsoleImpl implements IMeassgeConsole, Disposable {
 
     @Override
     public void dispose() {
-        if (consoleView != null) {
+        if (consoleView != null
+                && ProjectUtil.getDefaultProject() != null
+                && consoleView.get(ProjectUtil.getDefaultProject()) != null) {
             Disposer.dispose(consoleView.get(ProjectUtil.getDefaultProject()));
         }
     }

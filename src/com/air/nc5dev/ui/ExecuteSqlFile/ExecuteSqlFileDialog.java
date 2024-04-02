@@ -488,28 +488,25 @@ public class ExecuteSqlFileDialog extends DialogWrapper {
                         try {
                             int x = statement.executeUpdate(sql);
                             okIndexs.add(i);
-                            SwingUtilities.invokeLater(() -> {
-                                Vector v = new Vector();
-                                v.add(tableModel_result.getRowCount() + 1);
-                                v.add("成功");
-                                v.add("" + x);
-                                v.add(sql);
-                                tableModel_result.addRow(v);
-                                fitTableColumns(table_result);
-                            });
-
+                            Vector v = new Vector();
+                            v.add(tableModel_result.getRowCount() + 1);
+                            v.add("成功");
+                            v.add("" + x);
+                            v.add(sql);
+                            tableModel_result.addRow(v);
+                            fitTableColumns(table_result);
                         } catch (Throwable e) {
-                            SwingUtilities.invokeLater(() -> {
-                                textArea_msg.append("执行sql出错:" + e.getMessage() + " ,SQL=" + sql + "\n");
+                            String msg = "执行sql出错:" + e.getMessage() + " ,SQL=" + sql + "\n";
+                            textArea_msg.append(msg);
+                            indicator.setText(msg);
 
-                                Vector v = new Vector();
-                                v.add(tableModel_result.getRowCount() + 1);
-                                v.add("失败");
-                                v.add(e.toString());
-                                v.add(sql);
-                                tableModel_result.addRow(v);
-                                fitTableColumns(table_result);
-                            });
+                            Vector v = new Vector();
+                            v.add(tableModel_result.getRowCount() + 1);
+                            v.add("失败");
+                            v.add(e.toString());
+                            v.add(sql);
+                            tableModel_result.addRow(v);
+                            fitTableColumns(table_result);
 
                             if (!checkBox_skipErrorLine.isSelected()) {
                                 RuntimeException ex = new RuntimeException(
@@ -525,11 +522,12 @@ public class ExecuteSqlFileDialog extends DialogWrapper {
 
                 } catch (Throwable e) {
                     e.printStackTrace();
-                    LogUtil.error("执行sql出错:" + e.toString(), e);
-                    RuntimeException ex = new RuntimeException(
-                            "执行sql出错:" + e.toString()
-                                    + "，错误栈:" + ExceptionUtil.toString(ExceptionUtil.getTopCase(e))
-                            , e);
+                    String msg =
+                            "执行sql出错:" + e.toString() + "，错误栈:" + ExceptionUtil.toString(ExceptionUtil.getTopCase(e));
+                    LogUtil.error(msg, e);
+                    RuntimeException ex = new RuntimeException(msg, e);
+                    indicator.setText(msg);
+
                     ex.setStackTrace(e.getStackTrace());
                     throw ex;
                 } finally {
@@ -542,11 +540,11 @@ public class ExecuteSqlFileDialog extends DialogWrapper {
                             connection.commit();
                         } catch (Throwable ex) {
                             ex.printStackTrace();
-                            LogUtil.error("数据库出错:" + ex.toString(), ex);
-                            RuntimeException e2 = new RuntimeException(
-                                    "数据库出错:" + ex.toString()
-                                            + "，错误栈:" + ExceptionUtil.toString(ExceptionUtil.getTopCase(ex))
-                                    , ex);
+                            String msg = "数据库出错:" + ex.toString()
+                                    + "，错误栈:" + ExceptionUtil.toString(ExceptionUtil.getTopCase(ex));
+                            LogUtil.error(msg, ex);
+                            RuntimeException e2 = new RuntimeException(msg, ex);
+                            indicator.setText(msg);
                             e2.setStackTrace(ex.getStackTrace());
                             throw e2;
                         }

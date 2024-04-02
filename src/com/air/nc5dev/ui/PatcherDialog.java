@@ -709,8 +709,8 @@ public class PatcherDialog extends DialogWrapper {
     }
 
     public void initDefualtValues() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
-        this.textField_saveName.setText("patcher-" + event.getProject().getName() + "-" + LocalDateTime.now().format(formatter));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日HH点mm分ss秒");
+        this.textField_saveName.setText("patcher-" + event.getProject().getName() + "_" + LocalDateTime.now().format(formatter));
         this.textField_savePath.setText(ProjectUtil.getDefaultProject().getBasePath()
                 + File.separatorChar + "patchers"
                 + File.separatorChar + "patcher-" + event.getProject().getName() + "-" + LocalDateTime.now().format(formatter)
@@ -788,7 +788,14 @@ public class PatcherDialog extends DialogWrapper {
     }
 
     public void set2UI(ExportContentVO c) {
-        textField_saveName.setText(c.name);
+        String s = c.name;
+        if (StringUtil.isNotBlank(s)) {
+            if (s.contains("_")) {
+                s = s.substring(0, s.lastIndexOf('_'));
+            }
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日HH点mm分ss秒");
+            textField_saveName.setText(s + '_' + LocalDateTime.now().format(formatter));
+        }
         if (StringUtil.isNotBlank(c.outPath)) {
             textField_savePath.setText(new File(c.outPath).getParent());
         }

@@ -27,18 +27,18 @@ import java.util.List;
  * @project
  * @Version
  */
-public class RenameHomeClassIfInProjectSrcAction extends AbstractIdeaAction {
+public class UnRenameHomeClassIfInProjectSrcAction extends AbstractIdeaAction {
     @Override
     public String getConformTxt(AnActionEvent e) {
         File ncHome = ProjectNCConfigUtil.getNCHome(e.getProject());
-        return "你确定对NCHOME目录进行 重命名工程源码在NCHOME中的class、java文件 操作? " + ncHome;
+        return "你确定回滚对NCHOME目录进行 重命名工程源码在NCHOME中的class、java文件 操作? " + ncHome;
     }
 
     @Override
     protected void doHandler(AnActionEvent e) {
         try {
             Task.Backgroundable backgroundable = new Task.Backgroundable(e.getProject()
-                    , "正在重命名工程源码在NCHOME中的class、java文件中...") {
+                    , "正在回滚重命名工程源码在NCHOME中的class、java文件中...") {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     Module[] modules = ModuleManager.getInstance(e.getProject()).getModules();
@@ -51,53 +51,32 @@ public class RenameHomeClassIfInProjectSrcAction extends AbstractIdeaAction {
                         if (indicator.isCanceled()) {
                             return;
                         }
-                        cs.addAll(getAll(f, ".class"));
-                        cs.addAll(getAll(f, ".java"));
+                        cs.addAll(getAll(f, ".idea_plugin_rename"));
                     }
                     f = new File(ncHome, "hotwebs");
                     if (f.isDirectory()) {
                         if (indicator.isCanceled()) {
                             return;
                         }
-                        cs.addAll(getAll(f, ".class"));
-                        cs.addAll(getAll(f, ".java"));
+                        cs.addAll(getAll(f, ".idea_plugin_rename"));
                     }
                     f = new File(ncHome, "external");
                     if (f.isDirectory()) {
                         if (indicator.isCanceled()) {
                             return;
                         }
-                        cs.addAll(getAll(f, ".class"));
-                        cs.addAll(getAll(f, ".java"));
+                        cs.addAll(getAll(f, ".idea_plugin_rename"));
                     }
 
                     indicator.setText("文件数量: " + cs.size());
-
-                    for (Module module : modules) {
+                    for (File c : cs) {
                         if (indicator.isCanceled()) {
                             return;
                         }
 
-                        VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
-                        if (sourceRoots == null) {
-                            continue;
-                        }
-
-                        indicator.setText("处理模块:" + module.getName() + " ,源码目录数量: " + sourceRoots.length);
-                        for (VirtualFile sourceRoot : sourceRoots) {
-                            if (indicator.isCanceled()) {
-                                return;
-                            }
-
-                            List<File> all = getAll(new File(sourceRoot.toNioPath().toUri()), ".java");
-                            for (File ff : all) {
-                                if (indicator.isCanceled()) {
-                                    return;
-                                }
-
-                                renameHome(cs, ff, indicator);
-                            }
-                        }
+                        indicator.setText(c.getName());
+                        c.renameTo(new File(c.getParentFile(), c.getName().substring(0
+                                , c.getName().length() - ".idea_plugin_rename".length())));
                     }
 
                     LogUtil.infoAndHide("重命名完成: " + ncHome);
@@ -107,37 +86,6 @@ public class RenameHomeClassIfInProjectSrcAction extends AbstractIdeaAction {
             backgroundable.setCancelTooltipText("立即停止操作");
             ProgressManager.getInstance().run(backgroundable);
         } catch (Throwable ex) {
-        }
-    }
-
-    private static void renameHome(List<File> cs, File ff, ProgressIndicator indicator) {
-        boolean has = false;
-        String n = ff.getName();
-        n = n.substring(0, n.lastIndexOf('.'));
-        for (File c : cs) {
-            if (indicator.isCanceled()) {
-                return;
-            }
-
-            String cn = c.getName();
-            cn = cn.substring(0, cn.lastIndexOf('.'));
-
-            if (cn.equals(n)
-                    || cn.startsWith(n + "$")) {
-                if (c.getParentFile().getName().equals(ff.getParentFile().getName())) {
-                    has = true;
-                    String msg = "\t" + c.getPath() + " 重命名";
-                    LogUtil.info(msg);
-                    indicator.setText(msg);
-                    c.renameTo(new File(c.getParentFile(), c.getName() + ".idea_plugin_rename"));
-                }
-            }
-        }
-
-        if (has) {
-            String msg = "=========   " + ff.getPath() + " -> 搜索重命名完成=============";
-            LogUtil.info(msg);
-            indicator.setText(msg);
         }
     }
 
@@ -165,27 +113,4 @@ public class RenameHomeClassIfInProjectSrcAction extends AbstractIdeaAction {
     public boolean showConform() {
         return true;
     }
-
-    public static void main(String[] args) {
-        File m = new File("E:\\runtimes\\NCC1909_ZTNRNY_HOME\\modules");
-
-        File p = new File("E:\\projects\\iuap\\NCC1909_ZTNRNY");
-
-        List<File> cs = getAll(m, ".class");
-
-        File[] ps = p.listFiles();
-        for (File f : ps) {
-            File src = new File(f, "src");
-            if (!src.isDirectory()) {
-                continue;
-            }
-
-            List<File> all = getAll(src, ".java");
-            for (File ff : all) {
-                renameHome(cs, ff, null);
-            }
-        }
-
-    }
-
 }
