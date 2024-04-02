@@ -3,6 +3,8 @@ package com.air.nc5dev.ui.datadictionary;
 import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.NCPropXmlUtil;
+import com.air.nc5dev.util.ProjectNCConfigUtil;
+import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
@@ -247,8 +249,31 @@ public class NCDataDictionaryDialog extends DialogWrapper {
 
             String html = ProjectUtil.getResourceTemplatesUtf8Txt("nc_data_dictionary/index.html");
             html = html.replace("{{DataDictionaryAggVOJsonString}}", str);
+            html = html.replace("{{version}}", agg.getNcVersion());
 
-            File index = new File(f, "index.html");
+            String name = StringUtil.replaceAll(agg.getNcVersion(), ":", ".");
+            name = StringUtil.replaceAll(name, "&", ".");
+            name = StringUtil.replaceAll(name, "$", ".");
+            name = StringUtil.replaceAll(name, "\\", ".");
+            name = StringUtil.replaceAll(name, "/", ".");
+            name = StringUtil.replaceAll(name, "*", ".");
+            name = StringUtil.replaceAll(name, "?", ".");
+            name = StringUtil.replaceAll(name, "\"", ".");
+            name = StringUtil.replaceAll(name, "'", ".");
+            name = StringUtil.replaceAll(name, "<", ".");
+            name = StringUtil.replaceAll(name, ">", ".");
+            name = StringUtil.replaceAll(name, "(", ".");
+            name = StringUtil.replaceAll(name, ")", ".");
+            name = StringUtil.replaceAll(name, "=", ".");
+            name = StringUtil.replaceAll(name, "|", ".");
+            File index = null;
+            try {
+                index = new File(f, name + "_离线数据字典.html");
+            } catch (Throwable e) {
+                index = new File(f, (ProjectNCConfigUtil.getNCVersion(getProject()) == null ? "index" :
+                        ProjectNCConfigUtil.getNCVersion(getProject()).name())
+                        + "_离线数据字典.html");
+            }
             FileUtil.writeUtf8String(html, index);
 
             HashSet<String> fs = CollUtil.newHashSet("index.js"
