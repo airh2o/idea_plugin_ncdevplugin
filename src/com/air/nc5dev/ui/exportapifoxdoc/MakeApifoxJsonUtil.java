@@ -4,11 +4,15 @@ import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.V;
+import com.air.nc5dev.util.idea.LogUtil;
+import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
 import com.air.nc5dev.vo.meta.ClassDTO;
 import com.air.nc5dev.vo.meta.ComponentAggVO;
 import com.air.nc5dev.vo.meta.PropertyDTO;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -20,7 +24,7 @@ import java.util.stream.Collectors;
  * 生成apifox的接口文档json
  */
 public class MakeApifoxJsonUtil {
-    public static ApifoxObjVO meta(Statement st, ComponentAggVO agg) throws Throwable {
+    public static ApifoxObjVO meta(Connection con, ComponentAggVO agg) throws Throwable {
         ApifoxObjVO root = new ApifoxObjVO();
 
         HashMap<Object, Object> rootps = new HashMap<>();
@@ -43,7 +47,7 @@ public class MakeApifoxJsonUtil {
             jh.setProperties(jhps);
             rootps.put("head", jh);
 
-            fill(st, root, rootps, agg, head, jh, jhps);
+            fill(con, root, rootps, agg, head, jh, jhps);
         }
 
         ApifoxObjVO bodys = new ApifoxObjVO();
@@ -77,14 +81,14 @@ public class MakeApifoxJsonUtil {
                 items.setRequired(new ArrayList<String>());
                 BODY.setItems(items);
 
-                fill(st, root, rootps, agg, bodymeta, items, bodyps);
+                fill(con, root, rootps, agg, bodymeta, items, bodyps);
             }
         }
 
         return root;
     }
 
-    private static void fill(Statement st, ApifoxObjVO root, HashMap<Object, Object> rootps, ComponentAggVO agg
+    private static void fill(Connection con, ApifoxObjVO root, HashMap<Object, Object> rootps, ComponentAggVO agg
             , ClassDTO meta, ApifoxObjVO jvo, HashMap<Object, Object> jvops) throws Throwable {
         jvo.setRequired(new ArrayList<String>());
         List<PropertyDTO> as = agg.getPropertyVOlist().get(meta.getId());
@@ -138,16 +142,26 @@ public class MakeApifoxJsonUtil {
             }
 
             if (StrUtil.isNotBlank(a.getRefModelName())) {
+                PreparedStatement st = null;
                 ResultSet rs = null;
                 try {
-                    rs = st.executeQuery("select displayname||' '||defaulttablename from md_class where " +
-                            " id='" + a.getDataType() + "'");
+                    String sql = "select displayname||' '||defaulttablename from md_class where id=? ";
+                    if (ConnectionUtil.isSqlServer(con)) {
+                        sql = "select displayname+' '+defaulttablename from md_class where id=? ";
+                    } else if (ConnectionUtil.isGaussDB(con)) {
+                        sql = "select concat(displayname,' ',defaulttablename) from md_class where id=? ";
+                    }
+
+                    st = con.prepareStatement(sql);
+                    st.setObject(1, a.getDataType());
+                    rs = st.executeQuery();
                     rs.next();
                     f.setDescription(String.format("档案: %s ", rs.getString(1)));
                 } catch (Throwable ex) {
-                    f.setDescription(String.format("档案: %s ", a.getRefModelDesc())
-                    );
+                    LogUtil.error(ex.getMessage(), ex);
+                    f.setDescription(String.format("档案: %s ", a.getRefModelDesc()));
                 } finally {
+                    IoUtil.close(st);
                     IoUtil.close(rs);
                 }
             }

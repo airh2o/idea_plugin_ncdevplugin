@@ -1,14 +1,17 @@
 package com.air.nc5dev.util.meta.xml;
 
 import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.V;
 import com.air.nc5dev.util.XmlUtil;
+import com.air.nc5dev.vo.meta.AccessorParameterDTO;
 import com.air.nc5dev.vo.meta.AssociationDTO;
 import com.air.nc5dev.vo.meta.BizItfMapDTO;
 import com.air.nc5dev.vo.meta.BusiitfconnectionDTO;
 import com.air.nc5dev.vo.meta.ClassDTO;
 import com.air.nc5dev.vo.meta.ComponentAggVO;
 import com.air.nc5dev.vo.meta.ComponentDTO;
+import com.air.nc5dev.vo.meta.EnumValueDTO;
 import com.air.nc5dev.vo.meta.PropertyDTO;
 import com.air.nc5dev.vo.meta.ReferenceDTO;
 import com.google.common.collect.Sets;
@@ -19,20 +22,25 @@ import org.dom4j.Element;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Struct;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * NC6系列 </br>
- * </br>
- * </br>
- * </br>
- * </br>
- * </br>
- * </br>
+ * NC6系列 <br>
+ * yonbuilder 工具双击打开 bmf处理逻辑： org.eclipse.gef.ui.parts.GraphicalEditor#init -> ncmdp.serialize
+ * .XMLSerialize#paserXmlToMDP <br>
+ * yonbuilder 元数据 点击实体或者元素后监听： org.eclipse.ui.ISelectionListener ->
+ * ncmdp.views.NCMDPViewSheet#selectionChanged -> ncmdp.views.NCMDPViewPage#selectionChanged <br>
+ * <br>
+ * <br>
+ * <br>
+ * <br>
  *
  * @author 唐粟 Email:209308343@qq.com 微信yongyourj
  * @date 2023/10/19 0019 16:53
@@ -96,7 +104,26 @@ public class MetaXmlBuilder4NC6 {
         map.put("isbmf", "isbizmodel");
 
         ComponentDTO v = agg.getComponentVO();
+        v.setMetaType(V.get(v.getMetaType(), ".bmf"));
+        v.setConRouterType(V.get(v.getConRouterType(), "手动"));
+        v.setCreateIndustry(V.get(v.getCreateIndustry(), "0"));
+        v.setGencodestyle(V.get(v.getGencodestyle(), "NC传统样式"));
+        v.setIndustryChanged(V.get(v.getIndustryChanged(), "bmf"));
+        v.setIndustryIncrease(V.get(v.getIndustryIncrease(), false));
+        v.setIndustryName(V.get(v.getIndustryName(), "false"));
+        v.setIsSource(V.get(v.getIsSource(), false));
+        v.setModifyIndustry(V.get(v.getModifyIndustry(), "0"));
+        v.setPreload(V.get(v.getPreload(), false));
+        v.setProgramcode(V.get(v.getProgramcode(), "0"));
 
+        if (agg.getClassVOlist() != null && StringUtil.isBlank(v.getMainEntity())) {
+            for (ClassDTO c : agg.getClassVOlist()) {
+                if (c.isPrimary) {
+                    v.setMainEntity(c.getId());
+                    break;
+                }
+            }
+        }
         XmlUtil.addAttr(doc, component, v, map);
 
         return component;
@@ -109,6 +136,17 @@ public class MetaXmlBuilder4NC6 {
         int x = 1;
         int y = 1;
         agg.setClassVOlist(V.get(agg.getClassVOlist(), new ArrayList<>()));
+        agg.setItfEntityId2PropertyIdsMap(V.get(agg.getItfEntityId2PropertyIdsMap(), new HashMap<>()));
+
+        //Key =当前元数据实体id  , value = 被引用接口的属性id等信息
+        Map<String, Set<BizItfMapDTO>> entityId2ItfPropertyIdsMap = new HashMap<>();
+        for (Collection<BizItfMapDTO> bizItfMapDTOS : agg.getItfEntityId2PropertyIdsMap().values()) {
+            for (BizItfMapDTO bizItfMapDTO : bizItfMapDTOS) {
+                entityId2ItfPropertyIdsMap.putIfAbsent(bizItfMapDTO.getClassID(), new HashSet<>());
+                entityId2ItfPropertyIdsMap.get(bizItfMapDTO.getClassID()).add(bizItfMapDTO);
+            }
+        }
+
         for (ClassDTO c : agg.getClassVOlist()) {
             c.setX(x += 40);
             c.setY(y += 40);
@@ -125,48 +163,68 @@ public class MetaXmlBuilder4NC6 {
                     attribute.addAttribute("visibility", p.getVisibilityName());
                 }
 
-                Element operationlist = celllist.addElement("operationlist");
+                Element operationlist = entity.addElement("operationlist");
 
-                Element busiitfs = celllist.addElement("busiitfs");
-                Element busimaps = celllist.addElement("busimaps");
+                //每个实体， 会有实现的接口或者参照配置， 这里做处理
+                Element busiitfs = entity.addElement("busiitfs");
                 Set<String> itfs = V.get(agg.getEntityId2ItfEntityIdMap().get(c.getId()), new HashSet<>());
                 for (String itf : itfs) {
                     Element itfid = busiitfs.addElement("itfid");
                     itfid.setText(itf);
-
-                    Set<BizItfMapDTO> itfAttrids = V.get(agg.getItfEntityId2PropertyIdsMap().get(itf), new HashSet<>());
-                    for (BizItfMapDTO itfAttr : itfAttrids) {
+                }
+                Set<BizItfMapDTO> bizItfMapDTOS = entityId2ItfPropertyIdsMap.get(c.getId());
+                if (CollUtil.isNotEmpty(bizItfMapDTOS)) {
+                    Element busimaps = entity.addElement("busimaps");
+                    for (BizItfMapDTO itfAttr : bizItfMapDTOS) {
                         Element busimap = busimaps.addElement("busimap");
                         XmlUtil.addAttr(doc, busimap, itfAttr, bizMapNameMaping);
                     }
                 }
 
-                Element canzhaolist = celllist.addElement("canzhaolist");
+                Element canzhaolist = entity.addElement("canzhaolist");
 
-                Element accessor = celllist.addElement("accessor");
+                Element accessor = entity.addElement("accessor");
                 Element properties = accessor.addElement("properties");
-                accessor.attributeValue("classFullname", c.getAccessorClassName());
-                accessor.attributeValue("displayName", CollUtil.asMap(
-                                "nc.md.model.access.javamap.POJOStyle", "POJO"
-                                , "nc.md.model.access.javamap.NCBeanStyle", "NCVO"
-                                , "nc.md.model.access.javamap.AggVOStyle", "AggVO"
-                        )
-                        .get(c.getAccessorClassName()));
-                accessor.attributeValue("name", CollUtil.asMap(
+                accessor.addAttribute("classFullname", c.getAccessorClassName());
+                accessor.addAttribute("displayName", CollUtil.asMap(
+                                        "nc.md.model.access.javamap.POJOStyle", "POJO"
+                                        , "nc.md.model.access.javamap.NCBeanStyle", "NCVO"
+                                        , "nc.md.model.access.javamap.AggVOStyle", "AggVO"
+                                )
+                                .get(c.getAccessorClassName())
+                );
+                accessor.addAttribute("name", CollUtil.asMap(
                                 "nc.md.model.access.javamap.POJOStyle", "pojo"
                                 , "nc.md.model.access.javamap.NCBeanStyle", "NCVO"
                                 , "nc.md.model.access.javamap.AggVOStyle", "AggVO"
                         )
                         .get(c.getAccessorClassName()));
+
+                List<AccessorParameterDTO> accessorParameterDTOS = agg.getAccessorParaVOList().get(c.getId());
+                if (CollUtil.isNotEmpty(accessorParameterDTOS)) {
+                    for (AccessorParameterDTO accessorParameterDTO : accessorParameterDTOS) {
+                        Element property = properties.addElement("property");
+                        //包装类名
+                        property.addAttribute("classid", accessorParameterDTO.getId());
+                        property.addAttribute("displayName", "包装类名");
+                        property.addAttribute("name", "wrapclsname");
+                        property.addAttribute("sequence", accessorParameterDTO.getAssosequence() == null ? "0" :
+                                accessorParameterDTO.getAssosequence() + "");
+                        property.addAttribute("value", accessorParameterDTO.getParaValue());
+                    }
+                }
             } else if (ClassDTO.CLASSTYPE_ENUMERATE.equals(c.getClassType())) {
                 Element enumerate = celllist.addElement("Enumerate");
                 XmlUtil.addAttr(doc, enumerate, c, enumerateNameMaping);
 
                 Element enumitemlist = enumerate.addElement("enumitemlist");
-                List<PropertyDTO> propertyDTOs = V.get(agg.getPropertyVOlist().get(c.getId()), new ArrayList<>());
-                for (PropertyDTO p : propertyDTOs) {
+                List<EnumValueDTO> enumValueDTOS = V.get(agg.getEnumValueVOList().get(c.getId()), new ArrayList<>());
+                for (EnumValueDTO enumValueDTO : enumValueDTOS) {
                     Element enumitem = enumitemlist.addElement("enumitem");
-                    XmlUtil.addAttr(doc, enumitem, p, enumeratePropersNameMaping);
+                    if (StringUtil.isBlank(enumValueDTO.getItemId())) {
+                        enumValueDTO.setItemId(StringUtil.uuid().toLowerCase());
+                    }
+                    XmlUtil.addAttr(doc, enumitem, enumValueDTO, enumeratePropersNameMaping);
                 }
             }
         }
@@ -268,6 +326,7 @@ public class MetaXmlBuilder4NC6 {
         enumeratePropersNameMaping.put("value", "enumValue");
         enumeratePropersNameMaping.put("name", "enumDisplay");
         enumeratePropersNameMaping.put("id", "enumID");
+        enumeratePropersNameMaping.put("itemid", "id");
         enumeratePropersNameMaping.put("enumsequence", "sequence");
 
         busiitfconnectionNameMapper.put("startelementid", "realsource");

@@ -55,10 +55,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 项目 工具类</br>
- * </br>
- * </br>
- * </br>
+ * 项目 工具类<br>
+ * <br>
+ * <br>
+ * <br>
  *
  * @author air Email: 209308343@qq.com
  * @version NC505, JDK1.5+, V1.0
@@ -76,10 +76,10 @@ public class ProjectUtil {
             , NotificationDisplayType.STICKY_BALLOON, false);*/
 
     /**
-     * 显示一个 错误的 非模态提醒      </br>
-     * </br>
-     * </br>
-     * </br>
+     * 显示一个 错误的 非模态提醒      <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -100,10 +100,10 @@ public class ProjectUtil {
     }
 
     /**
-     * 显示一个 警告的 非模态提醒      </br>
-     * </br>
-     * </br>
-     * </br>
+     * 显示一个 警告的 非模态提醒      <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -117,10 +117,10 @@ public class ProjectUtil {
     }
 
     /**
-     * 显示一个 正常消息提醒的 非模态提醒      </br>
-     * </br>
-     * </br>
-     * </br>
+     * 显示一个 正常消息提醒的 非模态提醒      <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -134,10 +134,10 @@ public class ProjectUtil {
     }
 
     /**
-     * 显示一个 正常消息提醒的 非模态提醒      </br>
-     * </br>
-     * </br>
-     * </br>
+     * 显示一个 正常消息提醒的 非模态提醒      <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -151,10 +151,10 @@ public class ProjectUtil {
     }
 
     /**
-     * 显示一个 正常消息提醒的 非模态提醒      </br>
-     * </br>
-     * </br>
-     * </br>
+     * 显示一个 正常消息提醒的 非模态提醒      <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -178,10 +178,10 @@ public class ProjectUtil {
     }
 
     /* *
-     *     获取默认的项目      </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     *     获取默认的项目      <br>
+     *           <br>
+     *           <br>
+     *           <br>
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 8:44
      * @Param []
@@ -198,10 +198,10 @@ public class ProjectUtil {
     }
 
     /* *
-     *    TODO  根据项目名字获取项目,未实现，返回默认项目      </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     *    TODO  根据项目名字获取项目,未实现，返回默认项目      <br>
+     *           <br>
+     *           <br>
+     *           <br>
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 8:47
      * @Param [name]
@@ -223,10 +223,10 @@ public class ProjectUtil {
     }
 
     /* *
-     *    获取项目管理器       </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     *    获取项目管理器       <br>
+     *           <br>
+     *           <br>
+     *           <br>
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 8:46
      * @Param []

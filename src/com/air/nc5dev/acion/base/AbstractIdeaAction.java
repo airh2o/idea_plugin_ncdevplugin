@@ -12,10 +12,10 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.Icon;
 
 /**
- * 这是IDEA action顶级抽象类，请所有的action继承他        </br>
- * </br>
- * </br>
- * </br>
+ * 这是IDEA action顶级抽象类，请所有的action继承他        <br>
+ * <br>
+ * <br>
+ * <br>
  *
  * @author air Email: 209308343@qq.com
  * @date 2020/3/18 0018 8:53
@@ -65,10 +65,10 @@ public abstract class AbstractIdeaAction extends AnAction {
     }
 
     /**
-     * 当前是否是windows系统         </br>
-     * </br>
-     * </br>
-     * </br>
+     * 当前是否是windows系统         <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return boolean
      * @author air Email: 209308343@qq.com
@@ -80,10 +80,10 @@ public abstract class AbstractIdeaAction extends AnAction {
     }
 
     /**
-     * 当前是否是windows系统         </br>
-     * </br>
-     * </br>
-     * </br>
+     * 当前是否是windows系统         <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return boolean
      * @author air Email: 209308343@qq.com
@@ -95,10 +95,10 @@ public abstract class AbstractIdeaAction extends AnAction {
     }
 
     /**
-     * 事件处理方法      </br>
-     * </br>
-     * </br>
-     * </br>
+     * 事件处理方法      <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com

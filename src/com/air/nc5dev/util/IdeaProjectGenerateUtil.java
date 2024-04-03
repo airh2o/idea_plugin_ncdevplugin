@@ -57,11 +57,11 @@ import java.util.Properties;
 import java.util.stream.Stream;
 
 /***
- *    生成新项目里 NC必须的东西  等    </br>
- *     1.NC库依赖      </br>
- *     2.NC 3个源文件夹 和 1个xml     </br>
+ *    生成新项目里 NC必须的东西  等    <br>
+ *     1.NC库依赖      <br>
+ *     2.NC 3个源文件夹 和 1个xml     <br>
  *     3.NC 2个运行选项 服务端+客户端
- *     4. 复制项目 ump文件到 NC HOME的工具方法 </br>
+ *     4. 复制项目 ump文件到 NC HOME的工具方法 <br>
  * @author air Email: 209308343@qq.com
  * @date 2019/12/25 0025 9:02
  */
@@ -113,10 +113,10 @@ public class IdeaProjectGenerateUtil {
     }
 
     /**
-     * 生成NC默认 几个个文件夹 src和META-INF 到指定模块       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 生成NC默认 几个个文件夹 src和META-INF 到指定模块       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -171,10 +171,10 @@ public class IdeaProjectGenerateUtil {
     }
 
     /**
-     * 生成 插件补丁 标准导出配置文件 到 到指定模块       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 生成 插件补丁 标准导出配置文件 到 到指定模块       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -549,11 +549,11 @@ public class IdeaProjectGenerateUtil {
     }
 
     /**
-     * </br>
+     * <br>
      * 马上把最新的项目里所有模块的 META-INF 里所有文件复制到(包括ncc项目的hotwebs的文件)
-     * NC HOME里对应的项目模块文件夹，主要是 ejb部署xml       </br>
-     * </br>
-     * </br>
+     * NC HOME里对应的项目模块文件夹，主要是 ejb部署xml       <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -572,11 +572,11 @@ public class IdeaProjectGenerateUtil {
     }
 
     /**
-     * </br>
+     * <br>
      * 马上把指定模块的 META-INF 里所有文件复制到
-     * NC HOME里对应的项目模块文件夹，主要是 ejb部署xml       </br>
-     * </br>
-     * </br>
+     * NC HOME里对应的项目模块文件夹，主要是 ejb部署xml       <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com

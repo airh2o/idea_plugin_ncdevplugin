@@ -58,10 +58,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /***
- *     弹框UI        </br>
- *           </br>
- *           </br>
- *           </br>
+ *     弹框UI        <br>
+ *           <br>
+ *           <br>
+ *           <br>
  * @author air Email: 209308343@qq.com
  * @date 2019/12/25 0025 15:29
  * @Param
@@ -201,10 +201,20 @@ public class ExportbmfDialog extends DialogWrapper {
                 , project
                 , contentPane);
 
-        if (CACHE.get(getProject()) == null) {
-            initFiles(1);
-        } else {
-            initFiles(0);
+        if (runing.get()) {
+            LogUtil.infoAndHide("请等待上一次搜索完成...再试");
+            return;
+        }
+
+        long start = System.currentTimeMillis();
+        runing.set(true);
+        try {
+            doSearch();
+
+            long end = System.currentTimeMillis();
+            labelInfo.setText("搜索完成,匹配数: " + CollUtil.size(result) + "   耗时: " + ((end - start) / 1000) + " 秒");
+        } finally {
+            runing.set(false);
         }
     }
 
@@ -225,56 +235,6 @@ public class ExportbmfDialog extends DialogWrapper {
             }
 
             result.sort((r1, r2) -> V.get(r1.getOrder1(), 0).compareTo(V.get(r2.getOrder1(), 0)));
-
-            //匹配 bmf文件这些
-            Map<String, SearchComponentVO> bmfmap = CACHE.get(getProject());
-            if (bmfmap != null) {
-                boolean onlyNoMatch = checkBoxOnlyNoMatch.isSelected();
-                boolean onlyHasFile = checkBoxOnlyHasFile.isSelected();
-                boolean onlyOnlyBmf = checkBoxOnlyBmf.isSelected();
-                Iterator<SearchComponentVO> it = result.iterator();
-                while (it.hasNext()) {
-                    SearchComponentVO vo = it.next();
-
-                    if (onlyOnlyBmf) {
-                        if (Boolean.TRUE.equals(vo.getIsbizmodel())
-                                /* || (
-                                        StringUtil.isNotBlank(vo.getMetaType())
-                                                && !".bmf".equalsIgnoreCase(vo.getMetaType())
-                                )*/
-                        ) {
-                            it.remove();
-                        }
-                    }
-
-                    SearchComponentVO b = bmfmap.get(vo.getId());
-                    if (b == null) {
-                        vo.setFileName(null);
-                        vo.setFilePath(null);
-                        vo.setFileVersion(null);
-
-                        if (onlyHasFile) {
-                            it.remove();
-                        }
-
-                        continue;
-                    }
-
-                    vo.setFileName(b.getFileName());
-                    vo.setFilePath(b.getFilePath());
-                    vo.setFileVersion(b.getFileVersion());
-
-                    if (onlyOnlyBmf && vo.getFileName() != null && !vo.getFileName().toLowerCase().endsWith(".bmf")) {
-                        it.remove();
-                    } else {
-                        if (onlyNoMatch) {
-                            if (StringUtil.equalsIgnoreCase(vo.getVersion(), vo.getFileVersion())) {
-                                it.remove();
-                            }
-                        }
-                    }
-                }
-            }
 
             loadDatas(result);
         } catch (Throwable e) {
@@ -336,11 +296,9 @@ public class ExportbmfDialog extends DialogWrapper {
         }
 
         Connection con = null;
-        Statement st = null;
         try {
             NCDataSourceVO ds = NCPropXmlUtil.getDataSourceVOS(getProject()).get(comboBoxDb.getSelectedIndex());
             con = ConnectionUtil.getConn(ds);
-            st = con.createStatement();
             for (SearchComponentVO v : vs) {
                 if (indicator != null) {
                     if (indicator.isCanceled()) {
@@ -350,7 +308,7 @@ public class ExportbmfDialog extends DialogWrapper {
                     indicator.setText("导出： " + v.getName() + "  " + v.getDisplayName() + " 中...");
                 }
                 ComponentAggVO agg = new QueryCompomentVOUtil(con).queryVOAgg(v.getId(), getProject());
-                String str = toApifoxJSON(st, agg);
+                String str = toApifoxJSON(con, agg);
                 FileUtil.writeUtf8String(str, new File(outDir, v.getOwnModule() + '_' + v.getName() + ".json"));
             }
 
@@ -365,9 +323,9 @@ public class ExportbmfDialog extends DialogWrapper {
         }
     }
 
-    public String toApifoxJSON(Statement st, ComponentAggVO agg) {
+    public String toApifoxJSON(Connection con, ComponentAggVO agg) {
         try {
-            ApifoxObjVO apifoxObjVO = MakeApifoxJsonUtil.meta(st, agg);
+            ApifoxObjVO apifoxObjVO = MakeApifoxJsonUtil.meta(con, agg);
 
             return JSON.toJSONString(apifoxObjVO, SerializerFeature.PrettyFormat);
         } catch (Throwable e) {
@@ -375,121 +333,9 @@ public class ExportbmfDialog extends DialogWrapper {
             LogUtil.error(e.getMessage(), e);
             ExceptionUtil.wrapRuntime(e);
         } finally {
-            IoUtil.close(st);
         }
         return null;
     }
-
-    private void searchAllBmfFile(ProgressIndicator indicator) {
-        File home = new File(ProjectNCConfigUtil.getNCHomePath(getProject()));
-        if (!home.isDirectory()) {
-            return;
-        }
-
-        File modules = new File(home, "modules");
-        if (!modules.isDirectory()) {
-            return;
-        }
-
-        List<File> bmfs = V.get(IoUtil.getAllFiles(modules
-                , true
-                , f -> f.isFile() || !(
-                        f.getName().equalsIgnoreCase(".idea")
-                                || f.getName().equalsIgnoreCase(".git")
-                                || f.getName().equalsIgnoreCase(".settings")
-                                || f.getName().equalsIgnoreCase(".svn")
-                )
-                , ".bmf", ".bpf"), new ArrayList<>());
-
-        readBmfFileInfo2Cache(bmfs, indicator);
-
-        searchProjectBmfFile(indicator);
-    }
-
-    private void readBmfFileInfo2Cache(List<File> bmfs, ProgressIndicator indicator) {
-        CACHE.putIfAbsent(getProject(), new ConcurrentHashMap<>());
-        Map<String, SearchComponentVO> m = CACHE.get(getProject());
-        for (File bmf : bmfs) {
-            try {
-                if (indicator != null) {
-                    if (indicator.isCanceled()) {
-                        LogUtil.infoAndHide("取消缓存BMF任务完成");
-                        return;
-                    }
-                    indicator.setText("正在读取BMF文件到缓存: " + bmf.getPath());
-                }
-
-                ComponentDTO c = MeatBaseInfoReadUtil.readComponentInfo(FileUtil.readUtf8String(bmf));
-                SearchComponentVO s = ReflectUtil.copy2VO(c, SearchComponentVO.class);
-                s.setFileName(bmf.getName());
-                s.setFilePath(bmf.getPath());
-                s.setFileVersion(c.getVersion());
-
-                if (StringUtil.isBlank(c.getMetaType())) {
-                    if (Boolean.FALSE.equals(c.getIsbizmodel()) || StringUtil.endWithIgnoreCase(s.getFileName(),
-                            ".bmf")) {
-                        c.setMetaType(".bmf");
-                    } else {
-                        c.setMetaType(".bpf");
-                    }
-                }
-
-                m.put(c.getId(), s);
-            } catch (Throwable e) {
-                System.err.println(bmf.getPath() + " error " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void searchProjectBmfFile(ProgressIndicator indicator) {
-        List<File> bmfs = V.get(IoUtil.getAllFiles(
-                new File(getProject().getBasePath())
-                , true
-                , f -> f.isFile() || !(
-                        f.getName().equalsIgnoreCase(".idea")
-                                || f.getName().equalsIgnoreCase(".git")
-                                || f.getName().equalsIgnoreCase(".settings")
-                                || f.getName().equalsIgnoreCase(".svn")
-                )
-                , ".bmf", ".bpf"), new ArrayList<>());
-
-        readBmfFileInfo2Cache(bmfs, indicator);
-    }
-
-    public void initFiles(int type) {
-        if (runing.get()) {
-            LogUtil.infoAndHide("请等待上一次搜索完成...再试");
-            return;
-        }
-
-        long start = System.currentTimeMillis();
-        runing.set(true);
-        Task.Backgroundable backgroundable = new Task.Backgroundable(project, "正在搜索...请耐心等待(第一次搜索会初始化扫描HOME中BMF文件.." +
-                ".初始化只会运行一次)") {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                try {
-                    if (1 == type) {
-                        searchAllBmfFile(indicator);
-                    } else if (0 == type) {
-                        searchProjectBmfFile(indicator);
-                    }
-                } finally {
-                    runing.set(false);
-
-                    doSearch();
-
-                    long end = System.currentTimeMillis();
-                    labelInfo.setText("搜索完成,匹配数: " + CollUtil.size(result) + "   耗时: " + ((end - start) / 1000) + " 秒");
-                }
-            }
-        };
-        backgroundable.setCancelText("停止任务");
-        backgroundable.setCancelTooltipText("停止这个任务");
-        ProgressManager.getInstance().run(backgroundable);
-    }
-
 
     @Override
     public void doCancelAction() {

@@ -58,10 +58,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * 导出NC补丁 工具类      </br>
- * </br>
- * </br>
- * </br>
+ * 导出NC补丁 工具类      <br>
+ * <br>
+ * <br>
+ * <br>
  *
  * @author air Email: 209308343@qq.com
  * @version NC505, JDK1.5+, V1.0
@@ -117,10 +117,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 导出补丁到指定的文件夹   </br>
-     * </br>
-     * </br>
-     * </br>
+     * 导出补丁到指定的文件夹   <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -1169,10 +1169,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 打包模块class到jar文件       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 打包模块class到jar文件       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -1236,10 +1236,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 打包成jar文件   </br>
-     * </br>
-     * </br>
-     * </br>
+     * 打包成jar文件   <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.io.File
      * @author air Email: 209308343@qq.com
@@ -1273,10 +1273,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 获得jar的manifest文件，如果穿的file是null 就够就默认的格式      </br>
-     * </br>
-     * </br>
-     * </br>
+     * 获得jar的manifest文件，如果穿的file是null 就够就默认的格式      <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -1327,10 +1327,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 把一个包 当前的文件夹内所有 java源代码和类文件 复制到补丁对应位置（不包含下级包）      </br>
-     * </br>
-     * </br>
-     * </br>
+     * 把一个包 当前的文件夹内所有 java源代码和类文件 复制到补丁对应位置（不包含下级包）      <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -1356,10 +1356,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 导出一个包       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 导出一个包       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -1397,10 +1397,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 通过循环 class文件 方式复制包里补丁         </br>
-     * </br>
-     * </br>
-     * </br>
+     * 通过循环 class文件 方式复制包里补丁         <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -1489,10 +1489,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 把一个文件 复制到指定的文件夹里 </br>
-     * 会自动创建不存在的文件夹      </br>
-     * </br>
-     * </br>
+     * 把一个文件 复制到指定的文件夹里 <br>
+     * 会自动创建不存在的文件夹      <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -1518,10 +1518,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 根据 补丁模块配置文件 获得模块名        </br>
-     * </br>
-     * </br>
-     * </br>
+     * 根据 补丁模块配置文件 获得模块名        <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com
@@ -1597,10 +1597,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 获得第几个包名字       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 获得第几个包名字       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com
@@ -1618,10 +1618,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 通过循环源文件方式复制 包里补丁        </br>
-     * 警告：同一个java源文件内非匿名 非public class会跳过复制！</br>
-     * </br>
-     * </br>
+     * 通过循环源文件方式复制 包里补丁        <br>
+     * 警告：同一个java源文件内非匿名 非public class会跳过复制！<br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -1782,10 +1782,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 把一个包里的 非代码文件 复制到补丁 对应位置里      </br>
-     * 比如 wsdl json 各种类路径配置文件等     </br>
-     * </br>
-     * </br>
+     * 把一个包里的 非代码文件 复制到补丁 对应位置里      <br>
+     * 比如 wsdl json 各种类路径配置文件等     <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -1845,10 +1845,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 根据class全名，获得所有他的编译后class     </br>
-     * </br>
-     * </br>
-     * </br>
+     * 根据class全名，获得所有他的编译后class     <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.io.File
      * @author air Email: 209308343@qq.com
@@ -1873,10 +1873,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 读取模块补丁输出设置的配置文件       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 读取模块补丁输出设置的配置文件       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.util.Properties
      * @author air Email: 209308343@qq.com
@@ -1901,10 +1901,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 根据class文件 获取他的源码文件名字： 会根据javap命令来        </br>
-     * </br>
-     * </br>
-     * </br>
+     * 根据class文件 获取他的源码文件名字： 会根据javap命令来        <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com
@@ -1937,10 +1937,10 @@ public class ExportNCPatcherUtil {
     }
 
     /**
-     * 从Class文件 javap 读取 源文件名        </br>
-     * FIXME 有效率问题，如果用二进制读取会更好        </br>
-     * </br>
-     * </br>
+     * 从Class文件 javap 读取 源文件名        <br>
+     * FIXME 有效率问题，如果用二进制读取会更好        <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com

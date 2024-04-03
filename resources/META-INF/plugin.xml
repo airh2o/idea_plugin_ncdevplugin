@@ -305,6 +305,7 @@
 
             <reference ref="nc5dev.info.opennchome"/>
             <reference ref="nc5dev.info.opennclogconfigfile"/>
+            <reference ref="nc5dev.info.openncconfigwindow"/>
             <reference ref="nc5dev.info.openncdataconfigfile"/>
             <reference ref="nc5dev.info.NCDataDictionaryAction"/>
 
@@ -325,7 +326,6 @@
                 <reference ref="nc5dev.info.deletenclogs"/>
                 <reference ref="nc5dev.info.ReConfigModuleAction"/>
                 <reference ref="nc5dev.info.opennchomeierpbin"/>
-                <reference ref="nc5dev.info.openncconfigwindow"/>
                 <reference ref="nc5dev.info.OpenNCCDevWebAction"/>
                 <reference ref="nc5dev.info.OpenNCCUIWebAction"/>
                 <reference ref="nc5dev.info.OpenCopyWebAction"/>

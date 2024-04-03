@@ -12,10 +12,10 @@ import javax.swing.JTextField;
 import java.util.concurrent.TimeUnit;
 
 /***
- *   设置定时提醒 弹框UI        </br>
- *           </br>
- *           </br>
- *           </br>
+ *   设置定时提醒 弹框UI        <br>
+ *           <br>
+ *           <br>
+ *           <br>
  * @author air Email: 209308343@qq.com
  * @date 2019/12/25 0025 15:29
  * @Param
@@ -46,9 +46,9 @@ public class SetingRemindDialog
     }
 
     /***
-     *   点击了确认    </br>
-     *           </br>
-     *           </br>
+     *   点击了确认    <br>
+     *           <br>
+     *           <br>
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 16:17
      * @Param []

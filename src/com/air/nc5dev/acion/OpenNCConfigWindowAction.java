@@ -62,5 +62,7 @@ public class OpenNCConfigWindowAction extends AbstractIdeaAction {
         }
 
         Runtime.getRuntime().exec(bat.getPath());
+
+        LogUtil.infoAndHide("如果没有打开且是win系统,脚本应该是sh文件,可以安装git后 设置默认git打开sh文件");
     }
 }

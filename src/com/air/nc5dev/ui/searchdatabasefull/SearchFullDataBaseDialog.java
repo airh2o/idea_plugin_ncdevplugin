@@ -71,10 +71,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /***
- *     弹框UI        </br>
- *           </br>
- *           </br>
- *           </br>
+ *     弹框UI        <br>
+ *           <br>
+ *           <br>
+ *           <br>
  * @author air Email: 209308343@qq.com
  * @date 2019/12/25 0025 15:29
  * @Param
@@ -422,9 +422,9 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
     }
 
     /***
-     *   点击了确认，开始导出补丁包        </br>
-     *           </br>
-     *           </br>
+     *   点击了确认，开始导出补丁包        <br>
+     *           <br>
+     *           <br>
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 16:17
      * @Param []

@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /***
- *     NC 的prop.xml工具类，提供数据源读取 修改等     </br>
- *           </br>
- *           </br>
- *          </br>
+ *     NC 的prop.xml工具类，提供数据源读取 修改等     <br>
+ *           <br>
+ *           <br>
+ *          <br>
  * @author air Email: 209308343@qq.com
  * @version NC505, JDK1.5+, V1.0
  * @date 2019/12/25 0025 9:34
@@ -39,10 +39,10 @@ public class NCPropXmlUtil {
     private static List<NCDataSourceVO> dataSourceVOS;
 
     /***
-     *    是否 数据源为空，true空！       </br>
-     *     1.还没有读取数据源       </br>
-     *     2.读取了 但是xml里是空的     </br>
-     *           </br>
+     *    是否 数据源为空，true空！       <br>
+     *     1.还没有读取数据源       <br>
+     *     2.读取了 但是xml里是空的     <br>
+     *           <br>
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 9:36
      * @Param []
@@ -63,10 +63,10 @@ public class NCPropXmlUtil {
     }
 
     /***
-     *    获取第几个 数据源       </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     *    获取第几个 数据源       <br>
+     *           <br>
+     *           <br>
+     *           <br>
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 9:38
      * @Param [index]
@@ -85,10 +85,10 @@ public class NCPropXmlUtil {
     }
 
     /***
-     *    获取 指定数据源名字的 数据源       </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     *    获取 指定数据源名字的 数据源       <br>
+     *           <br>
+     *           <br>
+     *           <br>
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 9:38
      * @Param [dataSourceName]
@@ -105,10 +105,10 @@ public class NCPropXmlUtil {
     }
 
     /***
-     *    获得数据源操作流       </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     *    获得数据源操作流       <br>
+     *           <br>
+     *           <br>
+     *           <br>
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 9:40
      * @Param []
@@ -121,10 +121,10 @@ public class NCPropXmlUtil {
     }
 
     /***
-     *     增加一个数据源      </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     *     增加一个数据源      <br>
+     *           <br>
+     *           <br>
+     *           <br>
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 9:41
      * @Param [ds]

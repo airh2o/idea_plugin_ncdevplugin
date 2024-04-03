@@ -188,10 +188,10 @@ public class NC5HomeConfigDialogUIListener {
     }
 
     /**
-     * 数据库类型 下拉框改变         </br>
-     * </br>
-     * </br>
-     * </br>
+     * 数据库类型 下拉框改变         <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -211,10 +211,10 @@ public class NC5HomeConfigDialogUIListener {
     }
 
     /**
-     * 根据下拉框的数据库类型获得jdbc class名字      </br>
-     * </br>
-     * </br>
-     * </br>
+     * 根据下拉框的数据库类型获得jdbc class名字      <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com

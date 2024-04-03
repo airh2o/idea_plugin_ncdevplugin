@@ -277,4 +277,108 @@ public class ConnectionUtil {
         }
 
     }
+
+    public static boolean isMysql(Connection con) throws SQLException {
+        if (con == null) {
+            return false;
+        }
+
+        if (con.getMetaData() == null) {
+            return false;
+        }
+
+        return con.getMetaData().getDriverName().toUpperCase().contains(".MYSQL.")
+                || con.getMetaData().getURL().toUpperCase().startsWith("JDBC:MYSQL:");
+    }
+
+    public static boolean isOracle(Connection con) throws SQLException {
+        if (con == null) {
+            return false;
+        }
+
+        if (con.getMetaData() == null) {
+            return false;
+        }
+
+        return con.getMetaData().getDriverName().toUpperCase().contains("ORACLE.")
+                || con.getMetaData().getURL().toUpperCase().startsWith("JDBC:ORACLE:");
+    }
+
+    public static boolean isSqlServer(Connection con) throws SQLException {
+        if (con == null) {
+            return false;
+        }
+
+        if (con.getMetaData() == null) {
+            return false;
+        }
+
+        return con.getMetaData().getDriverName().toUpperCase().contains(".SQLSERVER.")
+                || con.getMetaData().getURL().toUpperCase().startsWith("JDBC:SQLSERVER:");
+    }
+
+    public static boolean isDM(Connection con) throws SQLException {
+        if (con == null) {
+            return false;
+        }
+
+        if (con.getMetaData() == null) {
+            return false;
+        }
+
+        return con.getMetaData().getDriverName().toUpperCase().contains(".DMDRIVER")
+                || con.getMetaData().getURL().toUpperCase().startsWith("JDBC:DM:");
+    }
+
+    public static boolean isPostgreSQL(Connection con) throws SQLException {
+        if (con == null) {
+            return false;
+        }
+
+        if (con.getMetaData() == null) {
+            return false;
+        }
+
+        return con.getMetaData().getDriverName().toUpperCase().contains(".POSTGRESQL.")
+                || con.getMetaData().getURL().toUpperCase().startsWith("JDBC:POSTGRESQL:");
+    }
+
+    public static boolean isDB2(Connection con) throws SQLException {
+        if (con == null) {
+            return false;
+        }
+
+        if (con.getMetaData() == null) {
+            return false;
+        }
+
+        return con.getMetaData().getDriverName().toUpperCase().contains(".DB2.")
+                || con.getMetaData().getURL().toUpperCase().startsWith("JDBC:DB2:");
+    }
+
+    public static boolean isGaussDB(Connection con) throws SQLException {
+        if (con == null) {
+            return false;
+        }
+
+        if (con.getMetaData() == null) {
+            return false;
+        }
+
+        return con.getMetaData().getDriverName().toUpperCase().contains(".GAUSS.")
+                || con.getMetaData().getURL().toUpperCase().startsWith("JDBC:GAUSS:");
+    }
+
+    public static boolean isGBASE(Connection con) throws SQLException {
+        if (con == null) {
+            return false;
+        }
+
+        if (con.getMetaData() == null) {
+            return false;
+        }
+
+        return con.getMetaData().getDriverName().toUpperCase().contains(".GBASE.")
+                || con.getMetaData().getURL().toUpperCase().startsWith("JDBC:GBASE:");
+    }
 }

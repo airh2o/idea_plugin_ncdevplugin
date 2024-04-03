@@ -23,10 +23,10 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * 项目的NC总体配置 读取 维护   工具类       </br>
- * </br>
- * </br>
- * </br>
+ * 项目的NC总体配置 读取 维护   工具类       <br>
+ * <br>
+ * <br>
+ * <br>
  *
  * @author air Email: 209308343@qq.com
  * @date 2019/12/25 0025 9:05
@@ -53,10 +53,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 获取 NC主目录        </br>
-     * </br>
-     * </br>
-     * </br>
+     * 获取 NC主目录        <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com
@@ -102,10 +102,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 获取 NC主目录        </br>
-     * </br>
-     * </br>
-     * </br>
+     * 获取 NC主目录        <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com
@@ -117,10 +117,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 获取 NC主目录        </br>
-     * </br>
-     * </br>
-     * </br>
+     * 获取 NC主目录        <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com
@@ -133,10 +133,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 设置NC HOME路径       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 设置NC HOME路径       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -149,10 +149,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 获取 NC客户端要链接的服务器ip       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 获取 NC客户端要链接的服务器ip       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com
@@ -165,10 +165,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 设置NC 客户端要链接的服务器ip      </br>
-     * </br>
-     * </br>
-     * </br>
+     * 设置NC 客户端要链接的服务器ip      <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -186,10 +186,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 获取 NC客户端要链接的服务器 端口      </br>
-     * </br>
-     * </br>
-     * </br>
+     * 获取 NC客户端要链接的服务器 端口      <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com
@@ -206,10 +206,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 设置NC 客户端要链接的服务器  端口  </br>
-     * </br>
-     * </br>
-     * </br>
+     * 设置NC 客户端要链接的服务器  端口  <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -222,10 +222,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 根据key获取NC项目配置值       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 根据key获取NC项目配置值       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com
@@ -238,10 +238,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 根据key获取NC项目配置值       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 根据key获取NC项目配置值       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com
@@ -276,10 +276,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 根据key获取NC项目配置值       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 根据key获取NC项目配置值       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com
@@ -292,10 +292,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 根据key获取NC项目配置值       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 根据key获取NC项目配置值       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return java.lang.String
      * @author air Email: 209308343@qq.com
@@ -324,10 +324,10 @@ public class ProjectNCConfigUtil {
     }
 
     /***
-     *     马上把配置信息更新到配置文件里      </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     *     马上把配置信息更新到配置文件里      <br>
+     *           <br>
+     *           <br>
+     *           <br>
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 9:16
      * @Param []
@@ -408,10 +408,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 设置NC项目配置       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 设置NC项目配置       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -424,10 +424,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 设置NC项目配置       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 设置NC项目配置       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return void
      * @author air Email: 209308343@qq.com
@@ -532,10 +532,10 @@ public class ProjectNCConfigUtil {
     }
 
     /**
-     * 获取这个插件的运行实例的唯一标识int        </br>
-     * </br>
-     * </br>
-     * </br>
+     * 获取这个插件的运行实例的唯一标识int        <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return int
      * @author air Email: 209308343@qq.com

@@ -12,10 +12,10 @@ import java.io.File;
 import java.util.jar.Manifest;
 
 /**
- * 把一个NC补丁的模块文件夹  转换成Jar包        </br>
- * </br>
- * </br>
- * </br>
+ * 把一个NC补丁的模块文件夹  转换成Jar包        <br>
+ * <br>
+ * <br>
+ * <br>
  *
  * @author air Email: 209308343@qq.com
  * @date 2020/4/1 0001 22:03

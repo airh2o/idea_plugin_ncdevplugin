@@ -12,10 +12,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 发布-订阅 消费工具类 </br>
- * A 发布一个 主题消息，B 被动接收下消息 来消费A发布的</br>
- * </br>
- * </br>
+ * 发布-订阅 消费工具类 <br>
+ * A 发布一个 主题消息，B 被动接收下消息 来消费A发布的<br>
+ * <br>
+ * <br>
  *
  * @author air Email: 209308343@qq.com
  * @version NC505, JDK1.5+, V1.0
@@ -46,10 +46,10 @@ public final class PubSubUtil {
     private static final PubSubUtil INSTANCE = new PubSubUtil();
 
     /**
-     * 订阅某个主题消息       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 订阅某个主题消息       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return boolean true 订阅成功
      * @author air Email: 209308343@qq.com
@@ -73,10 +73,10 @@ public final class PubSubUtil {
     }
 
     /**
-     * 同步：发布一个主题消息       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 同步：发布一个主题消息       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @author air Email: 209308343@qq.com
      * @date 2020/2/4 0004 15:14
@@ -98,10 +98,10 @@ public final class PubSubUtil {
     }
 
     /**
-     * 异步: 发布一个主题消息       </br>
-     * </br>
-     * </br>
-     * </br>
+     * 异步: 发布一个主题消息       <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @author air Email: 209308343@qq.com
      * @date 2020/2/4 0004 15:14
@@ -115,10 +115,10 @@ public final class PubSubUtil {
     }
 
     /**
-     * 获得 实例对象         </br>
-     * </br>
-     * </br>
-     * </br>
+     * 获得 实例对象         <br>
+     * <br>
+     * <br>
+     * <br>
      *
      * @return com.air.nc5dev.util.subscribe.PubSubUtil
      * @author air Email: 209308343@qq.com

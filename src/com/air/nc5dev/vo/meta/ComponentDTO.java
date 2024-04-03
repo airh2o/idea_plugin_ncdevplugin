@@ -38,7 +38,8 @@ public class ComponentDTO implements Serializable, Cloneable {
     private String programcode;
     private String filePath;
     String metaType;
-
+    String industryChanged;
+    Boolean isSource;
 
     transient List<? extends ClassDTO> classDTOS;
 }

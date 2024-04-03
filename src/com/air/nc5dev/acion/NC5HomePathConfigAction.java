@@ -10,10 +10,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 
 /***
- *  点击  配置NC HOME  的action       </br>
- *           </br>
- *           </br>
- *           </br>
+ *  点击  配置NC HOME  的action       <br>
+ *           <br>
+ *           <br>
+ *           <br>
  * @author air Email: 209308343@qq.com
  * @date 2019/12/25 0025 14:41
  * @Param

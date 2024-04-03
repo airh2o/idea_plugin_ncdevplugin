@@ -55,33 +55,9 @@ public class ExportbmfTableMouseListenerImpl implements MouseListener {
         popup.add(export);
         export.addActionListener(event -> {
             SearchComponentVO v = CollUtil.get(mainPanel.getResult(), mainPanel.getTable().getSelectedRow());
-            if (v != null && StringUtil.isNotBlank(v.getFilePath())) {
+            if (v != null) {
                 mainPanel.export2Files(CollUtil.toList(v));
             }
-        });
-
-        JMenuItem remove = new JMenuItem("打开BMF文件");
-        popup.add(remove);
-        remove.addActionListener(event -> {
-            SearchComponentVO v = CollUtil.get(mainPanel.getResult(), mainPanel.getTable().getSelectedRow());
-            if (v != null && StringUtil.isNotBlank(v.getFilePath())) {
-                openXml(mainPanel.getProject(), v.getFilePath());
-            }
-        });
-
-        JMenuItem clear = new JMenuItem("打开BMF文件位置");
-        popup.add(clear);
-        clear.addActionListener(event -> {
-            SearchComponentVO v = CollUtil.get(mainPanel.getResult(), mainPanel.getTable().getSelectedRow());
-            if (v != null && StringUtil.isNotBlank(v.getFilePath())) {
-                IoUtil.tryOpenFileExpolor(new File(v.getFilePath()));
-            }
-        });
-
-        JMenuItem forceRefash = new JMenuItem("强制刷新缓存的BMF文件信息");
-        popup.add(forceRefash);
-        forceRefash.addActionListener(event -> {
-            mainPanel.initFiles(1);
         });
 
         popup.show(e.getComponent(), e.getX(), e.getY());

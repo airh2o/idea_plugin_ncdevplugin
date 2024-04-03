@@ -158,7 +158,7 @@ public final class StringUtil extends StrUtil {
     }
 
     /**
-     * 把一个对象安全的变成字符串,如果是null返回"" </br> </br>
+     * 把一个对象安全的变成字符串,如果是null返回"" <br> <br>
      *
      * @param o
      * @return
@@ -219,8 +219,8 @@ public final class StringUtil extends StrUtil {
     }
 
     /**
-     * 获得字符串编码 </br>
-     * </br>
+     * 获得字符串编码 <br>
+     * <br>
      *
      * @param str
      * @return
@@ -286,7 +286,7 @@ public final class StringUtil extends StrUtil {
     }
 
     /**
-     * 计算字符串 src 总 给定字符串 des 出现的次数 </br> </br>
+     * 计算字符串 src 总 给定字符串 des 出现的次数 <br> <br>
      *
      * @param src
      * @param des
@@ -305,7 +305,7 @@ public final class StringUtil extends StrUtil {
     }
 
     /**
-     * 计算字符串 src 总 给定字符串 des 出现的次数 达到阀值over,也就是出现次数只要 >= over 返回true </br> </br>
+     * 计算字符串 src 总 给定字符串 des 出现的次数 达到阀值over,也就是出现次数只要 >= over 返回true <br> <br>
      *
      * @param src
      * @param des
@@ -327,7 +327,7 @@ public final class StringUtil extends StrUtil {
     }
 
     /**
-     * 把一个字符串从 老的编码 转换到 新的编码 </br> </br>
+     * 把一个字符串从 老的编码 转换到 新的编码 <br> <br>
      *
      * @param s
      * @param oldCharEncode
@@ -379,8 +379,8 @@ public final class StringUtil extends StrUtil {
 
     /**
      * 字符串格式化,把占位符替换成 参数
-     * </br>
-     * </br>
+     * <br>
+     * <br>
      *
      * @param s    母字符串 比如 select 1 from dual where 1 != %s;
      * @param pars 参数值 比如 2 就是  select 1 from dual where 1 != 2;
@@ -398,8 +398,8 @@ public final class StringUtil extends StrUtil {
 
     /**
      * 把一个字符串src 里的 所有 from 替换成 to
-     * 不使用 正则！                   </br>
-     * </br>
+     * 不使用 正则！                   <br>
+     * <br>
      *
      * @param src
      * @param from
@@ -419,8 +419,8 @@ public final class StringUtil extends StrUtil {
 
     /**
      * 把一个字符串src 里的 第一次遇见的 from 替换成 to
-     * 不使用 正则！                   </br>
-     * </br>
+     * 不使用 正则！                   <br>
+     * <br>
      *
      * @param src
      * @param from

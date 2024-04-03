@@ -7,10 +7,10 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.Icon;
 
 /**
- * bmf 文件类型 </br>
- * </br>
- * </br>
- * </br>
+ * bmf 文件类型 <br>
+ * <br>
+ * <br>
+ * <br>
  *
  * @author air Email: 209308343@qq.com
  * @version NC505, JDK1.5+, V1.0

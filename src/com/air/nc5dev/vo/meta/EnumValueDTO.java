@@ -20,6 +20,6 @@ public class EnumValueDTO implements Serializable, Cloneable {
     private String createIndustry;
     private String modifyIndustry;
     private Boolean isSource;
-
+    String itemId;
 
 }

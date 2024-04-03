@@ -7,8 +7,8 @@ import java.io.StringWriter;
 
 /**
  * 异常工具类
- * </br>
- * </br>
+ * <br>
+ * <br>
  *
  * @author air Email:209308343@qq.com
  * @version NC505+,JDK1.5
@@ -147,8 +147,8 @@ public final class ExceptionUtil extends cn.hutool.core.exceptions.ExceptionUtil
 
     /**
      * 调用此方法 抛出一个指定错误消息的 异常
-     * </br>
-     * </br>
+     * <br>
+     * <br>
      *
      * @param errorMsg 异常消息
      * @throws BusinessException
@@ -161,8 +161,8 @@ public final class ExceptionUtil extends cn.hutool.core.exceptions.ExceptionUtil
 
     /**
      * 调用此方法 把一个 Throwable 抛出成  BusinessException 异常
-     * </br>
-     * </br>
+     * <br>
+     * <br>
      *
      * @param error 异常消息
      * @throws BusinessException
@@ -182,8 +182,8 @@ public final class ExceptionUtil extends cn.hutool.core.exceptions.ExceptionUtil
 
     /**
      * 调用此方法 把一个 Throwable 抛出成  BusinessException 异常,且消息用errorMsg替换,但错误栈保留
-     * </br>
-     * </br>
+     * <br>
+     * <br>
      *
      * @param errorMsg 异常消息
      * @throws BusinessException

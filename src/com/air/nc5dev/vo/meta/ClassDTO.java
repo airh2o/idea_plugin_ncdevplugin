@@ -45,13 +45,13 @@ public class ClassDTO implements Serializable, Cloneable {
     public String bizItfImpClassName;
     public String modInfoClassName;
     public Boolean isCreateSQL = true;
-    public Boolean isExtendBean;
+    public Boolean isExtendBean = false;
     public String resmodule;
     public Boolean fixedLength;
     public String userDefClassName;
     public String industry = "0";
     public Boolean industryChanged = false;
-    public Boolean isSource = true;
+    public Boolean isSource = false;
     public String createIndustry = "0";
     public String modifyIndustry = "0";
     public Integer height = 100;

@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * </br>
- * </br>
- * </br>
+ * <br>
+ * <br>
+ * <br>
  *
  * @author 唐粟 Email:209308343@qq.com 微信yongyourj
  * @date 2023/10/19 0019 15:43
@@ -118,27 +118,24 @@ public class ComponentAggVO implements Serializable, Cloneable {
             }
 
             //是否处理过
-            if (distent.contains(bizItfMapDTO.getBizInterfaceID() + ":" + bizItfMapDTO.getClassID())) {
+            String key = bizItfMapDTO.getBizInterfaceID() + ":" + bizItfMapDTO.getClassID()
+                    + '_' + bizItfMapDTO.getClassAttrPath() + ":" + bizItfMapDTO.getIntAttrID();
+            if (distent.contains(key)) {
                 continue;
             }
-            distent.add(bizItfMapDTO.getBizInterfaceID() + ":" + bizItfMapDTO.getClassID());
+
+            if (StringUtil.isNotBlank(bizItfMapDTO.getClassAttrPath())) {
+                bizItfMapDTO.setAttrpathid(StringUtil.uuid().toLowerCase());
+            }
+
+            distent.add(key);
             entityId2ItfEntityIdMap.putIfAbsent(bizItfMapDTO.getClassID(), new HashSet<>());
             Set<String> set = entityId2ItfEntityIdMap.get(bizItfMapDTO.getClassID());
             set.add(bizItfMapDTO.getBizInterfaceID());
 
+            itfEntityId2PropertyIdsMap.putIfAbsent(bizItfMapDTO.getBizInterfaceID(), new HashSet<>());
             Set<BizItfMapDTO> set2 = itfEntityId2PropertyIdsMap.get(bizItfMapDTO.getBizInterfaceID());
-            if (set2 == null) {
-                set2 = new HashSet<>();
-                itfEntityId2PropertyIdsMap.put(bizItfMapDTO.getBizInterfaceID(), set2);
-
-                List<PropertyDTO> ps = V.get(queryPropertyVOListUtil.queryVOs(bizItfMapDTO.getBizInterfaceID()), new LinkedList<>());
-                for (PropertyDTO p : ps) {
-                    BizItfMapDTO b = bizItfMapDTO.clone();
-                    set2.add(b);
-
-                    b.setIntAttrID(p.getId());
-                }
-            }
+            set2.add(bizItfMapDTO);
 
             //不是bmf文件本身的classid，说明是 引用的实体或接口对象！
             //计算 component > celllist > Reference
@@ -161,18 +158,24 @@ public class ComponentAggVO implements Serializable, Cloneable {
                 referenceDTO.setDisplayName("引用：" + c.getDisplayName());
             }
             referenceDTO.setName("reference" + referenceList.size());
-            referenceDTO.setFullClassName("nc.vo." + componentVO.getNamespace() + "." + componentVO.getName() + ".reference");
+            referenceDTO.setFullClassName("nc.vo." + componentVO.getNamespace() + "." + componentVO.getName() +
+                    ".reference");
             referenceList.add(referenceDTO);
 
             //计算  connectlist > busiitfconnection
-            BusiitfconnectionDTO busiitfconnectionDTO = new BusiitfconnectionDTO();
-            busiitfconnectionDTO.setId(StringUtil.uuid());
-            busiitfconnectionDTO.setComponentID(referenceDTO.getComponentID());
-            busiitfconnectionDTO.setTarget(referenceDTO.getId());
-            busiitfconnectionDTO.setRealsource(bizItfMapDTO.getClassID());
-            busiitfconnectionDTO.setRealtarget(referenceDTO.getRefId());
-            busiitfconnectionDTO.setSource(busiitfconnectionDTO.getRealsource());
-            busiitfconnectionList.add(busiitfconnectionDTO);
+            //是否处理过
+            key = bizItfMapDTO.getBizInterfaceID() + ":" + bizItfMapDTO.getClassID();
+            if (!distent.contains(key)) {
+                distent.add(key);
+                BusiitfconnectionDTO busiitfconnectionDTO = new BusiitfconnectionDTO();
+                busiitfconnectionDTO.setId(StringUtil.uuid());
+                busiitfconnectionDTO.setComponentID(referenceDTO.getComponentID());
+                busiitfconnectionDTO.setTarget(referenceDTO.getId());
+                busiitfconnectionDTO.setRealsource(bizItfMapDTO.getClassID());
+                busiitfconnectionDTO.setRealtarget(referenceDTO.getRefId());
+                busiitfconnectionDTO.setSource(busiitfconnectionDTO.getRealsource());
+                busiitfconnectionList.add(busiitfconnectionDTO);
+            }
         }
 
     }

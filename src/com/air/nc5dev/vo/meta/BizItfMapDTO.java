@@ -56,6 +56,7 @@ public class BizItfMapDTO implements Serializable, Cloneable {
     String versionType = "0";
     String target;
     String realtarget;
+    String attrpathid;
 
     public BizItfMapDTO clone() {
         try {

@@ -12,10 +12,10 @@ import java.awt.Desktop;
 import java.io.File;
 
 /**
- * 把一个NC元数据文件复制成新的文件且重置里面的各种id等        </br>
- * </br>
- * </br>
- * </br>
+ * 把一个NC元数据文件复制成新的文件且重置里面的各种id等        <br>
+ * <br>
+ * <br>
+ * <br>
  *
  * @author air Email: 209308343@qq.com
  * @date 2020/4/1 0001 22:03

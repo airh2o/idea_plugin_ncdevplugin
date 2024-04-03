@@ -304,7 +304,8 @@ public final class XmlUtil extends cn.hutool.core.util.XmlUtil {
 
             ele.addAttribute(map.containsKey(attr.getName().toLowerCase())
                             ? map.get(attr.getName().toLowerCase()) : attr.getName()
-                    , StringUtil.obj4StrIfnullBlack(ReflectUtil.getFieldValue(v, attr)));
+                    , StringUtil.obj4StrIfnullBlack(ReflectUtil.getFieldValue(v, attr))
+            );
         }
     }
 }

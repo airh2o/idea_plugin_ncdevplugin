@@ -11,10 +11,10 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Method;
 
 /**
- * Idea - 运行配置的工具类</br>
- * </br>
- * </br>
- * </br>
+ * Idea - 运行配置的工具类<br>
+ * <br>
+ * <br>
+ * <br>
  *
  * @author air Email: 209308343@qq.com
  * @version NC505, JDK1.5
@@ -24,10 +24,10 @@ import java.lang.reflect.Method;
 public class RunConfigurationUtil {
 
     /* *
-     *  往项目里添加一个     Application的运行项目     </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     *  往项目里添加一个     Application的运行项目     <br>
+     *           <br>
+     *           <br>
+     *           <br>
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 8:37
      * @Param [project] 添加到指定的项目
@@ -65,10 +65,10 @@ public class RunConfigurationUtil {
     }
 
     /* *
-     *  获取运行管理器         </br>
-     *           </br>
-     *           </br>
-     *           </br>
+     *  获取运行管理器         <br>
+     *           <br>
+     *           <br>
+     *           <br>
      * @author air Email: 209308343@qq.com
      * @date 2019/12/25 0025 8:43
      * @Param [project] 指定项目的
