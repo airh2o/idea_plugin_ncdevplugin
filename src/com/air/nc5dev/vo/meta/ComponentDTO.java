@@ -6,6 +6,13 @@ import nc.vo.pub.lang.UFDateTime;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * 组件vo
+ *
+ * @Author air Email: 209308343@qq.com
+ * @Description
+ * @Date 2024/4/10 0010 9:52
+ **/
 //com.yonyou.studio.mdp.database.model.ComponentVO
 @Data
 public class ComponentDTO implements Serializable, Cloneable {
@@ -41,5 +48,5 @@ public class ComponentDTO implements Serializable, Cloneable {
     String industryChanged;
     Boolean isSource;
 
-    transient List<? extends ClassDTO> classDTOS;
+    transient List<ClassDTO> classDTOS;
 }

@@ -1,10 +1,15 @@
 package com.air.nc5dev.vo.meta;
 
+import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.ReflectUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.V;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <busimap> 标签 （ ）
@@ -64,5 +69,22 @@ public class BizItfMapDTO implements Serializable, Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<BizItfMapDTO> toImpl(List<BizItfMapDTO> vs) throws SQLException {
+        if (CollUtil.isEmpty(vs)) {
+            return null;
+        }
+
+        ArrayList<BizItfMapDTO> is = new ArrayList<>(vs.size() << 1 + 16);
+
+        for (BizItfMapDTO v : vs) {
+            BizItfMapDTO v2 = new BizItfMapDTO();
+            ReflectUtil.copy2VO(v, v2);
+            v2.setIntAttrID("OK");
+            is.add(v2);
+        }
+
+        return is;
     }
 }

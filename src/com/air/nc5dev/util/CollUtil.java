@@ -345,6 +345,50 @@ public class CollUtil extends cn.hutool.core.collection.CollUtil {
         return result;
     }
 
+    /**
+     * 翻转kkey value， 空value会跳过！
+     *
+     * @param m
+     * @param <K>
+     * @param <V>
+     * @return
+     */
+    public static <K, V> Map<V, K> reverse(Map<K, V> m) {
+        if (isEmpty(m)) {
+            return new HashMap<>();
+        }
+
+        Map<V, K> m2 = new HashMap<>();
+
+        Set<K> ks = m.keySet();
+        for (K k : ks) {
+            if (m.get(k) == null) {
+                continue;
+            }
+
+            m2.put(m.get(k), k);
+        }
+
+        return m2;
+    }
+
+    /**
+     * 根据 cloneKeyMap 复制值到map中
+     *
+     * @param map         原来的map
+     * @param cloneKeyMap key=map中原来的key， value=要复制value put到map中的新key， 原来key不会删除！
+     */
+    public static void cloneMapKeys(Map map, Map cloneKeyMap) {
+        if (isEmpty(map) || isEmpty(cloneKeyMap)) {
+            return;
+        }
+
+        Set oks = cloneKeyMap.keySet();
+        for (Object ok : oks) {
+            map.put(cloneKeyMap.get(ok), map.get(ok));
+        }
+    }
+
     public static int size(Collection c) {
         if (c == null) {
             return 0;

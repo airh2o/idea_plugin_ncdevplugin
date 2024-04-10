@@ -5,6 +5,13 @@ import nc.vo.pub.lang.UFDateTime;
 
 import java.io.Serializable;
 
+/**
+ * 组件引用vo
+ *
+ * @Author air Email: 209308343@qq.com
+ * @Description
+ * @Date 2024/4/10 0010 9:53
+ **/
 //com.yonyou.studio.mdp.database.model.BizItfMapVO
 @Data
 public class ReferenceDTO implements Serializable, Cloneable {

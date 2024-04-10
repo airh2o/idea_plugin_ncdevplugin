@@ -6,6 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+/**
+ * 组件扩展vo
+ *
+ * @Author air Email: 209308343@qq.com
+ * @Description
+ * @Date 2024/4/10 0010 9:54
+ **/
 
 /**
  * <br>
@@ -26,7 +33,6 @@ public class SearchComponentVO extends ComponentDTO implements Serializable, Clo
     String fileVersion;
     String fileName;
     String filePath;
-
 
 
     //实体的信息

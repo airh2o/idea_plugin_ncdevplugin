@@ -23,14 +23,21 @@ import com.intellij.openapi.util.IconLoader;
 
 import javax.swing.Icon;
 
+/**
+ * 常用ion图标
+ *
+ * @Author air Email: 209308343@qq.com
+ * @Description
+ * @Date 2024/4/10 0010 9:55
+ **/
 public class Icons {
-  public static final Icon PLAY = IconLoader.getIcon("/images/execute.png");
-  public static final Icon CLEAN = IconLoader.getIcon("/images/clean.png");
-  public static final Icon TOOLS = IconLoader.getIcon("/images/externalToolsSmall.png");
-  public static final Icon SUSPEND = IconLoader.getIcon("/images/suspend.png");
-  public static final Icon INFO = IconLoader.getIcon("/images/info.png");
-  public static final Icon WARN = IconLoader.getIcon("/images/warn.png");
-  public static final Icon SCM = IconLoader.getIcon("/images/toolWindowChanges.png");
-  public static final Icon PROJECT = IconLoader.getIcon("/images/ideaProject.png");
+    public static final Icon PLAY = IconLoader.getIcon("/images/execute.png");
+    public static final Icon CLEAN = IconLoader.getIcon("/images/clean.png");
+    public static final Icon TOOLS = IconLoader.getIcon("/images/externalToolsSmall.png");
+    public static final Icon SUSPEND = IconLoader.getIcon("/images/suspend.png");
+    public static final Icon INFO = IconLoader.getIcon("/images/info.png");
+    public static final Icon WARN = IconLoader.getIcon("/images/warn.png");
+    public static final Icon SCM = IconLoader.getIcon("/images/toolWindowChanges.png");
+    public static final Icon PROJECT = IconLoader.getIcon("/images/ideaProject.png");
 
 }

@@ -4,6 +4,13 @@ import lombok.Data;
 
 import java.io.Serializable;
 
+/**
+ * 枚举-值vo
+ *
+ * @Author air Email: 209308343@qq.com
+ * @Description
+ * @Date 2024/4/10 0010 9:53
+ **/
 //com.yonyou.studio.mdp.database.model.interfaces.IEnumValueVO
 @Data
 public class EnumValueDTO implements Serializable, Cloneable {

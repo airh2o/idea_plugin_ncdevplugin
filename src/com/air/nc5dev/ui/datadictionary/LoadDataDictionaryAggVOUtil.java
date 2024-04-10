@@ -3,6 +3,7 @@ package com.air.nc5dev.ui.datadictionary;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.EmptyProgressIndicatorImpl;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.ReflectUtil;
@@ -15,7 +16,7 @@ import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
 import com.air.nc5dev.vo.DataDictionaryAggVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.air.nc5dev.vo.meta.ClassDTO;
-import com.air.nc5dev.vo.meta.ClassDTO2;
+import com.air.nc5dev.vo.meta.ClassExtInfoDTO;
 import com.air.nc5dev.vo.meta.EnumValueDTO;
 import com.air.nc5dev.vo.meta.PropertyDTO;
 import com.air.nc5dev.vo.meta.SearchComponentVO;
@@ -66,6 +67,9 @@ public class LoadDataDictionaryAggVOUtil {
         agg.setClassId2EnumValuesMap(new HashMap<>());
         agg.setCompomentIdMap(new HashMap<>());
         agg.setClassMap(new HashMap<>());
+        if (indicator == null) {
+            indicator = new EmptyProgressIndicatorImpl();
+        }
 
         Connection conn = null;
         Statement st = null;
@@ -133,9 +137,7 @@ public class LoadDataDictionaryAggVOUtil {
                     sql.indexOf(" from ")
                     , sql.lastIndexOf(" order by ")
             ) + ')';
-            if (indicator != null) {
-                indicator.setText2(String.format("正在查询模块列表...%s", sql));
-            }
+            indicator.setText2(String.format("正在查询模块列表...%s", sql));
             rs = st.executeQuery(sql);
             ArrayList<DataDictionaryAggVO.Module> allModules =
                     new VOArrayListResultSetExtractor<DataDictionaryAggVO.Module>
@@ -148,9 +150,7 @@ public class LoadDataDictionaryAggVOUtil {
             agg.setAllModules(allModules);
 
             //读取元数据了
-            if (indicator != null) {
-                indicator.setText2(String.format("正在查询元数据组件列表...%s", compomentSql));
-            }
+            indicator.setText2(String.format("正在查询元数据组件列表...%s", compomentSql));
             rs = st.executeQuery(compomentSql);
             ArrayList<SearchComponentVO2> coms =
                     new VOArrayListResultSetExtractor<SearchComponentVO2>(SearchComponentVO2.class).extractData(rs);
@@ -158,13 +158,11 @@ public class LoadDataDictionaryAggVOUtil {
 
             //读取他们的实体列表和字段列表
             for (SearchComponentVO com : coms) {
-                if (indicator != null && indicator.isCanceled()) {
+                if (indicator.isCanceled()) {
                     return agg;
                 }
 
-                if (indicator != null) {
-                    indicator.setText2(String.format("正在加载元数据组件...%s - %s", com.getName(), com.getDisplayName()));
-                }
+                indicator.setText2(String.format("正在加载元数据组件...%s - %s", com.getName(), com.getDisplayName()));
 
                 loadSearchComponentVO(agg, com, st);
             }
@@ -177,7 +175,7 @@ public class LoadDataDictionaryAggVOUtil {
                 if (c.getClassDTOS() != null) {
                     ArrayList<ClassDTO> ncas = new ArrayList<>();
                     for (ClassDTO ca : c.getClassDTOS()) {
-                        ClassDTO2 nca = new ClassDTO2();
+                        ClassExtInfoDTO nca = new ClassExtInfoDTO();
                         nca.setId(ca.getId());
                         nca.setName(ca.getName());
                         nca.setDisplayName(ca.getDisplayName());
@@ -204,6 +202,9 @@ public class LoadDataDictionaryAggVOUtil {
 
     public void loadSearchComponentVO(DataDictionaryAggVO agg, SearchComponentVO c, Statement st) throws SQLException {
         try {
+            if (indicator == null) {
+                indicator = new EmptyProgressIndicatorImpl();
+            }
             if (agg.getCompomentIdMap().get(c.getId()) != null) {
                 return;
             }
@@ -254,9 +255,7 @@ public class LoadDataDictionaryAggVOUtil {
             agg.getCompomentIdMap().put(com.getId(), com);
 
             //读取他们的实体列表和字段列表
-            if (indicator != null) {
-                indicator.setText2(String.format("正在查询元数据组件实体列表...%s - %s", com.getName(), com.getDisplayName()));
-            }
+            indicator.setText2(String.format("正在查询元数据组件实体列表...%s - %s", com.getName(), com.getDisplayName()));
             LinkedList<ClassDTO> allClasss = new LinkedList<>();
             sql = String.format(
                     "select id,name,displayname,fullclassname,componentid,classtype,parentclassid,%s defaulttablename" +
@@ -265,7 +264,7 @@ public class LoadDataDictionaryAggVOUtil {
                     , com.getId()
             );
             rs = st.executeQuery(sql);
-            ArrayList<ClassDTO2> cs = new VOArrayListResultSetExtractor<ClassDTO2>(ClassDTO2.class).extractData(rs);
+            List cs = new VOArrayListResultSetExtractor<ClassExtInfoDTO>(ClassExtInfoDTO.class).extractData(rs);
             IoUtil.close(rs);
 
             com.setClassDTOS(cs);
@@ -317,7 +316,8 @@ public class LoadDataDictionaryAggVOUtil {
 
             // m.getMetas().add(com);
             //立即放入map中，防止下个元数据 又依赖他的实体！
-            for (ClassDTO2 cla : cs) {
+            List<ClassExtInfoDTO> classExtInfoDTOs = cs;
+            for (ClassExtInfoDTO cla : classExtInfoDTOs) {
                 if (CollUtil.isNotEmpty(billType)) {
                     ReflectUtil.copy2VO(billType, cla);
                 }
@@ -344,19 +344,17 @@ public class LoadDataDictionaryAggVOUtil {
                 agg.getClassMap().put(cla.getId(), cla);
             }
 
-            for (ClassDTO2 cla : cs) {
-                if (indicator != null && indicator.isCanceled()) {
+            for (ClassExtInfoDTO cla : classExtInfoDTOs) {
+                if (indicator.isCanceled()) {
                     return;
                 }
 
-                if (indicator != null) {
-                    indicator.setText2(String.format("正在查询元数据组件实体的属性等信息...%s - %s - %s - %s "
-                            , com.getName()
-                            , com.getDisplayName()
-                            , cla.getName()
-                            , cla.getDisplayName()
-                    ));
-                }
+                indicator.setText2(String.format("正在查询元数据组件实体的属性等信息...%s - %s - %s - %s "
+                        , com.getName()
+                        , com.getDisplayName()
+                        , cla.getName()
+                        , cla.getDisplayName()
+                ));
 
                 if (ClassDTO.CLASSTYPE_ENTITY.equals(cla.getClassType())) {
                     rs = st.executeQuery(
@@ -422,7 +420,7 @@ public class LoadDataDictionaryAggVOUtil {
                 }
                 IoUtil.close(rs);
                 for (PropertyDTO p : cla.getPerperties()) {
-                    if (indicator != null && indicator.isCanceled()) {
+                    if (indicator.isCanceled()) {
                         return;
                     }
 

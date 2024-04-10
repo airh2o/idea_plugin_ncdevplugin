@@ -9,6 +9,13 @@ import nc.vo.pub.lang.UFDateTime;
 
 import java.io.Serializable;
 
+/**
+ * 实体属性vo
+ *
+ * @Author air Email: 209308343@qq.com
+ * @Description
+ * @Date 2024/4/10 0010 9:53
+ **/
 //com.yonyou.studio.mdp.database.model.PropertyVO
 @Data
 public class PropertyDTO implements Serializable, Cloneable {

@@ -12,10 +12,11 @@ import com.air.nc5dev.util.V;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.util.jdbc.resulthandel.VOArrayListResultSetExtractor;
-import com.air.nc5dev.util.meta.QueryCompomentVOUtil;
-import com.air.nc5dev.util.meta.xml.MeatBaseInfoReadUtil;
-import com.air.nc5dev.util.meta.xml.MetaXmlBuilder4NC6;
+import com.air.nc5dev.util.meta.database.MetaBFMReadFromDatabaseUtil;
+import com.air.nc5dev.util.meta.xml.MetaBFMReadFromBmfFileUtil;
+import com.air.nc5dev.util.meta.xml.MetaAggVOConvertToXmlUtil;
 import com.air.nc5dev.vo.NCDataSourceVO;
+import com.air.nc5dev.vo.meta.ClassDTO;
 import com.air.nc5dev.vo.meta.ComponentAggVO;
 import com.air.nc5dev.vo.meta.ComponentDTO;
 import com.air.nc5dev.vo.meta.SearchComponentVO;
@@ -78,7 +79,15 @@ public class ExportbmfDialog extends DialogWrapper {
             , "filePath"
     };
 
-    public static Map<Project, Map<String, SearchComponentVO>> CACHE = new ConcurrentHashMap<>();
+    public static Map<String, AtomicBoolean> HOME_CACHEED_MAP = new ConcurrentHashMap<>();
+    /**
+     * key = 项目， value=(key= componentId，value= 组织基本信息)
+     */
+    public static Map<Project, Map<String, SearchComponentVO>> CACHE_COMPONENTID2COMVOMAP = new ConcurrentHashMap<>();
+    /**
+     * key = 项目， value=(key= 实体id，value= 组织基本信息)
+     */
+    public static Map<Project, Map<String, SearchComponentVO>> CACHE_ENTITYID2COMVOMAP = new ConcurrentHashMap<>();
 
     JBTabbedPane contentPane;
     JBPanel panel_main;
@@ -199,7 +208,7 @@ public class ExportbmfDialog extends DialogWrapper {
                 , project
                 , contentPane);
 
-        if (CACHE.get(getProject()) == null) {
+        if (CACHE_COMPONENTID2COMVOMAP.get(getProject()) == null) {
             initFiles(1);
         } else {
             initFiles(0);
@@ -225,7 +234,7 @@ public class ExportbmfDialog extends DialogWrapper {
             result.sort((r1, r2) -> V.get(r1.getOrder1(), 0).compareTo(V.get(r2.getOrder1(), 0)));
 
             //匹配 bmf文件这些
-            Map<String, SearchComponentVO> bmfmap = CACHE.get(getProject());
+            Map<String, SearchComponentVO> bmfmap = CACHE_COMPONENTID2COMVOMAP.get(getProject());
             if (bmfmap != null) {
                 boolean onlyNoMatch = checkBoxOnlyNoMatch.isSelected();
                 boolean onlyHasFile = checkBoxOnlyHasFile.isSelected();
@@ -339,15 +348,13 @@ public class ExportbmfDialog extends DialogWrapper {
             con = ConnectionUtil.getConn(ds);
 
             for (SearchComponentVO v : vs) {
-                if (indicator != null) {
-                    if (indicator.isCanceled()) {
-                        LogUtil.infoAndHide("手工取消任务完成，导出元数据文件: " + outDir.getPath());
-                        return;
-                    }
-                    indicator.setText("导出： " + v.getName() + "  " + v.getDisplayName() + " 中...");
+                if (indicator.isCanceled()) {
+                    LogUtil.infoAndHide("手工取消任务完成，导出元数据文件: " + outDir.getPath());
+                    return;
                 }
-                ComponentAggVO agg = new QueryCompomentVOUtil(con).queryVOAgg(v.getId(), getProject());
-                MetaXmlBuilder4NC6 metaXmlBuilder4NC6 = new MetaXmlBuilder4NC6(con, agg);
+                indicator.setText("导出： " + v.getName() + "  " + v.getDisplayName() + " 中...");
+                ComponentAggVO agg = new MetaBFMReadFromDatabaseUtil(con).readAggVO(v.getId(), getProject());
+                MetaAggVOConvertToXmlUtil metaXmlBuilder4NC6 = new MetaAggVOConvertToXmlUtil(agg);
                 String str = metaXmlBuilder4NC6.toBmfStr();
                 FileUtil.writeUtf8String(str, new File(outDir, StringUtil.get(v.getFileName()
                         , v.getOwnModule() + '_' + v.getName() + ".bmf")));
@@ -364,11 +371,81 @@ public class ExportbmfDialog extends DialogWrapper {
         }
     }
 
-    private void searchAllBmfFile(ProgressIndicator indicator) {
-        File home = new File(ProjectNCConfigUtil.getNCHomePath(getProject()));
+    public static void searchAllBmfFile(ProgressIndicator indicator, Project project) {
+        searchHomeBmfFileIfNeed(indicator, project);
+
+        searchProjectBmfFile(indicator, project);
+    }
+
+    public static void searchAllBmfFileForce(ProgressIndicator indicator, Project project) {
+        File home = new File(ProjectNCConfigUtil.getNCHomePath(project));
         if (!home.isDirectory()) {
             return;
         }
+
+        searchHomeBmfFile(indicator, project);
+
+        searchProjectBmfFile(indicator, project);
+    }
+
+    /**
+     * 只初始化一次！
+     *
+     * @param indicator
+     * @param project
+     */
+    public static void searchHomeBmfFileIfNeed(ProgressIndicator indicator, Project project) {
+        File home = new File(ProjectNCConfigUtil.getNCHomePath(project));
+        if (!home.isDirectory()) {
+            return;
+        }
+
+        AtomicBoolean initHome = HOME_CACHEED_MAP.get(home.getPath());
+        if (initHome == null) {
+            HOME_CACHEED_MAP.putIfAbsent(home.getPath(), new AtomicBoolean(false));
+        }
+        initHome = HOME_CACHEED_MAP.get(home.getPath());
+        if (!initHome.get()) {
+            return;
+        }
+
+        searchHomeBmfFile(indicator, project);
+    }
+
+    /**
+     * 只初始化一次！
+     *
+     * @param indicator
+     * @param project
+     */
+    public static void searchProjectBmfFileIfNeed(ProgressIndicator indicator, Project project) {
+        File home = new File(ProjectNCConfigUtil.getNCHomePath(project));
+        if (!home.isDirectory()) {
+            return;
+        }
+
+        AtomicBoolean initHome = HOME_CACHEED_MAP.get(home.getPath());
+        if (initHome == null) {
+            HOME_CACHEED_MAP.putIfAbsent(home.getPath(), new AtomicBoolean(false));
+        }
+        initHome = HOME_CACHEED_MAP.get(home.getPath());
+        if (!initHome.get()) {
+            return;
+        }
+        searchProjectBmfFile(indicator, project);
+    }
+
+    public static void searchHomeBmfFile(ProgressIndicator indicator, Project project) {
+        File home = new File(ProjectNCConfigUtil.getNCHomePath(project));
+        if (!home.isDirectory()) {
+            return;
+        }
+
+        AtomicBoolean initHome = HOME_CACHEED_MAP.get(home.getPath());
+        if (initHome == null) {
+            HOME_CACHEED_MAP.putIfAbsent(home.getPath(), new AtomicBoolean(false));
+        }
+        initHome = HOME_CACHEED_MAP.get(home.getPath());
 
         File modules = new File(home, "modules");
         if (!modules.isDirectory()) {
@@ -385,25 +462,25 @@ public class ExportbmfDialog extends DialogWrapper {
                 )
                 , ".bmf", ".bpf"), new ArrayList<>());
 
-        readBmfFileInfo2Cache(bmfs, indicator);
+        readBmfFileInfo2Cache(bmfs, indicator, project);
 
-        searchProjectBmfFile(indicator);
+        initHome.compareAndSet(initHome.get(), true);
     }
 
-    private void readBmfFileInfo2Cache(List<File> bmfs, ProgressIndicator indicator) {
-        CACHE.putIfAbsent(getProject(), new ConcurrentHashMap<>());
-        Map<String, SearchComponentVO> m = CACHE.get(getProject());
+    public static void readBmfFileInfo2Cache(List<File> bmfs, ProgressIndicator indicator, Project project) {
+        CACHE_COMPONENTID2COMVOMAP.putIfAbsent(project, new ConcurrentHashMap<>());
+        CACHE_ENTITYID2COMVOMAP.putIfAbsent(project, new ConcurrentHashMap<>());
+        Map<String, SearchComponentVO> componentIdMap = CACHE_COMPONENTID2COMVOMAP.get(project);
+        Map<String, SearchComponentVO> entityIdMap = CACHE_ENTITYID2COMVOMAP.get(project);
         for (File bmf : bmfs) {
             try {
-                if (indicator != null) {
-                    if (indicator.isCanceled()) {
-                        LogUtil.infoAndHide("取消缓存BMF任务完成");
-                        return;
-                    }
-                    indicator.setText("正在读取BMF文件到缓存: " + bmf.getPath());
+                if (indicator.isCanceled()) {
+                    LogUtil.infoAndHide("取消缓存BMF任务完成");
+                    return;
                 }
+                indicator.setText("正在读取BMF文件到缓存: " + bmf.getPath());
 
-                ComponentDTO c = MeatBaseInfoReadUtil.readComponentInfo(FileUtil.readUtf8String(bmf));
+                ComponentDTO c = MetaBFMReadFromBmfFileUtil.readComponentBaseInfo(FileUtil.readUtf8String(bmf));
                 SearchComponentVO s = ReflectUtil.copy2VO(c, SearchComponentVO.class);
                 s.setFileName(bmf.getName());
                 s.setFilePath(bmf.getPath());
@@ -418,7 +495,13 @@ public class ExportbmfDialog extends DialogWrapper {
                     }
                 }
 
-                m.put(c.getId(), s);
+                componentIdMap.put(c.getId(), s);
+
+                if (s.getClassDTOS() != null) {
+                    for (ClassDTO entity : s.getClassDTOS()) {
+                        entityIdMap.put(entity.getId(), s);
+                    }
+                }
             } catch (Throwable e) {
                 System.err.println(bmf.getPath() + " error " + e.getMessage());
                 e.printStackTrace();
@@ -426,9 +509,9 @@ public class ExportbmfDialog extends DialogWrapper {
         }
     }
 
-    private void searchProjectBmfFile(ProgressIndicator indicator) {
+    public static void searchProjectBmfFile(ProgressIndicator indicator, Project project) {
         List<File> bmfs = V.get(IoUtil.getAllFiles(
-                new File(getProject().getBasePath())
+                new File(project.getBasePath())
                 , true
                 , f -> f.isFile() || !(
                         f.getName().equalsIgnoreCase(".idea")
@@ -438,7 +521,7 @@ public class ExportbmfDialog extends DialogWrapper {
                 )
                 , ".bmf", ".bpf"), new ArrayList<>());
 
-        readBmfFileInfo2Cache(bmfs, indicator);
+        readBmfFileInfo2Cache(bmfs, indicator, project);
     }
 
     public void initFiles(int type) {
@@ -455,9 +538,9 @@ public class ExportbmfDialog extends DialogWrapper {
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
                     if (1 == type) {
-                        searchAllBmfFile(indicator);
+                        searchAllBmfFile(indicator, project);
                     } else if (0 == type) {
-                        searchProjectBmfFile(indicator);
+                        searchProjectBmfFile(indicator, project);
                     }
                 } finally {
                     runing.set(false);

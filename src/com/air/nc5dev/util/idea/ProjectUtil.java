@@ -1,6 +1,8 @@
 package com.air.nc5dev.util.idea;
 
 import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.StrUtil;
+import com.air.nc5dev.ui.actionurlsearch.ActionResultListTable;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
@@ -33,6 +35,7 @@ import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.impl.java.stubs.index.JavaFullClassNameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -548,5 +551,26 @@ public class ProjectUtil {
                 }
             }
         }, ModalityState.NON_MODAL);
+    }
+
+    public static void openFile(Project project, String path, int row, int column) {
+        // 直接 打开 文件 编辑
+        final FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+
+        VirtualFile virtualFile = null;
+
+        String jar = "jar://" + StrUtil.replace(StrUtil.replace(path, "\\", "/"), ".jar/", ".jar!/");
+        if (jar.toLowerCase().contains(".jar!/")) {
+            virtualFile = VirtualFileManager.getInstance().findFileByUrl(jar);
+        } else {
+            virtualFile = VirtualFileManager.getInstance().findFileByNioPath(new File(path).toPath());
+        }
+
+        if (virtualFile == null) {
+            IoUtil.tryOpenFileExpolor(new File(path));
+            return;
+        }
+
+        ActionResultListTable.openFile(project, virtualFile, row, column);
     }
 }

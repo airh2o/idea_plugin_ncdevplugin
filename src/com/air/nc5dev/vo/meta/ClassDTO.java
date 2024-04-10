@@ -7,6 +7,9 @@ import nc.vo.pub.lang.UFDateTime;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * 实体vo
+ */
 //com.yonyou.studio.mdp.database.model.ClassVO
 @Data
 public class ClassDTO implements Serializable, Cloneable {
@@ -67,6 +70,9 @@ public class ClassDTO implements Serializable, Cloneable {
     public String visibility = "public";
 
     public transient List<PropertyDTO> perperties;
+    public transient List<EnumValueDTO> enumValues;
+    public transient  List<BizItfMapDTO> bizItfMaps;
+    public transient  List<AccessorParameterDTO> accessorParameters;
 
     public void setIndustry(String industry) {
         if (StringUtil.isBlank(industry)) {

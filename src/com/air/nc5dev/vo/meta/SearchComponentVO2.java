@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * <br>
+ * 组件扩展vo 扩展2 <br>
  * <br>
  * <br>
  *
@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Data
 public class SearchComponentVO2 extends SearchComponentVO {
-    List<? extends ClassDTO> classDTOS;
+    List<ClassDTO> classDTOS;
 
     public SearchComponentVO2() {
         super();

@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -286,7 +287,7 @@ public final class XmlUtil extends cn.hutool.core.util.XmlUtil {
         return doc.asXML();
     }
 
-    public static void addAttr(Document doc, Element ele, Object v, HashMap<String, String> map) {
+    public static void addAttr(Document doc, Element ele, Object v, Map<String, String> map) {
         Field[] attrs = ReflectUtil.getFields(v.getClass());
         if (CollUtil.isEmpty(attrs)) {
             return;

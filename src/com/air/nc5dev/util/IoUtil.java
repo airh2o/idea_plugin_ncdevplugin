@@ -978,7 +978,8 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         try {
             jos = new JarOutputStream(new FileOutputStream(outputFile), minf);
             // 设置压缩包注释
-            jos.setComment("power by air QQ:209308343@qq.com 微信:yongyourj 插件地址:https://gitee.com/yhlx/idea_plugin_nc5devplugin");
+            jos.setComment("power by air QQ:209308343@qq.com 微信:yongyourj 插件地址:https://gitee" +
+                    ".com/yhlx/idea_plugin_nc5devplugin");
 
             List<File> allFiles = getAllFiles(dir, true);
             if (skipSuffixs == null) {
@@ -1063,7 +1064,8 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
                 zos = new ZipOutputStream(new FileOutputStream(outputFile));
             }
             // 设置压缩包注释
-            zos.setComment("power by air QQ:209308343@qq.com 微信:yongyourj 插件地址:https://gitee.com/yhlx/idea_plugin_nc5devplugin");
+            zos.setComment("power by air QQ:209308343@qq.com 微信:yongyourj 插件地址:https://gitee" +
+                    ".com/yhlx/idea_plugin_nc5devplugin");
             zipFile(zos, inputFile, null, skipSuffixs);
 
             //2次调用 保证字节完全写入磁盘。
@@ -1375,7 +1377,8 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         //解压jar
         JarFile in = new JarFile(jarfile);
         JarOutputStream out = new JarOutputStream(new FileOutputStream(tempJar));
-        out.setComment("power by air QQ:209308343@qq.com 微信:yongyourj 插件地址:https://gitee.com/yhlx/idea_plugin_nc5devplugin");
+        out.setComment("power by air QQ:209308343@qq.com 微信:yongyourj 插件地址:https://gitee" +
+                ".com/yhlx/idea_plugin_nc5devplugin");
         try {
             Enumeration<JarEntry> es = in.entries();
             while (es.hasMoreElements()) {
@@ -1410,15 +1413,16 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         FileUtil.move(tempJar, jarfile, true);
         //重新打包jar
     }
+
+    /**
+     * 压缩类型枚举
+     *
+     * @author Log
+     */
+    public static enum CompressType {
+        //	GZIP是用于UNIX系统的文件压缩，在Linux中经常会使用到*.gz的文件，就是GZIP格式
+        ZIP, JAR, GZIP
+    }
 }
 
 
-/**
- * 压缩类型枚举
- *
- * @author Log
- */
-enum CompressType {
-    //	GZIP是用于UNIX系统的文件压缩，在Linux中经常会使用到*.gz的文件，就是GZIP格式
-    ZIP, JAR, GZIP
-}

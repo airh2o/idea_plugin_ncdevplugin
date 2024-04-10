@@ -9,7 +9,8 @@ import com.air.nc5dev.util.V;
 import com.air.nc5dev.util.XmlUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
-import com.air.nc5dev.util.meta.xml.MeatBaseInfoReadUtil;
+import com.air.nc5dev.util.meta.xml.MetaAggVOConvertToXmlUtil;
+import com.air.nc5dev.util.meta.xml.MetaBFMReadFromBmfFileUtil;
 import com.air.nc5dev.vo.meta.ClassDTO;
 import com.air.nc5dev.vo.meta.ComponentDTO;
 import com.air.nc5dev.vo.meta.PropertyDTO;
@@ -203,16 +204,7 @@ public class AddDefField2BmfDialog extends DialogWrapper {
             entityId2EleMap.put(et.attributeValue("id"), et);
         }
 
-        HashMap<String, String> attributeNameMaping = new HashMap();
-        attributeNameMaping.put("hided", "isHide");
-        attributeNameMaping.put("nullable", "isNullable");
-        attributeNameMaping.put("readonly", "isReadOnly");
-        attributeNameMaping.put("accessorclassname", "accessStrategy");
-        attributeNameMaping.put("attrmaxvalue", "maxValue");
-        attributeNameMaping.put("attrminvalue", "minValue");
-        attributeNameMaping.put("attrlength", "length");
-        attributeNameMaping.put("attrsequence", "sequence");
-        attributeNameMaping.put("dynamicattr", "dynamic");
+        Map<String, String> attributeNameMaping = MetaAggVOConvertToXmlUtil.NAMEMAPING_ENTITY_ATTRIBUTE;
 
         org.dom4j.Element e = null;
         for (String entityId : propertyMap.keySet()) {
@@ -375,7 +367,7 @@ public class AddDefField2BmfDialog extends DialogWrapper {
 
     private Vector<ClassComboxDTO> readClassList() {
         String xml = FileUtil.readUtf8String(bmf.toNioPath().toFile());
-        componentDTO = MeatBaseInfoReadUtil.readEntityList(xml);
+        componentDTO = MetaBFMReadFromBmfFileUtil.readEntityList(xml);
         List<? extends ClassDTO> es = componentDTO.getClassDTOS();
 
         entits = new Vector(es.stream()

@@ -1,5 +1,6 @@
 package com.air.nc5dev.util.searchfulldatabase;
 
+import com.air.nc5dev.util.EmptyProgressIndicatorImpl;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -38,7 +39,7 @@ public class DbConnectionFactory {
         String url = ds.getDatabaseUrl();
         String user = ds.getUser();
         String pass = ds.getPassword();
-        this.indicator = indicator;
+        this.indicator = indicator == null ? new EmptyProgressIndicatorImpl(): indicator;
         return getConnection(url, user, pass, driver);
     }
 
@@ -65,9 +66,7 @@ public class DbConnectionFactory {
                 return con;
             } catch (Exception e) {
                 LogUtil.error("连接数据库出错：" + e);
-                if (indicator != null) {
-                    indicator.setText("连接数据库出错：" + e);
-                }
+                indicator.setText("连接数据库出错：" + e);
                 e.printStackTrace();
                 return null;
             }
@@ -84,9 +83,7 @@ public class DbConnectionFactory {
                     e.close();
                 } catch (Throwable e1) {
                     LogUtil.error("断开数据库出错：" + e);
-                    if (indicator != null) {
-                        indicator.setText("断开数据库出错：" + e);
-                    }
+                    indicator.setText("断开数据库出错：" + e);
                 }
             });
         }

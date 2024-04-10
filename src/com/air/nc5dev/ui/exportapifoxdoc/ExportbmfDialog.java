@@ -8,16 +8,13 @@ import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.NCPropXmlUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.ReflectUtil;
-import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.V;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.util.jdbc.resulthandel.VOArrayListResultSetExtractor;
-import com.air.nc5dev.util.meta.QueryCompomentVOUtil;
-import com.air.nc5dev.util.meta.xml.MeatBaseInfoReadUtil;
+import com.air.nc5dev.util.meta.database.MetaBFMReadFromDatabaseUtil;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.air.nc5dev.vo.meta.ComponentAggVO;
-import com.air.nc5dev.vo.meta.ComponentDTO;
 import com.air.nc5dev.vo.meta.SearchComponentVO;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -48,8 +45,6 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -79,8 +74,6 @@ public class ExportbmfDialog extends DialogWrapper {
             , "version", "id", "fileVersion", "fileName", "metaType"
             , "filePath"
     };
-
-    public static Map<Project, Map<String, SearchComponentVO>> CACHE = new ConcurrentHashMap<>();
 
     JBTabbedPane contentPane;
     JBPanel panel_main;
@@ -300,14 +293,12 @@ public class ExportbmfDialog extends DialogWrapper {
             NCDataSourceVO ds = NCPropXmlUtil.getDataSourceVOS(getProject()).get(comboBoxDb.getSelectedIndex());
             con = ConnectionUtil.getConn(ds);
             for (SearchComponentVO v : vs) {
-                if (indicator != null) {
-                    if (indicator.isCanceled()) {
-                        LogUtil.infoAndHide("手工取消任务完成，导出文件: " + outDir.getPath());
-                        return;
-                    }
-                    indicator.setText("导出： " + v.getName() + "  " + v.getDisplayName() + " 中...");
+                if (indicator.isCanceled()) {
+                    LogUtil.infoAndHide("手工取消任务完成，导出文件: " + outDir.getPath());
+                    return;
                 }
-                ComponentAggVO agg = new QueryCompomentVOUtil(con).queryVOAgg(v.getId(), getProject());
+                indicator.setText("导出： " + v.getName() + "  " + v.getDisplayName() + " 中...");
+                ComponentAggVO agg = new MetaBFMReadFromDatabaseUtil(con).readAggVO(v.getId(), getProject());
                 String str = toApifoxJSON(con, agg);
                 FileUtil.writeUtf8String(str, new File(outDir, v.getOwnModule() + '_' + v.getName() + ".json"));
             }

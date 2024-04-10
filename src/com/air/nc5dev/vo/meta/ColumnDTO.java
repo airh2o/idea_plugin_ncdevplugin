@@ -5,6 +5,9 @@ import nc.vo.pub.lang.UFDateTime;
 
 import java.io.Serializable;
 
+/**
+ * 实体列vo
+ */
 //com.yonyou.studio.mdp.database.model.ColumnVO
 @Data
 public class ColumnDTO implements Serializable, Cloneable {

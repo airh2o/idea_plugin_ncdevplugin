@@ -320,6 +320,9 @@ public class ProjectNCConfigUtil {
     }
 
     public static boolean isInited(Project project) {
+        if (project == null) {
+            return false;
+        }
         return Boolean.TRUE.equals(isInit.get(project.getBasePath()));
     }
 
