@@ -538,7 +538,7 @@ public class ExportbmfDialog extends DialogWrapper {
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
                     if (1 == type) {
-                        searchAllBmfFile(indicator, project);
+                        searchAllBmfFileForce(indicator, project);
                     } else if (0 == type) {
                         searchProjectBmfFile(indicator, project);
                     }

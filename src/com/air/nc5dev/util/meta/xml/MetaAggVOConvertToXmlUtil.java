@@ -50,6 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 public class MetaAggVOConvertToXmlUtil {
     ///////数据库字段名和bmf文件的标签属性的 对照表， key=数据库， value=xml里
+    public static Map<String, String> NAMEMAPING_COMPONENT = new ConcurrentHashMap();
     public static Map<String, String> NAMEMAPING_ENTITY = new ConcurrentHashMap();
     public static Map<String, String> NAMEMAPING_ENTITY_ATTRIBUTE = new ConcurrentHashMap();
     public static Map<String, String> NAMEMAPING_BIZMAP = new ConcurrentHashMap();
@@ -108,9 +109,6 @@ public class MetaAggVOConvertToXmlUtil {
 
     protected Element component() {
         Element component = doc.addElement("component");
-        HashMap<String, String> map = new HashMap();
-        map.put("resmodule", "resModuleName");
-        map.put("isbmf", "isbizmodel");
 
         ComponentDTO v = agg.getComponentVO();
         v.setMetaType(V.get(v.getMetaType(), ".bmf"));
@@ -133,7 +131,7 @@ public class MetaAggVOConvertToXmlUtil {
                 }
             }
         }
-        XmlUtil.addAttr(doc, component, v, map);
+        XmlUtil.addAttr(doc, component, v, NAMEMAPING_COMPONENT);
 
         return component;
     }
@@ -354,5 +352,8 @@ public class MetaAggVOConvertToXmlUtil {
         NAMEMAPPER_ACCESSOR_PROPERTIES_PROPERTY.put("name", "wrapclsname");
         NAMEMAPPER_ACCESSOR_PROPERTIES_PROPERTY.put("assosequence", "sequence");
         NAMEMAPPER_ACCESSOR_PROPERTIES_PROPERTY.put("paraValue", "value");
+
+        NAMEMAPING_COMPONENT.put("resmodule", "resModuleName");
+      //  NAMEMAPING_COMPONENT.put("isbmf", "isbizmodel");
     }
 }

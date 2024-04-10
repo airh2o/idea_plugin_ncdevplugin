@@ -55,7 +55,7 @@ public class ExportbmfTableMouseListenerImpl implements MouseListener {
         popup.add(export);
         export.addActionListener(event -> {
             SearchComponentVO v = CollUtil.get(mainPanel.getResult(), mainPanel.getTable().getSelectedRow());
-            if (v != null && StringUtil.isNotBlank(v.getFilePath())) {
+            if (v != null) {
                 mainPanel.export2Files(CollUtil.toList(v));
             }
         });

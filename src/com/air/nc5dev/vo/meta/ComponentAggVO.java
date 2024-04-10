@@ -94,13 +94,10 @@ public class ComponentAggVO implements Serializable, Cloneable {
                     new QueryAccessorParameterVOListUtil(con);
 
             for (ClassDTO classVO : getClassVOlist()) {
-                getEnumValueVOList().put(classVO.getId(), queryEnumValueVOListUtil.queryVOs(classVO.getId()));
-                getPropertyVOlist().put(classVO.getId(), queryPropertyVOListUtil.queryVOs(classVO.getId()));
-                getBizItfMapVOlist().put(classVO.getId(), queryBizItfVOMapVOListUtil.queryVOs(classVO.getId()));
-                getBizItfImplMapVoList().put(classVO.getId(),
-                        BizItfMapDTO.toImpl(getBizItfMapVOlist().get(classVO.getId())));
-                getAccessorParaVOList().put(classVO.getId(),
-                        queryAccessorParameterVOListUtil.queryVOs(classVO.getId()));
+                classVO.setEnumValues(queryEnumValueVOListUtil.queryVOs(classVO.getId()));
+                classVO.setPerperties(queryPropertyVOListUtil.queryVOs(classVO.getId()));
+                classVO.setBizItfMaps(queryBizItfVOMapVOListUtil.queryVOs(classVO.getId()));
+                classVO.setAccessorParameters(queryAccessorParameterVOListUtil.queryVOs(classVO.getId()));
             }
         }
 

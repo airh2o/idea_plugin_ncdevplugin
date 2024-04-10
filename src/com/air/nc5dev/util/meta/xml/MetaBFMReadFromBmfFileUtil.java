@@ -128,10 +128,7 @@ public class MetaBFMReadFromBmfFileUtil implements IMetaBMFReader<String> {
                 System.err.println("sax都读取失败，摆烂 不要这个了。");
             }
         }
-
-        ComponentDTO d = new ComponentDTO();
-        d.setClassDTOS(new LinkedList<>());
-        ComponentAggVO.attr2VO(d, root, null);
+        Map<String, String> componentNameMaping = CollUtil.reverse(MetaAggVOConvertToXmlUtil.NAMEMAPING_COMPONENT);
         Map<String, String> entityNameMaping = CollUtil.reverse(MetaAggVOConvertToXmlUtil.NAMEMAPING_ENTITY);
         Map<String, String> attributeNameMaping =
                 CollUtil.reverse(MetaAggVOConvertToXmlUtil.NAMEMAPING_ENTITY_ATTRIBUTE);
@@ -141,6 +138,10 @@ public class MetaBFMReadFromBmfFileUtil implements IMetaBMFReader<String> {
         Map<String, String> bizmapNameMaping = CollUtil.reverse(MetaAggVOConvertToXmlUtil.NAMEMAPING_BIZMAP);
         Map<String, String> accessorPropertiesPropertyMaping =
                 CollUtil.reverse(MetaAggVOConvertToXmlUtil.NAMEMAPPER_ACCESSOR_PROPERTIES_PROPERTY);
+
+        ComponentDTO d = new ComponentDTO();
+        d.setClassDTOS(new LinkedList<>());
+        ComponentAggVO.attr2VO(d, root, componentNameMaping);
         Element celllist = XmlUtil.getElement(root, "celllist");
         List<Element> entitys = XmlUtil.getElements(celllist, "entity");
         for (Element entity : entitys) {
@@ -217,18 +218,7 @@ public class MetaBFMReadFromBmfFileUtil implements IMetaBMFReader<String> {
      */
     @NotNull
     private static ComponentDTO readEntityList(Element root) {
-        ArrayList<ClassDTO> cs = new ArrayList<>();
-        ComponentDTO d = new ComponentDTO();
-        d.setClassDTOS(cs);
-
-        ComponentAggVO.attr2VO(d, root, null);
-
-        if (root.getElementsByTagName("celllist").getLength() < 1) {
-            return d;
-        }
-
-        Element celllist = XmlUtil.getElement(root, "celllist");
-        List<Element> entitys = XmlUtil.getElements(celllist, "entity");
+        Map<String, String> componentNameMaping = CollUtil.reverse(MetaAggVOConvertToXmlUtil.NAMEMAPING_COMPONENT);
         Map<String, String> entityNameMaping = CollUtil.reverse(MetaAggVOConvertToXmlUtil.NAMEMAPING_ENTITY);
         Map<String, String> attributeNameMaping =
                 CollUtil.reverse(MetaAggVOConvertToXmlUtil.NAMEMAPING_ENTITY_ATTRIBUTE);
@@ -238,6 +228,18 @@ public class MetaBFMReadFromBmfFileUtil implements IMetaBMFReader<String> {
         Map<String, String> bizmapNameMaping = CollUtil.reverse(MetaAggVOConvertToXmlUtil.NAMEMAPING_BIZMAP);
         Map<String, String> accessorPropertiesPropertyMaping =
                 CollUtil.reverse(MetaAggVOConvertToXmlUtil.NAMEMAPPER_ACCESSOR_PROPERTIES_PROPERTY);
+
+        ArrayList<ClassDTO> cs = new ArrayList<>();
+        ComponentDTO d = new ComponentDTO();
+        d.setClassDTOS(cs);
+
+        ComponentAggVO.attr2VO(d, root, componentNameMaping);
+        Element celllist = XmlUtil.getElement(root, "celllist");
+        if (celllist == null) {
+            return d;
+        }
+
+        List<Element> entitys = XmlUtil.getElements(celllist, "entity");
         //读取实体列表
         for (Element entity : entitys) {
             ClassDTO c = new ClassDTO();
@@ -249,35 +251,44 @@ public class MetaBFMReadFromBmfFileUtil implements IMetaBMFReader<String> {
 
             cs.add(c);
             ComponentAggVO.attr2VO(c, entity, entityNameMaping);
-
             //attributelist
-            List<Element> attributes = XmlUtil.getElements(entity, "attribute");
-            for (Element attribute : attributes) {
-                PropertyDTO p = new PropertyDTO();
-                ComponentAggVO.attr2VO(p, attribute, attributeNameMaping);
-                c.getPerperties().add(p);
+            Element attributelist = XmlUtil.getElement(entity, "attributelist");
+            if (attributelist != null) {
+                List<Element> attributes = XmlUtil.getElements(attributelist, "attribute");
+                for (Element attribute : attributes) {
+                    PropertyDTO p = new PropertyDTO();
+                    ComponentAggVO.attr2VO(p, attribute, attributeNameMaping);
+                    c.getPerperties().add(p);
 
-                if (p.getAttrsequence() == null) {
-                    p.setAttrsequence(1000000);
+                    if (p.getAttrsequence() == null) {
+                        p.setAttrsequence(1000000);
+                    }
                 }
+                c.getPerperties().sort((p1, p2) -> p1.getAttrsequence().compareTo(p2.getAttrsequence()));
             }
-            c.getPerperties().sort((p1, p2) -> p1.getAttrsequence().compareTo(p2.getAttrsequence()));
 
             //busimap
-            List<Element> busimaps = XmlUtil.getElements(entity, "busimap");
-            for (Element busimap : busimaps) {
-                BizItfMapDTO p = new BizItfMapDTO();
-                ComponentAggVO.attr2VO(p, busimap, bizmapNameMaping);
-                c.getBizItfMaps().add(p);
+            Element busimapsEle = XmlUtil.getElement(entity, "busimaps");
+            if (busimapsEle != null) {
+                List<Element> busimaps = XmlUtil.getElements(busimapsEle, "busimap");
+                for (Element busimap : busimaps) {
+                    BizItfMapDTO p = new BizItfMapDTO();
+                    ComponentAggVO.attr2VO(p, busimap, bizmapNameMaping);
+                    c.getBizItfMaps().add(p);
+                }
             }
+
             //accessor > properties > property
             Element accessor = XmlUtil.getElement(entity, "accessor");
             if (accessor != null) {
-                List<Element> propertys = XmlUtil.getElements(accessor, "property");
-                for (Element property : propertys) {
-                    AccessorParameterDTO p = new AccessorParameterDTO();
-                    ComponentAggVO.attr2VO(p, property, accessorPropertiesPropertyMaping);
-                    c.getAccessorParameters().add(p);
+                Element properties = XmlUtil.getElement(accessor, "properties");
+                if (properties != null) {
+                    List<Element> propertys = XmlUtil.getElements(properties, "property");
+                    for (Element property : propertys) {
+                        AccessorParameterDTO p = new AccessorParameterDTO();
+                        ComponentAggVO.attr2VO(p, property, accessorPropertiesPropertyMaping);
+                        c.getAccessorParameters().add(p);
+                    }
                 }
             }
         }
@@ -295,28 +306,38 @@ public class MetaBFMReadFromBmfFileUtil implements IMetaBMFReader<String> {
             ComponentAggVO.attr2VO(c, enumerate, enumerateNameMaping);
 
             //enumitem
-            List<Element> enumitems = XmlUtil.getElements(enumerate, "enumitem");
-            for (Element enumitem : enumitems) {
-                EnumValueDTO p = new EnumValueDTO();
-                c.getEnumValues().add(p);
-                ComponentAggVO.attr2VO(p, enumitem, enumeratePropertNameMaping);
+            Element enumitemlist = XmlUtil.getElement(enumerate, "enumitemlist");
+            if (enumitemlist != null) {
+                List<Element> enumitems = XmlUtil.getElements(enumitemlist, "enumitem");
+                for (Element enumitem : enumitems) {
+                    EnumValueDTO p = new EnumValueDTO();
+                    c.getEnumValues().add(p);
+                    ComponentAggVO.attr2VO(p, enumitem, enumeratePropertNameMaping);
+                }
             }
 
             //busimap
-            List<Element> busimaps = XmlUtil.getElements(enumerate, "busimap");
-            for (Element busimap : busimaps) {
-                BizItfMapDTO p = new BizItfMapDTO();
-                ComponentAggVO.attr2VO(p, busimap, bizmapNameMaping);
-                c.getBizItfMaps().add(p);
+            Element busimapsEle = XmlUtil.getElement(enumerate, "busimaps");
+            if (busimapsEle != null) {
+                List<Element> busimaps = XmlUtil.getElements(busimapsEle, "busimap");
+                for (Element busimap : busimaps) {
+                    BizItfMapDTO p = new BizItfMapDTO();
+                    ComponentAggVO.attr2VO(p, busimap, bizmapNameMaping);
+                    c.getBizItfMaps().add(p);
+                }
             }
+
             //accessor > properties > property
             Element accessor = XmlUtil.getElement(enumerate, "accessor");
             if (accessor != null) {
-                List<Element> propertys = XmlUtil.getElements(accessor, "property");
-                for (Element property : propertys) {
-                    AccessorParameterDTO p = new AccessorParameterDTO();
-                    ComponentAggVO.attr2VO(p, property, accessorPropertiesPropertyMaping);
-                    c.getAccessorParameters().add(p);
+                Element properties = XmlUtil.getElement(accessor, "properties");
+                if (properties != null) {
+                    List<Element> propertys = XmlUtil.getElements(properties, "property");
+                    for (Element property : propertys) {
+                        AccessorParameterDTO p = new AccessorParameterDTO();
+                        ComponentAggVO.attr2VO(p, property, accessorPropertiesPropertyMaping);
+                        c.getAccessorParameters().add(p);
+                    }
                 }
             }
         }
