@@ -78,6 +78,10 @@ public class AddFile2PathcerSelectFilesAction extends AbstractIdeaAction {
 
         VirtualFile f = CollUtil.getFirst(getSelectedFile(e));
 
+        if (f == null) {
+            return ;
+        }
+
         e.getPresentation().setEnabled(
                 !PatcherDialog.containsForceAddSelectFile(e.getProject()
                         , PatcherSelectFileVO.builder()

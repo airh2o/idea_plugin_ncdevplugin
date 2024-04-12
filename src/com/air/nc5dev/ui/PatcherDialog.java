@@ -711,10 +711,6 @@ public class PatcherDialog extends DialogWrapper {
     public void initDefualtValues() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日HH点mm分ss秒");
         this.textField_saveName.setText("patcher-" + event.getProject().getName() + "_" + LocalDateTime.now().format(formatter));
-        this.textField_savePath.setText(ProjectUtil.getDefaultProject().getBasePath()
-                + File.separatorChar + "patchers"
-                + File.separatorChar + "patcher-" + event.getProject().getName() + "-" + LocalDateTime.now().format(formatter)
-        );
 
         File hotwebs = new File(event.getProject().getBasePath(), "hotwebs");
         if (hotwebs.isDirectory()) {
@@ -796,9 +792,12 @@ public class PatcherDialog extends DialogWrapper {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日HH点mm分ss秒");
             textField_saveName.setText(s + '_' + LocalDateTime.now().format(formatter));
         }
-        if (StringUtil.isNotBlank(c.outPath)) {
-            textField_savePath.setText(new File(c.outPath).getParent());
-        }
+
+        this.textField_savePath.setText(ProjectUtil.getDefaultProject().getBasePath()
+                + File.separatorChar + "patchers"
+                + File.separatorChar + textField_saveName.getText()
+        );
+
         if (StringUtil.isNotBlank(c.hotwebsResourcePath)) {
             textField_hotwebsProject.setText(c.hotwebsResourcePath);
         }

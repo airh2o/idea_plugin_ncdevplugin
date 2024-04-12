@@ -438,6 +438,10 @@ public class ProjectNCConfigUtil {
      * @Param [key, value]
      */
     public static final void setNCConfigPropertice(Project project, @NotNull String key, String value) {
+        if (project == null) {
+            return ;
+        }
+
         if (!isInited(project)) {
             initConfigFile(project);
         }

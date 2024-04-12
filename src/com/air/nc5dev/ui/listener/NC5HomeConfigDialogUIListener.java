@@ -182,9 +182,11 @@ public class NC5HomeConfigDialogUIListener {
 
 
         //显示最新选择的
-        String now = ui.comboBox_datasource.getSelectedItem().toString();
-        NCDataSourceVO ds = NCPropXmlUtil.get(now);
-        showDataSource2UI(ds);
+        if (ui.comboBox_datasource.getSelectedItem() != null) {
+            String now = ui.comboBox_datasource.getSelectedItem().toString();
+            NCDataSourceVO ds = NCPropXmlUtil.get(now);
+            showDataSource2UI(ds);
+        }
     }
 
     /**
