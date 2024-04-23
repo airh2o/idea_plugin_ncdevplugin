@@ -12,8 +12,9 @@
 使用教程:  https://www.bilibili.com/video/BV1mg4y1f7cQ/?vd_source=6b1c74e795e65a8b04ffe9fe91867a10 </a>
 
 # 因本人目前在微服务公司，所以本人业余接开发私单，有私单才能继续参与NC 继续更新插件
-## 专业承接 U8C NC5 NC6 NCC BIP，java微服务，前后端分离，小程序 H5APP 等等私活， ncc这些开发都是用友高级以上认证，项目都是100家以上经验！      每年至少会做10家以上私单项目！                    
+## 专业承接 U8C NC5 NC6 NCC BIP，java微服务 springcloud，前后端分离，小程序 H5APP 等等私活，用友高级以上认证，项目都是120家以上经验！每年至少会做10家以上私单项目！                    
 ## 业务联系方式: QQ 209308343   微信： yongyourj                  
+
 # 交个朋友，支持一杯咖啡:
 <img width="200px" height="200px" src="https://s1.ax1x.com/2020/03/30/GeyNdI.md.png"  alt="buy me a coffee"  />     
 
@@ -46,9 +47,17 @@ V3以及以上版本 兼容 IDEA 2021.2.1 和更新版本 (IDEA 本身支持JDK7
 
 ![NC代码规范检查](readme/imgs/4.png "NC代码规范检查")
 
-![抽取BMF](readme/imgs/6.png "抽取BMF")
+![Action搜索(简单版本)](readme/imgs/5.png "Action搜索(简单版本)")
 
-![编辑文件右键菜单](readme/imgs/5.png "编辑文件右键菜单")
+![Action搜索(完整版本)](readme/imgs/6.png "Action搜索(完整版本)")
+
+![从数据库表抽取导出最新BMF文件](readme/imgs/7.png "从数据库表抽取导出最新BMF文件")
+
+![编辑文件右键菜单](readme/imgs/8.png "编辑文件右键菜单")
+
+![导出离线数据字典效果](readme/imgs/9.png "导出离线数据字典效果")
+
+![导出离线数据字典效果](readme/imgs/10.png "导出离线数据字典效果")
 
 ![重置密码](https://s1.ax1x.com/2020/11/11/BjAWD0.png "重置密码")
 
@@ -177,6 +186,12 @@ IDEA连接数据库导出SQL的xml配置文件:
 # 版本更新
 
 ``` 
+<em>4.0.6 版本 更新:</em> <br>
+      <ul>
+              <li>1. 优化bug和操作便利性！</li>
+              <li>2. 新增根据在类名或者接口名等点击右键 打开upm文件功能！</li>
+      </ul>
+      
 <em>4.0 版本 更新:</em> <br>
       <ul>
               <li>1. 新增 根据数据库表最新数据导出BMF元数据功能！</li>
