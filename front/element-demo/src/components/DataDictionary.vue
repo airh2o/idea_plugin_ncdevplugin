@@ -95,6 +95,23 @@
               <el-checkbox v-model="tableShowColumns.defaultValue">默认值</el-checkbox>
               <el-checkbox v-model="tableShowColumns.description">取值范围/枚举</el-checkbox>
             </div>
+
+            <div>
+              <el-tag>其他设置:</el-tag>
+              <br>
+              <el-switch active-text="不显示自定义项"
+                         inactive-text="显示"
+                         v-model="hideDefFields" onchange="this.onHideDefFieldsChange">
+              </el-switch>
+              <el-switch active-text="不显示引用模型字段"
+                         inactive-text="显示"
+                         v-model="hideRefFields" onchange="this.onHideDefFieldsChange">
+              </el-switch>
+              <el-switch active-text="只显示自定义项"
+                         inactive-text="全部"
+                         v-model="onleyShowDefFields" onchange="this.onHideDefFieldsChange">
+              </el-switch>
+            </div>
           </el-drawer>
 
           <el-input
@@ -121,6 +138,9 @@
               empty-text="啥也没有找到啦"
           >
           </el-tree>
+
+
+<!--          <i class="el-icon-top tree-top-icon" v-on:click="this.handleTreeTopIconClick">顶部</i>-->
         </el-aside>
 
         <el-container class="main-div">
@@ -517,6 +537,9 @@ export default {
         return;
       }
 
+      this.openEntity2Tab(id)
+    },
+    openEntity2Tab(id, hideDefFields = this.hideDefFields) {
       let c = this.agg.classMap[id];
 
       let nowClass = c;
@@ -540,6 +563,7 @@ export default {
 
       for (let i = 0; i < c.perperties.length; i++) {
         let r = c.perperties[i];
+
         tableData.push({
           ...r,
         });
@@ -646,17 +670,40 @@ export default {
         tableData, // 实体属性表格数据
       });
       this.showTabsValue = id;
-
+      let index = this.tabsList.length - 1
       if (this.notShowCalculation) {
-        this.tabsList[this.showTabsValue].tableData = this.tabsList[this.showTabsValue].tableData.filter(
+        this.tabsList[index].tableData = this.tabsList[index].tableData.filter(
             r => !!!r.calculation
         );
       }
       if (this.notShowDynamic) {
-        this.tabsList[this.showTabsValue].tableData = this.tabsList[this.showTabsValue].tableData.filter(
+        this.tabsList[index].tableData = this.tabsList[index].tableData.filter(
             r => !!!r.dynamic
         );
       }
+      if (hideDefFields) {
+        this.tabsList[index].tableData = this.tabsList[index].tableData.filter(
+            r => r.dataType != 'BS000010000100001056'
+        );
+      }
+
+      if (this.hideRefFields) {
+        this.tabsList[index].tableData = this.tabsList[index].tableData.filter(
+            r => !!!r.refModelName
+        );
+      }
+
+      if (this.onleyShowDefFields) {
+        this.tabsList[index].tableData = this.tabsList[index].tableData.filter(
+            r => r.dataType == 'BS000010000100001056'
+        );
+      }
+
+      //表格 滚动条到顶部
+      this.$refs.filterTable.bodyWrapper.scrollTop = 0;
+    },
+    handleTreeTopIconClick() {
+      this.$refs.tree.$el.scrollTop = 0;
     },
     handleTreeNodeClick(data, node, treeNode, e) {
       console.log("handleTreeNodeClick...", this.agg, data, node, treeNode, e);
@@ -799,6 +846,14 @@ export default {
       this.historyClassIds = [];
       this.historyClassIdsIndex = -1;
     },
+    onHideDefFieldsChange(v) {
+      /*  typeName :  "CUSTOM"  r.dataType == 'BS000010000100001056'  */
+      console.log("onHideDefFieldsChange...", v);
+
+      this.tabsList[this.showTabsValue].tableData = this.tabsList[this.showTabsValue].tableData.filter(
+          r => !v && r.dataType == 'BS000010000100001056'
+      );
+    }
   },
   created() {
   },
@@ -849,12 +904,15 @@ export default {
         name: true,
         displayName: true,
         fieldName: true,
-        fileTypeDesc: true,
+        fileTypeDesc: false,
         nullable: true,
         refModelDesc: true,
-        defaultValue: true,
+        defaultValue: false,
         description: true,
       },
+      hideDefFields: false,
+      hideRefFields: false,
+      onleyShowDefFields: false,
       searchIncloudProperts: true,
       treeShowNames: ["displayname", "defaultTableName"],
       treeShowNamesOptions: [
@@ -1012,5 +1070,13 @@ body {
 
 .main-tabs {
   margin-top: 5px;
+}
+
+.tree-top-icon {
+  position: fixed;
+  top: 70%; /* 距离顶部10像素 */
+  left: 1px; /* 距离左侧10像素 */
+  color: red;
+  cursor: pointer;
 }
 </style>
