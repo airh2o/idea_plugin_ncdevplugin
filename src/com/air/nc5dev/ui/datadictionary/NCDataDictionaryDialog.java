@@ -162,8 +162,15 @@ public class NCDataDictionaryDialog extends DialogWrapper {
     }
 
     public void export2Files() {
-        ConnectionUtil.initDataSourceClass(NCPropXmlUtil.getDataSourceVOS(getProject()).get(comboBoxDb.getSelectedIndex()), project,
-                contentPane);
+        List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS(getProject());
+        if (dataSourceVOS == null) {
+            LogUtil.infoAndHide("没有配置NC HOME哦!");
+            return;
+        }
+
+        ConnectionUtil.initDataSourceClass(dataSourceVOS.get(comboBoxDb.getSelectedIndex())
+                , project
+                , contentPane);
         //选择保存位置
         File outDir = new File(getProject().getBasePath(), "nc_data_dictionary_" + System.currentTimeMillis());
         JFileChooser fileChooser = new JFileChooser();

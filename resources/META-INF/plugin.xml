@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>Yonyou NC Dev Tool</name>
-    <version>v4.0.6</version>
+    <version>v4.0.7</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx/idea_plugin_nc5devplugin">Air 209308043@qq.com 微信:yongyourj 欢迎外包联系
     </vendor>
 
@@ -274,6 +274,10 @@
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
 
+        <action id="nc5dev.info.NCHomeDecompilerAction" class="com.air.nc5dev.acion.NCHomeDecompilerAction"
+                text="NC目录一键反编译代码(仅做学习测试用,请勿违法使用,本人不负任何责任!)" description="NC目录一键反编译代码">
+        </action>
+
         <group id="nc5devtool" text="NC 开发插件配置" popup="true" description="配置NC开发插件"
                icon="/META-INF/nc-logo.png">
             <reference ref="nc5dev.config.nchome"/>
@@ -317,6 +321,7 @@
 
             <group id="nc5devtoolOtherTools" text="其他小功能"
                    popup="true" description="其他小功能">
+                <reference ref="nc5dev.info.NCHomeDecompilerAction"/>
                 <reference ref="nc5dev.info.SearchFullDataBaseAction"/>
                 <reference ref="nc5dev.info.MstscManggerUIAction"/>
                 <reference ref="nc5dev.info.MakeExcelByBmfFile"/>
@@ -644,11 +649,18 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <em>4.0.7 版本 更新:</em> <br>
+      <ul>
+          <li>中文:</li>
+              <li>1. 新增 批量反编译HOME代码功能！</li>
+              <li>2. 修复 可能报错的情况！</li>
+      </ul>
+
        <em>4.0.1 版本 更新:</em> <br>
       <ul>
           <li>中文:</li>
               <li>1. 新增 生成数据字典！</li>
-              <li>2. 修复 可能报错的部分清空！</li>
+              <li>2. 修复 可能报错的情况！</li>
       </ul>
 
      <em>4.0 版本 更新:</em> <br>

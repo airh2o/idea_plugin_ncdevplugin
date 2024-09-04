@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
  * 单纯避免com.intellij.openapi.progress.ProgressIndicator为空的
  */
 public class EmptyProgressIndicatorImpl implements ProgressIndicator {
+    volatile boolean cancel = false;
+
     @Override
     public void start() {
 
@@ -17,22 +19,22 @@ public class EmptyProgressIndicatorImpl implements ProgressIndicator {
 
     @Override
     public void stop() {
-
+        cancel();
     }
 
     @Override
     public boolean isRunning() {
-        return false;
+        return !cancel;
     }
 
     @Override
     public void cancel() {
-
+        cancel = true;
     }
 
     @Override
     public boolean isCanceled() {
-        return false;
+        return cancel;
     }
 
     @Override

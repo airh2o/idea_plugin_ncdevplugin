@@ -31,6 +31,10 @@ public class RemoveFile2PathcerSelectFilesAction extends AddFile2PathcerSelectFi
 
         VirtualFile f = CollUtil.getFirst(getSelectedFile(e));
 
+        if (f == null) {
+            return ;
+        }
+
         e.getPresentation().setEnabled(PatcherDialog.containsForceAddSelectFile(e.getProject()
                 , PatcherSelectFileVO.builder()
                         .file(f)
