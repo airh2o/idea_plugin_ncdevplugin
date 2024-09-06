@@ -2,13 +2,16 @@ package com.air.nc5dev.decompiler;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
 import com.air.nc5dev.ui.decompiler.NCDecompilerDialog;
+import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.jd.core.v1.ClassFileToJavaSourceDecompiler;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -21,12 +24,14 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Scanner;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -54,6 +59,9 @@ public class DecompilerUtil {
     JTextArea textArea;
     ProgressIndicator indicator;
     NCDecompilerDialog dialog;
+    volatile boolean autoLogScr = false;
+    volatile int threadNum = Runtime.getRuntime().availableProcessors() >> 2;
+    volatile boolean doubleThread = false;
 
     public static void main(String[] args) {
         //   testColor();
@@ -104,28 +112,204 @@ public class DecompilerUtil {
         return true;
     }
 
-    public void decompiler() throws Throwable {
-        log("\n开始处理home: " + nchome + " 输出到: " + out);
 
-        for (int i = 0; i < dialog.getPathsTableModel().getRowCount(); i++) {
-            if (indicator.isCanceled()) {
+    public void decompiler() throws Throwable {
+        //下载jad
+        File cfr = new File(System.getProperty("user.home"), "cfr-0.152.jar");
+        log("正在下载cfr..." + cfr.getPath() + "  ，如果没有外网或者下载失败，可把文件放入这个位置即可！");
+
+        if (!cfr.isFile()) {
+            HttpUtil.downloadFile("https://www.benf.org/other/cfr/cfr-0.152.jar", cfr);
+        }
+        log("下载成功....");
+
+        AtomicInteger threadFlag = new AtomicInteger(0);
+        if (threadNum < 1) {
+            threadNum = Runtime.getRuntime().availableProcessors();
+        }
+
+        if (threadNum > 1) {
+            ArrayList<Integer> indexs = new ArrayList<>();
+            for (int i = 0; i < dialog.getPathsTableModel().getRowCount(); i++) {
+                indexs.add(i);
+            }
+
+            List<List<Integer>> indexListList = CollUtil.split(indexs, threadNum);
+            for (List<Integer> ids : indexListList) {
+                if (indicator.isCanceled()) {
+                    return;
+                }
+
+                new Thread(() -> {
+                    for (Integer idx : ids) {
+                        if (indicator.isCanceled()) {
+                            return;
+                        }
+
+                        try {
+                            processRow2(idx, cfr);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }, DecompilerUtil.class.getSimpleName() + "-DIR-" + threadFlag.incrementAndGet()).start();
+            }
+        } else {
+            for (int i = 0; i < dialog.getPathsTableModel().getRowCount(); i++) {
+                if (indicator.isCanceled()) {
+                    return;
+                }
+
+                processRow2(i, cfr);
+            }
+        }
+    }
+
+    private void processRow2(int i, File cfr) throws InterruptedException {
+        setRowResult(i, "处理中");
+        if (!("true".equalsIgnoreCase(StringUtil.getSafeString(dialog.getPathsTableModel().getValueAt(i, 0)))
+                || "y".equalsIgnoreCase(StringUtil.getSafeString(dialog.getPathsTableModel().getValueAt(i, 0))))) {
+            setRowResult(i, "跳过");
+            return;
+        }
+
+        File ncHomeDir = new File(nchome);
+        File javaExe = new File(ncHomeDir, "ufjdk" + File.separatorChar + "bin" + File.separatorChar + "java.exe");
+        if (!javaExe.isFile()) {
+            javaExe = new File(ncHomeDir, "ufjdk" + File.separatorChar + "bin" + File.separatorChar + "java");
+        }
+
+        File dir = new File((String) dialog.getPathsTableModel().getValueAt(i, 1));
+        try {
+            List<File> fs = IoUtil.getAllFiles(dir, true, ".class", ".jar");
+            if (CollUtil.isEmpty(fs)) {
                 return;
             }
-            setRowResult(i, "处理中");
 
-            if (!("true".equalsIgnoreCase(StringUtil.getSafeString(dialog.getPathsTableModel().getValueAt(i, 0)))
-                    || "y".equalsIgnoreCase(StringUtil.getSafeString(dialog.getPathsTableModel().getValueAt(i, 0))))) {
-                setRowResult(i, "跳过");
-                continue;
+            log(getColoredString(31, 40, "开始处理文件夹: ** (共有文件" + fs.size() + "个)" + dir));
+            File outDir = new File(out
+                    + File.separatorChar + StrUtil.removePrefix(dir.getPath(), ncHomeDir.getPath())
+            );
+            for (File file : fs) {
+                if (indicator.isCanceled()) {
+                    return;
+                }
+
+                if (file.getName().toLowerCase().endsWith(".jar")) {
+                    //反编译！   java -jar D:\develop\java逆向\cfr_0_122.jar "%%i" --caseinsensitivefs true  --outputdir "%%~di%%~pi%%~ni"
+                    excuteShell(String.format("%s -jar \"%s\" \"%s\" --caseinsensitivefs true  --outputdir \"%s\""
+                            , javaExe.isFile() ? javaExe.getPath() : "java"
+                            , cfr.getPath()
+                            , file.getPath()
+                            , outDir.getPath()));
+                } else {
+                    //class java -jar D:\develop\java逆向\cfr_0_122.jar %1 --caseinsensitivefs true  --outputdir "%~d1%~p1%~n1"
+                    excuteShell(String.format("%s -jar \"%s\" \"%s\" --caseinsensitivefs true  --outputdir \"%s\""
+                            , javaExe.isFile() ? javaExe.getPath() : "java"
+                            , cfr.getPath()
+                            , file.getPath()
+                            , outDir.getPath()));
+                }
+            }
+        } finally {
+            setRowResult(i, "完成");
+        }
+    }
+
+    private void excuteShell(String shell) {
+        String result = RuntimeUtil.execForStr(shell);
+        log(result);
+    }
+
+    public void decompiler1() throws Throwable {
+        log("\n开始处理home: " + nchome + " 输出到: " + out);
+        AtomicInteger threadFlag = new AtomicInteger(0);
+        if (threadNum < 1) {
+            threadNum = Runtime.getRuntime().availableProcessors();
+        }
+        //idea 不允许执行线程池！
+ /*       ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(threadNum
+                , threadNum
+                , 60L
+                , TimeUnit.SECONDS
+                , new ArrayBlockingQueue<Runnable>(threadNum << 2)
+                , r -> new Thread(DecompilerUtil.class.getSimpleName() + "-" + threadFlag.incrementAndGet())
+        );*/
+
+        if (doubleThread) {
+            ArrayList<Integer> indexs = new ArrayList<>();
+            for (int i = 0; i < dialog.getPathsTableModel().getRowCount(); i++) {
+                indexs.add(i);
             }
 
-            File dir = new File((String) dialog.getPathsTableModel().getValueAt(i, 1));
-            try {
-                log(getColoredString(31, 40, "开始处理文件夹: ** " + dir));
-                decompiler(dir);
-            } finally {
-                setRowResult(i, "完成");
+            List<List<Integer>> indexListList = CollUtil.split(indexs, threadNum);
+            for (List<Integer> ids : indexListList) {
+                if (indicator.isCanceled()) {
+                    return;
+                }
+
+                new Thread(() -> {
+                    for (Integer idx : ids) {
+                        if (indicator.isCanceled()) {
+                            return;
+                        }
+
+                        try {
+                            processRow(idx);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }, DecompilerUtil.class.getSimpleName() + "-DIR").start();
             }
+        } else {
+            for (int i = 0; i < dialog.getPathsTableModel().getRowCount(); i++) {
+                if (indicator.isCanceled()) {
+                    return;
+                }
+
+                processRow(i);
+            }
+        }
+    }
+
+    private void processRow(int i) throws InterruptedException {
+        setRowResult(i, "处理中");
+        if (!("true".equalsIgnoreCase(StringUtil.getSafeString(dialog.getPathsTableModel().getValueAt(i, 0)))
+                || "y".equalsIgnoreCase(StringUtil.getSafeString(dialog.getPathsTableModel().getValueAt(i, 0))))) {
+            setRowResult(i, "跳过");
+            return;
+        }
+
+        File dir = new File((String) dialog.getPathsTableModel().getValueAt(i, 1));
+        try {
+            List<File> fs = IoUtil.getAllFiles(dir, true, ".class", ".jar");
+            if (CollUtil.isEmpty(fs)) {
+                return;
+            }
+
+            log(getColoredString(31, 40, "开始处理文件夹: ** (共有文件" + fs.size() + "个)" + dir));
+
+            List<List<File>> fileListList = CollUtil.split(fs, threadNum);
+            CountDownLatch countDownLatch = new CountDownLatch(fileListList.size());
+            SwingUtilities.invokeLater(() -> getDialog().getLabelInfo().setText("正在启动" + fileListList.size() + "个线程执行任务: "));
+            AtomicInteger startI = new AtomicInteger();
+            for (final List<File> files : fileListList) {
+                new Thread(() -> {
+                    try {
+                        SwingUtilities.invokeLater(() -> getDialog().getLabelInfo().setText(getDialog().getLabelInfo().getText()
+                                + " ,线程运行中:" + startI.incrementAndGet()));
+                        for (File f : files) {
+                            decompilerFile(f);
+                        }
+                    } finally {
+                        countDownLatch.countDown();
+                    }
+                }, DecompilerUtil.class.getSimpleName() + "-FILE").start();
+            }
+            countDownLatch.await();
+        } finally {
+            setRowResult(i, "完成");
         }
     }
 
@@ -133,6 +317,7 @@ public class DecompilerUtil {
         SwingUtilities.invokeLater(() -> dialog.getPathsTableModel().setValueAt(str, row, 2));
     }
 
+    @Deprecated
     public void decompiler(File dir) throws Exception {
         if (dir == null || !dir.exists()) {
             return;
@@ -149,12 +334,20 @@ public class DecompilerUtil {
                 continue;
             }
 
-            indicator.setText("处理文件: " + f.getPath());
-            if (f.getName().toLowerCase().endsWith(".class")) {
-                decompilerClass(f);
-            } else if (f.getName().toLowerCase().endsWith(".jar")) {
-                decompilerJar(f);
+            decompilerFile(f);
+        }
+    }
+
+    public void decompilerFile(File jarOrClass) {
+        indicator.setText("处理文件: " + jarOrClass.getPath());
+        try {
+            if (jarOrClass.getName().toLowerCase().endsWith(".class")) {
+                decompilerClass(jarOrClass);
+            } else if (jarOrClass.getName().toLowerCase().endsWith(".jar")) {
+                decompilerJar(jarOrClass);
             }
+        } catch (Throwable e) {
+            logerr("文件反编译失败: " + jarOrClass.getPath() + " err=" + e.toString(), e);
         }
     }
 
@@ -181,7 +374,7 @@ public class DecompilerUtil {
     }
 
     public void decompiler(InputStream in, String filePath) throws Exception {
-        log("\n**反编译: " + filePath + "  >>>  ");
+      /*  log("\n**反编译: " + filePath + "  >>>  ");
 
         try {
             String classFullName = filePath;
@@ -235,7 +428,7 @@ public class DecompilerUtil {
             log("输出: " + cls.getPath());
         } catch (Throwable e) {
             logerr(getColoredString(31, 40, "!!反编译失败: " + filePath + " 错误:" + e.toString() + "  in: "), e);
-        }
+        }*/
     }
 
     public static Set<File> loadPaths(String nchome) {
@@ -317,8 +510,14 @@ public class DecompilerUtil {
 
     private void append(String s) {
         SwingUtilities.invokeLater(() -> {
+            if (textArea.getLineCount() > 4000) {
+                textArea.setText(null);
+            }
+
             textArea.append("\n" + s);
-            textArea.setCaretPosition(textArea.getDocument().getLength());
+            if (autoLogScr) {
+                textArea.setCaretPosition(textArea.getDocument().getLength());
+            }
         });
     }
 

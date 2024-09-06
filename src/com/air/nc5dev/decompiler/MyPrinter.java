@@ -1,7 +1,9 @@
+/*
 package com.air.nc5dev.decompiler;
 
 import org.jd.core.v1.api.printer.Printer;
 
+*/
 /**
  * </br>
  * </br>
@@ -11,7 +13,8 @@ import org.jd.core.v1.api.printer.Printer;
  * @date 2024/9/2 17:26
  * @project
  * @Version
- */
+ *//*
+
 public class MyPrinter implements Printer {
     protected static final String TAB = "  ";
     protected static final String NEWLINE = "\n";
@@ -95,3 +98,4 @@ public class MyPrinter implements Printer {
     public void endMarker(int type) {
     }
 }
+*/

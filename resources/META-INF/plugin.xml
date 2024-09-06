@@ -277,7 +277,9 @@
         <action id="nc5dev.info.NCHomeDecompilerAction" class="com.air.nc5dev.acion.NCHomeDecompilerAction"
                 text="NC目录一键反编译代码(仅做学习测试用,请勿违法使用,本人不负任何责任!)" description="NC目录一键反编译代码">
         </action>
-
+        <action id="nc5dev.info.TestOpenAPIAction" class="com.air.nc5dev.acion.TestOpenAPIAction"
+                text="测试OpenAPI" description="">
+        </action>
         <group id="nc5devtool" text="NC 开发插件配置" popup="true" description="配置NC开发插件"
                icon="/META-INF/nc-logo.png">
             <reference ref="nc5dev.config.nchome"/>
@@ -289,6 +291,7 @@
 
             <reference ref="nc5dev.export.exportncpatcher"/>
             <reference ref="nc5dev.export.RestNcUserPassWordAction"/>
+<!--            <reference ref="nc5dev.info.TestOpenAPIAction"/>-->
             <separator/>
             <!-- 方便使用的小功能 -->
             <!-- <group id="nc5devtoolRemind" text="久坐定时提醒"

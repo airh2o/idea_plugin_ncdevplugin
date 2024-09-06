@@ -1,24 +1,15 @@
 package com.air.nc5dev.ui.decompiler;
 
-import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.decompiler.DecompilerUtil;
 import com.air.nc5dev.ui.MyTableCellEditor;
 import com.air.nc5dev.ui.MyTableRenderer;
-import com.air.nc5dev.ui.PatcherDialog;
 import com.air.nc5dev.ui.SearchTableFieldDialog;
-import com.air.nc5dev.ui.datadictionary.LoadDataDictionaryAggVOUtil;
-import com.air.nc5dev.util.CollUtil;
-import com.air.nc5dev.util.NCPropXmlUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
-import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
-import com.air.nc5dev.util.idea.ProjectUtil;
-import com.air.nc5dev.util.jdbc.ConnectionUtil;
-import com.air.nc5dev.vo.DataDictionaryAggVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.google.common.collect.Sets;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -42,8 +33,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
@@ -55,7 +46,6 @@ import javax.swing.table.TableColumn;
 import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -63,13 +53,12 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Vector;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /***
  *     弹框UI        <br>
@@ -88,7 +77,8 @@ public class NCDecompilerDialog extends DialogWrapper {
     DefaultComboBoxModel<NCDataSourceVO> comboBoxModelDb;
     ComboBox comboBoxDb;
     JBTextArea textFieldSerach;
-    JButton buttonSearch;
+    JButton buttonStart;
+    JButton buttonStop;
     JBLabel labelInfo;
     JBTextField home;
     JBTextField out;
@@ -101,6 +91,9 @@ public class NCDecompilerDialog extends DialogWrapper {
     int width = 700;
     Project project;
     long start;
+    AtomicInteger threadNum = new AtomicInteger(Runtime.getRuntime().availableProcessors() >> 2);
+    boolean AutoLogScr;
+    boolean doubleThread = false;//true;
 
     public NCDecompilerDialog(Project project) {
         super(project);
@@ -184,7 +177,7 @@ public class NCDecompilerDialog extends DialogWrapper {
             outlog.setBounds(1, label.getY() + label.getHeight() + 10, 130, h);
             panel_main.add(outlog);
 
-            jarname = new JBCheckBox("Jar文件名作为文件夹");
+            jarname = new JBCheckBox("非用友NC系列"); //Jar文件名作为文件夹
             jarname.setEnabled(true);
             jarname.setSelected(false);
             jarname.setBounds(outlog.getX() + outlog.getWidth() + 5, outlog.getY(), 150, h);
@@ -202,13 +195,21 @@ public class NCDecompilerDialog extends DialogWrapper {
             encoding.setBounds(label.getX() + label.getWidth() + 5, label.getY(), 150, h);
             panel_main.add(encoding);
 
-            buttonSearch = new JButton("启动反编译");
-            buttonSearch.setBounds(encoding.getX() + encoding.getWidth() + 5
+            buttonStart = new JButton("启动反编译");
+            buttonStart.setBounds(encoding.getX() + encoding.getWidth() + 5
                     , encoding.getY()
                     , 100
                     , h);
-            panel_main.add(buttonSearch);
-            buttonSearch.addActionListener(e -> execute());
+            panel_main.add(buttonStart);
+            buttonStart.addActionListener(e -> execute());
+
+            buttonStop = new JButton("停止反编译");
+            buttonStop.setBounds(buttonStart.getX() + buttonStart.getWidth() + 5
+                    , buttonStart.getY()
+                    , 100
+                    , h);
+            panel_main.add(buttonStop);
+            buttonStop.addActionListener(e -> stopTask());
 
             Vector heads = new Vector();
             heads.add("选择");
@@ -235,6 +236,35 @@ public class NCDecompilerDialog extends DialogWrapper {
 
             textFieldSerach = new JBTextArea();
             textFieldSerach.setEditable(true);
+            textFieldSerach.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getButton() != MouseEvent.BUTTON1) {
+                        final JPopupMenu popup = new JPopupMenu();
+                        JMenuItem item = new JMenuItem((isAutoLogScr() ? "关闭" : "打开 ") + "自动滚动");
+                        popup.add(item);
+                        item.addActionListener(event -> {
+                            setAutoLogScr(!isAutoLogScr());
+                        });
+
+                        item = new JMenuItem(isDoubleThread() ? "关闭双重线程" : "打开双重线程(文件夹和里面文件都采用多线程反编译)");
+                        //   popup.add(item);
+                        item.addActionListener(event -> {
+                            setDoubleThread(!isDoubleThread());
+                        });
+
+                        item = new JMenuItem("设置反编译线程数量");
+                        popup.add(item);
+                        item.addActionListener(event -> {
+                            getThreadNum().set(NumberUtil.parseInt(StrUtil.blankToDefault(
+                                    JOptionPane.showInputDialog("请输入反编译并发线程数量： "
+                                            , getThreadNum().get()), "" + getThreadNum().get())));
+                        });
+
+                        popup.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+            });
             //textFieldSerach.setLineWrap(true);
             JBScrollPane jbScrollPane2 = new JBScrollPane(textFieldSerach);
             jbScrollPane2.setBounds(x = 1, jbScrollPane.getY() + jbScrollPane.getHeight() + 5, getWidth(), 200);
@@ -246,9 +276,16 @@ public class NCDecompilerDialog extends DialogWrapper {
     }
 
     public void loadPaths() {
-        Set<File> ps = DecompilerUtil.loadPaths(home.getText());
-        //   textFieldSerach.append("匹配到路径列表： \n");
+        out.setText(home.getText() + File.separatorChar + "decom");
         clearTable();
+        Set<File> ps = null;
+        if (jarname.isSelected()) {
+            ps = loadAllChildDir(new File(home.getText()));
+        } else {
+            ps = DecompilerUtil.loadPaths(home.getText());
+        }
+
+        //   textFieldSerach.append("匹配到路径列表： \n");
         for (File p : ps) {
             //  textFieldSerach.append(p.getPath() + "\n");
             Vector v = new Vector();
@@ -259,6 +296,31 @@ public class NCDecompilerDialog extends DialogWrapper {
         }
 
         fitTableColumns(paths);
+    }
+
+    private Set<File> loadAllChildDir(File dir) {
+        LinkedHashSet<File> all = Sets.newLinkedHashSet();
+        if (dir == null) {
+            return all;
+        }
+
+        File[] fs = dir.listFiles();
+        if (fs == null) {
+            return all;
+        }
+        for (File f : fs) {
+            if (f.isDirectory()) {
+                all.addAll(loadAllChildDir(f));
+                continue;
+            }
+
+            if (f.getName().toLowerCase().endsWith(".jar")
+                    || f.getName().toLowerCase().endsWith(".class")) {
+                all.add(f.getParentFile());
+            }
+        }
+
+        return all;
     }
 
     public void clearTable() {
@@ -285,18 +347,20 @@ public class NCDecompilerDialog extends DialogWrapper {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
-                    getButtonSearch().setEnabled(false);
+                    //  getButtonStart().setEnabled(false);
                     //  getOKAction().setEnabled(false);
-                    getCancelAction().setEnabled(false);
+                    // getCancelAction().setEnabled(false);
+                    // getButtonStop().setEnabled(true);
 
                     startTask(indicator);
                 } catch (Throwable e) {
                     LogUtil.error(e.getMessage(), e);
                     decompilerUtil = null;
                 } finally {
-                    getButtonSearch().setEnabled(true);
+                    //  getButtonStart().setEnabled(true);
                     //getOKAction().setEnabled(true);
-                    getCancelAction().setEnabled(true);
+                    //   getCancelAction().setEnabled(true);
+                    //   getButtonStop().setEnabled(false);
                 }
             }
         };
@@ -316,7 +380,10 @@ public class NCDecompilerDialog extends DialogWrapper {
                 .setOutlog(outlog.isSelected())
                 .setJarNameUseOut(jarname.isSelected())
                 .setIndicator(indicator)
-                .setTextArea(getTextFieldSerach());
+                .setTextArea(getTextFieldSerach())
+                .setAutoLogScr(isAutoLogScr())
+                .setDoubleThread(isDoubleThread())
+                .setThreadNum(getThreadNum().get());
 
         if (StrUtil.isBlank(decompilerUtil.getNchome())) {
             textFieldSerach.append("请输入NCHOME文件夹路径");
@@ -337,6 +404,11 @@ public class NCDecompilerDialog extends DialogWrapper {
     private void stopTask() {
         if (decompilerUtil != null) {
             decompilerUtil.getIndicator().cancel();
+
+            //getButtonStart().setEnabled(true);
+            //getOKAction().setEnabled(true);
+            // getCancelAction().setEnabled(true);
+            //  getButtonStop().setEnabled(false);
         }
     }
 
@@ -366,7 +438,7 @@ public class NCDecompilerDialog extends DialogWrapper {
             out.setText(home.getText() + File.separatorChar + "decom");
             encoding.setText("GBK");
             textFieldSerach.setText("");
-            labelInfo.setText("点击启动反编译按钮，开始执行");
+            labelInfo.setText("点击启动反编译按钮，开始执行(下面日志窗口内右键 有更多菜单哦)");
 
             loadPaths();
         } catch (Throwable e) {
@@ -497,6 +569,34 @@ public class NCDecompilerDialog extends DialogWrapper {
                 });
                 popup.add(new JSeparator());
                 popup.add(calcel);
+
+                final int[] selectedRows = table.getSelectedRows();
+                final HashSet<Integer> selectedRowSet = Sets.newHashSet();
+                for (int selectedRow : selectedRows) {
+                    selectedRowSet.add(selectedRow);
+                }
+                selectAllOrNot = new JMenuItem("选中行批量反选");
+                selectAllOrNot.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        //高亮选择指定的行
+                        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+                        for (int i = 0; i < tableModel.getRowCount(); i++) {
+                            if (!selectedRowSet.contains(i)) {
+                                continue;
+                            }
+
+                            if ("true".equals(tableModel.getDataVector().get(i).get(column))
+                                    || Boolean.TRUE.equals(tableModel.getDataVector().get(i).get(column))) {
+                                table.setValueAt(false, i, isCheckboxFinal ? column : 0);
+                            } else {
+                                table.setValueAt(true, i, isCheckboxFinal ? column : 0);
+                            }
+                        }
+                        // table.setRowSelectionInterval(row, row);
+                    }
+                });
+                popup.add(selectAllOrNot);
+
                 popup.show(me.getComponent(), me.getX(), me.getY());
             }
         }
