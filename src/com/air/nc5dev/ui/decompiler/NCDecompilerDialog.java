@@ -91,7 +91,8 @@ public class NCDecompilerDialog extends DialogWrapper {
     int width = 700;
     Project project;
     long start;
-    AtomicInteger threadNum = new AtomicInteger(Runtime.getRuntime().availableProcessors() >> 2);
+    AtomicInteger threadNum = new AtomicInteger(1 //Runtime.getRuntime().availableProcessors() >> 2
+    );
     boolean AutoLogScr;
     boolean doubleThread = false;//true;
 
@@ -102,7 +103,7 @@ public class NCDecompilerDialog extends DialogWrapper {
         init();
         setOKActionEnabled(false);
         setCancelButtonText("取消");
-        setTitle("NC目录一键反编译代码(仅做学习测试用,请勿违法使用,本人不负任何责任!)");
+        setTitle("NC目录一键反编译代码(仅做学习测试用,请勿违法使用,本人不负任何责任!如果闪退 加大内存和日志窗口点击鼠标右键设置反编译线程数量小点)");
     }
 
     private void createCenterPanel0() throws Exception {
@@ -171,16 +172,24 @@ public class NCDecompilerDialog extends DialogWrapper {
             out.setBounds(label.getX() + label.getWidth() + 5, label.getY(), contentPane.getWidth() - 10 - label.getWidth(), h);
             panel_main.add(out);
 
-            outlog = new JBCheckBox("输出日志文件");
+            outlog = new JBCheckBox("输出日志文件(以及界面显示日志)");
             outlog.setEnabled(true);
             outlog.setSelected(false);
-            outlog.setBounds(1, label.getY() + label.getHeight() + 10, 130, h);
+            outlog.setBounds(1, label.getY() + label.getHeight() + 10, 200, h);
             panel_main.add(outlog);
 
             jarname = new JBCheckBox("非用友NC系列"); //Jar文件名作为文件夹
             jarname.setEnabled(true);
             jarname.setSelected(false);
             jarname.setBounds(outlog.getX() + outlog.getWidth() + 5, outlog.getY(), 150, h);
+            jarname.addActionListener(e -> {
+                if (jarname.isSelected()) {
+                    encoding.setText("UTF8");
+                } else {
+                    encoding.setText("GBK");
+                }
+                loadPaths();
+            });
             panel_main.add(jarname);
 
             label = new JBLabel();

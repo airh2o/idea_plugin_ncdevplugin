@@ -186,10 +186,10 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         }
 
         inputStr = inputStr.trim();
-        if (inputStr.charAt(0) == '!') {
+        if (inputStr.length() > 1 && inputStr.charAt(0) == '!') {
             everwhere = false;
             inputStr = inputStr.substring(1);
-        } else if (inputStr.charAt(1) == '!') {
+        } else if (inputStr.length() > 2 && inputStr.charAt(1) == '!') {
             everwhere = false;
             inputStr = inputStr.charAt(0) + inputStr.substring(2);
         }
@@ -392,7 +392,7 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
             return 10;
         }
 
-      //  List<String> mm = StringUtil.split(match, '.');
+        //  List<String> mm = StringUtil.split(match, '.');
         HashSet<String> set = CollUtil.newHashSet(ss);
         int matchsize = 0;
         for (String s : ss) {

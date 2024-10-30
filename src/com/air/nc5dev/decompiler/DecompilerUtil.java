@@ -2,6 +2,7 @@ package com.air.nc5dev.decompiler;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
@@ -186,14 +187,19 @@ public class DecompilerUtil {
                 return;
             }
 
-            log(getColoredString(31, 40, "开始处理文件夹: ** (共有文件" + fs.size() + "个)" + dir));
+            // log(getColoredString(31, 40, "开始处理文件夹: ** (共有文件" + fs.size() + "个)" + dir));
             File outDir = new File(out
                     + File.separatorChar + StrUtil.removePrefix(dir.getPath(), ncHomeDir.getPath())
             );
+            int x = 1;
             for (File file : fs) {
                 if (indicator.isCanceled()) {
                     return;
                 }
+
+                log(getColoredString(31, 40, "开始处理文件夹: 第" + (x) + "个 剩余:" + (fs.size() - x) + "个(共有文件" + fs.size() + "个)"));
+
+                setRowResult(i, "处理中:" + x + "/" + fs.size());
 
                 if (file.getName().toLowerCase().endsWith(".jar")) {
                     //反编译！   java -jar D:\develop\java逆向\cfr_0_122.jar "%%i" --caseinsensitivefs true  --outputdir "%%~di%%~pi%%~ni"
@@ -210,6 +216,7 @@ public class DecompilerUtil {
                             , file.getPath()
                             , outDir.getPath()));
                 }
+                ++x;
             }
         } finally {
             setRowResult(i, "完成");
@@ -217,8 +224,12 @@ public class DecompilerUtil {
     }
 
     private void excuteShell(String shell) {
-        String result = RuntimeUtil.execForStr(shell);
-        log(result);
+        try {
+            String result = RuntimeUtil.execForStr(shell);
+            log(result, false);
+        } catch (Throwable e) {
+            logerr(shell, e);
+        }
     }
 
     public void decompiler1() throws Throwable {
@@ -488,21 +499,23 @@ public class DecompilerUtil {
     }
 
     private void logerr(String s, Throwable e) {
+        indicator.setText(s);
         append(s);
         append("\n" + ExceptionUtil.stacktraceToString(e));
-
-        indicator.setText(s);
-
         if (outlog) {
             FileUtil.appendString(s + ExceptionUtil.stacktraceToString(e), logf, ENCODING);
         }
     }
 
     private void log(String s) {
-        indicator.setText(s);
+        log(s, true);
+    }
 
+    private void log(String s, boolean toIndicator) {
+        if (toIndicator) {
+            indicator.setText(s);
+        }
         append(s);
-
         if (outlog) {
             FileUtil.appendString(s, logf, ENCODING);
         }
