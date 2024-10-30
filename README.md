@@ -11,7 +11,7 @@
 <a href="https://www.bilibili.com/video/BV1mg4y1f7cQ/?vd_source=6b1c74e795e65a8b04ffe9fe91867a10">
 使用教程:  https://www.bilibili.com/video/BV1mg4y1f7cQ/?vd_source=6b1c74e795e65a8b04ffe9fe91867a10 </a>
 
-# 因本人目前在微服务公司，所以本人业余接开发私单，有私单才能继续参与NC 继续更新插件
+# 专业独立顾问，接开发项目，有私单才能继续参与NC 继续更新插件，可做 NC5系列 NC6系列 NCCloud系列 BIP高级版系列，BIP旗舰版系列，金蝶云苍穹 eas，java，go，python，前后端，微信 钉钉等等。。。。
 ## 专业承接 U8C NC5 NC6 NCC BIP，java微服务 springcloud，前后端分离，小程序 H5APP 等等私活，用友高级以上认证，项目都是120家以上经验！每年至少会做10家以上私单项目！                    
 ## 业务联系方式: QQ 209308343   微信： yongyourj                  
 
