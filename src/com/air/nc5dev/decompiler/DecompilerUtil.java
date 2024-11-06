@@ -203,14 +203,14 @@ public class DecompilerUtil {
 
                 if (file.getName().toLowerCase().endsWith(".jar")) {
                     //反编译！   java -jar D:\develop\java逆向\cfr_0_122.jar "%%i" --caseinsensitivefs true  --outputdir "%%~di%%~pi%%~ni"
-                    excuteShell(String.format("%s -jar \"%s\" \"%s\" --caseinsensitivefs true  --outputdir \"%s\""
+                    excuteShell(String.format("%s -jar \"%s\" \"%s\" --caseinsensitivefs true --hideutf false --outputdir \"%s\""
                             , javaExe.isFile() ? javaExe.getPath() : "java"
                             , cfr.getPath()
                             , file.getPath()
                             , outDir.getPath()));
                 } else {
                     //class java -jar D:\develop\java逆向\cfr_0_122.jar %1 --caseinsensitivefs true  --outputdir "%~d1%~p1%~n1"
-                    excuteShell(String.format("%s -jar \"%s\" \"%s\" --caseinsensitivefs true  --outputdir \"%s\""
+                    excuteShell(String.format("%s -jar \"%s\" \"%s\" --caseinsensitivefs true --hideutf false --outputdir \"%s\""
                             , javaExe.isFile() ? javaExe.getPath() : "java"
                             , cfr.getPath()
                             , file.getPath()
