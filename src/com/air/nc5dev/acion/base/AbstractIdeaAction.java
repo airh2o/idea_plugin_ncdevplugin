@@ -108,7 +108,7 @@ public abstract class AbstractIdeaAction extends AnAction {
      */
     protected abstract void doHandler(AnActionEvent e) throws Exception;
 
-    public ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.OLD_EDT;
-    }
+//    public ActionUpdateThread getActionUpdateThread() {
+//        return ActionUpdateThread.OLD_EDT;
+//    }
 }
