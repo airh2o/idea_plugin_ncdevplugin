@@ -7,7 +7,6 @@ import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.ConvertUtil;
 import com.air.nc5dev.util.ExceptionUtil;
-import com.air.nc5dev.util.ExecUtil;
 import com.air.nc5dev.util.ExportNCPatcherUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.NCPropXmlUtil;
@@ -15,6 +14,8 @@ import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.ReflectUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.V;
+import com.air.nc5dev.vo.FileContentVO;
+import com.air.nc5dev.util.exportpatcher.output.HotwebNccloudFrontCopyOutPutFileImpl;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
@@ -1407,16 +1408,16 @@ public class PatcherDialog extends DialogWrapper {
 
     private void reBuildNpmPatcther(ExportContentVO contentVO, @NotNull ProgressIndicator indicator) throws IOException {
         File dir = new File(contentVO.hotwebsResourcePath);
-        if (dir.isDirectory()) {
-            indicator.setText("强制删除前端hotwebs的dist后执行" + contentVO.getNpmRunCommand() + "中...");
-            IoUtil.cleanUpDirFiles(new File(dir, "dist"));
-            String cm = ExecUtil.npmBuild(dir.getPath()
-                    , (line) -> {
-                        indicator.setText("npm building:" + StrUtil.removeAllLineBreaks(line));
-                    }
-                    , contentVO.getNpmRunCommand()
+        if (contentVO.exportResources && dir.isDirectory()) {
+            FileContentVO file = new FileContentVO()
+                    .setFile(contentVO.hotwebsResourcePath)
+                    .setFileTo(contentVO.hotwebsResourcePath + File.separatorChar + "dist")
+                    .setName(FileContentVO.NAME_HOTWEBS_NCCLOUD_RESOURCE);
+            contentVO.addOutFiles(file);
+            new HotwebNccloudFrontCopyOutPutFileImpl().build(
+                    contentVO
+                    , file
             );
-            LogUtil.infoAndHide("前端 " + contentVO.getNpmRunCommand() + ": " + cm);
         }
     }
 

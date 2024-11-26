@@ -67,9 +67,20 @@ public class ExportConfigVO {
      * 是否不导出 modelue.xml 默认false
      */
     public boolean notExportModelueXml = false;
-
-
-
+    /**
+     * 是否导出到hotwebbs下的模块的 比如 hotwebs\ncchr\WEB-INF\classes
+     */
+    public boolean clientToModuleHotwebs = false;
+    /**
+     * 是否导出到hotwebbs下的模块的 比如 hotwebs\ncchr\WEB-INF\classes
+     */
+    public boolean publicToModuleHotwebs = false;
+    /**
+     * 是否导出到hotwebbs下的模块的 比如 hotwebs\ncchr\WEB-INF\classes
+     */
+    public boolean privateToModuleHotwebs = false;
+    /** hotwebs下模块命，默认 nccloud */
+    public String moduleHotwebsName = "nccloud";
 
     /**
      * 获取配置的其他信息

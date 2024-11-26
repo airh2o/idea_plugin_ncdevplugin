@@ -1,8 +1,13 @@
 package com.air.nc5dev.util;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
+import com.air.nc5dev.util.exportpatcher.searchs.AbstractContentSearchImpl;
+import com.air.nc5dev.vo.FileContentVO;
+import com.air.nc5dev.util.exportpatcher.output.SimpleCopyOutPutFileImpl;
+import com.air.nc5dev.util.exportpatcher.beforafter.AbstarctBeforRule;
+import com.air.nc5dev.util.exportpatcher.beforafter.EmptyBeforRule;
+import com.air.nc5dev.util.exportpatcher.searchs.ModuleJavaFileContentSearchImpl;
 import com.air.nc5dev.util.idea.ApplicationLibraryUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
@@ -53,7 +58,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.stream.Stream;
 
 /***
@@ -563,11 +567,17 @@ public class IdeaProjectGenerateUtil {
     public static void copyProjectMetaInfFiles2NCHomeModules() {
         Project project = ProjectUtil.getDefaultProject();
         Module[] modules = ModuleManager.getInstance(project).getModules();
+
+        ExportContentVO contentVO = new ExportContentVO();
+        contentVO.setProject(project);
+        AbstractContentSearchImpl.initModules(contentVO);
+        contentVO.initSelectModules();
+
         for (Module module : modules) {
             LogUtil.tryInfo(module.getModuleFilePath()
                     + " 模块执行：NC 各种配置文件 复制到NCHOME:"
                     + ProjectNCConfigUtil.getNCHomePath());
-            copyProjectMetaInfFiles2NCHomeModules(module);
+            copyProjectMetaInfFiles2NCHomeModules(contentVO, module);
         }
     }
 
@@ -583,7 +593,7 @@ public class IdeaProjectGenerateUtil {
      * @date 2019/12/25 0025 15:04
      * @Param []
      */
-    public static void copyProjectMetaInfFiles2NCHomeModules(@NotNull Module module) {
+    public static void copyProjectMetaInfFiles2NCHomeModules(ExportContentVO contentVO, @NotNull Module module) {
         try {
             copyModuleMetainfoDir2NChome(module);
 
@@ -591,7 +601,7 @@ public class IdeaProjectGenerateUtil {
                 copyModuleNccConfigDir2NChome(module);
                 if (!"true".equals(ProjectNCConfigUtil.getConfigValue("close_client_copy"))) {
                     try {
-                        copyModuleNccActionDir2NChome(module);
+                        copyModuleNccActionDir2NChome(contentVO, module);
                     } catch (Throwable e) {
                         LogUtil.error(e.toString(), e);
                     }
@@ -708,22 +718,13 @@ public class IdeaProjectGenerateUtil {
      *
      * @param module
      */
-    private static void copyModuleNccActionDir2NChome(@NotNull Module module) {
+    private static void copyModuleNccActionDir2NChome(ExportContentVO contentVO, @NotNull Module module) {
         String ncHomePath = ProjectNCConfigUtil.getNCHomePath();
         if (null == ncHomePath || ncHomePath.trim().isEmpty()) {
             return;
         }
 
         ModuleWarpVO moduleWarpVO = new ModuleWarpVO(module);
-        File clientDir = new File(new File(module.getModuleFilePath()).getParentFile(), "src"
-                + File.separatorChar + "client"
-                //  + File.separatorChar + "nccloud"
-        );
-        if (!clientDir.exists()) {
-            return;
-        }
-
-
         File nchome = new File(ncHomePath);
         if (!nchome.exists() || !nchome.isDirectory()) {
             LogUtil.tryInfo("NCHOME无法找到，跳过NCC配置文件复制.");
@@ -749,52 +750,158 @@ public class IdeaProjectGenerateUtil {
         }
 
         File outPathRoot = nccClientClassDir;
+        ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(module);
+        if (classBaseDirFile != null && configVO != null) {
+            File clientDir = new File(new File(module.getModuleFilePath()).getParentFile(), "src"
+                    + File.separatorChar + "client"
+            );
+            if (configVO.clientToModuleHotwebs && clientDir.exists()) {
+                searchJavas(AbstractContentSearchImpl.NC_TYPE_CLIENT, contentVO
+                        , moduleWarpVO
+                        , nccClientClassDir
+                        , classBaseDirFile
+                        , outPathRoot
+                        , clientDir
+                        , classBaseDirFile.getPath());
+            }
 
-        if (classBaseDirFile != null) {
-            //获取所有的 有源码的包路径文件夹！
-            List<File> allSourcePackges = IoUtil.getAllLastPackges(clientDir);
-            ExportContentVO contentVO = new ExportContentVO();
-            contentVO.setModule2ExportConfigVoMap(new HashMap<>());
-            ExportConfigVO exportConfigVO = new ExportConfigVO();
-            exportConfigVO.setProp(new Properties());
-            contentVO.getModule2ExportConfigVoMap().put(module, exportConfigVO);
-            contentVO.setModuleHomeDir2ModuleMap(new HashMap<>());
-            contentVO.getModuleHomeDir2ModuleMap().put(module.getModuleFilePath(), module);
-            for (final File sourcePackge : allSourcePackges) {
-                String packgePath = sourcePackge.getPath().substring(clientDir.getPath().length());
-                //class文件位置
-                File classFileDir = new File(classBaseDirFile, packgePath);
+            File publicDir = new File(new File(module.getModuleFilePath()).getParentFile(), "src"
+                    + File.separatorChar + "public"
+            );
+            if (configVO.publicToModuleHotwebs && publicDir.exists()) {
+                searchJavas(AbstractContentSearchImpl.NC_TYPE_PUBLIC, contentVO
+                        , moduleWarpVO
+                        , nccClientClassDir
+                        , classBaseDirFile
+                        , outPathRoot
+                        , publicDir
+                        , classBaseDirFile.getPath());
+            }
 
-                LogUtil.tryInfo("复制NCC Action代码文件夹: " + nccClientClassDir.getPath());
-
-                ExportNCPatcherUtil.copyClassAndJavaSourceFiles(sourcePackge, clientDir
-                        , contentVO, outPathRoot.getPath(), moduleWarpVO
-                        , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, classFileDir);
-
-                if (!StringUtil.replaceAll(StringUtil.replaceAll(sourcePackge.getPath(), File.separator, "/"), "\\",
-                        "/").contains("client/yyconfig/")) {
-                    ExportNCPatcherUtil.copyClassPathOtherFile(sourcePackge, outPathRoot.getPath(), moduleWarpVO
-                            , ExportNCPatcherUtil.NC_TYPE_CLIENT, packgePath, contentVO);
-                }
+            File privateDir = new File(new File(module.getModuleFilePath()).getParentFile(), "src"
+                    + File.separatorChar + "private"
+            );
+            if (configVO.privateToModuleHotwebs && privateDir.exists()) {
+                searchJavas(AbstractContentSearchImpl.NC_TYPE_PUBLIC, contentVO
+                        , moduleWarpVO
+                        , nccClientClassDir
+                        , classBaseDirFile
+                        , outPathRoot
+                        , privateDir
+                        , classBaseDirFile.getPath());
             }
         }
 
-        //移动文件到正确的文件夹结构
-        File[] fs1 = nccClientClassDir.listFiles();
-        if (CollUtil.isEmpty(fs1)) {
-            return;
+        SimpleCopyOutPutFileImpl executor = new SimpleCopyOutPutFileImpl();
+        AbstarctBeforRule beforRule = new EmptyBeforRule();
+        beforRule.addNext(new HotwebsNccloudClass2NCHOMEBeforRule());
+        for (FileContentVO outFile : contentVO.getOutFiles()) {
+            if (outFile.getExecutor() == null) {
+                outFile.setExecutor(executor);
+            }
+
+            outFile.getExecutor().outPut(contentVO, outFile, beforRule, null);
         }
-        File f2;
-        for (File f1 : fs1) {
-            try {
-                f2 = new File(f1, "client" + File.separatorChar + "classes");
-                if (!f2.isDirectory()) {
-                    continue;
+    }
+
+    private static void searchJavas(String ncType
+            , ExportContentVO contentVO
+            , ModuleWarpVO moduleWarpVO
+            , File nccClientClassDir
+            , File classBaseDirFile
+            , File outPathRoot
+            , File clientDir
+            , String classDir) {
+        //获取所有的 有源码的包路径文件夹！
+        List<File> allSourcePackges = IoUtil.getAllLastPackges(clientDir);
+        for (final File sourcePackge : allSourcePackges) {
+            String packgePath = sourcePackge.getPath().substring(clientDir.getPath().length());
+            //class文件位置
+            File classFileDir = new File(classBaseDirFile, packgePath);
+            LogUtil.tryInfo("复制" + ncType + "代码文件夹: " + nccClientClassDir.getPath());
+            ModuleJavaFileContentSearchImpl moduleJavaFileContentSearch = new ModuleJavaFileContentSearchImpl();
+            moduleJavaFileContentSearch.copyClassAndJavaSourceFiles(sourcePackge, clientDir
+                    , contentVO, outPathRoot.getPath(), moduleWarpVO
+                    , ncType, packgePath, classFileDir, classDir);
+
+            if (!StringUtil.replaceAll(StringUtil.replaceAll(sourcePackge.getPath(), File.separator, "/"), "\\",
+                    "/").contains("client/yyconfig/")) {
+                moduleJavaFileContentSearch.copyClassPathOtherFile(sourcePackge, outPathRoot.getPath(), moduleWarpVO
+                        , ncType, packgePath, contentVO, classDir);
+            }
+        }
+    }
+
+    /**
+     * 部署编译后的文件到 nchome中 hotwebs的代码里
+     */
+    public static class HotwebsNccloudClass2NCHOMEBeforRule extends AbstarctBeforRule {
+        @Override
+        public void doBefor(ExportContentVO contentVO, FileContentVO fileContentVO) {
+            if (fileContentVO.getModule() == null) {
+                return;
+            }
+            ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(fileContentVO.getModule().getModule());
+            File hotwebs = new File(ProjectNCConfigUtil.getNCHome(contentVO.getProject()), "hotwebs");
+            if (configVO.clientToModuleHotwebs && AbstractContentSearchImpl.NC_TYPE_CLIENT.equals(fileContentVO.getName())) {
+                if (StringUtil.isNotBlank(fileContentVO.getFile())) {
+                    fileContentVO.setFileTo(hotwebs.getPath()
+                            + File.separatorChar + configVO.getModuleHotwebsName()
+                            + File.separatorChar + "WEB-INF"
+                            + File.separatorChar + "classes"
+                            + IoUtil.rigthPathRemovePrefix(fileContentVO.getFile(), fileContentVO.getSrcTop())
+                    );
                 }
-                IoUtil.copyFile(f2, nccClientClassDir.getParentFile());
-                FileUtil.del(f1);
-            } catch (Throwable e) {
-                LogUtil.error(e.getMessage(), e);
+                if (StringUtil.isNotBlank(fileContentVO.getSrcFile())) {
+                    fileContentVO.setSrcFileTo(hotwebs.getPath()
+                            + File.separatorChar + configVO.getModuleHotwebsName()
+                            + File.separatorChar + "WEB-INF"
+                            + File.separatorChar + "classes"
+                            + IoUtil.rigthPathRemovePrefix(fileContentVO.getSrcFile(), fileContentVO.getSrcTop())
+                    );
+                }
+
+                return;
+            }
+
+            if (configVO.privateToModuleHotwebs && AbstractContentSearchImpl.NC_TYPE_PRIVATE.equals(fileContentVO.getName())) {
+                if (StringUtil.isNotBlank(fileContentVO.getFile())) {
+                    fileContentVO.setFileTo(hotwebs.getPath()
+                            + File.separatorChar + configVO.getModuleHotwebsName()
+                            + File.separatorChar + "WEB-INF"
+                            + File.separatorChar + "classes"
+                            + IoUtil.rigthPathRemovePrefix(fileContentVO.getFile(), fileContentVO.getSrcTop())
+                    );
+                }
+                if (StringUtil.isNotBlank(fileContentVO.getSrcFile())) {
+                    fileContentVO.setSrcFileTo(hotwebs.getPath()
+                            + File.separatorChar + configVO.getModuleHotwebsName()
+                            + File.separatorChar + "WEB-INF"
+                            + File.separatorChar + "classes"
+                            + IoUtil.rigthPathRemovePrefix(fileContentVO.getSrcFile(), fileContentVO.getSrcTop())
+                    );
+                }
+                return;
+            }
+
+            if (configVO.publicToModuleHotwebs && AbstractContentSearchImpl.NC_TYPE_PUBLIC.equals(fileContentVO.getName())) {
+                if (StringUtil.isNotBlank(fileContentVO.getFile())) {
+                    fileContentVO.setFileTo(hotwebs.getPath()
+                            + File.separatorChar + configVO.getModuleHotwebsName()
+                            + File.separatorChar + "WEB-INF"
+                            + File.separatorChar + "classes"
+                            + IoUtil.rigthPathRemovePrefix(fileContentVO.getFile(), fileContentVO.getSrcTop())
+                    );
+                }
+                if (StringUtil.isNotBlank(fileContentVO.getSrcFile())) {
+                    fileContentVO.setSrcFileTo(hotwebs.getPath()
+                            + File.separatorChar + configVO.getModuleHotwebsName()
+                            + File.separatorChar + "WEB-INF"
+                            + File.separatorChar + "classes"
+                            + IoUtil.rigthPathRemovePrefix(fileContentVO.getSrcFile(), fileContentVO.getSrcTop())
+                    );
+                }
+                return;
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.air.nc5dev.util;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -924,17 +925,40 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
      * @date 2020/1/16 0016 20:07
      * @Param [fromDir, toDir]
      */
-    public static void copyFile(@NotNull File from, @NotNull final File to) {
+    public static void copyFile(@NotNull File from, @NotNull File to) {
         try {
             if (!from.exists()) {
                 return;
             }
-            to.mkdirs();
+
+            if (!to.getName().endsWith(FileUtil.getName(from))) {
+                to = new File(to, FileUtil.getName(from));
+            }
+
             FileUtil.copy(from, to, true);
         } catch (Throwable e) {
             e.printStackTrace();
             LogUtil.error("复制文件出错:" + e.getMessage(), e);
         }
+    }
+
+    public static String rigthPathRemovePrefix(String a, String remove) {
+        if (a == null || remove == null) {
+            return a;
+        }
+
+        a = StrUtil.replace(StrUtil.replace(a, "/", File.separator), "\\", File.separator);
+        remove = StrUtil.replace(StrUtil.replace(remove, "/", File.separator), "\\", File.separator);
+
+        return StrUtil.removePrefix(a, remove);
+    }
+
+    public static String rigthPathSplit(String p) {
+        if (p == null) {
+            return p;
+        }
+
+        return StrUtil.replace(StrUtil.replace(p, "/", File.separator), "\\", File.separator);
     }
 
     /**

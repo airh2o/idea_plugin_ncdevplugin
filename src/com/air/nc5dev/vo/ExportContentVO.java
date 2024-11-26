@@ -4,7 +4,6 @@ import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.ExportNCPatcherUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
-import com.air.nc5dev.util.ReflectUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -195,6 +194,10 @@ public class ExportContentVO {
     String no;
     String v;
     //////////END
+    /**
+     * 所有要输出的文件列表
+     */
+    public volatile ArrayList<FileContentVO> outFiles = new ArrayList<>(1_000);
 
     public void init() {
         if (isSelectExport()) {
@@ -271,5 +274,12 @@ public class ExportContentVO {
                 }
             }
         }
+    }
+
+    public void addOutFiles(FileContentVO file) {
+        if (outFiles == null) {
+            outFiles = new ArrayList<>(1000);
+        }
+        outFiles.add(file);
     }
 }

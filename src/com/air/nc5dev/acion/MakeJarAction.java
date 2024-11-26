@@ -1,8 +1,8 @@
 package com.air.nc5dev.acion;
 
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
-import com.air.nc5dev.util.ExportNCPatcherUtil;
 import com.air.nc5dev.util.IoUtil;
+import com.air.nc5dev.util.exportpatcher.searchs.AbstractContentSearchImpl;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -68,7 +68,7 @@ public class MakeJarAction extends AbstractIdeaAction {
             manifest = fileChooser.getSelectedFile();
         }
 
-        Manifest maniFest = ExportNCPatcherUtil.getManiFest(manifest, dir.getName());
+        Manifest maniFest = AbstractContentSearchImpl.getManiFest(manifest, dir.getName());
 
         IoUtil.makeJar(dir, outJarFile, maniFest, null);
 
