@@ -57,7 +57,7 @@ public class HotwebsModuleClassBeforRule extends AbstarctBeforRule {
     ) {
         File hotwebs = new File(new File(contentVO.outPath).getParent(), "hotwebs");
 
-        if (StringUtil.isNotBlank(fileContentVO.getFile())) {
+        if (StringUtil.isAllNotBlank(fileContentVO.getFile(), fileContentVO.getFileTo())) {
             fileContentVO.setFileTo(hotwebs.getPath()
                     + File.separatorChar + configVO.getModuleHotwebsName()
                     + File.separatorChar + "WEB-INF"
@@ -65,7 +65,7 @@ public class HotwebsModuleClassBeforRule extends AbstarctBeforRule {
                     + IoUtil.rigthPathRemovePrefix(fileContentVO.getFile(), fileContentVO.getSrcTop())
             );
         }
-        if (StringUtil.isNotBlank(fileContentVO.getSrcFile())) {
+        if (StringUtil.isAllNotBlank(fileContentVO.getSrcFile(), fileContentVO.getSrcFileTo())) {
             fileContentVO.setFileTo(hotwebs.getPath()
                     + File.separatorChar + configVO.getModuleHotwebsName()
                     + File.separatorChar + "WEB-INF"

@@ -844,7 +844,7 @@ public class IdeaProjectGenerateUtil {
             ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(fileContentVO.getModule().getModule());
             File hotwebs = new File(ProjectNCConfigUtil.getNCHome(contentVO.getProject()), "hotwebs");
             if (configVO.clientToModuleHotwebs && AbstractContentSearchImpl.NC_TYPE_CLIENT.equals(fileContentVO.getName())) {
-                if (StringUtil.isNotBlank(fileContentVO.getFile())) {
+                if (StringUtil.isAllNotBlank(fileContentVO.getFile(), fileContentVO.getFileTo())) {
                     fileContentVO.setFileTo(hotwebs.getPath()
                             + File.separatorChar + configVO.getModuleHotwebsName()
                             + File.separatorChar + "WEB-INF"
@@ -852,7 +852,7 @@ public class IdeaProjectGenerateUtil {
                             + IoUtil.rigthPathRemovePrefix(fileContentVO.getFile(), fileContentVO.getSrcTop())
                     );
                 }
-                if (StringUtil.isNotBlank(fileContentVO.getSrcFile())) {
+                if (StringUtil.isAllNotBlank(fileContentVO.getSrcFile(), fileContentVO.getSrcFileTo())) {
                     fileContentVO.setSrcFileTo(hotwebs.getPath()
                             + File.separatorChar + configVO.getModuleHotwebsName()
                             + File.separatorChar + "WEB-INF"
@@ -865,7 +865,7 @@ public class IdeaProjectGenerateUtil {
             }
 
             if (configVO.privateToModuleHotwebs && AbstractContentSearchImpl.NC_TYPE_PRIVATE.equals(fileContentVO.getName())) {
-                if (StringUtil.isNotBlank(fileContentVO.getFile())) {
+                if (StringUtil.isAllNotBlank(fileContentVO.getFile(),fileContentVO.getFileTo())) {
                     fileContentVO.setFileTo(hotwebs.getPath()
                             + File.separatorChar + configVO.getModuleHotwebsName()
                             + File.separatorChar + "WEB-INF"
@@ -873,7 +873,7 @@ public class IdeaProjectGenerateUtil {
                             + IoUtil.rigthPathRemovePrefix(fileContentVO.getFile(), fileContentVO.getSrcTop())
                     );
                 }
-                if (StringUtil.isNotBlank(fileContentVO.getSrcFile())) {
+                if (StringUtil.isAllNotBlank(fileContentVO.getSrcFile(),fileContentVO.getSrcFileTo())) {
                     fileContentVO.setSrcFileTo(hotwebs.getPath()
                             + File.separatorChar + configVO.getModuleHotwebsName()
                             + File.separatorChar + "WEB-INF"
@@ -885,7 +885,7 @@ public class IdeaProjectGenerateUtil {
             }
 
             if (configVO.publicToModuleHotwebs && AbstractContentSearchImpl.NC_TYPE_PUBLIC.equals(fileContentVO.getName())) {
-                if (StringUtil.isNotBlank(fileContentVO.getFile())) {
+                if (StringUtil.isAllNotBlank(fileContentVO.getFile(),fileContentVO.getFileTo())) {
                     fileContentVO.setFileTo(hotwebs.getPath()
                             + File.separatorChar + configVO.getModuleHotwebsName()
                             + File.separatorChar + "WEB-INF"
@@ -893,7 +893,7 @@ public class IdeaProjectGenerateUtil {
                             + IoUtil.rigthPathRemovePrefix(fileContentVO.getFile(), fileContentVO.getSrcTop())
                     );
                 }
-                if (StringUtil.isNotBlank(fileContentVO.getSrcFile())) {
+                if (StringUtil.isAllNotBlank(fileContentVO.getSrcFile(),fileContentVO.getSrcFileTo())) {
                     fileContentVO.setSrcFileTo(hotwebs.getPath()
                             + File.separatorChar + configVO.getModuleHotwebsName()
                             + File.separatorChar + "WEB-INF"
