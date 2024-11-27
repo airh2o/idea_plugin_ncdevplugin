@@ -57,11 +57,11 @@ public abstract class AbstractOutPutFileImpl implements IOutPutFile {
         }
 
         if (from.isDirectory()) {
-               System.out.println(from + "  1->  " + to);
-           // IoUtil.copyAllFile(from, to, file.getFilter());
+             //  System.out.println(from + "  1->  " + to);
+            IoUtil.copyAllFile(from, to, file.getFilter());
         } else {
-             System.out.println(from + "  2->  " + to);
-          //  IoUtil.copyFile(from, to);
+           //  System.out.println(from + "  2->  " + to);
+            IoUtil.copyFile(from, to);
         }
     }
 }
