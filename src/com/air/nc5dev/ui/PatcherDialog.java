@@ -8,6 +8,7 @@ import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.ConvertUtil;
 import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.ExportNCPatcherUtil;
+import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.NCPropXmlUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
@@ -704,7 +705,12 @@ public class PatcherDialog extends DialogWrapper {
 
 
         //设置点默认值
-        initDefualtValues();
+        try {
+            initDefualtValues();
+        } catch (Throwable iae) {
+            iae.printStackTrace();
+            LogUtil.error(iae.toString(), iae);
+        }
 
         // jp.setPreferredSize(new Dimension(width + 40, y + 10));
     }
@@ -728,7 +734,7 @@ public class PatcherDialog extends DialogWrapper {
             return;
         }
 
-        Module[] modules = ModuleManager.getInstance(event.getProject()).getModules();
+        Module[] modules = IdeaProjectGenerateUtil.getProjectModules(event.getProject());
         while (selectModuleTableTableModel.getRowCount() > 0) {
             selectModuleTableTableModel.removeRow(0);
         }

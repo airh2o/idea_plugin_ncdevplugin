@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  * @Version
  */
 @Data
-public class ModuleJavaFileContentSearchImpl extends AbstractContentSearchImpl {
+public abstract class ModuleJavaFileContentSearchImpl extends AbstractContentSearchImpl {
     @Override
     public void search(ExportContentVO contentVO) {
         //循环模块，根据编译对象情况，输出补丁
@@ -129,7 +129,6 @@ public class ModuleJavaFileContentSearchImpl extends AbstractContentSearchImpl {
             //模块循环结束
         }
     }
-
 
     /**
      * 导出一个包       <br>
@@ -543,7 +542,7 @@ public class ModuleJavaFileContentSearchImpl extends AbstractContentSearchImpl {
      * @date 2020/1/16 0016 20:42
      * @Param [classFullName, javaFileDir] class名 比如 nc.ui.gl.ErrorUI  , java源文件夹根目录
      */
-    private List<File> getJavaClassByClassName(@NotNull String classFullName, @NotNull File classFileDir) {
+    public List<File> getJavaClassByClassName(@NotNull String classFullName, @NotNull File classFileDir) {
         final String classPath = StringUtil.replaceAll(classFullName, ".", File.separator);
         if (com.air.nc5dev.util.CollUtil.isEmpty(classFileDir.listFiles())) {
             return com.air.nc5dev.util.CollUtil.emptyList();

@@ -56,7 +56,9 @@ public class ModuleLibFileContentSearchImpl extends AbstractContentSearchImpl {
 
             //复制模块resoureces
             File resourcesDir = new File(new File(module.getModule().getModuleFilePath()).getParentFile(), "lib");
-            if (contentVO.exportModuleResources && resourcesDir.isDirectory() && !contentVO.indicator.isCanceled()) {
+            if (contentVO.isExportModuleLib()
+                    && resourcesDir.isDirectory()
+                    && !contentVO.indicator.isCanceled()) {
                 contentVO.indicator.setText("导出模块lib:" + resourcesDir.getPath());
 
                 contentVO.addOutFiles(new FileContentVO()

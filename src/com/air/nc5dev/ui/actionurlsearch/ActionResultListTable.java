@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
 import com.air.nc5dev.ui.SearchTableFieldDialog;
 import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
@@ -522,7 +523,7 @@ public class ActionResultListTable extends JBTable {
         String clz = vo.getClazz().substring(vo.getClazz().lastIndexOf('.') + 1);
         String classPt = StrUtil.replace(vo.getClazz(), ".", File.separator);
         String classPtDir = classPt.substring(0, classPt.lastIndexOf(File.separator));
-        Module[] modules = ModuleManager.getInstance(project).getModules();
+        Module[] modules = IdeaProjectGenerateUtil.getProjectModules(project);
         for (Module module : modules) {
             VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
             for (VirtualFile sourceRoot : sourceRoots) {

@@ -51,4 +51,8 @@ public class FileContentVO {
     IOutPutFile executor;
 
     String srcTop;
+    /**
+     * 是否包含下级文件夹和文件
+     */
+    boolean hasChildDir = false;
 }

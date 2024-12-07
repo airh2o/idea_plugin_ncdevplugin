@@ -37,7 +37,7 @@ public class ReConfigModuleAction extends AbstractIdeaAction {
                 return;
             }
 
-            Module[] modules = ModuleManager.getInstance(project).getModules();
+            Module[] modules = IdeaProjectGenerateUtil.getProjectModules(project);
             for (Module module1 : modules) {
                 setModuel(module1);
             }

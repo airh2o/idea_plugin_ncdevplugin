@@ -46,17 +46,19 @@ public class ModuleResourcesFileContentSearchImpl extends AbstractContentSearchI
                 continue;
             }
 
-         //   compilerModuleExtension = CompilerModuleExtension.getInstance(module.getModule());
+            //   compilerModuleExtension = CompilerModuleExtension.getInstance(module.getModule());
 
             //读取自定义配置文件
             configVO = contentVO.module2ExportConfigVoMap.get(module.getModule());
             if (configVO.isIgnoreModule()) {
-                return ; //忽略模块!
+                return; //忽略模块!
             }
 
             //复制模块resoureces
             File resourcesDir = new File(new File(module.getModule().getModuleFilePath()).getParentFile(), "resources");
-            if (contentVO.exportModuleResources && resourcesDir.isDirectory() && !contentVO.indicator.isCanceled()) {
+            if (contentVO.isExportModuleResources()
+                    && resourcesDir.isDirectory()
+                    && !contentVO.indicator.isCanceled()) {
                 contentVO.indicator.setText("导出模块resources:" + resourcesDir.getPath());
 
                 contentVO.addOutFiles(new FileContentVO()

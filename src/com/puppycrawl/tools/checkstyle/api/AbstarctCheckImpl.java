@@ -3,6 +3,7 @@ package com.puppycrawl.tools.checkstyle.api;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
@@ -109,7 +110,7 @@ public abstract class AbstarctCheckImpl implements FileSetCheck {
         Cecha hope = PROJECT_SOURCE_CECHA.get();
         PROJECT_SOURCE_CECHA.compareAndSet(hope, cecha);
 
-        Module[] modules = ModuleManager.getInstance(project).getModules();
+        Module[] modules = IdeaProjectGenerateUtil.getProjectModules(project);
         if (CollUtil.isEmpty(modules)) {
             return;
         }

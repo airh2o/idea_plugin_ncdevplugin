@@ -2,6 +2,7 @@ package com.air.nc5dev.util.exportpatcher.searchs;
 
 import cn.hutool.core.collection.CollUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
+import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
@@ -78,7 +79,7 @@ public abstract class AbstractContentSearchImpl implements IFileContentSearch {
             return;
         }
         //获得所有的 模块
-        Module[] modules = ModuleManager.getInstance(contentVO.project).getModules();
+        Module[] modules = IdeaProjectGenerateUtil.getProjectModules(contentVO.project);
         contentVO.modules = CollUtil.toList(modules);
         if (contentVO.moduleHomeDir2ModuleMap == null
                 || contentVO.moduleHomeDir2ModuleMap.isEmpty()) {

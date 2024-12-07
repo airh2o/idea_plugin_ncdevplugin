@@ -46,16 +46,18 @@ public class ModuleUpmFileContentSearchImpl extends AbstractContentSearchImpl {
                 continue;
             }
 
-          //  compilerModuleExtension = CompilerModuleExtension.getInstance(module.getModule());
+            //  compilerModuleExtension = CompilerModuleExtension.getInstance(module.getModule());
 
             //读取自定义配置文件
             configVO = contentVO.module2ExportConfigVoMap.get(module.getModule());
             if (configVO.isIgnoreModule()) {
-                return ; //忽略模块!
+                return; //忽略模块!
             }
 
             File libDir = new File(new File(module.getModule().getModuleFilePath()).getParentFile(), "META-INF");
-            if (contentVO.exportModuleMeteinfo && libDir.isDirectory() && !contentVO.indicator.isCanceled()) {
+            if (contentVO.isExportModuleMeteinfo()
+                    && libDir.isDirectory()
+                    && !contentVO.indicator.isCanceled()) {
                 contentVO.indicator.setText("导出模块META-INF:" + libDir.getPath());
                 contentVO.addOutFiles(new FileContentVO()
                         .setModule(module)

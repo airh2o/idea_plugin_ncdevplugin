@@ -3,6 +3,7 @@ package com.air.nc5dev.vo;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.ExportNCPatcherUtil;
+import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.google.common.collect.Lists;
@@ -217,7 +218,7 @@ public class ExportContentVO {
             return;
         }
 
-        Module[] ms = ModuleManager.getInstance(project).getModules();
+        Module[] ms = IdeaProjectGenerateUtil.getProjectModules(project);
         HashMap<String, Module> path2ModuleMap = Arrays.stream(ms).collect(Collectors.toMap(
                 o -> o.getModuleFile().getParent().getPath()
                 , o -> o
@@ -233,7 +234,7 @@ public class ExportContentVO {
     }
 
     public void initSelectModules() {
-        Module[] ms = ModuleManager.getInstance(project).getModules();
+        Module[] ms = IdeaProjectGenerateUtil.getProjectModules(project);
 
         //模块文件夹根路径 ： 模块对象
         for (Module module : ms) {

@@ -4,6 +4,7 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.ui.actionurlsearch.ActionResultListTable;
 import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.XmlUtil;
@@ -503,7 +504,7 @@ public class ProjectUtil {
             try {
                 scope = new ProjectAndLibrariesScope(project);
             } catch (Throwable e) {
-                Module[] ms = ModuleManager.getInstance(project).getModules();
+                Module[] ms = IdeaProjectGenerateUtil.getProjectModules(project);
                 Module module = ms[0];
                 final LibraryTable.ModifiableModel model =
                         LibraryTablesRegistrar.getInstance().getLibraryTable(project).getModifiableModel();

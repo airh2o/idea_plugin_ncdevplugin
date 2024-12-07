@@ -3,6 +3,7 @@ package com.air.nc5dev.util;
 import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.exportpatcher.searchs.AbstractContentSearchImpl;
+import com.air.nc5dev.util.exportpatcher.searchs.ModuleJavaClientFileContentSearchImpl;
 import com.air.nc5dev.vo.FileContentVO;
 import com.air.nc5dev.util.exportpatcher.output.SimpleCopyOutPutFileImpl;
 import com.air.nc5dev.util.exportpatcher.beforafter.AbstarctBeforRule;
@@ -82,7 +83,7 @@ public class IdeaProjectGenerateUtil {
             return;
         }
 
-        Module[] modules = ModuleManager.getInstance(project1).getModules();
+        Module[] modules = IdeaProjectGenerateUtil.getProjectModules(project1);
         for (Module module : modules) {
             generateSrcDir(module);
             generatePatherConfigFile(module);
@@ -344,7 +345,7 @@ public class IdeaProjectGenerateUtil {
                             + " -Dlocal.exclude.modules= "
             );
             conf.setWorkingDirectory(ncHome.getPath());
-            conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
+            conf.setModule(IdeaProjectGenerateUtil.getProjectModules(project)[0]);
             conf.setShowConsoleOnStdErr(true);
             conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
 
@@ -380,7 +381,7 @@ public class IdeaProjectGenerateUtil {
                             + " -Dnc.jstart.port=$FIELD_CLINET_PORT$"
                             + " -Dnc.fi.autogenfile=N "
             );
-            conf.setModule(ModuleManager.getInstance(project).getModules()[0]);
+            conf.setModule(IdeaProjectGenerateUtil.getProjectModules(project)[0]);
             conf.setWorkingDirectory(ncHome.getPath());
             conf.setShowConsoleOnStdErr(true);
             conf.setShortenCommandLine(ShortenCommandLine.MANIFEST);
@@ -532,7 +533,7 @@ public class IdeaProjectGenerateUtil {
             public Boolean compute() {
                 try {
                     // 向项目模块依赖中增加新增的库
-                    Module[] modules = ModuleManager.getInstance(project).getModules();
+                    Module[] modules = IdeaProjectGenerateUtil.getProjectModules(project);
                     for (Module module : modules) {
                         for (LibraryEx library : LibraryExList) {
                             ApplicationLibraryUtil.removeLib(module,
@@ -566,7 +567,7 @@ public class IdeaProjectGenerateUtil {
      */
     public static void copyProjectMetaInfFiles2NCHomeModules() {
         Project project = ProjectUtil.getDefaultProject();
-        Module[] modules = ModuleManager.getInstance(project).getModules();
+        Module[] modules = IdeaProjectGenerateUtil.getProjectModules(project);
 
         ExportContentVO contentVO = new ExportContentVO();
         contentVO.setProject(project);
@@ -804,6 +805,15 @@ public class IdeaProjectGenerateUtil {
         }
     }
 
+    public static Module[] getProjectModules(Project project) {
+        if (project == null) {
+            return null;
+        }
+
+        Module[] modules = ModuleManager.getInstance(project).getModules();
+        return modules;
+    }
+
     private static void searchJavas(String ncType
             , ExportContentVO contentVO
             , ModuleWarpVO moduleWarpVO
@@ -819,7 +829,7 @@ public class IdeaProjectGenerateUtil {
             //class文件位置
             File classFileDir = new File(classBaseDirFile, packgePath);
             LogUtil.tryInfo("复制" + ncType + "代码文件夹: " + nccClientClassDir.getPath());
-            ModuleJavaFileContentSearchImpl moduleJavaFileContentSearch = new ModuleJavaFileContentSearchImpl();
+            ModuleJavaFileContentSearchImpl moduleJavaFileContentSearch = new ModuleJavaClientFileContentSearchImpl();
             moduleJavaFileContentSearch.copyClassAndJavaSourceFiles(sourcePackge, clientDir
                     , contentVO, outPathRoot.getPath(), moduleWarpVO
                     , ncType, packgePath, classFileDir, classDir);
@@ -865,7 +875,7 @@ public class IdeaProjectGenerateUtil {
             }
 
             if (configVO.privateToModuleHotwebs && AbstractContentSearchImpl.NC_TYPE_PRIVATE.equals(fileContentVO.getName())) {
-                if (StringUtil.isAllNotBlank(fileContentVO.getFile(),fileContentVO.getFileTo())) {
+                if (StringUtil.isAllNotBlank(fileContentVO.getFile(), fileContentVO.getFileTo())) {
                     fileContentVO.setFileTo(hotwebs.getPath()
                             + File.separatorChar + configVO.getModuleHotwebsName()
                             + File.separatorChar + "WEB-INF"
@@ -873,7 +883,7 @@ public class IdeaProjectGenerateUtil {
                             + IoUtil.rigthPathRemovePrefix(fileContentVO.getFile(), fileContentVO.getSrcTop())
                     );
                 }
-                if (StringUtil.isAllNotBlank(fileContentVO.getSrcFile(),fileContentVO.getSrcFileTo())) {
+                if (StringUtil.isAllNotBlank(fileContentVO.getSrcFile(), fileContentVO.getSrcFileTo())) {
                     fileContentVO.setSrcFileTo(hotwebs.getPath()
                             + File.separatorChar + configVO.getModuleHotwebsName()
                             + File.separatorChar + "WEB-INF"
@@ -885,7 +895,7 @@ public class IdeaProjectGenerateUtil {
             }
 
             if (configVO.publicToModuleHotwebs && AbstractContentSearchImpl.NC_TYPE_PUBLIC.equals(fileContentVO.getName())) {
-                if (StringUtil.isAllNotBlank(fileContentVO.getFile(),fileContentVO.getFileTo())) {
+                if (StringUtil.isAllNotBlank(fileContentVO.getFile(), fileContentVO.getFileTo())) {
                     fileContentVO.setFileTo(hotwebs.getPath()
                             + File.separatorChar + configVO.getModuleHotwebsName()
                             + File.separatorChar + "WEB-INF"
@@ -893,7 +903,7 @@ public class IdeaProjectGenerateUtil {
                             + IoUtil.rigthPathRemovePrefix(fileContentVO.getFile(), fileContentVO.getSrcTop())
                     );
                 }
-                if (StringUtil.isAllNotBlank(fileContentVO.getSrcFile(),fileContentVO.getSrcFileTo())) {
+                if (StringUtil.isAllNotBlank(fileContentVO.getSrcFile(), fileContentVO.getSrcFileTo())) {
                     fileContentVO.setSrcFileTo(hotwebs.getPath()
                             + File.separatorChar + configVO.getModuleHotwebsName()
                             + File.separatorChar + "WEB-INF"

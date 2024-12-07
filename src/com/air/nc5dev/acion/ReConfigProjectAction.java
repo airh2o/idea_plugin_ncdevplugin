@@ -1,6 +1,7 @@
 package com.air.nc5dev.acion;
 
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
+import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
@@ -31,7 +32,7 @@ public class ReConfigProjectAction extends AbstractIdeaAction {
             return;
         }
 
-        Module[] modules = ModuleManager.getInstance(project).getModules();
+        Module[] modules = IdeaProjectGenerateUtil.getProjectModules(project);
         for (Module module1 : modules) {
             ReConfigModuleAction.setModuel(module1);
         }

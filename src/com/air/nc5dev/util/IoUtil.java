@@ -789,17 +789,22 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
             return;
         }
 
-        Stream.of(fromDir.listFiles()).forEach(file -> {
-            if (file.isDirectory()) {
-                copyAllFileAndDir(file, new File(toDir, file.getName()), filter);
+        List<File> fs = FileUtil.loopFiles(fromDir);
+        if (CollUtil.isEmpty(fs)) {
+            return;
+        }
+
+        for (File f : fs) {
+            if (filter != null && !filter.apply(f)) {
+                continue;
             }
 
-            if (filter != null && !filter.apply(file)) {
-                return;
-            }
-
-            copyFile(file, toDir);
-        });
+            FileUtil.copy(f
+                    , new File(toDir,
+                            StrUtil.removePrefix(f.getPath(), fromDir.getPath())
+                    )
+                    , true);
+        }
     }
 
     /**

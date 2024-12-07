@@ -1,6 +1,7 @@
 package com.air.nc5dev.acion;
 
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
+import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -41,7 +42,7 @@ public class UnRenameHomeClassIfInProjectSrcAction extends AbstractIdeaAction {
                     , "正在回滚重命名工程源码在NCHOME中的class、java文件中...") {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
-                    Module[] modules = ModuleManager.getInstance(e.getProject()).getModules();
+                    Module[] modules = IdeaProjectGenerateUtil.getProjectModules(e.getProject());
                     File ncHome = ProjectNCConfigUtil.getNCHome(e.getProject());
 
                     List<File> cs = new ArrayList<>(5000);

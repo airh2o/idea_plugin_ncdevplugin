@@ -40,7 +40,7 @@ public class NC5HomePathConfigAction extends AbstractIdeaAction {
                 IdeaProjectGenerateUtil.updateApplicationNCLibrarys(e.getProject());
 
 
-                Module[] modules = ModuleManager.getInstance(project).getModules();
+                Module[] modules =IdeaProjectGenerateUtil.getProjectModules(project) ;
                 for (Module module1 : modules) {
                     ReConfigModuleAction.setModuel(module1);
                 }

@@ -1,11 +1,16 @@
 package com.air.nc5dev.util;
 
+import b.k.F;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.MD5;
 import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.util.exportpatcher.searchs.AbstractContentSearchImpl;
+import com.air.nc5dev.util.exportpatcher.searchs.ModuleJavaClientFileContentSearchImpl;
+import com.air.nc5dev.util.exportpatcher.searchs.ModuleJavaPrivateFileContentSearchImpl;
+import com.air.nc5dev.util.exportpatcher.searchs.ModuleJavaPublicFileContentSearchImpl;
+import com.air.nc5dev.util.exportpatcher.searchs.NccloudHotwebsResourcesFileContentSearchImpl;
 import com.air.nc5dev.vo.FileContentVO;
 import com.air.nc5dev.util.exportpatcher.output.IOutPutFile;
 import com.air.nc5dev.util.exportpatcher.output.SimpleCopyOutPutFileImpl;
@@ -137,34 +142,61 @@ public class ExportNCPatcherUtil {
         }
 
         //处理NCC特殊的模块补丁结构
-        if (contentVO.exportSql && !contentVO.indicator.isCanceled()) {
+        if (contentVO.isExportSql()
+                && !contentVO.indicator.isCanceled()) {
             if (contentVO.rebuildsql) {
                 contentVO.indicator.setText("强制直接连接数据库生成SQL合并文件...");
-                reBuildNCCSqlAndFrontFiles(contentVO);
+                reBuildNCCSqlFiles(contentVO);
             } else {
                 contentVO.indicator.setText("使用用友开发工具导出的SQL脚本文件进行SQL合并...");
-                buildNCCSqlAndFrontFiles(contentVO);
+                buildNCCSqlFiles(contentVO);
             }
         }
 
-        if (contentVO.isFormat4Ygj() && !contentVO.indicator.isCanceled()) {
+        if (contentVO.isFormat4Ygj()
+                && !contentVO.indicator.isCanceled()) {
             //转换云管家格式！
             toYgjFormatExportStract(contentVO);
         }
 
-        if (contentVO.isReWriteSourceFile() && !contentVO.indicator.isCanceled()) {
+        if (contentVO.isReWriteSourceFile()
+                && !contentVO.indicator.isCanceled()) {
             reWriteSourceFile(contentVO);
         }
     }
 
     public static ArrayList<IFileContentSearch> getSearchs(ExportContentVO contentVO) {
         ArrayList<IFileContentSearch> shs = new ArrayList<>();
-        shs.add(new ModuleJavaFileContentSearchImpl());
-        shs.add(new ModuleUpmFileContentSearchImpl());
-        shs.add(new ModuleResourcesFileContentSearchImpl());
-        shs.add(new ModuleLibFileContentSearchImpl());
 
-        shs.add(new BmfFileContentSearchImpl());
+        if (contentVO.isExportHotwebsClass()) {
+            shs.add(new ModuleJavaClientFileContentSearchImpl());
+        }
+
+        if (contentVO.isExportModules()) {
+            shs.add(new ModuleJavaPublicFileContentSearchImpl());
+            shs.add(new ModuleJavaPrivateFileContentSearchImpl());
+        }
+
+        if (contentVO.isExportModuleMeteinfo()) {
+            shs.add(new ModuleUpmFileContentSearchImpl());
+        }
+
+        if (contentVO.isExportModuleResources()) {
+            shs.add(new ModuleResourcesFileContentSearchImpl());
+        }
+
+        if (contentVO.isExportModuleLib()) {
+            shs.add(new ModuleLibFileContentSearchImpl());
+        }
+
+        if (contentVO.isExportModuleMetadata()) {//元数据
+            shs.add(new BmfFileContentSearchImpl());
+        }
+
+        if (contentVO.isExportResources()
+                && NcVersionEnum.isNCCOrBIP(contentVO.getNcVersion())) {
+            shs.add(new NccloudHotwebsResourcesFileContentSearchImpl());
+        }
 
         return shs;
     }
@@ -238,28 +270,28 @@ public class ExportNCPatcherUtil {
         ArrayList<String> javas = Lists.newArrayList();
         ArrayList<String> jss = Lists.newArrayList();
         contentVO.indicator.setText("正在覆盖写入混淆字符串到源码文件...");
+
+        File base = new File(contentVO.getOutPath());
+
         if (contentVO.isFormat4Ygj()) {
             //云管家格式的
-            javas.add(contentVO.getOutPath() + File.separatorChar + "replacement" + File.separatorChar + "modules");
-            jss.add(contentVO.getOutPath() + File.separatorChar + "replacement" + File.separatorChar + "hotwebs"
-                    + File.separatorChar + "nccloud" + File.separatorChar + "resources"
-                    + File.separatorChar + "__SOURCE__CODE__" + File.separatorChar + "src"
-            );
-        } else {
-            javas.add(contentVO.getOutPath());
-            jss.add(new File(contentVO.getOutPath()).getParentFile().getPath() + File.separatorChar + "hotwebs"
-                    + File.separatorChar + "nccloud" + File.separatorChar + "resources"
-                    + File.separatorChar + "__SOURCE__CODE__" + File.separatorChar + "src"
-            );
+            base = new File(base, "replacement");
         }
 
-        File hotwebs = new File(contentVO.getOutPath() + File.separatorChar + "replacement" + File.separatorChar + "hotwebs");
+        javas.add(base.getPath() + File.separatorChar + "modules");
+        jss.add(new File(base, "hotwebs"
+                        + File.separatorChar + "nccloud" + File.separatorChar + "resources"
+                        + File.separatorChar + "__SOURCE__CODE__" + File.separatorChar + "src"
+                ).getPath()
+        );
+
+        File hotwebs = new File(base, "hotwebs");
         File[] fs = hotwebs.listFiles();
         if (fs != null) {
             for (File f : fs) {
                 if (f.isDirectory()) {
                     javas.add(
-                            f.getPath() + File.separatorChar + "nccloud" + File.separatorChar + "WEB-INF" + File.separatorChar + "classes"
+                            f.getPath() + File.separatorChar + "WEB-INF" + File.separatorChar + "classes"
                     );
                 }
             }
@@ -349,13 +381,7 @@ public class ExportNCPatcherUtil {
      *
      * @param contentVO
      */
-    public static void reBuildNCCSqlAndFrontFiles(ExportContentVO contentVO) {
-        if (contentVO.exportResources
-                && StringUtil.isNotBlank(contentVO.getHotwebsResourcePath())
-                && new File(contentVO.getHotwebsResourcePath()).isDirectory()) {
-            buildNCCHotwebs(new File(contentVO.getHotwebsResourcePath()), contentVO);
-        }
-
+    public static void reBuildNCCSqlFiles(ExportContentVO contentVO) {
         HashMap<String, Module> moduleHomeDir2ModuleMap = contentVO.getModuleHomeDir2ModuleMap();
         File sqldir = new File(new File(contentVO.getOutPath()).getParentFile(), "sql");
         ArrayList<File> moduleOneSqls = new ArrayList<>();
@@ -516,15 +542,9 @@ public class ExportNCPatcherUtil {
      *
      * @param contentVO
      */
-    public static void buildNCCSqlAndFrontFiles(ExportContentVO contentVO) {
+    public static void buildNCCSqlFiles(ExportContentVO contentVO) {
         if (contentVO.indicator.isCanceled()) {
             return;
-        }
-
-        if (contentVO.exportResources
-                && StringUtil.isNotBlank(contentVO.getHotwebsResourcePath())
-                && new File(contentVO.getHotwebsResourcePath()).isDirectory()) {
-            buildNCCHotwebs(new File(contentVO.getHotwebsResourcePath()), contentVO);
         }
 
         HashMap<String, Module> moduleHomeDir2ModuleMap = contentVO.getModuleHomeDir2ModuleMap();

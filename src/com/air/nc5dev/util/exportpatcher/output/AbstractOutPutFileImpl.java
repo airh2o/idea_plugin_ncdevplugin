@@ -7,6 +7,7 @@ import com.air.nc5dev.vo.FileContentVO;
 import com.air.nc5dev.vo.ExportContentVO;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.function.BiConsumer;
 
 /**
@@ -58,7 +59,11 @@ public abstract class AbstractOutPutFileImpl implements IOutPutFile {
 
         if (from.isDirectory()) {
              //  System.out.println(from + "  1->  " + to);
-            IoUtil.copyAllFile(from, to, file.getFilter());
+            if (file.isHasChildDir()) {
+                IoUtil.copyAllFileAndDir(from, to, file.getFilter());
+            }else{
+                IoUtil.copyAllFile(from, to, file.getFilter());
+            }
         } else {
            //  System.out.println(from + "  2->  " + to);
             IoUtil.copyFile(from, to);

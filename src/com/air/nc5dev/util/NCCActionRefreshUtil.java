@@ -68,7 +68,7 @@ public class NCCActionRefreshUtil {
 
         }*/
 
-        Module[] modules = ModuleManager.getInstance(project).getModules();
+        Module[] modules = IdeaProjectGenerateUtil.getProjectModules(project);
         if (modules == null) {
             return;
         }
@@ -375,7 +375,7 @@ public class NCCActionRefreshUtil {
         ProjectNCConfigUtil.initConfigFile(project);
         File ncHome = ProjectNCConfigUtil.getNCHome();
         if (ncHome == null) {
-            return ;
+            return;
         }
 
         if (!ncHome.isDirectory()) {
@@ -458,7 +458,7 @@ public class NCCActionRefreshUtil {
     private static void loadServletNoUpm0(Project project, Module module) {
         int from = module == null ? NCCActionInfoVO.FROM_HOME : NCCActionInfoVO.FROM_SRC;
         if (module == null) {
-            Module[] ms = ModuleManager.getInstance(project).getModules();
+            Module[] ms = IdeaProjectGenerateUtil.getProjectModules(project);
             final LibraryTable.ModifiableModel model =
                     LibraryTablesRegistrar.getInstance().getLibraryTable(project).getModifiableModel();
             for (Module m : ms) {
@@ -637,7 +637,7 @@ public class NCCActionRefreshUtil {
 
         int from = module == null ? NCCActionInfoVO.FROM_HOME : NCCActionInfoVO.FROM_SRC;
         if (module == null) {
-            Module[] ms = ModuleManager.getInstance(project).getModules();
+            Module[] ms = IdeaProjectGenerateUtil.getProjectModules(project);
             final LibraryTable.ModifiableModel model =
                     LibraryTablesRegistrar.getInstance().getLibraryTable(project).getModifiableModel();
             for (Module m : ms) {
@@ -741,7 +741,7 @@ public class NCCActionRefreshUtil {
 
         int from = module == null ? NCCActionInfoVO.FROM_HOME : NCCActionInfoVO.FROM_SRC;
         if (module == null) {
-            Module[] ms = ModuleManager.getInstance(project).getModules();
+            Module[] ms = IdeaProjectGenerateUtil.getProjectModules(project);
             final LibraryTable.ModifiableModel model =
                     LibraryTablesRegistrar.getInstance().getLibraryTable(project).getModifiableModel();
             for (Module m : ms) {
@@ -760,7 +760,7 @@ public class NCCActionRefreshUtil {
             } catch (Throwable exception) {
                 scope = new ProjectAndLibrariesScope(project);
             }
-        }else{
+        } else {
             scope = module.getModuleScope(false);
         }
 
