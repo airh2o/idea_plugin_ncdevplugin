@@ -311,7 +311,12 @@ public class ProjectNCConfigUtil {
             initConfigFile(project);
         }
 
-        return configPropertis.get(project.getBasePath()).getProperty(key);
+        Properties ps = configPropertis.get(project.getBasePath());
+        if (ps == null) {
+            return null;
+        }
+
+        return ps.getProperty(key);
     }
 
     @Deprecated

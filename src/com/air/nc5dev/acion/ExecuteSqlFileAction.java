@@ -1,7 +1,7 @@
 package com.air.nc5dev.acion;
 
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
-import com.air.nc5dev.ui.ExecuteSqlFile.ExecuteSqlFileDialog;
+import com.air.nc5dev.ui.executesqlfile.ExecuteSqlFileDialog;
 import com.air.nc5dev.util.CollUtil;
 import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.idea.LogUtil;

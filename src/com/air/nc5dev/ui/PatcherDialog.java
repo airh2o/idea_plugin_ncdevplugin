@@ -902,6 +902,7 @@ public class PatcherDialog extends DialogWrapper {
         contentVO.zip = zip.isSelected();
         contentVO.no2Jar = no2Jar.isSelected();
         contentVO.saveConfig = saveConfig.isSelected();
+        contentVO.exportModuleLib = getExportModuleLib().isSelected();
         contentVO.data_source_index = dataSourceIndex.getSelectedIndex();
         contentVO.ncVersion = (NcVersionEnum) ncVersion.getSelectedItem();
         contentVO.setNpmRunCommand(textField_npmRun.getText());

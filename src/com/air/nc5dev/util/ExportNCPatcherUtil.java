@@ -193,12 +193,16 @@ public class ExportNCPatcherUtil {
             shs.add(new BmfFileContentSearchImpl());
         }
 
-        if (contentVO.isExportResources()
-                && NcVersionEnum.isNCCOrBIP(contentVO.getNcVersion())) {
+        if (hasHotwebsFront(contentVO)) {
             shs.add(new NccloudHotwebsResourcesFileContentSearchImpl());
         }
 
         return shs;
+    }
+
+    public static boolean hasHotwebsFront(ExportContentVO contentVO) {
+        return contentVO.isExportResources()
+                && NcVersionEnum.isNCCOrBIP(contentVO.getNcVersion());
     }
 
     /**
