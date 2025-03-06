@@ -16,6 +16,10 @@
         <var name="metaNames">'P6HVO','P6BVO'</var>
         <!--        元数据里 表组件 id列表 -->
         <var name="metaIds">select id from md_class where name in({metaNames})</var>
+
+        <var name="我取到了变量myvar1">{myvar1}</var>
+        <!--  执行里面的sql语句，然后把结果 放入到 var变量里面！(解析优先级 高于 var) 。 join 如果有多个 用什么拼接字符串。itemwarp 每个结果用什么包裹住   -->
+        <varBySql name="metaIds" join="," itemwarp="'">select id as myvar1 from md_class where name ={module}</varBySql>
     </vars>
 
     <item>

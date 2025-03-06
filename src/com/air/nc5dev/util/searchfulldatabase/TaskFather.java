@@ -124,6 +124,8 @@ public class TaskFather {
         } finally {
             IoUtil.close(rs);
             IoUtil.close(st);
+
+            stopAll();
         }
     }
 
@@ -239,6 +241,7 @@ public class TaskFather {
      */
     public void stopAll() {
         isStop = true;
+        config.getDialog().getButton_Search().setText("开始搜素");
         config.getDialog().getButton_Search().setEnabled(false);
     }
 

@@ -1,9 +1,12 @@
 package com.air.nc5dev.vo;
 
 import cn.hutool.core.util.StrUtil;
+import com.air.nc5dev.util.ExceptionUtil;
+import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.V;
 import com.air.nc5dev.util.XmlUtil;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.google.common.collect.Maps;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -15,9 +18,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -44,13 +55,13 @@ public class ItemsItemVO {
     public String sql;
     public String schema;
 
-    public static List<ItemsItemVO> read(File xml, Project project, Module module) {
-        List<ItemsItemVO> vs = read0(xml, project, module);
+    public static List<ItemsItemVO> read(Connection connection, File xml, Project project, Module module) {
+        List<ItemsItemVO> vs = read0(connection, xml, project, module);
         // vs.addAll(read0(new File(xml.getParentFile(), "items_idea.xml"), project, module));
         return vs;
     }
 
-    private static List<ItemsItemVO> read0(File xml, Project project, Module module) {
+    private static List<ItemsItemVO> read0(Connection connection, File xml, Project project, Module module) {
         if (!xml.isFile()) {
             return new ArrayList<>();
         }
@@ -75,29 +86,86 @@ public class ItemsItemVO {
         }
 
         //读取自定义变量
+        Map<String, String> varNodeMap = new HashMap<>();
+        Map<String, Element> varSqlNodeMap = new HashMap<>();
+
         NodeList varsList = doc.getElementsByTagName("vars");
         if (varsList != null && varsList.getLength() > 0) {
             for (int i = 0; i < varsList.getLength(); i++) {
                 Node varsNode = varsList.item(i);
                 NodeList varList = ((Element) varsNode).getElementsByTagName("var");
-                if (varList == null || varList.getLength() < 1) {
-                    continue;
+                if (varList != null && varList.getLength() > 0) {
+                    for (int y = 0; y < varList.getLength(); y++) {
+                        Element node = (Element) varList.item(y);
+                        if (StringUtil.isBlank(node.getAttribute("name"))) {
+                            continue;
+                        }
+                        varNodeMap.put(node.getAttribute("name"), node.getTextContent());
+                    }
                 }
 
-                for (int y = 0; y < varList.getLength(); y++) {
-                    Element varNode = (Element) varList.item(y);
-                    if (StringUtil.isBlank(varNode.getAttribute("name"))) {
-                        continue;
+                NodeList varSqlList = ((Element) varsNode).getElementsByTagName("var");
+                if (varSqlList != null && varSqlList.getLength() > 0) {
+                    for (int y = 0; y < varSqlList.getLength(); y++) {
+                        Element node = (Element) varSqlList.item(y);
+                        if (StringUtil.isBlank(node.getAttribute("name"))) {
+                            continue;
+                        }
+                        varSqlNodeMap.put(node.getAttribute("name"), node);
                     }
-
-                    vars.put(varNode.getAttribute("name"), varNode.getTextContent());
                 }
             }
         }
 
-        //var可能本身也有变量
         HashMap<String, String> varsFinal = Maps.newHashMap();
         Set<String> keys = vars.keySet();
+
+        //执行varSql公式
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.createStatement();
+
+            for (String key : varSqlNodeMap.keySet()) {
+                Element sqlele = varSqlNodeMap.get(key);
+                String sql = sqlele.getTextContent();
+                for (String key2 : keys) {
+                    sql = StrUtil.replace(sql, "{" + key2 + "}", vars.get(key2));
+                }
+
+                try {
+                    rs = st.executeQuery(sql);
+                    ArrayList<String> vs = new ArrayList<>();
+                    while (rs.next()) {
+                        String v = StringUtil.of(rs.getObject(1));
+                        vs.add(v);
+                    }
+
+                    StringBuilder fv = new StringBuilder(1000);
+                    String join = sqlele.getAttribute("join");
+                    String itemwarp = sqlele.getAttribute("itemwarp");
+                    boolean first = true;
+                    for (String v : vs) {
+                        if (!first) {
+                           fv.append(join);
+                        }
+                        fv.append(itemwarp).append(v).append(itemwarp);
+                        first = false;
+                    }
+
+                    vars.put(key, fv.toString());
+                    varsFinal.put(key, fv.toString());
+                } finally {
+                    IoUtil.close(rs);
+                }
+            }
+        } catch (SQLException e) {
+            LogUtil.error("解析varsql标签错误", e);
+        } finally {
+            IoUtil.close(st);
+        }
+
+        //执行剩余var标签
         for (String key : keys) {
             String t = vars.get(key);
             for (String key2 : keys) {

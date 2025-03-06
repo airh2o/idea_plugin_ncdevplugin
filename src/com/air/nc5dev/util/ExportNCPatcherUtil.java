@@ -480,8 +480,10 @@ public class ExportNCPatcherUtil {
 
                         contentVO.indicator.setText("IDEA根据xml配置导出sql:" + f.getPath());
 
-                        List<ItemsItemVO> vs = ItemsItemVO.read(f, contentVO.getProject(),
-                                contentVO.moduleHomeDir2ModuleMap.get(modulePath));
+                        List<ItemsItemVO> vs = ItemsItemVO.read(con
+                                , f
+                                , contentVO.getProject()
+                                , contentVO.moduleHomeDir2ModuleMap.get(modulePath));
                         if (com.air.nc5dev.util.CollUtil.isNotEmpty(vs)) {
                             if (txt.length() > 0) {
                                 txt.delete(0, txt.length());

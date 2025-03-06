@@ -476,7 +476,12 @@ public class SearchFullDataBaseDialog extends DialogWrapper {
                     if (checkBox_async.isSelected()) {
                         taskFather.start();
                     } else {
-                        taskFather.syncRun();
+                        try {
+                            taskFather.syncRun();
+                        } finally {
+                            button_Search.setText("开始搜索");
+                            button_Search.setEnabled(true);
+                        }
                     }
                 } catch (Exception e) {
                     taskFather.stopAll();
