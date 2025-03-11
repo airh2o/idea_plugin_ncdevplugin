@@ -2,6 +2,7 @@ package com.air.nc5dev.acion.meta;
 
 import com.air.nc5dev.acion.base.AbstractIdeaAction;
 import com.air.nc5dev.ui.MakeBmfDialog;
+import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.module.Module;
@@ -25,7 +26,7 @@ public abstract class AbstractMakeBmfAction extends AbstractIdeaAction {
 
         if (module != null) {
             moduleName = module.getName();
-            path = new File(module.getModuleFile().getParent().getPath(), "METADATA");
+            path = new File(IdeaProjectGenerateUtil.getModuleBaseDir(module), "METADATA");
         } else {
             moduleName = project.getName();
             path = new File(project.getBasePath(), "METADATA");

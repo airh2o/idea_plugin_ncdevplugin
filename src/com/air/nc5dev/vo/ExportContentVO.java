@@ -220,7 +220,7 @@ public class ExportContentVO {
 
         Module[] ms = IdeaProjectGenerateUtil.getProjectModules(project);
         HashMap<String, Module> path2ModuleMap = Arrays.stream(ms).collect(Collectors.toMap(
-                o -> o.getModuleFile().getParent().getPath()
+                o -> IdeaProjectGenerateUtil.getModuleBaseDir(o)
                 , o -> o
                 , (o1, o2) -> o2
                 , HashMap::new
@@ -253,7 +253,7 @@ public class ExportContentVO {
         HashMap<String, Module> path2ModuleMap = Arrays.stream(ms)
                 .filter(m -> m.getModuleFile() != null)
                 .collect(Collectors.toMap(
-                        o -> o.getModuleFile().getParent().getPath()
+                        o -> IdeaProjectGenerateUtil.getModuleBaseDir(o)
                         , o -> o
                         , (o1, o2) -> o2
                         , HashMap::new

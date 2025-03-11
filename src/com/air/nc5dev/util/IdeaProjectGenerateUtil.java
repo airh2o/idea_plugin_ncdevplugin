@@ -814,6 +814,34 @@ public class IdeaProjectGenerateUtil {
         return modules;
     }
 
+    public static String getModuleBaseDir(Module module) {
+        if (module == null) {
+            return null;
+        }
+
+        String path = module.getModuleFile().getParent().getPath();
+        String projectPath = module.getProject().getBasePath();
+
+        path = StrUtil.replace(path, "\\", File.separator);
+        path = StrUtil.replace(path, "/", File.separator);
+
+        projectPath = StrUtil.replace(projectPath, "\\", File.separator);
+        projectPath = StrUtil.replace(projectPath, "/", File.separator);
+
+        if (!path.endsWith(File.separator)) {
+            path += File.separator;
+        }
+        if (!projectPath.endsWith(File.separator)) {
+            projectPath += File.separator;
+        }
+
+        if ((projectPath + ".idea" + File.separator).equals(path)) {
+            return module.getProject().getBasePath();
+        }
+
+        return module.getModuleFile().getParent().getPath();
+    }
+
     private static void searchJavas(String ncType
             , ExportContentVO contentVO
             , ModuleWarpVO moduleWarpVO

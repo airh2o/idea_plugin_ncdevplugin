@@ -184,7 +184,7 @@ public abstract class AbstractContentSearchImpl implements IFileContentSearch {
                 out = out + File.separatorChar;
             }
 
-            modulePath = module.getModule().getModuleFile().getParent().getPath();
+            modulePath = IdeaProjectGenerateUtil.getModuleBaseDir(module.getModule());
             modulePath = StringUtil.replaceChars(modulePath, "/", File.separator);
             modulePath = StringUtil.replaceChars(modulePath, "\\", File.separator);
         }

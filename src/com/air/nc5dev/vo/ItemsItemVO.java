@@ -104,7 +104,7 @@ public class ItemsItemVO {
                     }
                 }
 
-                NodeList varSqlList = ((Element) varsNode).getElementsByTagName("var");
+                NodeList varSqlList = ((Element) varsNode).getElementsByTagName("varBySql");
                 if (varSqlList != null && varSqlList.getLength() > 0) {
                     for (int y = 0; y < varSqlList.getLength(); y++) {
                         Element node = (Element) varSqlList.item(y);
@@ -117,8 +117,22 @@ public class ItemsItemVO {
             }
         }
 
-        HashMap<String, String> varsFinal = Maps.newHashMap();
+        //读取自定义变量
+        for (String key : varNodeMap.keySet()) {
+            vars.put(key, varNodeMap.get(key));
+        }
+
+        //var可能本身也有变量
         Set<String> keys = vars.keySet();
+        for (String key : keys) {
+            String t = vars.get(key);
+            for (String key2 : keys) {
+                t = StrUtil.replace(t, "{" + key2 + "}", vars.get(key2));
+            }
+            vars.put(key, t);
+        }
+
+        HashMap<String, String> varsFinal = Maps.newHashMap();
 
         //执行varSql公式
         Statement st = null;
@@ -147,7 +161,7 @@ public class ItemsItemVO {
                     boolean first = true;
                     for (String v : vs) {
                         if (!first) {
-                           fv.append(join);
+                            fv.append(join);
                         }
                         fv.append(itemwarp).append(v).append(itemwarp);
                         first = false;
@@ -165,7 +179,7 @@ public class ItemsItemVO {
             IoUtil.close(st);
         }
 
-        //执行剩余var标签
+        //再次执行var标签，防止他用到了 varsql
         for (String key : keys) {
             String t = vars.get(key);
             for (String key2 : keys) {
@@ -174,7 +188,7 @@ public class ItemsItemVO {
             varsFinal.put(key, t);
         }
 
-        vars = varsFinal;
+        vars = null;
 
         //
         NodeList is = doc.getElementsByTagName("item");
@@ -200,15 +214,15 @@ public class ItemsItemVO {
 
             //处理变量填充
             for (String key : keys) {
-                e.setItemKey(StrUtil.replace(e.getItemKey(), "{" + key + "}", vars.get(key)));
-                e.setItemName(StrUtil.replace(e.getItemName(), "{" + key + "}", vars.get(key)));
-                e.setItemRule(StrUtil.replace(e.getItemRule(), "{" + key + "}", vars.get(key)));
-                e.setSysField(StrUtil.replace(e.getSysField(), "{" + key + "}", vars.get(key)));
-                e.setCorpField(StrUtil.replace(e.getCorpField(), "{" + key + "}", vars.get(key)));
-                e.setGrpField(StrUtil.replace(e.getGrpField(), "{" + key + "}", vars.get(key)));
-                e.setFixedWhere(StrUtil.replace(e.getFixedWhere(), "{" + key + "}", vars.get(key)));
-                e.setSql(StrUtil.replace(e.getSql(), "{" + key + "}", vars.get(key)));
-                e.setSchema(StrUtil.replace(e.getSchema(), "{" + key + "}", vars.get(key)));
+                e.setItemKey(StrUtil.replace(e.getItemKey(), "{" + key + "}", varsFinal.get(key)));
+                e.setItemName(StrUtil.replace(e.getItemName(), "{" + key + "}", varsFinal.get(key)));
+                e.setItemRule(StrUtil.replace(e.getItemRule(), "{" + key + "}", varsFinal.get(key)));
+                e.setSysField(StrUtil.replace(e.getSysField(), "{" + key + "}", varsFinal.get(key)));
+                e.setCorpField(StrUtil.replace(e.getCorpField(), "{" + key + "}", varsFinal.get(key)));
+                e.setGrpField(StrUtil.replace(e.getGrpField(), "{" + key + "}", varsFinal.get(key)));
+                e.setFixedWhere(StrUtil.replace(e.getFixedWhere(), "{" + key + "}", varsFinal.get(key)));
+                e.setSql(StrUtil.replace(e.getSql(), "{" + key + "}", varsFinal.get(key)));
+                e.setSchema(StrUtil.replace(e.getSchema(), "{" + key + "}", varsFinal.get(key)));
             }
 
             vs.add(e);

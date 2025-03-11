@@ -743,8 +743,8 @@ public class PatcherDialog extends DialogWrapper {
         for (Module module : modules) {
             c.getModuleDirPath2ModuleMap().put(module.getName(), module);
             Vector v = new Vector();
-            ExportConfigVO exportConfigVO =
-                    ExportNCPatcherUtil.loadExportConfig(module.getModuleFile().getParent().getPath(), module);
+            String path = IdeaProjectGenerateUtil.getModuleBaseDir(module);
+            ExportConfigVO exportConfigVO = ExportNCPatcherUtil.loadExportConfig(path, module);
             if (exportConfigVO != null) {
                 v.add(!exportConfigVO.ignoreModule);
             } else {
@@ -764,7 +764,7 @@ public class PatcherDialog extends DialogWrapper {
                 v.add(false);
             }
 
-            v.add(module.getModuleFile().getParent().getPath());
+            v.add(path);
             rows.add(v);
         }
 
