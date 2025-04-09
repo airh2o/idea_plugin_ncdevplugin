@@ -6,6 +6,7 @@ import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.ncutils.AESEncode;
 import com.air.nc5dev.util.ncutils.NC5xEncode;
+import com.air.nc5dev.util.ncutils.NC6xEncode;
 import lombok.Data;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -45,9 +46,11 @@ public class NCDataSourceVO {
     private String conInUse;
     private String conIdle;
     private String isBase;
+    String ncHome;
 
-    public NCDataSourceVO(Element e, Element root) {
+    public NCDataSourceVO(String ncHome, Element e, Element root) {
         this.element = e;
+        this.ncHome = ncHome;
         read(this.element, root);
     }
 
@@ -57,8 +60,9 @@ public class NCDataSourceVO {
         databaseUrl = getSonElementTextContent(element, "databaseUrl", 0);
         user = getSonElementTextContent(element, "user", 0);
         password = getSonElementTextContent(element, "password", 0);
+        String passwordOrg = getSonElementTextContent(element, "password", 0);
         passwordOrgin = password;
-        password = new NC5xEncode().decode(password);
+        password = new NC5xEncode().decode(passwordOrg);
         if (NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion())) {
             if (root.getElementsByTagName("isEncode").getLength() > 0) {
                 String isEncode = root.getElementsByTagName("isEncode").item(0).getTextContent();
@@ -71,6 +75,20 @@ public class NCDataSourceVO {
             }
 
         }
+
+        if (password == null) {
+            //BIP 其他加密算法？
+            if (passwordOrg.substring(0, 1).equals("#")) {
+                passwordOrg = passwordOrg.substring(1);
+            }
+
+            password = new NC6xEncode().setNcHome(ncHome).decode(passwordOrg);
+        }
+
+        if (password == null) {
+            password = "无法解密 暂不支持";
+        }
+
         driverClassName = getSonElementTextContent(element, "driverClassName", 0);
         databaseType = getSonElementTextContent(element, "databaseType", 0);
         maxCon = getSonElementTextContent(element, "maxCon", 0);

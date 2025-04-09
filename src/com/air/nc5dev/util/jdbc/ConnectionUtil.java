@@ -61,6 +61,10 @@ public class ConnectionUtil {
             Class.forName(ds.getDriverClassName());
         }
 
+        if (ds.getDatabaseUrl().toLowerCase().contains("jdbc:oracle:")) {
+            Class.forName("oracle.jdbc.OracleDriver");
+        }
+
         try {
             return DriverManager.getConnection(ds.getDatabaseUrl().trim(), ds.getUser(), ds.getPassword());
         } catch (Throwable e) {

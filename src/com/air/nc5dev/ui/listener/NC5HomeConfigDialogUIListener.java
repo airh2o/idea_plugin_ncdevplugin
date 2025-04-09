@@ -63,6 +63,15 @@ public class NC5HomeConfigDialogUIListener {
         String password = ui.textField_pass.getText();
         String className = ds.getDriverClassName();
         String url = ui.textField_ip.getText();
+
+        if (ds.getDatabaseUrl().toLowerCase().contains("jdbc:oracle:")) {
+            try {
+                Class.forName("oracle.jdbc.OracleDriver");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
         try {
             if (StringUtils.isNotBlank(className)) {
                 Class.forName(className);

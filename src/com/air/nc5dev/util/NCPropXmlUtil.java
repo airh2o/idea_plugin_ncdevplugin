@@ -194,7 +194,7 @@ public class NCPropXmlUtil {
         Element element;
         for (int i = 0; i < dataSources.getLength(); i++) {
             element = (Element) dataSources.item(i);
-            dataSourceVOS.add(new NCDataSourceVO(element, root));
+            dataSourceVOS.add(new NCDataSourceVO(ncHome, element, root));
         }
     }
 
