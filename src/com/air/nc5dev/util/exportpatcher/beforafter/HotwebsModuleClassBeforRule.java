@@ -57,6 +57,25 @@ public class HotwebsModuleClassBeforRule extends AbstarctBeforRule {
     ) {
         File hotwebs = new File(new File(contentVO.outPath).getParent(), "hotwebs");
 
+        //判断是否是 ncc前端接口配置文件
+        if (AbstractContentSearchImpl.NC_TYPE_CLIENT.equals(fileContentVO.getName())) {
+            String file = StrUtil.nullToDefault(fileContentVO.getFile(), "");
+            file = StrUtil.replace(file, "/", File.separator);
+            file = StrUtil.replace(file, "\\", File.separator);
+            if (StrUtil.contains(file, File.separator + "yyconfig" + File.separator)) {
+                //yyconfig 文件夹！！！！ 特殊处理
+                file = hotwebs.getPath()
+                        + File.separatorChar + configVO.getModuleHotwebsName()
+                        + File.separatorChar + "WEB-INF"
+                        + File.separatorChar + "extend"
+                        + StrUtil.subSuf(file, file.indexOf(File.separator + "yyconfig" + File.separator))
+                ;
+                fileContentVO.setFileTo(file);
+
+                return;
+            }
+        }
+
         if (StringUtil.isAllNotBlank(fileContentVO.getFile(), fileContentVO.getFileTo())) {
             fileContentVO.setFileTo(hotwebs.getPath()
                     + File.separatorChar + configVO.getModuleHotwebsName()

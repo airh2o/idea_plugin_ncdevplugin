@@ -807,10 +807,25 @@ public class IdeaProjectGenerateUtil {
 
     public static Module[] getProjectModules(Project project) {
         if (project == null) {
+            LogUtil.infoAndHide("项目为空，无法获取到模块！！！！");
             return null;
         }
 
-        Module[] modules = ModuleManager.getInstance(project).getModules();
+        Module[] modules = null;
+
+        try {
+            modules = ModuleManager.getInstance(project).getSortedModules();
+
+            if (CollUtil.isEmpty(modules)) {
+                LogUtil.infoAndHide("项目无法获取到模块！！！！" + project.getBasePath());
+            }
+        } catch (Throwable e) {
+            modules = ModuleManager.getInstance(project).getModules();
+            if (CollUtil.isEmpty(modules)) {
+                LogUtil.infoAndHide("项目无法获取到模块2！！！！" + project.getBasePath());
+            }
+        }
+
         return modules;
     }
 
