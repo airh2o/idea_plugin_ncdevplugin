@@ -152,6 +152,7 @@ public class PatcherDialog extends DialogWrapper {
     JTextField textField_ygj_provider;
     JBCheckBox checkBox_ygj_deploy;
     JBCheckBox checkBox_ygj_appleyjar;
+    JButton button_reloadModules;
 
     public PatcherDialog(AnActionEvent event) {
         super(event.getProject());
@@ -165,6 +166,19 @@ public class PatcherDialog extends DialogWrapper {
                 )*/
         );
         setOKButtonText("执行导出");
+    }
+
+    @Override
+    public boolean showAndGet() {
+        //设置点默认值
+        try {
+            initDefualtValues();
+        } catch (Throwable iae) {
+            iae.printStackTrace();
+            LogUtil.error(iae.toString(), iae);
+        }
+
+        return super.showAndGet();
     }
 
     @Nullable
@@ -595,6 +609,10 @@ public class PatcherDialog extends DialogWrapper {
             label_9 = new JBLabel("要导出的模块:");
             label_9.setBounds(x, y = y + selectTableScrollPane.getHeight() + 5, 280, height);
             jgp.add(label_9);
+            button_reloadModules = new JButton("重新加载模块列表(如果空 点击这个，否则导出补丁会空白)");
+            button_reloadModules.setBounds(label_9.getX() + label_9.getWidth() + 10, label_9.getY(), 400, height);
+            button_reloadModules.addActionListener(this::onButton_reloadModules);
+            jgp.add(button_reloadModules);
             heads = new Vector();
             heads.add("导出");
             heads.add("模块名");
@@ -703,16 +721,16 @@ public class PatcherDialog extends DialogWrapper {
             tab.add(checkBox_ygj_appleyjar);
         }
 
-
-        //设置点默认值
-        try {
-            initDefualtValues();
-        } catch (Throwable iae) {
-            iae.printStackTrace();
-            LogUtil.error(iae.toString(), iae);
-        }
-
         // jp.setPreferredSize(new Dimension(width + 40, y + 10));
+    }
+
+    private void onButton_reloadModules(ActionEvent actionEvent) {
+        ExportContentVO c = ExportNCPatcherUtil.readConfig(event.getProject());
+        if (c == null) {
+            LogUtil.infoAndHide("没有读取到导出配置文件:" + event.getProject().getBasePath());
+            return;
+        }
+        loadModulesSet2UI(c);
     }
 
     public void initDefualtValues() {
@@ -731,9 +749,24 @@ public class PatcherDialog extends DialogWrapper {
 
         ExportContentVO c = ExportNCPatcherUtil.readConfig(event.getProject());
         if (c == null) {
+            LogUtil.infoAndHide("没有读取到导出配置文件:" + event.getProject().getBasePath());
             return;
         }
 
+        loadModulesSet2UI(c);
+
+        set2UI(c);
+
+        textField_ygj_version.setText("1");
+        textField_ygj_id.setText(UUID.randomUUID().toString());
+        textField_ygj_no.setText(UUID.randomUUID().toString());
+        textField_ygj_applyVersion.setText("5.0,5.01,5.011,5.02,5.3,5.5,5.6,5.7,5.75,6.0,6.1,6.3");
+        textField_ygj_department.setText("air QQ 209308343, 微信: yongyourj");
+        textField_ygj_provider.setText("QQ 209308343, 微信: yongyourj");
+        checkBox_ygj_deploy.setSelected(true);
+    }
+
+    private void loadModulesSet2UI(ExportContentVO c) {
         Module[] modules = IdeaProjectGenerateUtil.getProjectModules(event.getProject());
         while (selectModuleTableTableModel.getRowCount() > 0) {
             selectModuleTableTableModel.removeRow(0);
@@ -783,16 +816,6 @@ public class PatcherDialog extends DialogWrapper {
         }
 
         fitTableColumns(selectModuleTable);
-
-        set2UI(c);
-
-        textField_ygj_version.setText("1");
-        textField_ygj_id.setText(UUID.randomUUID().toString());
-        textField_ygj_no.setText(UUID.randomUUID().toString());
-        textField_ygj_applyVersion.setText("5.0,5.01,5.011,5.02,5.3,5.5,5.6,5.7,5.75,6.0,6.1,6.3");
-        textField_ygj_department.setText("air QQ 209308343, 微信: yongyourj");
-        textField_ygj_provider.setText("QQ 209308343, 微信: yongyourj");
-        checkBox_ygj_deploy.setSelected(true);
     }
 
     public void set2UI(ExportContentVO c) {

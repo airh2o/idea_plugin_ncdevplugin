@@ -91,12 +91,16 @@ public class ExportNCPatcherUtil {
             String str = FileUtil.readUtf8String(new File(new File(pro.getBasePath(), ".idea")
                     , "ExportContentVO.json"));
             if (StrUtil.isBlank(str)) {
-                return null;
+                ExportContentVO c = new ExportContentVO();
+                saveConfig(pro, c);
+                return c;
             }
             return JSON.parseObject(str, ExportContentVO.class);
         } catch (Throwable e) {
             e.printStackTrace();
-            return null;
+            ExportContentVO c = new ExportContentVO();
+            saveConfig(pro, c);
+            return c;
         }
     }
 
