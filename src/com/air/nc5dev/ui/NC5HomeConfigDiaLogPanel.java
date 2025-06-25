@@ -31,6 +31,7 @@ public class NC5HomeConfigDiaLogPanel extends JScrollPane {
     public JTextField textField_clientip;
     public JTextField textField_cientport;
     public JButton button_testdb;
+    public JButton button_tempInputPass;
     public JButton button_choseDir;
     public JButton button_adddesign;
     public JButton button_yes;
@@ -79,8 +80,11 @@ public class NC5HomeConfigDiaLogPanel extends JScrollPane {
         contentPanel.add(comboBox_dbtype);
 
         button_testdb = new JButton("测试链接");
-        button_testdb.setBounds(300, 112, 120, 42);
+        button_testdb.setBounds(300, 140, 120, 42);
         contentPanel.add(button_testdb);
+        button_tempInputPass = new JButton("手工临时录入这个数据源的密码(不会保存!针对无法解密密码情况)");
+        button_tempInputPass.setBounds(300, 70, 400, 35);
+        contentPanel.add(button_tempInputPass);
 
         JLabel l34 = new JLabel("指定NC版本:");
         l34.setBounds(450, 100, 80, 42);
@@ -235,7 +239,7 @@ public class NC5HomeConfigDiaLogPanel extends JScrollPane {
         textField_ip.setEditable(false);
         textField_minConCout.setEditable(false);
         textField_user.setEditable(false);
-        textField_pass.setEditable(false);
+       // textField_pass.setEditable(false);
         textField_oidmark.setEditable(false);
         textField_sid.setEditable(false);
         button_adddesign.setVisible(false);

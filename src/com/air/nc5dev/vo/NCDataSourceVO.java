@@ -1,12 +1,7 @@
 package com.air.nc5dev.vo;
 
-import com.air.nc5dev.enums.NcVersionEnum;
 import com.air.nc5dev.ui.compoment.SimpleListColumn;
-import com.air.nc5dev.util.ProjectNCConfigUtil;
-import com.air.nc5dev.util.StringUtil;
-import com.air.nc5dev.util.ncutils.AESEncode;
-import com.air.nc5dev.util.ncutils.NC5xEncode;
-import com.air.nc5dev.util.ncutils.NC6xEncode;
+import com.air.nc5dev.util.NCPassWordUtil;
 import lombok.Data;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -62,33 +57,11 @@ public class NCDataSourceVO {
         password = getSonElementTextContent(element, "password", 0);
         String passwordOrg = getSonElementTextContent(element, "password", 0);
         passwordOrgin = password;
-        password = new NC5xEncode().decode(passwordOrg);
-        if (NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion())) {
-            if (root.getElementsByTagName("isEncode").getLength() > 0) {
-                String isEncode = root.getElementsByTagName("isEncode").item(0).getTextContent();
-                if ("true".equalsIgnoreCase(StringUtil.trim(isEncode))) {
-                    password = AESEncode.decrypt(passwordOrgin);
-                    if (password.equals("ufnull")) {
-                        password = "";
-                    }
-                }
-            }
-
+        String isEncode = null;
+        if (root.getElementsByTagName("isEncode").getLength() > 0) {
+            isEncode = root.getElementsByTagName("isEncode").item(0).getTextContent();
         }
-
-        if (password == null) {
-            //BIP 其他加密算法？
-            if (passwordOrg.substring(0, 1).equals("#")) {
-                passwordOrg = passwordOrg.substring(1);
-            }
-
-            password = new NC6xEncode().setNcHome(ncHome).decode(passwordOrg);
-        }
-
-        if (password == null) {
-            password = "无法解密 暂不支持";
-        }
-
+        password = NCPassWordUtil.decode(dataSourceName, null, passwordOrgin, isEncode);
         driverClassName = getSonElementTextContent(element, "driverClassName", 0);
         databaseType = getSonElementTextContent(element, "databaseType", 0);
         maxCon = getSonElementTextContent(element, "maxCon", 0);

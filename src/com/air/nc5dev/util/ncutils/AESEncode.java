@@ -32,12 +32,25 @@ public class AESEncode {
     }
 
     public static String decrypt(String data) {
+        String re = null;
         if (data.substring(0, 1).equals("#")) {
             data = data.substring(1);
-            return aesDecode(data);
+            try {
+                re = aesDecode(data);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                re = (new Encode()).decode(data);
+            }
         } else {
-            return (new Encode()).decode(data);
+            try {
+                re = (new Encode()).decode(data);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                re = aesDecode(data);
+            }
         }
+
+        return re;
     }
 
     public static String aesEncode(String text) {
@@ -46,7 +59,7 @@ public class AESEncode {
         Security.addProvider(new BouncyCastleProvider());
 
         try {
-            CryptoCipher encipher =  Utils.getCipherInstance(transform, properties);
+            CryptoCipher encipher = Utils.getCipherInstance(transform, properties);
             Throwable var8 = null;
 
             try {
@@ -102,8 +115,7 @@ public class AESEncode {
         try {
             CryptoCipher decipher = // Utils.getCipherInstance("AES/CBC/PKCS5Padding", properties)
                     ReflectionUtils.newInstance(Class.forName("org.apache.commons.crypto.cipher.OpenSslCipher").asSubclass
-                            (CryptoCipher.class), properties, transform)
-                    ;
+                            (CryptoCipher.class), properties, transform);
             Throwable var6 = null;
 
             try {
@@ -150,7 +162,7 @@ public class AESEncode {
     public static String parseByte2HexStr(byte[] buf) {
         StringBuilder sb = new StringBuilder();
 
-        for(int i = 0; i < buf.length; ++i) {
+        for (int i = 0; i < buf.length; ++i) {
             String hex = Integer.toHexString(buf[i] & 255);
             if (hex.length() == 1) {
                 hex = '0' + hex;
@@ -168,10 +180,10 @@ public class AESEncode {
         } else {
             byte[] result = new byte[hexStr.length() / 2];
 
-            for(int i = 0; i < hexStr.length() / 2; ++i) {
+            for (int i = 0; i < hexStr.length() / 2; ++i) {
                 int high = Integer.parseInt(hexStr.substring(i * 2, i * 2 + 1), 16);
                 int low = Integer.parseInt(hexStr.substring(i * 2 + 1, i * 2 + 2), 16);
-                result[i] = (byte)(high * 16 + low);
+                result[i] = (byte) (high * 16 + low);
             }
 
             return result;
@@ -237,7 +249,7 @@ public class AESEncode {
 
         try {
             outputStream = new FileOutputStream(propFile);
-            properties.store(outputStream, (String)null);
+            properties.store(outputStream, (String) null);
             KEY = secret_key;
         } catch (Exception var14) {
         } finally {

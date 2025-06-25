@@ -160,10 +160,12 @@ public class RestNcUserPassWordDialog
                         return;
                     }
 
-                    String str = vo.getName() + " |  " + NCPassWordUtil.decode(vo.getPass());
+                    String str = vo.getName() + " |  " + NCPassWordUtil.decode(NcUserVo.class.getName()
+                            , event.getProject(), vo.getPass(), null);
                     CopyPasteManager.getInstance().setContents(new SimpleTransferable(str, DataFlavor.stringFlavor));
                     LogUtil.info("复制用户列表元素: " + JSON.toJSONString(vo)
-                            + " , 明文密码可能是: " + NCPassWordUtil.decode(vo.getPass()));
+                            + " , 明文密码可能是: " + NCPassWordUtil.decode(NcUserVo.class.getName(),
+                            event.getProject(), vo.getPass(), null));
                 }
             }
         });

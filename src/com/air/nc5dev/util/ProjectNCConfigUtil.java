@@ -444,7 +444,7 @@ public class ProjectNCConfigUtil {
      */
     public static final void setNCConfigPropertice(Project project, @NotNull String key, String value) {
         if (project == null) {
-            return ;
+            return;
         }
 
         if (!isInited(project)) {
@@ -508,33 +508,33 @@ public class ProjectNCConfigUtil {
 
 
     /*****    NC 依赖库： NC ant jars         ****/
-    public static final String LIB_Ant_Library = "NC_LIBS/Ant_Library";
+    public static final String LIB_Ant_Library = "NC/Ant_Library";
     /*****    NC 依赖库： NC公共LIB         ****/
-    public static final String LIB_Product_Common_Library = "NC_LIBS/Product_Common_Library";
+    public static final String LIB_Product_Common_Library = "NC/Product_Common_Library";
     /*****    NC 依赖库： NC Middleware_Library  ****/
-    public static final String LIB_Middleware_Library = "NC_LIBS/Middleware_Library";
+    public static final String LIB_Middleware_Library = "NC/Middleware_Library";
     /*****    NC 依赖库： NC Framework_Library  ****/
-    public static final String LIB_Framework_Library = "NC_LIBS/Framework_Library";
+    public static final String LIB_Framework_Library = "NC/Framework_Library";
     /*****    NC 依赖库： NC模块  Module_Public_Library     ****/
-    public static final String LIB_NC_Module_Public_Library = "NC_LIBS/Module_Public_Library";
+    public static final String LIB_NC_Module_Public_Library = "NC/Module_Public_Library";
     /*****    NC 依赖库： NC模块  Module_Public_Hyext_Library     ****/
-    public static final String LIB_NC_Module_Public_Hyext_Library = "NC_LIBS/Module_Public_Hyext_Library";
+    public static final String LIB_NC_Module_Public_Hyext_Library = "NC/Module_Public_Hyext_Library";
     /*****    NC 依赖库： NC模块  Module_Client_Library     ****/
-    public static final String LIB_Module_Client_Library = "NC_LIBS/Module_Client_Library";
+    public static final String LIB_Module_Client_Library = "NC/Module_Client_Library";
     /*****    NC 依赖库： NC模块  Module_Client_Hyext_Library     ****/
-    public static final String LIB_Module_Client_Hyext_Library = "NC_LIBS/Module_Client_Hyext_Library";
+    public static final String LIB_Module_Client_Hyext_Library = "NC/Module_Client_Hyext_Library";
     /*****    NC 依赖库： NC模块  Module_Private_Library     ****/
-    public static final String LIB_Module_Private_Library = "NC_LIBS/Module_Private_Library";
+    public static final String LIB_Module_Private_Library = "NC/Module_Private_Library";
     /*****    NC 依赖库： NC模块  Module_Private_Hyext_Library     ****/
-    public static final String LIB_Module_Private_Hyext_Library = "NC_LIBS/Module_Private_Hyext_Library";
+    public static final String LIB_Module_Private_Hyext_Library = "NC/Module_Private_Hyext_Library";
     /*****    NC 依赖库： NC模块  Module_Private_Extra_Library     ****/
-    public static final String LIB_Module_Private_Extra_Library = "NC_LIBS/Module_Private_Extra_Library";
+    public static final String LIB_Module_Private_Extra_Library = "NC/Module_Private_Extra_Library";
     /*****    NC 依赖库： NC模块  Module_Lang_Library     ****/
-    public static final String LIB_Module_Lang_Library = "NC_LIBS/Module_Lang_Library";
+    public static final String LIB_Module_Lang_Library = "NC/Module_Lang_Library";
     /*****    NC 依赖库： NC模块  Generated_EJB     ****/
-    public static final String LIB_Generated_EJB = "NC_LIBS/Generated_EJB";
+    public static final String LIB_Generated_EJB = "NC/Generated_EJB";
     /*****    NC 依赖库： Resources     ****/
-    public static final String LIB_RESOURCES = "NC_LIBS/Resources";
+    public static final String LIB_RESOURCES = "NC/Resources";
 
     /*****    U8C 依赖库： 解决启用优先级         ****/
     public static final String U8C_RUN_FIRST_DEPEND = "U8C_RUN_FIRST_DEPEND/Run_Library";
@@ -679,4 +679,24 @@ public class ProjectNCConfigUtil {
         }
     }
 
+    public static boolean isHyVersion(Project project) {
+        // 读取配置文件
+        File f = new File(getNCHome(project), "ierp"
+                + File.separatorChar + "bin"
+                + File.separatorChar + "industry_config.xml"
+        );
+        if (!f.isFile()) {
+            return false;
+        }
+        try {
+            // 解析配置文件
+            Document document = XmlUtil.xmlFile2Document2(f);
+            // 产品编码
+            String industryCode = document.getDocumentElement().getElementsByTagName("entry").item(0).getTextContent();
+            // 非0，为行业版
+            return !"0".equals(industryCode);
+        } catch (Throwable e) {
+            return true;
+        }
+    }
 }

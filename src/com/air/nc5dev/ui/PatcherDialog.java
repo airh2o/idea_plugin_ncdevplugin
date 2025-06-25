@@ -828,12 +828,15 @@ public class PatcherDialog extends DialogWrapper {
             textField_saveName.setText(s + '_' + LocalDateTime.now().format(formatter));
         }
 
-        this.textField_savePath.setText(ProjectUtil.getDefaultProject().getBasePath()
+        this.textField_savePath.setText(event.getProject().getBasePath()
                 + File.separatorChar + "patchers"
                 + File.separatorChar + textField_saveName.getText()
         );
 
         if (StringUtil.isNotBlank(c.hotwebsResourcePath)) {
+            if (!new File(c.hotwebsResourcePath).isDirectory()) {
+                c.setHotwebsResourcePath(new File(ProjectNCConfigUtil.getNCHome(event.getProject()), "hotwebs").getPath());
+            }
             textField_hotwebsProject.setText(c.hotwebsResourcePath);
         }
         filtersql.setSelected(c.filtersql);

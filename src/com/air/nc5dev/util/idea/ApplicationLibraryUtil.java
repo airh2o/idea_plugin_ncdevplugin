@@ -170,7 +170,7 @@ public class ApplicationLibraryUtil {
         List<File> hotwebs = getHotwebsModules(module.getProject());
         if (!hotwebs.isEmpty()) {
             for (File h : hotwebs) {
-                LibraryEx lb = (LibraryEx) model.getLibraryByName(StringUtil.format("NC_LIBS/hotwebs_%s"
+                LibraryEx lb = (LibraryEx) model.getLibraryByName(StringUtil.format("NC/hotwebs_%s"
                         , h.getName()));
                 if (lb == null) {
                     continue;

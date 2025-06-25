@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.io.File;
@@ -43,6 +44,7 @@ public class NC5HomeConfigDialogUIListener {
         }
         int selectedIndex = ui.comboBox_datasource.getSelectedIndex();
         NCDataSourceVO ds = NCPropXmlUtil.get(selectedIndex);
+        ds.setPassword(ui.getTextField_pass().getText());
 
         ConnectionUtil.initDataSourceClass(ds
                 , ui.getProject()
@@ -51,12 +53,26 @@ public class NC5HomeConfigDialogUIListener {
         testConnectDb(ds);
     }
 
+    private void OnTempInputPass(ActionEvent e) {
+        NCPropXmlUtil.loadConfFromFile(ProjectNCConfigUtil.getNCHomePath());
+        if (NCPropXmlUtil.isDataSourceEmpty()) {
+            return;
+        }
+        int selectedIndex = ui.comboBox_datasource.getSelectedIndex();
+        NCDataSourceVO ds = NCPropXmlUtil.get(selectedIndex);
+        ds.setPassword(JOptionPane.showInputDialog(ui, "请输入数据库密码，放心不会保存 不会写入nchome！单纯临时使用。"
+                , ui.getTextField_pass().getText()));
+        ui.getTextField_pass().setText(ds.getPassword());
+
+        NCPassWordUtil.TEMP_PASS.put(ProjectNCConfigUtil.getNCHomePath() + ":" + ds.getDataSourceName(), ds.getPassword());
+    }
+
     /**
      * 测试数据源链接
      *
      * @param ds
      */
-    private void testConnectDb(NCDataSourceVO ds) {
+    public void testConnectDb(NCDataSourceVO ds) {
         //final String ora11 = "ORACLE11G", ora10 = "ORACLE10G", sqlserver = "SQLSERVER2008", db297 = "DB297";
         Connection con;
         String user = ui.textField_user.getText();
@@ -314,6 +330,7 @@ public class NC5HomeConfigDialogUIListener {
      */
     private void initEventListeners() {
         ui.button_testdb.addActionListener(this::OnTestDb);
+        ui.button_tempInputPass.addActionListener(this::OnTempInputPass);
         ui.button_choseDir.addActionListener(this::OnChoseHomeDir);
         ui.button_adddesign.addActionListener(this::OnAddDesgin);
         ui.comboBox_datasource.addItemListener(this::onDataSourceSelectChange);

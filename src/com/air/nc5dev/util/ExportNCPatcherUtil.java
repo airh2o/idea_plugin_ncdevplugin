@@ -1,34 +1,32 @@
 package com.air.nc5dev.util;
 
-import b.k.F;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.MD5;
 import com.air.nc5dev.enums.NcVersionEnum;
-import com.air.nc5dev.util.exportpatcher.searchs.AbstractContentSearchImpl;
-import com.air.nc5dev.util.exportpatcher.searchs.ModuleJavaClientFileContentSearchImpl;
-import com.air.nc5dev.util.exportpatcher.searchs.ModuleJavaPrivateFileContentSearchImpl;
-import com.air.nc5dev.util.exportpatcher.searchs.ModuleJavaPublicFileContentSearchImpl;
-import com.air.nc5dev.util.exportpatcher.searchs.NccloudHotwebsResourcesFileContentSearchImpl;
-import com.air.nc5dev.vo.FileContentVO;
-import com.air.nc5dev.util.exportpatcher.output.IOutPutFile;
-import com.air.nc5dev.util.exportpatcher.output.SimpleCopyOutPutFileImpl;
 import com.air.nc5dev.util.exportpatcher.beforafter.AbstarctAfterRule;
 import com.air.nc5dev.util.exportpatcher.beforafter.AbstarctBeforRule;
 import com.air.nc5dev.util.exportpatcher.beforafter.EmptyAfterRule;
 import com.air.nc5dev.util.exportpatcher.beforafter.EmptyBeforRule;
 import com.air.nc5dev.util.exportpatcher.beforafter.HotwebsModuleClassBeforRule;
+import com.air.nc5dev.util.exportpatcher.output.IOutPutFile;
+import com.air.nc5dev.util.exportpatcher.output.SimpleCopyOutPutFileImpl;
+import com.air.nc5dev.util.exportpatcher.searchs.AbstractContentSearchImpl;
 import com.air.nc5dev.util.exportpatcher.searchs.BmfFileContentSearchImpl;
 import com.air.nc5dev.util.exportpatcher.searchs.IFileContentSearch;
-import com.air.nc5dev.util.exportpatcher.searchs.ModuleJavaFileContentSearchImpl;
+import com.air.nc5dev.util.exportpatcher.searchs.ModuleJavaClientFileContentSearchImpl;
+import com.air.nc5dev.util.exportpatcher.searchs.ModuleJavaPrivateFileContentSearchImpl;
+import com.air.nc5dev.util.exportpatcher.searchs.ModuleJavaPublicFileContentSearchImpl;
 import com.air.nc5dev.util.exportpatcher.searchs.ModuleLibFileContentSearchImpl;
 import com.air.nc5dev.util.exportpatcher.searchs.ModuleResourcesFileContentSearchImpl;
 import com.air.nc5dev.util.exportpatcher.searchs.ModuleUpmFileContentSearchImpl;
+import com.air.nc5dev.util.exportpatcher.searchs.NccloudHotwebsResourcesFileContentSearchImpl;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.vo.ExportConfigVO;
 import com.air.nc5dev.vo.ExportContentVO;
+import com.air.nc5dev.vo.FileContentVO;
 import com.air.nc5dev.vo.ItemsItemVO;
 import com.air.nc5dev.vo.ModuleWarpVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
@@ -73,7 +71,6 @@ public class ExportNCPatcherUtil {
      * 模块补丁输出配置文件名字
      **/
     public static final String MODULE_OUTPATCHER_CONFIG_FILENAME = "patcherconfig.properties";
-
     public static String javapCommandPath = null;
 
     public static void saveConfig(Project pro, ExportContentVO contentVO) {

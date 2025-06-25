@@ -73,6 +73,34 @@ public class NC6xEncode {
         }
     }
 
+    public String decodeError(String encodedString, Object... expars) throws Throwable {
+        Security.addProvider(new BouncyCastleProvider());
+        Properties properties = new Properties();
+        int bufferSize = 1024;
+        ByteBuffer decoded = ByteBuffer.allocateDirect(1024);
+
+        try (CryptoCipher decipher = Utils.getCipherInstance("AES/CBC/PKCS5Padding", properties)) {
+            SecretKeySpec keySpec = null;
+            if (query() != null) {
+                keySpec = new SecretKeySpec(parseHexStr2Byte(query()), "AES");
+            } else {
+                byte[] keysecByte = AESGeneratorKey.genBindIpKey();
+                insert(parseByte2HexStr(keysecByte));
+                keySpec = new SecretKeySpec(keysecByte, "AES");
+            }
+
+            decipher.init(2, keySpec, iv);
+            ByteBuffer outBuffer = ByteBuffer.allocateDirect(1024);
+            outBuffer.put(parseHexStr2Byte(encodedString));
+            outBuffer.flip();
+            decipher.update(outBuffer, decoded);
+            decipher.doFinal(outBuffer, decoded);
+            decoded.flip();
+
+            return asString(decoded);
+        }
+    }
+
     public String encode(String s, Object... expars) {
         try {
             return getEncodedPassword((NcUserVo) expars[0], s);

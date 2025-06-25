@@ -441,7 +441,7 @@ public class IdeaProjectGenerateUtil {
                     }
 
                     // 是否为行业版
-                    boolean hyVersion = ProjectNCConfigUtil.isHyVersion();
+                    boolean hyVersion = ProjectNCConfigUtil.isHyVersion(project);
 
                     LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
                             ProjectNCConfigUtil.LIB_Ant_Library

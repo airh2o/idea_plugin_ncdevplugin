@@ -42,7 +42,7 @@ public class NcUserVo {
         return String.format("%s | %s | %s"
                 , code
                 , name
-                , NCPassWordUtil.decode(getPass(), this)
+                , NCPassWordUtil.decode(this.getClass().getName(),null, getPass(), null)
         );
     }
 
