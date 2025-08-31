@@ -327,7 +327,10 @@ public class IdeaProjectGenerateUtil {
                             + " -Duser.timezone=GMT+8 "
                             + (
                             NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion()) ?
-                                    " -Dfile.encoding=UTF-8 "
+                                    " -Dfile.encoding=UTF-8 \n" +
+                                            " java.base/java.lang=ALL-UNNAMED\n" +
+                                            "--add-opens\n" +
+                                            "java.base/java.lang.reflect=ALL-UNNAMED \n"
                                     : (
                                     " -Xmx1024m -XX:MaxPermSize=256m "
                                             + " -Dfile.encoding=GBK "
