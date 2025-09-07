@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.air.nc5dev.tool.plugin.nc5devtool</id>
     <name>Yonyou NC Dev Tool</name>
-    <version>v4.2.1</version>
+    <version>v4.2.5</version>
     <vendor email="209308343@qq.com" url="https://gitee.com/yhlx/idea_plugin_nc5devplugin">Air 209308043@qq.com
         微信:yongyourj 欢迎外包联系
     </vendor>

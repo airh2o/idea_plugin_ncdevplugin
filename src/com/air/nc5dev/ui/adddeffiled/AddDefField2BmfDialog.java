@@ -182,7 +182,7 @@ public class AddDefField2BmfDialog extends DialogWrapper {
             root = doc.getRootElement();
 
             Integer version = Convert.toInt(root.attributeValue("version"), 1);
-            root.attributeValue("version", String.valueOf(version + 1));
+            root.attribute("version").setValue(String.valueOf(version + 1));
         } catch (Throwable e) {
             //出错了
             e.printStackTrace();
