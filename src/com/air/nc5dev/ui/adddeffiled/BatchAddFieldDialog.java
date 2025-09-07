@@ -70,7 +70,7 @@ public class BatchAddFieldDialog extends DialogWrapper {
             int x = 1;
             int y = 1;
 
-            JBLabel label = new JBLabel("请输入内容： 字段编码 字段名称 字段类型 长度 回车换行， 用,，、空格 tab 均可分割!");
+            JBLabel label = new JBLabel("请输入内容： 字段编码 字段名称 字段类型 长度 回车换行， 用,，空格 \\t \\r | 均可分割!");
             label.setBounds(x, y, 500, 40);
             panel_main.add(label);
 
@@ -108,7 +108,7 @@ public class BatchAddFieldDialog extends DialogWrapper {
 
             line = StrUtil.replace(line, ",", " ");
             line = StrUtil.replace(line, "，", " ");
-            line = StrUtil.replace(line, "、", " ");
+            line = StrUtil.replace(line, "|", " ");
             line = StrUtil.replace(line, "\t", " ");
             line = StrUtil.replace(line, "\r", " ");
 
