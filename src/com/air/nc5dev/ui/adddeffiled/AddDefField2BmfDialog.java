@@ -1,5 +1,6 @@
 package com.air.nc5dev.ui.adddeffiled;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
 import com.air.nc5dev.ui.exportbmf.ExportbmfDialog;
 import com.air.nc5dev.util.CollUtil;
@@ -179,6 +180,9 @@ public class AddDefField2BmfDialog extends DialogWrapper {
         try {
             doc = new SAXReader().read(bmf.toNioPath().toFile());
             root = doc.getRootElement();
+
+            Integer version = Convert.toInt(root.attributeValue("version"), 1);
+            root.attributeValue("version", String.valueOf(version + 1));
         } catch (Throwable e) {
             //出错了
             e.printStackTrace();
