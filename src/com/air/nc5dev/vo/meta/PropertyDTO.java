@@ -109,6 +109,7 @@ public class PropertyDTO implements Serializable, Cloneable {
         isShare = false;
         isAuthorization = true;
         modifyIndustry = "0";
+        industry = "0";
         industryChanged = false;
         notSerialize = false;
         isAuthen = true;
