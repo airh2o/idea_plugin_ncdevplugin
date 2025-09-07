@@ -58,6 +58,15 @@ public class ProperteListTableMouseListenerImpl implements MouseListener {
             mainPanel.addDef(PropertyDataTypeEnum.BS000010000100001059);
         });
 
+        item = new JMenuItem("批量新增字段");
+        popup.add(item);
+        item.addActionListener(event -> {
+            new BatchAddFieldDialog(mainPanel.getProject()
+                    , mainPanel.getTablePropertis()
+                    , mainPanel
+                    , mainPanel.getTablePropertis().getSelectedRow()).show();
+        });
+
         item = new JMenuItem("复制选中行");
         popup.add(item);
         item.addActionListener(event -> {

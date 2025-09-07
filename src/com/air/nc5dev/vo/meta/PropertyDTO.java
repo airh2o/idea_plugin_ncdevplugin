@@ -4,6 +4,7 @@ import com.air.nc5dev.util.meta.consts.DataTypeStyleConverter;
 import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
 import com.air.nc5dev.util.meta.consts.VisibilityConverter;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import nc.vo.pub.VOStatus;
 import nc.vo.pub.lang.UFDateTime;
 
@@ -18,6 +19,7 @@ import java.io.Serializable;
  **/
 //com.yonyou.studio.mdp.database.model.PropertyVO
 @Data
+@Accessors(chain = true)
 public class PropertyDTO implements Serializable, Cloneable {
     private String id;
     private String accessorClassName;

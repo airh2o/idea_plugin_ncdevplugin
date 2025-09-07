@@ -32,8 +32,25 @@ public enum PropertyDataTypeEnum {
     BS000010000100001059("自由项", "CUSTOM", "BS000010000100001059", "varchar", "varchar"),
     BS000010000100001030("备注", "MEMO", "BS000010000100001030", "varchar", "varchar"),
     BS000010000100001058("多语文本", "Multilangtext", "BS000010000100001058", "varchar", "varchar"),
-    BS000010000100001056("自定义项", "CUSTOM", "BS000010000100001056", "varchar", "varchar")
-    ;
+    BS000010000100001056("自定义项", "CUSTOM", "BS000010000100001056", "varchar", "varchar");
+
+
+    public static final PropertyDataTypeEnum agest(String key, PropertyDataTypeEnum ifnull) {
+        for (PropertyDataTypeEnum e : values()) {
+            if (
+                    e.dataType.equalsIgnoreCase(key)
+                            || e.name().equalsIgnoreCase(key)
+                            || e.typeDisplayName.equalsIgnoreCase(key)
+                            || e.typeName.equalsIgnoreCase(key)
+                            || e.dbtype.equalsIgnoreCase(key)
+                            || e.fieldType.equalsIgnoreCase(key)
+            ) {
+                return e;
+            }
+        }
+
+        return ifnull;
+    }
 
     /**
      * 根据类型 获得 对象，没有返回null
