@@ -308,45 +308,47 @@ public class IdeaProjectGenerateUtil {
             envs.put("FIELD_CLINET_PORT", ProjectNCConfigUtil.getNCClientPort());
             conf.setEnvs(envs);
 
-            conf.setVMParameters(
-                    " -Dnc.http.port=$FIELD_CLINET_PORT$ "
-                            + " -Dcom.sun.management.jmxremote "
-                            //  + " -Dcom.sun.management.jmxremote.port=" + RandomUtil.randomInt(25000, 55000)
-                            + " -Dcom.sun.management.jmxremote.ssl=false "
-                            + " -Dcom.sun.management.jmxremote.authenticate=false "
-                            + " -Dnc.exclude.modules=" //${FIELD_EX_MODULES}
-                            + " -Dnc.runMode=develop "
-                            + " -Dnc.server.location=$FIELD_NC_HOME$ "
-                            + " -Dorg.owasp.esapi.resources=$FIELD_NC_HOME$/ierp/bin/esapi "
-                            + " -DEJBConfigDir=$FIELD_NC_HOME$/ejbXMLs"
-                            + " -DExtServiceConfigDir=$FIELD_NC_HOME$/ejbXMLs"
-                            + " -XX:+HeapDumpOnOutOfMemoryError "
-                            + " -Duap.hotwebs=" + ProjectNCConfigUtil.getNcHotWebsList()
-                            + " -Djava.awt.headless=true "
-                            + " -Dlog4j.ignoreTCL=true "
-                            + " -Duser.timezone=GMT+8 "
-                            + (
-                            NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion()) ?
-                                    " -Dfile.encoding=UTF-8 \n" +
-                                            "\n\n\njava.base/java.lang=ALL-UNNAMED\n" +
-                                            "--add-opens\n" +
-                                            "java.base/java.lang.reflect=ALL-UNNAMED \n\n\n"
-                                    : (
-                                    " -Xmx1024m -XX:MaxPermSize=256m "
-                                            + " -Dfile.encoding=GBK "
-                            )
-                    )
-                            // + " -Xdebug -Xrunjdwp:transport=dt_socket,address=" + RandomUtil.randomInt(25000,
-                            // 55000) + ",server=y,suspend=n "
+            String jvmpar = " -Dnc.http.port=$FIELD_CLINET_PORT$ "
+                    + " -Dcom.sun.management.jmxremote "
+                    //  + " -Dcom.sun.management.jmxremote.port=" + RandomUtil.randomInt(25000, 55000)
+                    + " -Dcom.sun.management.jmxremote.ssl=false "
+                    + " -Dcom.sun.management.jmxremote.authenticate=false "
+                    + " -Dnc.exclude.modules=" //${FIELD_EX_MODULES}
+                    + " -Dnc.runMode=develop "
+                    + " -Dnc.server.location=$FIELD_NC_HOME$ "
+                    + " -Dorg.owasp.esapi.resources=$FIELD_NC_HOME$/ierp/bin/esapi "
+                    + " -DEJBConfigDir=$FIELD_NC_HOME$/ejbXMLs"
+                    + " -DExtServiceConfigDir=$FIELD_NC_HOME$/ejbXMLs"
+                    + " -XX:+HeapDumpOnOutOfMemoryError "
+                    + " -Duap.hotwebs=" + ProjectNCConfigUtil.getNcHotWebsList()
+                    + " -Djava.awt.headless=true "
+                    + " -Dlog4j.ignoreTCL=true "
+                    + " -Duser.timezone=GMT+8 ";
+
+            if (NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion())) {
+                jvmpar += " -Dfile.encoding=UTF-8 \n";
+            } else {
+                jvmpar += " -Xmx1024m -XX:MaxPermSize=256m "
+                        + " -Dfile.encoding=GBK ";
+            }
+
+            // + " -Xdebug -Xrunjdwp:transport=dt_socket,address=" + RandomUtil.randomInt(25000,
+            // 55000) + ",server=y,suspend=n "
                           /*  + " -Dnc.server.name= "
                             + " -Dnc.server.startCount=0 "
                             + " -Dnc.bs.logging.format=text "
                             + " -Drun.side=server "
                             + " -Dnc.run.side=server "*/
-                            + " -Dnc.fi.autogenfile=N "
-                            + " -Duap.disable.codescan=false "
-                            + " -Dlocal.exclude.modules= "
-            );
+            jvmpar += " -Dnc.fi.autogenfile=N "
+                    + " -Duap.disable.codescan=false "
+                    + " -Dlocal.exclude.modules= ";
+
+            if (NcVersionEnum.BIP.equals(ProjectNCConfigUtil.getNCVersion())) {
+                jvmpar += "\n\n\n--add-opens java.base/java.lang=ALL-UNNAMED\n" +
+                        "--add-opens java.base/java.lang.reflect=ALL-UNNAMED  ";
+            }
+
+            conf.setVMParameters(jvmpar);
             conf.setWorkingDirectory(ncHome.getPath());
             conf.setModule(IdeaProjectGenerateUtil.getProjectModules(project)[0]);
             conf.setShowConsoleOnStdErr(true);
