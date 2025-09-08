@@ -328,9 +328,9 @@ public class IdeaProjectGenerateUtil {
                             + (
                             NcVersionEnum.isNCCOrBIP(ProjectNCConfigUtil.getNCVersion()) ?
                                     " -Dfile.encoding=UTF-8 \n" +
-                                            " java.base/java.lang=ALL-UNNAMED\n" +
+                                            "\n\n\njava.base/java.lang=ALL-UNNAMED\n" +
                                             "--add-opens\n" +
-                                            "java.base/java.lang.reflect=ALL-UNNAMED \n"
+                                            "java.base/java.lang.reflect=ALL-UNNAMED \n\n\n"
                                     : (
                                     " -Xmx1024m -XX:MaxPermSize=256m "
                                             + " -Dfile.encoding=GBK "

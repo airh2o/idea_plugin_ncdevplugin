@@ -4,9 +4,15 @@
 实现了 Idea Yonyou NC5x 、 U8Cloud 、 NC6x 、 NCCloud(新版改名叫YonBip) 、 YonBIP 开发插件。            
 
 ## 注意，最新的插件安装包是 项目根目录的 idea_plugin_ncdevplugin文件名开头的 7z文件！ 安装需要 下载这个7z文件后解压，里面是个zip，直接安装这个zip即可！
-  如果有多个 就都下载下来，加压，因为git限制文件大小，所以我可能会压缩zip成为 多个拆分大小的7z文件。
-  如果没有7z 那就是 项目根目录的 几十MB大小的那个 zip 文件 。
-
+  如果有多个 就都下载下来，加压，因为git限制文件大小，所以我可能会压缩zip成为 多个拆分大小的7z文件。                  
+  如果没有7z 那就是 项目根目录的 几十MB大小的那个 zip 文件 。                             
+  NCC以上版本 服务端运行选项的jvm参数会增加 
+```text
+    java.base/java.lang=ALL-UNNAMED 
+    --add-opens 
+    java.base/java.lang.reflect=ALL-UNNAMED 
+```
+如果导致启动失败 可以删除这3个jvm参数！            
 # 插件使用视频教程
 <a href="https://www.bilibili.com/video/BV1mg4y1f7cQ/?vd_source=6b1c74e795e65a8b04ffe9fe91867a10">
 使用教程:  https://www.bilibili.com/video/BV1mg4y1f7cQ/?vd_source=6b1c74e795e65a8b04ffe9fe91867a10 </a>
