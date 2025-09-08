@@ -698,4 +698,11 @@
         </fixedWhere>
     </item>
     <!--  END  ´òÓ¡Ä£°å-->
+    <item>
+        <itemKey>pub_workitemconfig</itemKey>
+        <itemName>pub_workitemconfig</itemName>
+        <fixedWhere>
+            nvl(dr,0)=0 and pk_billtype in({billtype})
+        </fixedWhere>
+    </item>
 </items>
