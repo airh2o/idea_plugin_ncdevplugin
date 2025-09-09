@@ -61,7 +61,7 @@
         <itemRule>xi_billdefine</itemRule>
         <fixedWhere>
             billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or
-            pk_billtypecode in({billtype}) ))
+            pk_billtypecode in({billtype}) or parentbilltype in({billtype}) ))
         </fixedWhere>
     </item>
     <item>
@@ -70,7 +70,7 @@
         <itemRule>excel_billprocess</itemRule>
         <fixedWhere>
             billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or
-            pk_billtypecode in({billtype}) ))
+            pk_billtypecode in({billtype}) or parentbilltype in({billtype}) ))
         </fixedWhere>
     </item>
     <item>
@@ -95,7 +95,7 @@
         <itemRule>excel_outputprocess</itemRule>
         <fixedWhere>
             billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or
-            pk_billtypecode in({billtype}) ))
+            pk_billtypecode in({billtype}) or parentbilltype in({billtype}) ))
         </fixedWhere>
     </item>
     <item>
@@ -144,9 +144,9 @@
         <itemKey>pub_vochange</itemKey>
         <fixedWhere>
             dest_billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or
-            pk_billtypecode in({billtype}) ))
+            pk_billtypecode in({billtype})  or parentbilltype in({billtype}) ))
             or src_billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or
-            pk_billtypecode in({billtype}) ))
+            pk_billtypecode in({billtype}) or parentbilltype in({billtype}) ))
         </fixedWhere>
     </item>
     <item>
@@ -172,9 +172,9 @@
         <fixedWhere>nvl(dr,0)=0
             and (
             src_billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or
-            pk_billtypecode in({billtype}) ))
+            pk_billtypecode in({billtype}) or parentbilltype in({billtype}) or parentbilltype in({billtype}) ))
             or dest_billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}'
-            or pk_billtypecode in({billtype}) ))
+            or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) or parentbilltype in({billtype}) ))
             )
         </fixedWhere>
     </item>
@@ -271,7 +271,7 @@
         <itemName>单据类型(包含单据动作脚本)***注意新增的一定要全抽！dbml对应的是多语文件！只抽自己的就把别人的name丢了***</itemName>
         <itemRule>bd_billtype</itemRule>
         <fixedWhere>
-            nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
+            nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
         </fixedWhere>
     </item>
     <item>
@@ -400,7 +400,7 @@
             <itemRule>dap_defitem</itemRule>
         <fixedWhere>nvl(dr,0)=0
                 and pk_billtypeid in(
-                    select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
+                    select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
                 )
             </fixedWhere>
         </item>-->
@@ -411,7 +411,7 @@
            <itemRule>dap_billfactor</itemRule>
         <fixedWhere>nvl(dr,0)=0
                and pk_billtypeid in(
-               select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
+               select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
                )
            </fixedWhere>
        </item>-->
@@ -421,7 +421,7 @@
             <itemRule>pub_votable</itemRule>
         <fixedWhere>nvl(dr,0)=0
                 and pk_billtypeid in(
-                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
+                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
                 )
             </fixedWhere>
         </item>
@@ -431,7 +431,7 @@
             <itemRule>pub_billtobillrefer</itemRule>
         <fixedWhere>nvl(dr,0)=0
                 and pk_billtypeid in(
-                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) )
+                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
                 )
             </fixedWhere>
         </item>-->
@@ -441,8 +441,7 @@
         <itemRule>pub_function</itemRule>
         <fixedWhere>nvl(dr,0)=0
             and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode
-            in({billtype}) )
+                    select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
             )
         </fixedWhere>
     </item>
@@ -452,8 +451,7 @@
         <itemRule>pub_billaction</itemRule>
         <fixedWhere>nvl(dr,0)=0
             and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode
-            in({billtype}) )
+                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
             )
         </fixedWhere>
     </item>
@@ -463,8 +461,7 @@
         <itemRule>pub_billactiongroup</itemRule>
         <fixedWhere>nvl(dr,0)=0
             and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode
-            in({billtype}) )
+                 select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
             )
         </fixedWhere>
     </item>
@@ -477,11 +474,10 @@
         <grpField></grpField>
         <fixedWhere>nvl(dr,0)=0
             and pk_billactiongroup in(
-            select pk_billactiongroup from pub_billactiongroup where nvl(dr,0)=0
-            and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode
-            in({billtype}) )
-            )
+                select pk_billactiongroup from pub_billactiongroup where nvl(dr,0)=0
+                    and pk_billtypeid in(
+                            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
+                    )
             )
         </fixedWhere>
     </item>
@@ -491,8 +487,7 @@
         <itemRule>pub_busiclass</itemRule>
         <fixedWhere>nvl(dr,0)=0
             and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode
-            in({billtype}) )
+                 select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode  in({billtype}) or parentbilltype in({billtype}) )
             )
         </fixedWhere>
     </item>
@@ -502,15 +497,13 @@
         <itemRule>bd_fwdbilltype</itemRule>
         <fixedWhere>nvl(dr,0)=0
             and (
-            pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode
-            in({billtype}) )
-            )
-            or
-            pk_backbilltype in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode
-            in({billtype}) )
-            )
+                pk_billtypeid in(
+                    select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype})  or parentbilltype in({billtype}) )
+                )
+                or
+                pk_backbilltype in(
+                    select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
+                )
             )
         </fixedWhere>
     </item>
@@ -520,8 +513,7 @@
         <itemRule>bd_relatedapp</itemRule>
         <fixedWhere>nvl(dr,0)=0
             and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode
-            in({billtype}) )
+                select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
             )
         </fixedWhere>
     </item>
@@ -531,8 +523,7 @@
         <itemRule>bd_billtype2</itemRule>
         <fixedWhere>nvl(dr,0)=0
             and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode
-            in({billtype}) )
+                 select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
             )
         </fixedWhere>
     </item>
@@ -542,8 +533,7 @@
         <itemRule>pub_publishapp</itemRule>
         <fixedWhere>nvl(dr,0)=0
             and pk_billtypeid in(
-            select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode
-            in({billtype}) )
+              select pk_billtypeid from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype})  or parentbilltype in({billtype}) )
             )
         </fixedWhere>
     </item>
@@ -554,10 +544,13 @@
         <itemKey>pub_vochange_b</itemKey>
         <fixedWhere>nvl(dr,0)=0
             and pk_vochange in(
-            select pk_vochange from pub_vochange where dest_billtype in (select pk_billtypecode from bd_billtype where
-            nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) ))
-            or src_billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or
-            pk_billtypecode in({billtype}) ))
+                select pk_vochange from pub_vochange where
+                    dest_billtype in (
+                        select pk_billtypecode from bd_billtype where  nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
+                    )
+                    or src_billtype in (
+                        select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or pk_billtypecode in({billtype}) or parentbilltype in({billtype}) )
+                    )
             )
         </fixedWhere>
     </item>
@@ -569,9 +562,9 @@
             and pk_vochange in(
             select pk_vochange from pub_vochange where
             dest_billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or
-            pk_billtypecode in({billtype}) ))
+            pk_billtypecode in({billtype}) or parentbilltype in({billtype}) ))
             or src_billtype in (select pk_billtypecode from bd_billtype where nvl(dr,0)=0 and (nodecode like '{node}' or
-            pk_billtypecode in({billtype}) ))
+            pk_billtypecode in({billtype}) or parentbilltype in({billtype}) ))
             )
         </fixedWhere>
     </item>
