@@ -2,7 +2,6 @@ package org.infernus.idea.checkstyle.handlers;
 
 import com.intellij.CommonBundle;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -95,7 +94,7 @@ public class ScanFilesBeforeCheckinHandler extends CheckinHandler {
 
                 return processScanResults(scanResults, executor, project);
 
-            } catch (ProcessCanceledException e) {
+            } catch (Throwable e) {
                 return CANCEL;
             }
 

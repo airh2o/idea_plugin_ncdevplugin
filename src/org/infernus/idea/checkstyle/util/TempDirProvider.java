@@ -1,11 +1,14 @@
 package org.infernus.idea.checkstyle.util;
 
+import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.openapi.components.ServiceKt;
 import com.intellij.openapi.components.StorageScheme;
 import com.intellij.openapi.components.impl.stores.IProjectStore;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import org.apache.commons.io.FileUtils;
@@ -53,18 +56,32 @@ public class TempDirProvider {
 
     @NotNull
     private File temporaryDirectoryLocationFor(final Project project) {
-        return getIdeaFolder(project).map(vf -> new File(vf.getPath(), "checkstyleidea.tmp"))
+        return this.getIdeaFolder(project).map(vf -> new File(vf.getPath(), "checkstyleidea.tmp"))
                 .orElse(new File(project.getBasePath(), "checkstyleidea.tmp"));
     }
 
-    Optional<VirtualFile> getIdeaFolder(@NotNull final Project project) {
-        final IProjectStore projectStore = (IProjectStore) ServiceKt.getStateStore(project);
-        if (projectStore.getStorageScheme() == StorageScheme.DIRECTORY_BASED) {
-            VirtualFile projectDir = ProjectUtil.guessProjectDir(project);
-            if (projectDir != null) {
-                final VirtualFile ideaStorageDir = projectDir.findChild(Project.DIRECTORY_STORE_FOLDER);
-                if (ideaStorageDir != null && ideaStorageDir.exists() && ideaStorageDir.isDirectory()) {
-                    return Optional.of(ideaStorageDir);
+    public Optional<VirtualFile> getIdeaFolder(@NotNull final Project project) {
+        try {
+            final IProjectStore projectStore = (IProjectStore) ServiceKt.getStateStore(project);
+            if (projectStore.getStorageScheme() == StorageScheme.DIRECTORY_BASED) {
+                VirtualFile projectDir = ProjectUtil.guessProjectDir(project);
+                if (projectDir != null) {
+                    final VirtualFile ideaStorageDir = projectDir.findChild(Project.DIRECTORY_STORE_FOLDER);
+                    if (ideaStorageDir != null && ideaStorageDir.exists() && ideaStorageDir.isDirectory()) {
+                        return Optional.of(ideaStorageDir);
+                    }
+                }
+            }
+        } catch (NoSuchMethodError e) {
+            LogUtil.error(e.getMessage(), e);
+            //兼容新版本！
+            if (project != null) {
+                try {
+                    com.air.nc5dev.util.idea.ProjectUtil.setProject(project);
+                    VirtualFile f = LocalFileSystem.getInstance().findFileByIoFile(new File(project.getBasePath()));
+                    return Optional.of(f);
+                } catch (Exception ex) {
+                    LogUtil.error(ex.getMessage(), ex);
                 }
             }
         }
