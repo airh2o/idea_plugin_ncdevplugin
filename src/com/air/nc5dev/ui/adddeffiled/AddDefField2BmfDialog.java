@@ -375,6 +375,7 @@ public class AddDefField2BmfDialog extends DialogWrapper {
         List<? extends ClassDTO> es = componentDTO.getClassDTOS();
 
         entits = new Vector(es.stream()
+                .filter(e -> Integer.valueOf(ClassDTO.CLASSTYPE_ENTITY).equals(e.getClassType()))
                 .map(ClassComboxDTO::ofClassDTO)
                 .collect(Collectors.toList()));
         for (ClassComboxDTO entit : entits) {
@@ -394,7 +395,15 @@ public class AddDefField2BmfDialog extends DialogWrapper {
         return p;
     }
 
-    List<PropertyDTO> copyedPropertis;
+    public static volatile List<PropertyDTO> copyedPropertis;
+
+    public List<PropertyDTO> getCopyedPropertis() {
+        return copyedPropertis;
+    }
+
+    public void setCopyedPropertis(List<PropertyDTO> ps) {
+        copyedPropertis = ps;
+    }
 
     public void setPerpotiesTableRows(List<PropertyDTO> vs) {
         result = vs;
@@ -477,7 +486,7 @@ public class AddDefField2BmfDialog extends DialogWrapper {
 
     public void past2LineAfter(List<PropertyDTO> ps, int startRow) {
         if (startRow >= getResult().size()) {
-            past2tail();
+            past2tail(ps);
             return;
         }
 
@@ -512,6 +521,10 @@ public class AddDefField2BmfDialog extends DialogWrapper {
 
     public void past2top() {
         List<PropertyDTO> ps = getCopyedPropertis();
+        past2top(ps);
+    }
+
+    public void past2top(List<PropertyDTO> ps) {
         if (CollUtil.isEmpty(ps)) {
             return;
         }
@@ -540,6 +553,10 @@ public class AddDefField2BmfDialog extends DialogWrapper {
 
     public void past2tail() {
         List<PropertyDTO> ps = getCopyedPropertis();
+        past2tail(ps);
+    }
+
+    public void past2tail(List<PropertyDTO> ps) {
         if (CollUtil.isEmpty(ps)) {
             return;
         }
