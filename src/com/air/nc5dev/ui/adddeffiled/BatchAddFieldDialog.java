@@ -128,8 +128,34 @@ public class BatchAddFieldDialog extends DialogWrapper {
                     .setFieldType(type.getFieldType())
                     .setDbtype(type.getDbtype())
                     .setDataType(type.getDataType())
-                    .setAttrLength(Convert.toInt(CollUtil.get(ks, 2), 100)
-                    );
+                    .setAttrLength(Convert.toInt(CollUtil.get(ks, 2), 100));
+
+            if (PropertyDataTypeEnum.BS000010000100001031.getFieldType().equals(p.getFieldType())) {
+                p.setAttrLength(28);
+                p.setPrecise(8);
+            } else if (PropertyDataTypeEnum.BS000010000100001052.getFieldType().equals(p.getFieldType())) {
+                p.setAttrLength(28);
+                p.setPrecise(8);
+            } else if (PropertyDataTypeEnum.BS000010000100001004.getFieldType().equals(p.getFieldType())) {
+                p.setAttrLength(28);
+                p.setPrecise(0);
+            } else if (PropertyDataTypeEnum.BS000010000100001051.getFieldType().equals(p.getFieldType())) {
+                p.setPrecise(0);
+            } else if (PropertyDataTypeEnum.BS000010000100001032.getFieldType().equals(p.getFieldType())) {
+                p.setAttrLength(1);
+                p.setDbtype(PropertyDataTypeEnum.BS000010000100001032.getDbtype());
+                p.setPrecise(0);
+            } else if (PropertyDataTypeEnum.BS000010000100001033.getFieldType().equals(p.getFieldType())) {
+                p.setAttrLength(19);
+                p.setDbtype(PropertyDataTypeEnum.BS000010000100001033.getDbtype());
+                p.setPrecise(0);
+            } else if (PropertyDataTypeEnum.BS000010000100001034.getFieldType().equals(p.getFieldType())) {
+                p.setAttrLength(19);
+                p.setDbtype(PropertyDataTypeEnum.BS000010000100001034.getDbtype());
+                p.setPrecise(0);
+            }
+
+
             p.fixDisplays();
             fs.add(p);
         }

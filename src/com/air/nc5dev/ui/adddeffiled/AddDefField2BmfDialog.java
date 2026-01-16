@@ -472,8 +472,13 @@ public class AddDefField2BmfDialog extends DialogWrapper {
                     p = p.clone();
                     p.setId(StringUtil.uuid());
                     p.setFieldName(prefix + (start + i));
-                    p.setName(prefixName + (start + i));
-                    p.setDisplayName(d.getType().getTypeDisplayName() + (start + i));
+                    p.setName(prefix + (start + i));
+                    p.setDisplayName(prefixName+ (start + i));
+                    p.setTypeName(type.getTypeName());
+                    p.setFieldType(type.getFieldType());
+                    p.setDataType(type.getDataType());
+                    p.setDbtype(type.getDbtype());
+                    p.setTypeDisplayName(type.getTypeDisplayName());
                     p.fixDisplays();
                     ps.add(p);
                 } catch (CloneNotSupportedException e) {

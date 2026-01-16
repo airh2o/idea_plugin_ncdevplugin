@@ -580,7 +580,7 @@ public class ExportbmfDialog extends DialogWrapper {
     public void initDefualtValues() {
         try {
             textFieldSerach.setText("select " +
-                    "\n        rownum as order1, name,displayname,ownmodule, namespace,version, id " +
+                    "\n        1 as order1, name,displayname,ownmodule, namespace,version, id " +
                     "\nfrom md_component where 1=1 " +
                     "\n        and displayname like '%销售订单%' " +
                     "\norder by ts desc ");
