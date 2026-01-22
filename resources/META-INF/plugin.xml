@@ -284,6 +284,11 @@
         <action id="nc5dev.info.TestOpenAPIAction" class="com.air.nc5dev.acion.TestOpenAPIAction"
                 text="测试OpenAPI" description="">
         </action>
+        <action id="ExportChangeCodeFilesAction" class="com.air.nc5dev.acion.ExportChangeCodeFilesAction"
+                text="导出被修改的标品代码文件情况" description="只识别被修改jar文件里的类">
+            <!--            <add-to-group group-id="GenerateGroup" anchor="last"/>-->
+        </action>
+
         <group id="nc5devtool" text="NC 开发插件配置" popup="true" description="配置NC开发插件"
                icon="/META-INF/nc-logo.png">
             <reference ref="nc5dev.config.nchome"/>
@@ -358,6 +363,7 @@
                 <reference ref="GenerateGetSetAction"/>
                 <reference ref="GenerateGetAction"/>
                 <reference ref="GenerateSetAction"/>
+                <reference ref="ExportChangeCodeFilesAction"/>
 
                 <group id="nc5devtoolExportBillAll" text="导出已有节点单据SQL脚本"
                        popup="true" description="导出已有节点单据SQL脚本">
@@ -624,9 +630,19 @@
 
         <searchEverywhereContributor
                 implementation="com.air.nc5dev.util.GoToNCRequestMappingFastActionSearchEverywhereContributorFactory"/>
+
+        <!--        监听文件树变化-->
+        <projectViewNodeDecorator implementation="com.air.nc5dev.listeners.ProjectNodeDecorator"/>
+
     </extensions>
 
     <depends optional="true">com.jetbrains.restClient</depends>
+    <!-- 必须声明，否则无法识别 Java 相关类 -->
+    <depends optional="true">com.intellij.modules.java</depends>
+    <depends optional="true">com.intellij.modules.platform</depends>
+    <depends optional="true">com.intellij.modules.java</depends>
+    <depends optional="true">com.intellij.modules.vcs</depends>
+    <depends optional="true">com.intellij.modules.git</depends> <!-- 如果使用了 git4idea 包 -->
 
     <description><![CDATA[
       <p>Yonyou U8Cloud, NC5 NC6 NCCloud YonBip and other series of software development tools</p>

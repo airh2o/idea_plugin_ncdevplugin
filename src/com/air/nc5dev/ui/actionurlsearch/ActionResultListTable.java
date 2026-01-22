@@ -44,6 +44,7 @@ import com.intellij.psi.impl.java.stubs.PsiClassStub;
 import com.intellij.psi.impl.java.stubs.PsiJavaFileStub;
 import com.intellij.psi.impl.java.stubs.impl.PsiClassStubImpl;
 import com.intellij.psi.impl.java.stubs.impl.PsiJavaFileStubImpl;
+import com.intellij.psi.impl.source.PsiClassImpl;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.ui.table.JBTable;
@@ -54,6 +55,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.tangsu.mstsc.ui.MainPanel;
 
+import javax.annotation.Nullable;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
@@ -69,12 +71,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 @Getter
 @Setter
@@ -517,37 +514,62 @@ public class ActionResultListTable extends JBTable {
     }
 
     public static VirtualFile findClassFile(Project project, ActionResultDTO vo) {
+        List<VirtualFile> fs = findClassFile(project, vo.getClazz(), true, true, true, vo);
+        if (fs.isEmpty()) {
+            return null;
+        }
+
+        return fs.get(0);
+    }
+
+    public static List<VirtualFile> findClassFile(Project project
+            , String classFullName
+            , boolean homeSearch
+            , boolean projectSearch
+            , boolean tryHard
+            , @Nullable NCCActionInfoVO vo) {
         String path = null;
-        vo.setClazz(StrUtil.trim(vo.getClazz()));
+        classFullName = StrUtil.trim(classFullName);
         //搜索 工程里的Java文件!
-        String clz = vo.getClazz().substring(vo.getClazz().lastIndexOf('.') + 1);
-        String classPt = StrUtil.replace(vo.getClazz(), ".", File.separator);
+        String clz = classFullName.substring(classFullName.lastIndexOf('.') + 1);
+        String classPt = StrUtil.replace(classFullName, ".", File.separator);
         String classPtDir = classPt.substring(0, classPt.lastIndexOf(File.separator));
-        Module[] modules = IdeaProjectGenerateUtil.getProjectModules(project);
-        for (Module module : modules) {
-            VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
-            for (VirtualFile sourceRoot : sourceRoots) {
-                File f = new File(sourceRoot.getPath(), classPtDir);
-                File[] fs = f.listFiles();
-                if (fs == null) {
-                    continue;
-                }
-                for (File file : fs) {
-                    if (!file.isFile()) {
+        ArrayList<VirtualFile> result = new ArrayList<>();
+        VirtualFile virtualFile = null;
+        if (projectSearch) {
+            Module[] modules = IdeaProjectGenerateUtil.getProjectModules(project);
+            for (Module module : modules) {
+                VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
+                for (VirtualFile sourceRoot : sourceRoots) {
+                    File f = new File(sourceRoot.getPath(), classPtDir);
+                    File[] fs = f.listFiles();
+                    if (fs == null) {
                         continue;
                     }
+                    for (File file : fs) {
+                        if (!file.isFile()) {
+                            continue;
+                        }
 
-                    if (file.getName().equalsIgnoreCase(clz + ".java")
-                            || file.getName().toLowerCase().endsWith("$" + clz.toLowerCase() + ".java")) {
-                        path = file.getPath();
-                        break;
+                        if (file.getName().equalsIgnoreCase(clz + ".java")
+                                || file.getName().toLowerCase().endsWith("$" + clz.toLowerCase() + ".java")) {
+                            path = file.getPath();
+                            if (path.startsWith("jar://")) {
+                                virtualFile = VirtualFileManager.getInstance().findFileByUrl(path);
+                            } else {
+                                virtualFile = VirtualFileManager.getInstance().findFileByNioPath(new File(path).toPath());
+                            }
+                            if (virtualFile != null) {
+                                result.add(virtualFile);
+                            }
+                        }
                     }
                 }
             }
         }
 
         //搜索HOME里的class文件
-        if (path == null) {
+        if (homeSearch) {
             File hotwebs = new File(ProjectNCConfigUtil.getNCHome(), "hotwebs");
             File nccloud = new File(hotwebs, "nccloud");
             File webinf = new File(nccloud, "WEB-INF");
@@ -563,44 +585,58 @@ public class ActionResultListTable extends JBTable {
                     if (file.getName().equalsIgnoreCase(clz + ".class")
                             || file.getName().toLowerCase().endsWith("$" + clz.toLowerCase() + ".class")) {
                         path = file.getPath();
-                        break;
+                        if (path.startsWith("jar://")) {
+                            virtualFile = VirtualFileManager.getInstance().findFileByUrl(path);
+                        } else {
+                            virtualFile = VirtualFileManager.getInstance().findFileByNioPath(new File(path).toPath());
+                        }
+                        if (virtualFile != null) {
+                            result.add(virtualFile);
+                        }
                     }
                 }
             }
         }
 
-        if (path == null) {
-            path = findClzPath(vo, vo.getClazz());
-        }
+        if (tryHard) {
+            if (path == null && vo != null) {
+                path = findClzPath(vo, classFullName);
+                if (StrUtil.isNotBlank(path)) {
+                    if (path.startsWith("jar://")) {
+                        virtualFile = VirtualFileManager.getInstance().findFileByUrl(path);
+                    } else {
+                        virtualFile = VirtualFileManager.getInstance().findFileByNioPath(new File(path).toPath());
+                    }
+                    if (virtualFile != null) {
+                        result.add(virtualFile);
+                    }
+                }
+            }
 
-        if (path == null) {
-            //我要是用大招了， 全局拉一边jar
-            Map<String, NCCActionInfoVO> map =
-                    RequestMappingItemProvider.ALL_ACTIONS.get(RequestMappingItemProvider.getKey(project));
-            if (CollUtil.isNotEmpty(map)) {
-                Collection<NCCActionInfoVO> vs = map.values();
-                for (NCCActionInfoVO v : vs) {
-                    path = findClzPath(v, vo.getClazz());
-                    if (path != null) {
-                        break;
+            if (path == null) {
+                //我要是用大招了， 全局拉一边jar
+                Map<String, NCCActionInfoVO> map =
+                        RequestMappingItemProvider.ALL_ACTIONS.get(RequestMappingItemProvider.getKey(project));
+                if (CollUtil.isNotEmpty(map)) {
+                    Collection<NCCActionInfoVO> vs = map.values();
+                    for (NCCActionInfoVO v : vs) {
+                        path = findClzPath(v, classFullName);
+                        if (StrUtil.isNotBlank(path)) {
+                            if (path.startsWith("jar://")) {
+                                virtualFile = VirtualFileManager.getInstance().findFileByUrl(path);
+                            } else {
+                                virtualFile = VirtualFileManager.getInstance().findFileByNioPath(new File(path).toPath());
+                            }
+                            if (virtualFile != null) {
+                                result.add(virtualFile);
+                            }
+                        }
                     }
                 }
             }
         }
 
-        if (path == null) {
-            return null;
-        }
-
-        VirtualFile virtualFile = null;
-
-        if (path.startsWith("jar://")) {
-            virtualFile = VirtualFileManager.getInstance().findFileByUrl(path);
-        } else {
-            virtualFile = VirtualFileManager.getInstance().findFileByNioPath(new File(path).toPath());
-        }
-
-        return virtualFile;
+        return result;
     }
 
     public static VirtualFile getPsiClassFile(PsiClass pc) {
@@ -608,12 +644,16 @@ public class ActionResultListTable extends JBTable {
             return null;
         }
 
-        ClsClassImpl cc = (ClsClassImpl) pc;
-        PsiClassStub pst = (PsiClassStub) cc.getStub();
-        if (pst.getParentStub() instanceof PsiJavaFileStub) {
-
-            PsiJavaFileStub pjava = (PsiJavaFileStub) pst.getParentStub();
-            return pjava.getPsi().getVirtualFile();
+        if (pc instanceof ClsClassImpl) {
+            ClsClassImpl cc = (ClsClassImpl) pc;
+            PsiClassStub pst = (PsiClassStub) cc.getStub();
+            if (pst.getParentStub() instanceof PsiJavaFileStub) {
+                PsiJavaFileStub pjava = (PsiJavaFileStub) pst.getParentStub();
+                return pjava.getPsi().getVirtualFile();
+            }
+        } else if (pc instanceof PsiClassImpl) {
+            PsiClassImpl cc = (PsiClassImpl) pc;
+            return cc.getContainingFile().getVirtualFile();
         }
 
         return null;
@@ -723,6 +763,60 @@ public class ActionResultListTable extends JBTable {
         }
 
         openFile(project, virtualFile, 0, 0);
+    }
+
+    public static Collection<VirtualFile> findClass(Project project
+            , String classFullName
+            , boolean homeSearch
+            , boolean projectSearch
+            , boolean tryHard) {
+        HashSet<VirtualFile> fs = new HashSet<>();
+        if (classFullName == null) {
+            return fs;
+        }
+
+//        if (CollUtil.isNotEmpty(vo.getNavigatables())) {
+//            vo.getNavigatables().get(0).navigate(true);
+//            return;
+//        }
+
+        GlobalSearchScope scope = ProjectUtil.getGlobalSearchScope(project);
+        try {
+            Collection<PsiClass> pcs = ProjectUtil.findClassByFullName(classFullName, project, scope);
+
+            for (int i = 0; i < 3; i++) {
+                if (CollUtil.isEmpty(pcs)) {
+                    pcs = ProjectUtil.findClassByFullName(classFullName, project, scope);
+                }
+            }
+
+            if (CollUtil.isNotEmpty(pcs)) {
+                ClsClassImpl notJar = null;
+                ClsClassImpl jar = null;
+                for (PsiClass pc : pcs) {
+                    VirtualFile f = getPsiClassFile(pc);
+                    if (f != null) {
+                        fs.add(f);
+                    }
+                }
+            }
+        } catch (Throwable exception) {
+        }
+
+        List<VirtualFile> fs2 = findClassFile(project
+                , classFullName
+                , homeSearch
+                , projectSearch
+                , tryHard
+                , null);
+
+        if (fs2 != null) {
+            for (VirtualFile virtualFile : fs2) {
+                fs.add(virtualFile);
+            }
+        }
+
+        return fs;
     }
 
     public static void openFile(Project project, VirtualFile vf, int row, int column) {

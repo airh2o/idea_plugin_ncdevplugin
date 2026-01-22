@@ -76,8 +76,9 @@ public class ExportNCPatcherUtil {
     public static void saveConfig(Project pro, ExportContentVO contentVO) {
         try {
             ExportContentVO c = contentVO;
-            FileUtil.writeUtf8String(JSON.toJSONString(c), new File(new File(pro.getBasePath(), ".idea"),
-                    "ExportContentVO.json"));
+            FileUtil.writeUtf8String(JSON.toJSONString(c)
+                    , new File(new File(pro.getBasePath(), ".idea"), "ExportContentVO.json")
+            );
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -85,8 +86,9 @@ public class ExportNCPatcherUtil {
 
     public static ExportContentVO readConfig(Project pro) {
         try {
-            String str = FileUtil.readUtf8String(new File(new File(pro.getBasePath(), ".idea")
-                    , "ExportContentVO.json"));
+            String str = FileUtil.readUtf8String(
+                    new File(new File(pro.getBasePath(), ".idea"), "ExportContentVO.json")
+            );
             if (StrUtil.isBlank(str)) {
                 ExportContentVO c = new ExportContentVO();
                 saveConfig(pro, c);
@@ -194,7 +196,7 @@ public class ExportNCPatcherUtil {
             shs.add(new BmfFileContentSearchImpl());
         }
 
-        if (hasHotwebsFront(contentVO)) {
+        if (hasHotwebsFront(contentVO) && contentVO.isExportResources()) {
             shs.add(new NccloudHotwebsResourcesFileContentSearchImpl());
         }
 

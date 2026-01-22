@@ -142,7 +142,7 @@ public class RenameHomeClassIfInProjectSrcAction extends AbstractIdeaAction {
         }
     }
 
-    private static List<File> getAll(File src, String s) {
+    public static List<File> getAll(File src, String s) {
         File[] fs = src.listFiles();
         ArrayList<File> ff = new ArrayList<>();
         if (fs == null) {

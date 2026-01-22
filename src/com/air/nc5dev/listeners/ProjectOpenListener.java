@@ -1,5 +1,6 @@
 package com.air.nc5dev.listeners;
 
+import com.air.nc5dev.acion.ExportChangeCodeFilesAction;
 import com.air.nc5dev.acion.HelpMeAction;
 import com.air.nc5dev.component.SubscribeEventAutoCopyNccClientFilesComponent;
 import com.air.nc5dev.nccrequstsearch.RequestMappingItemProvider;
@@ -8,9 +9,11 @@ import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.IdeaProjectGenerateUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.StringUtil;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.ide.BrowserUtil;
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import com.melloware.jintellitype.JIntellitype;
@@ -42,13 +45,9 @@ public class ProjectOpenListener implements StartupActivity.DumbAware {
                         "\n当前项目配置的NCHOME路径:" + ProjectNCConfigUtil.getNCHomePath(), project
                 , (int) TimeUnit.SECONDS.toMillis(15L));
 
-
-        registerGlobalHotKey();
-
-
         if (!"Y".equalsIgnoreCase(ProjectNCConfigUtil.getConfigValue(project, "what_new_showed"))) {
             try {
-              //  BrowserUtil.browse(new URL(HelpMeAction.URL));
+                //  BrowserUtil.browse(new URL(HelpMeAction.URL));
             } catch (Exception e) {
             }
             ProjectNCConfigUtil.setNCConfigPropertice("what_new_showed", "Y");
@@ -69,9 +68,31 @@ public class ProjectOpenListener implements StartupActivity.DumbAware {
 //                return;
 //            }
 
-            run(project);
+            try {
+                run(project);
+            } catch (Throwable e) {
+                LogUtil.error(e.getMessage(), e);
+            }
 
-            RequestMappingItemProvider.getMe().initScan(project);
+            try {
+                RequestMappingItemProvider.getMe().initScan(project);
+            } catch (Throwable e) {
+                LogUtil.error(e.getMessage(), e);
+            }
+
+            try {
+                ExportChangeCodeFilesAction.relaod(project, (indicator) -> {
+                    ProjectView.getInstance(project).refresh();
+                });
+            } catch (Throwable e) {
+                LogUtil.error(e.getMessage(), e);
+            }
+
+            try {
+                registerGlobalHotKey();
+            } catch (Throwable e) {
+                LogUtil.error(e.getMessage(), e);
+            }
         } catch (Throwable e) {
             //不要弹框报错！
             try {

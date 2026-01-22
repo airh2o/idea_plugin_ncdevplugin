@@ -29,13 +29,15 @@ import com.google.common.collect.Lists;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vcs.FilePath;
+import com.intellij.openapi.vcs.changes.Change;
+import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.ui.components.JBCheckBox;
@@ -84,12 +86,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -130,8 +127,8 @@ public class PatcherDialog extends DialogWrapper {
     JBCheckBox saveConfig;
     JBCheckBox no2Jar;
     JBCheckBox zip;
-    JBCheckBox selectExport;
-    JBCheckBox selectExport2;
+    JBCheckBox checkBox_OnlyTreeSelects;
+    JBCheckBox checkBox_OnlySelectFiles;
 
     JBCheckBox exportModuleResources;
     JBCheckBox exportModuleLib;
@@ -153,6 +150,7 @@ public class PatcherDialog extends DialogWrapper {
     JBCheckBox checkBox_ygj_deploy;
     JBCheckBox checkBox_ygj_appleyjar;
     JButton button_reloadModules;
+    JButton button_loadGitNotCommitFiles;
 
     public PatcherDialog(AnActionEvent event) {
         super(event.getProject());
@@ -557,25 +555,25 @@ public class PatcherDialog extends DialogWrapper {
             jgp.add(panel12);
 
             JLabel label_8 = new JBLabel("只导出选中的模块或文件:");
-            selectExport = new JBCheckBox();
-            this.selectExport.setSelected(ExportContentVO.EVENT_POPUP_CLICK.equals(event.getPlace()));
-            this.selectExport.addItemListener((e) -> updateSelectFileTable());
+            checkBox_OnlyTreeSelects = new JBCheckBox();
+            this.checkBox_OnlyTreeSelects.setSelected(ExportContentVO.EVENT_POPUP_CLICK.equals(event.getPlace()));
+            this.checkBox_OnlyTreeSelects.addItemListener((e) -> updateSelectFileTable());
             JBPanel panel10 = new JBPanel();
             panel10.setLayout(new BoxLayout(panel10, BoxLayout.X_AXIS));
             panel10.setBounds(panel12.getX() + panel12.getWidth() + 2, y, 180, height);
             panel10.add(label_8);
-            panel10.add(selectExport);
+            panel10.add(checkBox_OnlyTreeSelects);
             jgp.add(panel10);
 
             label_8 = new JBLabel("只导出右键选择的文件:");
-            selectExport2 = new JBCheckBox();
-            selectExport2.setSelected(ExportContentVO.EVENT_POPUP_CLICK.equals(event.getPlace()));
-            selectExport2.addItemListener((e) -> updateSelectFileTable2());
+            checkBox_OnlySelectFiles = new JBCheckBox();
+            checkBox_OnlySelectFiles.setSelected(ExportContentVO.EVENT_POPUP_CLICK.equals(event.getPlace()));
+            checkBox_OnlySelectFiles.addItemListener((e) -> updateSelectFileTable2());
             panel12 = new JBPanel();
             panel12.setLayout(new BoxLayout(panel12, BoxLayout.X_AXIS));
             panel12.setBounds(panel10.getX() + panel10.getWidth() + 2, y, 180, height);
             panel12.add(label_8);
-            panel12.add(selectExport2);
+            panel12.add(checkBox_OnlySelectFiles);
             jgp.add(panel12);
 
             JLabel label_9 = new JBLabel("当前选中的要导出的内容:");
@@ -609,10 +607,19 @@ public class PatcherDialog extends DialogWrapper {
             label_9 = new JBLabel("要导出的模块:");
             label_9.setBounds(x, y = y + selectTableScrollPane.getHeight() + 5, 280, height);
             jgp.add(label_9);
-            button_reloadModules = new JButton("重新加载模块列表(如果空 点击这个，否则导出补丁会空白)");
-            button_reloadModules.setBounds(label_9.getX() + label_9.getWidth() + 10, label_9.getY(), 400, height);
+
+            button_reloadModules = new JButton("重新加载模块列表(如果空 点击这个");
+            button_reloadModules.setToolTipText("如果下面模块列表表格是空的 就点击这个或者重启idea，否则导出补丁会空白");
+            button_reloadModules.setBounds(label_9.getX() + label_9.getWidth() + 10, label_9.getY(), 300, height);
             button_reloadModules.addActionListener(this::onButton_reloadModules);
             jgp.add(button_reloadModules);
+
+            button_loadGitNotCommitFiles = new JButton("Git未提交");
+            button_loadGitNotCommitFiles.setToolTipText("点击后会把版本未提交的文件加载到上面要导出的文件列表表格里面");
+            button_loadGitNotCommitFiles.setBounds(button_reloadModules.getX() + button_reloadModules.getWidth() + 10, label_9.getY(), 90, height);
+            button_loadGitNotCommitFiles.addActionListener(this::onButton_loadGitNotCommitFiles);
+            jgp.add(button_loadGitNotCommitFiles);
+
             heads = new Vector();
             heads.add("导出");
             heads.add("模块名");
@@ -731,6 +738,40 @@ public class PatcherDialog extends DialogWrapper {
             return;
         }
         loadModulesSet2UI(c);
+    }
+
+    private void onButton_loadGitNotCommitFiles(ActionEvent actionEvent) {
+        // 获取当前项目中所有未提交的修改
+        ChangeListManager changeListManager = ChangeListManager.getInstance(event.getProject());
+        // 1. 获取已追踪但未提交的修改（Modified/Added/Deleted）
+        Collection<Change> allChanges = changeListManager.getAllChanges();
+        List<VirtualFile> modifiedFiles = allChanges.stream()
+                .map(change -> change.getVirtualFile())
+                .filter(file -> file != null)
+                .collect(Collectors.toList());
+        // 2. 获取未版本化的文件（Unversioned/Untracked Files）
+        List<FilePath> unversionedFilesPaths = changeListManager.getUnversionedFilesPaths();
+
+        checkBox_OnlyTreeSelects.setSelected(true);
+        ArrayList<SelectDTO> rows = Lists.newArrayList();
+        if (CollUtil.isNotEmpty(modifiedFiles)) {
+            for (VirtualFile f : modifiedFiles) {
+                SelectDTO s = new SelectDTO();
+                s.setSelect(true);
+                s.setPath(f.getPath());
+                rows.add(s);
+            }
+        }
+        if (CollUtil.isNotEmpty(unversionedFilesPaths)) {
+            for (FilePath f : unversionedFilesPaths) {
+                SelectDTO s = new SelectDTO();
+                s.setSelect(true);
+                s.setPath(f.getPath());
+                rows.add(s);
+            }
+        }
+
+        setSelectTableDatas(rows);
     }
 
     public void initDefualtValues() {
@@ -891,7 +932,9 @@ public class PatcherDialog extends DialogWrapper {
         }
         checkBox_ygj_deploy.setSelected(c.isDeploy());
         checkBox_ygj_appleyjar.setSelected(c.isAppleyjar());
-
+        if (StrUtil.isNotBlank(c.getNpmRunCommand())) {
+            getTextField_npmRun().setText(c.getNpmRunCommand());
+        }
     }
 
     public ExportContentVO getFromUI() {
@@ -929,13 +972,15 @@ public class PatcherDialog extends DialogWrapper {
         contentVO.no2Jar = no2Jar.isSelected();
         contentVO.saveConfig = saveConfig.isSelected();
         contentVO.exportModuleLib = getExportModuleLib().isSelected();
+        contentVO.exportModuleMetadata = getExportModuleMetadata().isSelected();
+        contentVO.exportModuleMeteinfo = getExportModuleMeteinfo().isSelected();
         contentVO.data_source_index = dataSourceIndex.getSelectedIndex();
         contentVO.ncVersion = (NcVersionEnum) ncVersion.getSelectedItem();
         contentVO.setNpmRunCommand(textField_npmRun.getText());
 
         //要导出的文件们
         contentVO.init();
-        contentVO.selectExport = selectExport.isSelected() || selectExport2.isSelected();
+        contentVO.selectExport = checkBox_OnlyTreeSelects.isSelected() || checkBox_OnlySelectFiles.isSelected();
         if (contentVO.selectExport) {
             Vector<Vector> rows = defaultTableModel.getDataVector();
             contentVO.setSelectFiles(Lists.newArrayList());
@@ -1234,8 +1279,8 @@ public class PatcherDialog extends DialogWrapper {
 
     private void updateSelectFileTable() {
         ArrayList<SelectDTO> rows = Lists.newArrayList();
-        selectExport2.setSelected(false);
-        if (selectExport.isSelected()) {
+        checkBox_OnlySelectFiles.setSelected(false);
+        if (checkBox_OnlyTreeSelects.isSelected()) {
             VirtualFile[] selects = V.get(LangDataKeys.VIRTUAL_FILE_ARRAY.getData(event.getDataContext()),
                     new VirtualFile[0]);
             List<PatcherSelectFileVO> vs = getForceAddSelectFiles(event.getProject());
@@ -1265,8 +1310,8 @@ public class PatcherDialog extends DialogWrapper {
 
     private void updateSelectFileTable2() {
         ArrayList<SelectDTO> rows = Lists.newArrayList();
-        selectExport.setSelected(false);
-        if (selectExport2.isSelected()) {
+        checkBox_OnlyTreeSelects.setSelected(false);
+        if (checkBox_OnlySelectFiles.isSelected()) {
             List<PatcherSelectFileVO> vs = getForceAddSelectFiles(event.getProject());
             for (PatcherSelectFileVO select : vs) {
                 if (StringUtil.isBlank(select.getPath())) {
