@@ -71,7 +71,12 @@ public class ExportChangeCodeFilesAction extends AbstractIdeaAction {
             final File outDirFile = outDir;
 
             relaod(e.getProject(), (indicator) -> {
-                makeExcel(infos.get(e.getProject().getBasePath()), outDirFile, indicator);
+                List<FileInfoDTO> vs = ExportChangeCodeFilesAction.infos.get(e.getProject().getBasePath());
+                if (vs.isEmpty()) {
+                    LogUtil.infoAndHide("完成: 没有任何结果!");
+                    return;
+                }
+                makeExcel(vs, outDirFile, indicator);
             });
         } catch (Throwable ex) {
         }
@@ -117,11 +122,6 @@ public class ExportChangeCodeFilesAction extends AbstractIdeaAction {
                                 loadFile(project, vs, sourceFile, indicator, module.getName());
                             }
                         }
-                    }
-
-                    if (vs.isEmpty()) {
-                        LogUtil.error("完成: 没有任何结果!");
-                        return;
                     }
 
                     if (after != null) {

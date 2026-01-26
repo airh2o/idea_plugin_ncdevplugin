@@ -17,6 +17,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * </br>
@@ -82,6 +83,12 @@ public class ProjectNodeDecorator implements ProjectViewNodeDecorator {
                 // new SimpleTextAttributes(SimpleTextAttributes.STYLE_ITALIC, JBColor.BLUE): 蓝色斜体。
                 // SimpleTextAttributes.ERROR_ATTRIBUTES: 红色文本。
                 data.addText(" *标品类", tagStyle);
+                data.setTooltip(
+                        StrUtil.blankToDefault(data.getTooltip(), "")
+                        + v.getOrgins().stream()
+                                .map(VirtualFile::getPath)
+                                .collect(Collectors.joining("\n"))
+                );
             }
         }
     }

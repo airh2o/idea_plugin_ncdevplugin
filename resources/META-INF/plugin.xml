@@ -633,11 +633,13 @@
 
         <!--        监听文件树变化-->
         <projectViewNodeDecorator implementation="com.air.nc5dev.listeners.ProjectNodeDecorator"/>
-
+        <!--        java文件编辑器 类名显示一个 超链接-->
+        <codeInsight.inlayProvider language="JAVA" implementationClass="com.air.nc5dev.editor.hints.ProductFileInlayHintProvider"/>
     </extensions>
 
     <depends optional="true">com.jetbrains.restClient</depends>
     <!-- 必须声明，否则无法识别 Java 相关类 -->
+    <depends optional="true">com.intellij.java</depends>
     <depends optional="true">com.intellij.modules.java</depends>
     <depends optional="true">com.intellij.modules.platform</depends>
     <depends optional="true">com.intellij.modules.java</depends>
