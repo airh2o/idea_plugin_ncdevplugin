@@ -1,7 +1,10 @@
 package com.air.nc5dev.util.exportpatcher.searchs;
 
+import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.enums.NcVersionEnum;
+import com.air.nc5dev.util.ExceptionUtil;
 import com.air.nc5dev.util.IoUtil;
+import com.air.nc5dev.util.SimpleFormulaUtil;
 import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.vo.FileContentVO;
 import com.air.nc5dev.util.idea.ProjectUtil;
@@ -13,15 +16,13 @@ import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import lombok.Data;
+import nc.vo.pub.BusinessException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -144,7 +145,8 @@ public abstract class ModuleJavaFileContentSearchImpl extends AbstractContentSea
      */
     public void export(@NotNull String ncType, @NotNull String exportDir
             , @NotNull ModuleWarpVO module, @NotNull String sourceRoot
-            , @NotNull String classDir, @Nullable String testClassDir, @NotNull ExportContentVO contentVO) {
+            , @NotNull String classDir, @Nullable String testClassDir
+            , @NotNull ExportContentVO contentVO) {
         File sourceBaseDirFile = new File(sourceRoot);
 
         File classBaseDirFile;
@@ -196,8 +198,15 @@ public abstract class ModuleJavaFileContentSearchImpl extends AbstractContentSea
                 return;
             }
 
-            if (!canExport(contentVO, file, sourcePackge, null, exportDir
-                    , module, packgePath, null, ncType)) {
+            if (!canExport(contentVO
+                    , file
+                    , sourcePackge
+                    , null
+                    , exportDir
+                    , module
+                    , packgePath
+                    , null
+                    , ncType)) {
                 return;
             }
 
@@ -213,24 +222,52 @@ public abstract class ModuleJavaFileContentSearchImpl extends AbstractContentSea
             configKey = StringUtil.replaceAll(configKey, File.separator, ".");
 
             String outModuleName = getOutModuleName(contentVO, configKey, null, module, module.getConfigName());
-            String outClasPathOtherFileDirPath = exportDir + File.separatorChar + (StringUtil.isEmpty(outModuleName)
-                    ? module.getConfigName() : outModuleName);
-            File outClasPathOtherFileDir = null;
-            if (NC_TYPE_PUBLIC.equals(ncType)) {
-                outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "classes");
-            } else if (NC_TYPE_PRIVATE.equals(ncType)) {
-                outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "META-INF" + File.separatorChar +
-                        "classes");
-            } else if (NC_TYPE_CLIENT.equals(ncType)) {
-                outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "client" + File.separatorChar +
-                        "classes");
-            } else if (NC_TYPE_TEST.equals(ncType)) {
-                outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "test");
+            outModuleName = (StringUtil.isEmpty(outModuleName) ? module.getConfigName() : outModuleName);
+            outModuleName = StringUtil.replaceAll(outModuleName, "/", File.separator);
+            outModuleName = StringUtil.replaceAll(outModuleName, "\\", File.separator);
+
+            String path = null;
+            if (StrUtil.contains(outModuleName, "${")) {
+                HashMap<Object, Object> variables = new HashMap<>();
+                try {
+                    variables.put("root", exportDir);
+                    variables.put("nctype", ncType);
+                    variables.put("filename", fileName);
+                    variables.put("filetype", StrUtil.subAfter(fileName, ".", true));
+                    variables.put("packgepath", packgePath);
+                    variables.put("javafullname", "");
+                    variables.put("separator", File.separator);
+                    variables.put("javafullnamepath", StringUtil.replaceAll(outModuleName, ".", File.separator));
+                    variables.put("classdir", classDir);
+                    variables.put("classfiledir", configKey);
+                    variables.put("sourcepackge", sourcePackge == null ? "" : sourcePackge.getPath());
+                    variables.put("sourcebasedirfile", "");
+                    variables.put("module", module == null || module.getModule() == null ? "" : module.getModule().getName());
+
+                    path = SimpleFormulaUtil.executeFormula(outModuleName, variables, path);
+                } catch (Throwable e) {
+                    ExceptionUtil.wrapRuntime(e);
+                }
+            } else {
+                String outClasPathOtherFileDirPath = exportDir + File.separatorChar + (StringUtil.isEmpty(outModuleName)
+                        ? module.getConfigName() : outModuleName);
+                File outClasPathOtherFileDir = null;
+                if (NC_TYPE_PUBLIC.equals(ncType)) {
+                    outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "classes");
+                } else if (NC_TYPE_PRIVATE.equals(ncType)) {
+                    outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "META-INF" + File.separatorChar +
+                            "classes");
+                } else if (NC_TYPE_CLIENT.equals(ncType)) {
+                    outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "client" + File.separatorChar +
+                            "classes");
+                } else if (NC_TYPE_TEST.equals(ncType)) {
+                    outClasPathOtherFileDir = new File(outClasPathOtherFileDirPath, "test");
+                }
+                File outClasPathOtherFileDirFinal = new File(outClasPathOtherFileDir, packgePath);
+                path = outClasPathOtherFileDirFinal.getPath();
             }
 
-            File outClasPathOtherFileDirFinal = new File(outClasPathOtherFileDir, packgePath);
-
-            copyFile(file, outClasPathOtherFileDirFinal, contentVO, module, ncType, sourcePackge, null);
+            copyFile(file, new File(path), contentVO, module, ncType, sourcePackge, null);
         });
     }
 
@@ -292,13 +329,19 @@ public abstract class ModuleJavaFileContentSearchImpl extends AbstractContentSea
                 return;
             }
 
-            if (!canExport(contentVO, classFile, sourcePackge, sourceBaseDirFile, exportDir
-                    , module, packgePath, classFile, ncType)) {
+            if (!canExport(contentVO
+                    , classFile
+                    , sourcePackge
+                    , sourceBaseDirFile
+                    , exportDir
+                    , module
+                    , packgePath
+                    , classFile
+                    , ncType)) {
                 return;
             }
 
             //获得源文件名字 C:\Users\airh2o\IdeaProjects\ncctest\out\production\mmmpsxj\nc\bs\pub\action\N_36D1_SIGNAL.class
-
             String javaFullName = StringUtil.get(getClassFileSourceFileName(classFile.getPath(), sourcePackge), "");
 
             //这里判断一下， 解决 如果 public新建了一个 和 private一模一样的包路径，会导致 private的class可能跑到了 public里！
@@ -328,27 +371,50 @@ public abstract class ModuleJavaFileContentSearchImpl extends AbstractContentSea
             String outModuleName = NC_TYPE_CLIENT.equals(ncType) && NcVersionEnum.isNCCOrBIP(contentVO.ncVersion) ?
                     module.getConfigName() : getOutModuleName(contentVO
                     , javaFullClassName, classFile, module, module.getConfigName());
+            outModuleName = (StringUtil.isEmpty(outModuleName) ? module.getConfigName() : outModuleName);
+            outModuleName = StringUtil.replaceAll(outModuleName, "/", File.separator);
+            outModuleName = StringUtil.replaceAll(outModuleName, "\\", File.separator);
+            String path = exportDir + File.separatorChar + outModuleName;
+            if (outModuleName.contains("${")) {
+                HashMap<Object, Object> variables = new HashMap<>();
+                try {
+                    variables.put("root", exportDir);
+                    variables.put("nctype", ncType);
+                    variables.put("filename", javaFullName);
+                    variables.put("filetype", "class");
+                    variables.put("packgepath", packgePath);
+                    variables.put("javafullname", javaFullClassName);
+                    variables.put("separator", File.separator);
+                    variables.put("javafullnamepath", packgePath + File.separator + javaFullName);
+                    variables.put("classdir", classDir);
+                    variables.put("classfiledir", classFileDir == null ? "" : classFileDir.getPath());
+                    variables.put("sourcepackge", sourcePackge == null ? "" : sourcePackge.getPath());
+                    variables.put("sourcebasedirfile", sourceBaseDirFile == null ? "" : sourceBaseDirFile.getPath());
+                    variables.put("module", module == null ? "" : StringUtil.get(module.getConfigName(), module.getModule() == null ? "" : module.getModule().getName()));
 
-            final String baseOutDirPath = exportDir + File.separatorChar + outModuleName;
+                    path = SimpleFormulaUtil.executeFormula(outModuleName, variables, path);
+                } catch (Throwable e) {
+                    ExceptionUtil.wrapRuntime(e);
+                }
+            } else {
+                if (NC_TYPE_PUBLIC.equals(ncType)) {
+                    path = path + File.separatorChar + "classes";
+                } else if (NC_TYPE_PRIVATE.equals(ncType)) {
+                    path = path + File.separatorChar + "META-INF" + File.separatorChar + "classes";
+                } else if (NC_TYPE_CLIENT.equals(ncType)) {
+                    path = path + File.separatorChar + "client" + File.separatorChar + "classes";
+                } else if (NC_TYPE_TEST.equals(ncType)) {
+                    path = path + File.separatorChar + "test";
+                }
 
-            File outDir = null;
-            if (NC_TYPE_PUBLIC.equals(ncType)) {
-                outDir = new File(baseOutDirPath, "classes");
-            } else if (NC_TYPE_PRIVATE.equals(ncType)) {
-                outDir = new File(baseOutDirPath, "META-INF" + File.separatorChar + "classes");
-            } else if (NC_TYPE_CLIENT.equals(ncType)) {
-                outDir = new File(baseOutDirPath, "client" + File.separatorChar + "classes");
-            } else if (NC_TYPE_TEST.equals(ncType)) {
-                outDir = new File(baseOutDirPath, "test");
+                path = path + File.separatorChar + packgePath;
             }
-
-            outDir = new File(outDir, packgePath);
 
             if (configVO.hasSource && StringUtil.notEmpty(javaFullName)) {
                 //复制源码
                 copyFile(new File(sourcePackge, javaFullName.endsWith(".java")
                                 ? javaFullName : javaFullName + ".java")
-                        , outDir
+                        , new File(path)
                         , contentVO
                         , module
                         , ncType
@@ -358,7 +424,7 @@ public abstract class ModuleJavaFileContentSearchImpl extends AbstractContentSea
             }
 
             //复制class
-            copyFile(classFile, outDir, contentVO, module, ncType, sourceBaseDirFile, classDir);
+            copyFile(classFile, new File(path), contentVO, module, ncType, sourceBaseDirFile, classDir);
         });
     }
 
@@ -375,9 +441,15 @@ public abstract class ModuleJavaFileContentSearchImpl extends AbstractContentSea
      * @Param [sourcePackge, sourceBaseDirFile,  contentVO, exportDir, moduleName, ncType, packgePath,
      * hasJavaFile, classFileDir]
      */
-    public void copyClassAndJavaSourceFilesBySource(File sourcePackge, File sourceBaseDirFile
-            , ExportContentVO contentVO, String exportDir, ModuleWarpVO module
-            , String ncType, String packgePath, final File classFileDir, String classDir) {
+    public void copyClassAndJavaSourceFilesBySource(File sourcePackge
+            , File sourceBaseDirFile
+            , ExportContentVO contentVO
+            , String exportDir
+            , ModuleWarpVO module
+            , String ncType
+            , String packgePath
+            , final File classFileDir
+            , String classDir) {
         ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(module.getModule());
         Stream.of(sourcePackge.listFiles()).forEach(javaFile -> {
             //循环复制所有java文件 ,因为idea编译后 没有分NC这3个文件夹！
@@ -389,8 +461,15 @@ public abstract class ModuleJavaFileContentSearchImpl extends AbstractContentSea
                 return;
             }
 
-            if (!canExport(contentVO, javaFile, sourcePackge, sourceBaseDirFile, exportDir
-                    , module, packgePath, classFileDir, ncType)) {
+            if (!canExport(contentVO
+                    , javaFile
+                    , sourcePackge
+                    , sourceBaseDirFile
+                    , exportDir
+                    , module
+                    , packgePath
+                    , classFileDir
+                    , ncType)) {
                 return;
             }
 
@@ -419,20 +498,41 @@ public abstract class ModuleJavaFileContentSearchImpl extends AbstractContentSea
             outModuleName = StringUtil.replaceAll(outModuleName, "/", File.separator);
             outModuleName = StringUtil.replaceAll(outModuleName, "\\", File.separator);
 
-            final String baseOutDirPath = exportDir + File.separatorChar + outModuleName;
+            String path = exportDir + File.separatorChar + outModuleName;
+            if (outModuleName.contains("${")) {
+                HashMap<Object, Object> variables = new HashMap<>();
+                try {
+                    variables.put("root", exportDir);
+                    variables.put("nctype", ncType);
+                    variables.put("filename", javaFullName);
+                    variables.put("filetype", "class");
+                    variables.put("packgepath", packgePath);
+                    variables.put("javafullname", javaFullClassName);
+                    variables.put("separator", File.separator);
+                    variables.put("javafullnamepath", packgePath + File.separator + javaFullName);
+                    variables.put("classdir", classDir);
+                    variables.put("classfiledir", classFileDir == null ? "" : classFileDir.getPath());
+                    variables.put("sourcepackge", sourcePackge == null ? "" : sourcePackge.getPath());
+                    variables.put("sourcebasedirfile", sourceBaseDirFile == null ? "" : sourceBaseDirFile.getPath());
+                    variables.put("module", module == null ? "" : StringUtil.get(module.getConfigName(), module.getModule() == null ? "" : module.getModule().getName()));
 
-            File outDir = null;
-            if (NC_TYPE_PUBLIC.equals(ncType)) {
-                outDir = new File(baseOutDirPath, "classes");
-            } else if (NC_TYPE_PRIVATE.equals(ncType)) {
-                outDir = new File(baseOutDirPath, "META-INF" + File.separatorChar + "classes");
-            } else if (NC_TYPE_CLIENT.equals(ncType)) {
-                outDir = new File(baseOutDirPath, "client" + File.separatorChar + "classes");
-            } else if (NC_TYPE_TEST.equals(ncType)) {
-                outDir = new File(baseOutDirPath, "test");
+                    path = SimpleFormulaUtil.executeFormula(outModuleName, variables, path);
+                } catch (Throwable e) {
+                    ExceptionUtil.wrapRuntime(e);
+                }
+            } else {
+                if (NC_TYPE_PUBLIC.equals(ncType)) {
+                    path = path + File.separatorChar + "classes";
+                } else if (NC_TYPE_PRIVATE.equals(ncType)) {
+                    path = path + File.separatorChar + "META-INF" + File.separatorChar + "classes";
+                } else if (NC_TYPE_CLIENT.equals(ncType)) {
+                    path = path + File.separatorChar + "client" + File.separatorChar + "classes";
+                } else if (NC_TYPE_TEST.equals(ncType)) {
+                    path = path + File.separatorChar + "test";
+                }
+
+                path = path + File.separatorChar + packgePath;
             }
-
-            outDir = new File(outDir, packgePath);
 
             if (configVO.hasSource) {
                 //复制源码
@@ -440,7 +540,7 @@ public abstract class ModuleJavaFileContentSearchImpl extends AbstractContentSea
                         new FileContentVO()
                                 .setModule(module)
                                 .setSrcFile(javaFile.getPath())
-                                .setSrcFileTo(new File(outDir, javaFile.getName()).getPath())
+                                .setSrcFileTo(new File(path, javaFile.getName()).getPath())
                                 .setName(ncType)
                                 .setSrcTop(sourceBaseDirFile == null ? null : sourceBaseDirFile.getPath())
                 );
@@ -456,7 +556,7 @@ public abstract class ModuleJavaFileContentSearchImpl extends AbstractContentSea
                                 .setModule(module)
                                 .setSrcFile(javaFile.getPath())
                                 .setFile(classFile.getPath())
-                                .setFileTo(new File(outDir, classFile.getName()).getPath())
+                                .setFileTo(new File(path, classFile.getName()).getPath())
                                 .setName(ncType)
                                 .setSrcTop(classDir)
                 );

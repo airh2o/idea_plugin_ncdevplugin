@@ -54,6 +54,11 @@ public class MeassgeConsoleImpl implements IMeassgeConsole, Disposable {
     }
 
     @Override
+    public void output(String msg) {
+        getConsoleView().print(msg + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
+    }
+
+    @Override
     public void infoAndHide(String msg) {
         getConsoleView().print(msg + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
         ProjectUtil.notifyAndHide(msg, ProjectUtil.getDefaultProject());

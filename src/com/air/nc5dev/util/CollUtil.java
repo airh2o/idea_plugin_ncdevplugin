@@ -6,16 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -29,6 +20,58 @@ import java.util.function.Function;
  * @Version
  */
 public class CollUtil extends cn.hutool.core.collection.CollUtil {
+    /**
+     * 数组是否!=null && 长度 > 0 返回true <br/> <br/>
+     *
+     * @param parmars
+     * @return
+     * @author air Email:209308343@qq.com
+     * @date 2019-8-17 下午3:05:31
+     */
+    public static boolean notEmpty(Object[] o) {
+        return null != o && o.length > 0;
+    }
+
+    /**
+     * Collection是否!=null && 长度 > 0 返回true <br/> <br/>
+     *
+     * @param parmars
+     * @return
+     * @author air Email:209308343@qq.com
+     * @date 2019-8-17 下午3:05:31
+     */
+    public static boolean notEmpty(Collection o) {
+        return null != o && o.size() > 0;
+    }
+
+    /**
+     * 获取第i个
+     *
+     * @param coll
+     * @param <T>
+     * @return
+     */
+    public static <T> T getFirst(T[] arr, int i) {
+        if (isEmpty(arr) || arr.length < i - 1) {
+            return null;
+        }
+
+        return arr[i];
+    }
+
+    public static <T> Set<T> asSet(T... items) {
+        if (CollUtil.isEmpty(items)) {
+            return emptySet();
+        }
+
+        HashSet<T> set = new HashSet(items.length);
+        for (T item : items) {
+            set.add(item);
+        }
+
+        return set;
+    }
+
     /**
      * 转换成一个map，ks key的数组， vs value的数组，如果ks 的长度大于vs，多余的用null作为值，vs多余ks 多余的vs丢弃
      *
@@ -395,5 +438,12 @@ public class CollUtil extends cn.hutool.core.collection.CollUtil {
         }
 
         return c.size();
+    }
+
+    public static int length(Object[] ar) {
+        if (ar == null) {
+            return 0;
+        }
+        return ar.length;
     }
 }

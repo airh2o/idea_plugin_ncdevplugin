@@ -48,6 +48,16 @@ public class LogUtil {
         service.info(msg);
     }
 
+    public static void output(String msg) {
+        IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class, ProjectUtil.getDefaultProject());
+        if (service == null) {
+            LOGGER.info("com.air.nc5dev.util.idea.ProjectUtil.getService(java.lang.Class<T>) null for msg: " + msg);
+            return;
+        }
+
+        service.output(msg);
+    }
+
     public static void infoAndHide(String msg) {
         IMeassgeConsole service = ProjectUtil.getService(IMeassgeConsole.class, ProjectUtil.getDefaultProject());
         if (service == null) {

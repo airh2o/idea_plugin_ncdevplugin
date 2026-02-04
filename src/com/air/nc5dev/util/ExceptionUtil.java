@@ -33,6 +33,33 @@ public final class ExceptionUtil extends cn.hutool.core.exceptions.ExceptionUtil
     }
 
     /**
+     * 获得异常的简短描述+最近 lines 行的代码方法全限定名字和行数
+     *
+     * @param e
+     * @param lines 需要获得多少层异常栈信息
+     * @return
+     * @author air
+     * @date 2019年8月6日 下午1:58:56
+     */
+    public static String getMessageLines(Throwable e, int lines) {
+        StringBuilder sb = new StringBuilder(3000);
+        sb.append(e.toString());
+
+        StackTraceElement[] stackTrace = e.getStackTrace();
+
+        if (null != stackTrace) {
+            int lineSize = stackTrace.length < lines ? stackTrace.length : lines;
+            for (int i = 0; i < lineSize; i++) {
+                StackTraceElement s = stackTrace[i];
+                sb.append(s.getClassName()).append('.')
+                        .append(s.getMethodName()).append("()  ").append(s.getLineNumber()).append('\n');
+            }
+        }
+
+        return sb.toString();
+    }
+
+    /**
      * 获取所有错误栈代码方法全限定名字和行数
      *
      * @param e
