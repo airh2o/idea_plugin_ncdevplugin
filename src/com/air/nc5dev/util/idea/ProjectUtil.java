@@ -29,6 +29,7 @@ import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx;
@@ -458,6 +459,14 @@ public class ProjectUtil {
      * @return
      */
     public static Collection<PsiClass> findClassByFullName(String className, Project project, GlobalSearchScope scope) {
+        Collection<PsiClass> psiClasses = DumbService.getInstance(project).runReadActionInSmartMode(() -> {
+            return findClassByFullName0(className, project, scope);
+        });
+
+        return psiClasses;
+    }
+
+    public static Collection<PsiClass> findClassByFullName0(String className, Project project, GlobalSearchScope scope) {
         if (scope == null) {
             scope = getGlobalSearchScope(project);
         }

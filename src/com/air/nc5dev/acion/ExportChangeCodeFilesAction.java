@@ -11,6 +11,8 @@ import com.air.nc5dev.util.IoUtil;
 import com.air.nc5dev.util.ProjectNCConfigUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -85,6 +87,20 @@ public class ExportChangeCodeFilesAction extends AbstractIdeaAction {
     public static void relaod(Project project, Consumer<ProgressIndicator> after) {
         init(project);
 
+//        ReadAction.run(() -> {
+        //com.intellij.openapi.diagnostic.RuntimeExceptionWithAttachments: Read access is allowed from inside read-action only
+        // 这个错误是因为你在后台线程中直接访问了 IDEA 的项目模型（如 PSI、VirtualFile 或 Project 结构），而没有申请 Read Action（读锁）。
+        // IDEA 要求所有涉及代码分析或结构读取的操作必须在读锁保护下进行，以防止并发修改导致崩溃 JetBrains Threading Model。
+//        });
+        ApplicationManager.getApplication().invokeLater(() -> {
+            ApplicationManager.getApplication().runWriteAction(() -> {
+                reload0(project, after);
+            });
+        });
+
+    }
+
+    protected static void reload0(Project project, Consumer<ProgressIndicator> after) {
         Task.Backgroundable backgroundable = new Task.Backgroundable(project
                 , "正在导出被修改的标品代码文件情况中...") {
             @Override

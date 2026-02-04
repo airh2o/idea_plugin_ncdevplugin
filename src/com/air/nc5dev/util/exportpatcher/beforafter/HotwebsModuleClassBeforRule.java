@@ -31,7 +31,6 @@ public class HotwebsModuleClassBeforRule extends AbstarctBeforRule {
         ExportConfigVO configVO = contentVO.module2ExportConfigVoMap.get(fileContentVO.getModule().getModule());
 
         if (FileContentVO.NAME_HOTWEBS_NCCLOUD_RESOURCE.equals(fileContentVO.getName())) {
-
             return;
         }
 

@@ -406,13 +406,20 @@ public abstract class ModuleJavaFileContentSearchImpl extends AbstractContentSea
             String javaFullClassName = StringUtil.replaceAll(javaFullName, File.separator, ".");
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "\\", ".");
             javaFullClassName = StringUtil.replaceAll(javaFullClassName, "/", ".");
+
             //检查是否配置了 特殊输出路径
             String outModuleName = NC_TYPE_CLIENT.equals(ncType) && NcVersionEnum.isNCCOrBIP(contentVO.ncVersion) ?
-                    module.getConfigName() : getOutModuleName(contentVO, javaFullClassName, javaFile, module
+                    module.getConfigName()
+                    : getOutModuleName(contentVO
+                    , javaFullClassName
+                    , javaFile
+                    , module
                     , module.getConfigName());
+            outModuleName = (StringUtil.isEmpty(outModuleName) ? module.getConfigName() : outModuleName);
+            outModuleName = StringUtil.replaceAll(outModuleName, "/", File.separator);
+            outModuleName = StringUtil.replaceAll(outModuleName, "\\", File.separator);
 
-            final String baseOutDirPath = exportDir + File.separatorChar
-                    + (StringUtil.isEmpty(outModuleName) ? module.getConfigName() : outModuleName);
+            final String baseOutDirPath = exportDir + File.separatorChar + outModuleName;
 
             File outDir = null;
             if (NC_TYPE_PUBLIC.equals(ncType)) {

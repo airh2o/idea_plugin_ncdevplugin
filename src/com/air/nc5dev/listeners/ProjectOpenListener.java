@@ -14,6 +14,8 @@ import com.air.nc5dev.util.idea.ProjectUtil;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.projectView.ProjectView;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import com.melloware.jintellitype.JIntellitype;
@@ -85,8 +87,9 @@ public class ProjectOpenListener implements StartupActivity.DumbAware {
                     ProjectView.getInstance(project).refresh();
                 });
             } catch (Throwable e) {
-                LogUtil.error(e.getMessage(), e);
+                // LogUtil.error(e.getMessage(), e);
             }
+
 
             try {
                 registerGlobalHotKey();
