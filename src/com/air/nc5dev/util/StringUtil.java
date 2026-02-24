@@ -409,12 +409,7 @@ public final class StringUtil extends StrUtil {
      * @date 2019年12月6日 上午9:16:18
      */
     public static final String replaceAll(String src, String from, String to) {
-        String re = src;
-        while (re.contains(from)) {
-            re = replace(re, from, to);
-        }
-
-        return re;
+       return StrUtil.replace(src, from, to);
     }
 
     /**
