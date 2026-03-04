@@ -1,5 +1,8 @@
 package org.infernus.idea.checkstyle.util;
 
+import cn.hutool.core.util.StrUtil;
+import com.air.nc5dev.util.ExceptionUtil;
+import com.air.nc5dev.util.idea.LogUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.CompilerModuleExtension;
@@ -74,9 +77,21 @@ public final class ModulePaths {
     private static Optional<String> mirrorPathOf(final VirtualFile file) {
         final JarFileSystem jarFileSystem = JarFileSystem.getInstance();
         if (jarFileSystem instanceof JarFileSystemImpl) {
-            final File mirroredFile = ((JarFileSystemImpl) jarFileSystem).getMirroredFile(file);
-            if (mirroredFile != null) {
-                return Optional.of(mirroredFile.getPath());
+            try {
+                File mirroredFile = ((JarFileSystemImpl) jarFileSystem).getMirroredFile(file);
+                if (mirroredFile != null) {
+                    return Optional.of(mirroredFile.getPath());
+                }
+            } catch (Throwable e) {
+                LogUtil.tryInfo(file == null ? null : file.getPath() + " 读取出错1: " + ExceptionUtil.toString(e));
+                try {
+                    File mirroredFile = new File(StrUtil.removeSuffix(file.getPath(),"!/"));
+                    if (mirroredFile != null) {
+                        return Optional.of(mirroredFile.getPath());
+                    }
+                } catch (Throwable ex) {
+                    LogUtil.tryInfo(file == null ? null : file.getPath() + " 读取出错2: " + ExceptionUtil.toString(e));
+                }
             }
         }
         return empty();
