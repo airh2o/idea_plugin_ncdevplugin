@@ -446,11 +446,15 @@ public class IdeaProjectGenerateUtil {
                     }
 
                     // 是否为行业版
-                    boolean hyVersion = ProjectNCConfigUtil.isHyVersion(project);
+                    boolean hyVersion = true; // ProjectNCConfigUtil.isHyVersion(project);
 
                     LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
                             ProjectNCConfigUtil.LIB_Ant_Library
                             , IoUtil.serachAllNcAntJars(ncHome)));
+
+                    LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                            ProjectNCConfigUtil.LIB_Product_Common_Library
+                            , IoUtil.serachProduct_Common_LibraryJars(ncHome)));
 
                     LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
                             ProjectNCConfigUtil.LIB_Middleware_Library
@@ -460,47 +464,57 @@ public class IdeaProjectGenerateUtil {
                             ProjectNCConfigUtil.LIB_Framework_Library
                             , IoUtil.serachFramework_LibraryJars(ncHome)));
 
-                    LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
-                            ProjectNCConfigUtil.LIB_Product_Common_Library
-                            , IoUtil.serachProduct_Common_LibraryJars(ncHome)));
-
+                    ArrayList<File> extraJars = IoUtil.serachModule_Public_Extra_Library(ncHome);
+                    if (!extraJars.isEmpty()) {
+                        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                                ProjectNCConfigUtil.LIB_Module_Public_Extra_Library
+                                , extraJars));
+                    }
                     if (hyVersion) {
                         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
                                 ProjectNCConfigUtil.LIB_NC_Module_Public_Hyext_Library
                                 , IoUtil.serachNC_Module_Public_Hyext_Library(ncHome)));
                     }
-
                     LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
                             ProjectNCConfigUtil.LIB_NC_Module_Public_Library
                             , IoUtil.serachNC_Module_Public_Library(ncHome)));
 
+                    extraJars = IoUtil.serachModule_Client_Extra_Library(ncHome);
+                    if (!extraJars.isEmpty()) {
+                        LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                                ProjectNCConfigUtil.LIB_Module_Client_Extra_Library
+                                , extraJars));
+                    }
                     if (hyVersion) {
                         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
                                 ProjectNCConfigUtil.LIB_Module_Client_Hyext_Library
                                 , IoUtil.serachModule_Client_Hyext_Library(ncHome)));
                     }
-
                     LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
                             ProjectNCConfigUtil.LIB_Module_Client_Library
                             , IoUtil.serachModule_Client_Library(ncHome)));
 
-                    ArrayList<File> extraJars = IoUtil.serachModule_Private_Extra_Library(ncHome);
+                    extraJars = IoUtil.serachModule_Private_Extra_Library(ncHome);
                     if (!extraJars.isEmpty()) {
                         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
                                 ProjectNCConfigUtil.LIB_Module_Private_Extra_Library
                                 , extraJars));
                     }
-
                     if (hyVersion) {
                         LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
                                 ProjectNCConfigUtil.LIB_Module_Private_Hyext_Library
                                 , IoUtil.serachModule_Private_Hyext_Library(ncHome)));
                     }
-
                     LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
                             ProjectNCConfigUtil.LIB_Module_Private_Library
                             , IoUtil.serachModule_Private_Library(ncHome)));
 
+                    LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                            ProjectNCConfigUtil.LIB_Module_Lang_Library
+                            , IoUtil.serachModule_Lang_Library(ncHome)));
+                    LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
+                            ProjectNCConfigUtil.LIB_Generated_EJB
+                            , IoUtil.serachGenerated_EJB(ncHome)));
 
                     //hotwebs系列
                     List<File> hotwebs = ApplicationLibraryUtil.getHotwebsModules(project);
@@ -511,14 +525,6 @@ public class IdeaProjectGenerateUtil {
                                     , IoUtil.serachHotwebs_Library(ncHome, h.getName())));
                         }
                     }
-
-                    LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
-                            ProjectNCConfigUtil.LIB_Module_Lang_Library
-                            , IoUtil.serachModule_Lang_Library(ncHome)));
-
-                    LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
-                            ProjectNCConfigUtil.LIB_Generated_EJB
-                            , IoUtil.serachGenerated_EJB(ncHome)));
 
                     LibraryExList.add(ApplicationLibraryUtil.addApplicationLibrary(project,
                             ProjectNCConfigUtil.LIB_RESOURCES

@@ -102,7 +102,7 @@ public class ExportChangeCodeFilesAction extends AbstractIdeaAction {
 
     protected static void reload0(Project project, Consumer<ProgressIndicator> after) {
         Task.Backgroundable backgroundable = new Task.Backgroundable(project
-                , "正在导出被修改的标品代码文件情况中...") {
+                , "正在读取被修改的标品代码文件情况中...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
@@ -144,7 +144,7 @@ public class ExportChangeCodeFilesAction extends AbstractIdeaAction {
                         after.accept(indicator);
                     }
                 } catch (Throwable ex) {
-                    LogUtil.error("被修改的标品代码文件情况导出失败:" + ex.getLocalizedMessage(), ex);
+                    LogUtil.error("被修改的标品代码文件情况处理失败:" + ex.getLocalizedMessage(), ex);
                 }
             }
         };

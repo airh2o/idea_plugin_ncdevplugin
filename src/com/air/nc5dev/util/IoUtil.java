@@ -290,6 +290,22 @@ public final class IoUtil extends cn.hutool.core.io.IoUtil {
         return serachAllNcPrivateExtraJars(ncHome);
     }
 
+    public static ArrayList<File> serachModule_Public_Extra_Library(File ncHome) {
+        return serachAllNcPublicExtraJars(ncHome);
+    }
+
+    public static ArrayList<File> serachAllNcPublicExtraJars(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "modules"), "extra", true);
+    }
+
+    public static ArrayList<File> serachModule_Client_Extra_Library(File ncHome) {
+        return serachAllNcClientExtraJars(ncHome);
+    }
+
+    public static ArrayList<File> serachAllNcClientExtraJars(File ncHome) {
+        return serachAllNcClass(new File(ncHome, "client" + File.separatorChar + "modules"), "extra", true);
+    }
+
     /**
      * 获取NC的 所有 模块的 所有    Module_Private_Hyext_Library
      *

@@ -529,6 +529,10 @@ public class ProjectNCConfigUtil {
     public static final String LIB_Module_Private_Hyext_Library = "NC/Module_Private_Hyext_Library";
     /*****    NC 依赖库： NC模块  Module_Private_Extra_Library     ****/
     public static final String LIB_Module_Private_Extra_Library = "NC/Module_Private_Extra_Library";
+    /*****    NC 依赖库： NC模块  Module_Private_Extra_Library     ****/
+    public static final String LIB_Module_Public_Extra_Library = "NC/Module_Public_Extra_Library";
+    /*****    NC 依赖库： NC模块  Module_Client_Extra_Library     ****/
+    public static final String LIB_Module_Client_Extra_Library = "NC/Module_Client_Extra_Library";
     /*****    NC 依赖库： NC模块  Module_Lang_Library     ****/
     public static final String LIB_Module_Lang_Library = "NC/Module_Lang_Library";
     /*****    NC 依赖库： NC模块  Generated_EJB     ****/
