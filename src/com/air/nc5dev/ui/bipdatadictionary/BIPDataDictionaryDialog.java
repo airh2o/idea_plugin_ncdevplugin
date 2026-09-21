@@ -1,14 +1,14 @@
-package com.air.nc5dev.ui.datadictionary;
+package com.air.nc5dev.ui.bipdatadictionary;
 
 import cn.hutool.core.io.FileUtil;
-import com.air.nc5dev.util.CollUtil;
-import com.air.nc5dev.util.NCPropXmlUtil;
-import com.air.nc5dev.util.ProjectNCConfigUtil;
-import com.air.nc5dev.util.StringUtil;
+import cn.hutool.core.io.IORuntimeException;
+import cn.hutool.core.util.StrUtil;
+import com.air.nc5dev.util.*;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.vo.DataDictionaryAggVO;
+import com.air.nc5dev.vo.ExportContentVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -18,22 +18,16 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBTabbedPane;
-import com.intellij.ui.components.JBTextArea;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.ui.components.*;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import java.awt.Desktop;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.File;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
@@ -50,28 +44,32 @@ import java.util.stream.Collectors;
  * @return
  */
 @Data
-public class NCDataDictionaryDialog extends DialogWrapper {
+public class BIPDataDictionaryDialog extends DialogWrapper {
     JBTabbedPane contentPane;
     JBPanel panel_main;
-    DefaultComboBoxModel<NCDataSourceVO> comboBoxModelDb;
-    ComboBox comboBoxDb;
+    JBTextField url;
+    JBTextField user;
+    JBTextField pass;
     JBTextArea textFieldSerach;
     JButton buttonSearch;
-    JButton buttonClose;
     JBLabel labelInfo;
     int height = 200;
     int width = 300;
     Project project;
     long start;
+    JButton buttonClose;
+    JButton buttonTestDb;
 
-    public NCDataDictionaryDialog(Project project) {
+    public BIPDataDictionaryDialog(Project project) {
         super(project);
         this.project = project;
         createCenterPanel();
         init();
         setOKButtonText("查看字典(生成临时文件 浏览器直接打开)");
         setCancelButtonText("导出离线文件");
-        setTitle("生成NC数据字典");
+        setTitle("生成BIP旗舰版系列数据字典");
+
+        loadValues();
     }
 
     private void createCenterPanel0() throws Exception {
@@ -90,33 +88,50 @@ public class NCDataDictionaryDialog extends DialogWrapper {
             jtab.addTab("选项", panel_main);
 
             final List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS(getProject());
-            comboBoxModelDb = new DefaultComboBoxModel<>(new Vector(
-                    dataSourceVOS.stream()
-                            .map(v -> v.getDataSourceName() + '/' + v.getUser())
-                            .collect(Collectors.toList())
-            ));
 
-            JBLabel label = new JBLabel("数据源:");
-            label.setBounds(1, y, w, 60);
+            JBLabel label = new JBLabel("JDBC URL:");
+            label.setBounds(1, y, 100, 60);
             panel_main.add(label);
-            comboBoxDb = new ComboBox(comboBoxModelDb);
-            comboBoxDb.setBounds(x += w, y, 150, h);
-            panel_main.add(comboBoxDb);
+
+            url = new JBTextField();
+            url.setBounds(label.getX() + label.getWidth() + 3, y, 500, h);
+            panel_main.add(url);
+
+            label = new JBLabel("数据库用户:");
+            label.setBounds(1, y = url.getY() + url.getHeight() + 5, 100, 60);
+            panel_main.add(label);
+
+            user = new JBTextField();
+            user.setBounds(label.getX() + label.getWidth() + 3, y, 500, h);
+            panel_main.add(user);
+
+            label = new JBLabel("数据库密码:");
+            label.setBounds(1, y = user.getY() + user.getHeight() + 5, 100, 60);
+            panel_main.add(label);
+
+            pass = new JBTextField();
+            pass.setBounds(label.getX() + label.getWidth() + 3, y, 500, h);
+            panel_main.add(pass);
 
             labelInfo = new JBLabel();
-            labelInfo.setBounds(1, y += comboBoxDb.getHeight() + 3, getWidth(), h);
+            labelInfo.setBounds(1, y += pass.getHeight() + 3, getWidth(), h);
             panel_main.add(labelInfo);
 
             textFieldSerach = new JBTextArea();
             textFieldSerach.setEditable(true);
             textFieldSerach.setLineWrap(true);
-            textFieldSerach.setBounds(x = 1, y += h + 5, 500, h = 150);
+            textFieldSerach.setBounds(x = 1, y = labelInfo.getY() + labelInfo.getHeight() + 5, 500, h = 150);
             panel_main.add(textFieldSerach);
 
             w = getWidth() - 10;
             buttonSearch = new JButton("搜索");
             buttonSearch.setBounds(x += textFieldSerach.getWidth() + 5, y, w = 60, h = 40);
             panel_main.add(buttonSearch);
+
+            buttonTestDb = new JButton("测试数据库");
+            buttonTestDb.setBounds(x += w + 5, y, w = 100, h = 40);
+            panel_main.add(buttonTestDb);
+            buttonTestDb.addActionListener(this::testDbConnection);
 
             buttonClose = new JButton("关闭窗口");
             buttonClose.setBounds(x += w + 5, y, w = 100, h = 40);
@@ -134,8 +149,7 @@ public class NCDataDictionaryDialog extends DialogWrapper {
     @Override
     protected void doOKAction() {
         try {
-            ConnectionUtil.initDataSourceClass(NCPropXmlUtil.getDataSourceVOS(getProject()).get(comboBoxDb.getSelectedIndex()), project,
-                    contentPane);
+            ConnectionUtil.initDataSourceClass(getDataSource(), project, contentPane);
             start = System.currentTimeMillis();
             Task.Backgroundable backgroundable = new Task.Backgroundable(project, "正在生成...耗时会比较长...完成后会自动打开...请耐心等待") {
                 @Override
@@ -147,7 +161,7 @@ public class NCDataDictionaryDialog extends DialogWrapper {
 
                         export2Files0(
                                 new File(System.getProperty("java.io.tmpdir"),
-                                        "nc_data_dictionary_" + System.currentTimeMillis() + ".html")
+                                        "bip_data_dictionary_" + System.currentTimeMillis() + ".html")
                                 , false
                                 , indicator
                         );
@@ -169,17 +183,15 @@ public class NCDataDictionaryDialog extends DialogWrapper {
     }
 
     public void export2Files() {
-        List<NCDataSourceVO> dataSourceVOS = NCPropXmlUtil.getDataSourceVOS(getProject());
-        if (dataSourceVOS == null) {
-            LogUtil.infoAndHide("没有配置NC HOME哦!");
+        NCDataSourceVO dataSource = getDataSource();
+        if (dataSource == null) {
+            LogUtil.infoAndHide("没有配置数据库连接哦!");
             return;
         }
 
-        ConnectionUtil.initDataSourceClass(dataSourceVOS.get(comboBoxDb.getSelectedIndex())
-                , project
-                , contentPane);
+        ConnectionUtil.initDataSourceClass(dataSource, project, contentPane);
         //选择保存位置
-        File outDir = new File(getProject().getBasePath(), "nc_data_dictionary_" + System.currentTimeMillis());
+        File outDir = new File(getProject().getBasePath(), "bip_data_dictionary_" + System.currentTimeMillis());
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         fileChooser.setCurrentDirectory(outDir);
@@ -203,7 +215,7 @@ public class NCDataDictionaryDialog extends DialogWrapper {
         }
 
         try {
-            File f = new File(outDir, "nc_data_dictionary");
+            File f = new File(outDir, "bip_data_dictionary");
             Task.Backgroundable backgroundable = new Task.Backgroundable(project, "正在生成...耗时会比较长...完成后会自动打开...请耐心等待") {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
@@ -240,8 +252,10 @@ public class NCDataDictionaryDialog extends DialogWrapper {
         }
 
         try {
-            NCDataSourceVO ds = NCPropXmlUtil.getDataSourceVOS(getProject()).get(comboBoxDb.getSelectedIndex());
-            LoadDataDictionaryAggVOUtil util = new LoadDataDictionaryAggVOUtil(getProject(), ds);
+            NCDataSourceVO ds = getDataSource();
+            ConnectionUtil.initDataSourceClass(ds, project, contentPane);
+
+            BIPLoadDataDictionaryAggVOUtil util = new BIPLoadDataDictionaryAggVOUtil(getProject(), ds);
             util.setIndicator(indicator);
             util.setCompomentSql(textFieldSerach.getText());
             DataDictionaryAggVO agg = util.read();
@@ -257,7 +271,7 @@ public class NCDataDictionaryDialog extends DialogWrapper {
             String str = JSON.toJSONString(agg, SerializerFeature.DisableCircularReferenceDetect);
 
             /*try {
-                FileUtil.writeUtf8String(str, new File("e:/temp/nc_data_dictionary.json"));// TODO FIXME 测试用，正式注释这行
+                FileUtil.writeUtf8String(str, new File("e:/temp/bip_data_dictionary.json"));// TODO FIXME 测试用，正式注释这行
             } catch (Throwable e) {
             }*/
 
@@ -284,9 +298,8 @@ public class NCDataDictionaryDialog extends DialogWrapper {
             try {
                 index = new File(f, name + "_离线数据字典.html");
             } catch (Throwable e) {
-                index = new File(f, (ProjectNCConfigUtil.getNCVersion(getProject()) == null ? "index" :
-                        ProjectNCConfigUtil.getNCVersion(getProject()).name())
-                        + "_离线数据字典.html");
+                index = new File(f, StrUtil.replaceChars(agg.getNcVersion(), new char[]{'/', '\\', ':'}, "") + "_" +
+                        "离线数据字典.html");
             }
             FileUtil.writeUtf8String(html, index);
 
@@ -334,6 +347,60 @@ public class NCDataDictionaryDialog extends DialogWrapper {
         }
     }
 
+    public void testDbConnection(ActionEvent actionEvent) {
+        NCDataSourceVO ds = getDataSource(false);
+        ConnectionUtil.initDataSourceClass(ds, getProject(), getContentPane(), re -> {
+            if (re instanceof Boolean) {
+                if (((Boolean) re).booleanValue()) {
+                    Messages.showInfoMessage("数据库连接成功!", "恭喜");
+                } else {
+                    String msg = "未知原因";
+                    if (re instanceof Throwable) {
+                        msg = ExceptionUtil.toString(ExceptionUtil.getTopCase((Throwable) re));
+                    }
+                    Messages.showErrorDialog("数据库连接失败:" + msg, "哦豁");
+                }
+            }
+        });
+    }
+
+    public NCDataSourceVO getDataSource() {
+        return getDataSource(true);
+    }
+
+    public NCDataSourceVO getDataSource(boolean save) {
+        NCDataSourceVO ds = new NCDataSourceVO();
+        ds.setDatabaseUrl(getUrl().getText());
+        ds.setUser(getUser().getText());
+        ds.setPassword(getPass().getText());
+        ds.setPasswordOrgin(ds.getPassword());
+
+        if (save) {
+            FileUtil.writeUtf8String(JSON.toJSONString(ds)
+                    , new File(new File(getProject().getBasePath(), ".idea"), this.getClass().getSimpleName() + ".json")
+            );
+        }
+
+        return ds;
+    }
+
+    public void loadValues() {
+        try {
+            String str = FileUtil.readUtf8String(
+                    new File(new File(getProject().getBasePath(), ".idea"), this.getClass().getSimpleName() + ".json")
+            );
+            if (StrUtil.isBlank(str)) {
+                return;
+            }
+
+            NCDataSourceVO ds = JSON.parseObject(str, NCDataSourceVO.class);
+            getUrl().setText(ds.getDatabaseUrl());
+            getUser().setText(ds.getUser());
+            getPass().setText(ds.getPassword());
+        } catch (Throwable e) {
+        }
+    }
+
     @Override
     public void doCancelAction() {
         start = System.currentTimeMillis();
@@ -356,9 +423,11 @@ public class NCDataDictionaryDialog extends DialogWrapper {
 
     public void initDefualtValues() {
         try {
-            textFieldSerach.setText("select id,name,namespace,displayName,ownModule,version " +
-                    "\nfrom md_component where 1=1 " +
-                    "\norder by ts desc ");
+            textFieldSerach.setText("select \n " +
+                    " id,name,micro_service_code as namespace,display_name as displayName \n " +
+                    " ,own_module as ownModule,version \n" +
+                    "from iuap_metadata_base.md_meta_component where 1=1 \n" +
+                    "order by pubts desc ");
             labelInfo.setText("保存文件弹框 直接点击取消 不选择文件 就是关闭窗口！");
         } catch (Throwable e) {
             e.printStackTrace();

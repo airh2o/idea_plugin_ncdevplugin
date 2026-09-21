@@ -303,7 +303,7 @@ public class PatcherDialog extends DialogWrapper {
             panel4 = new JBPanel();
             //  panel5.setBorder(LineBorder.createGrayLineBorder());
             panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
-            panel4.setBounds(panel5.getX() + panel5.getWidth() + 2, y, 120, height);
+            panel4.setBounds(panel5.getX() + panel5.getWidth() + 15, y, 120, height);
             panel4.add(label_6);
             panel4.add(exportHotwebsClass);
             jbxxp.add(panel4);
@@ -315,7 +315,7 @@ public class PatcherDialog extends DialogWrapper {
             panel5 = new JBPanel();
             //  panel5.setBorder(LineBorder.createGrayLineBorder());
             panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
-            panel5.setBounds(panel4.getX() + panel4.getWidth() + 2, y, 180, height);
+            panel5.setBounds(panel4.getX() + panel4.getWidth() + 15, y, 180, height);
             panel5.add(label_6);
             panel5.add(exportModules);
             jbxxp.add(panel5);
@@ -337,7 +337,7 @@ public class PatcherDialog extends DialogWrapper {
             panel7 = new JBPanel();
             //  panel7.setBorder(LineBorder.createGrayLineBorder());
             panel7.setLayout(new BoxLayout(panel7, BoxLayout.X_AXIS));
-            panel7.setBounds(x, y = y + height + 5, 170, height);
+            panel7.setBounds(x, y = y + height + 10, 170, height);
             panel7.add(label_10);
             panel7.add(saveConfig);
             jbxxp.add(panel7);
@@ -347,7 +347,7 @@ public class PatcherDialog extends DialogWrapper {
             panel4 = new JBPanel();
             //  panel7.setBorder(LineBorder.createGrayLineBorder());
             panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
-            panel4.setBounds(panel7.getX() + panel7.getWidth() + 2, y, 220, height);
+            panel4.setBounds(panel7.getX() + panel7.getWidth() + 15, y, 220, height);
             panel4.add(label_10);
             panel4.add(no2Jar);
             jbxxp.add(panel4);
@@ -357,7 +357,7 @@ public class PatcherDialog extends DialogWrapper {
             panel7 = new JBPanel();
             //  panel7.setBorder(LineBorder.createGrayLineBorder());
             panel7.setLayout(new BoxLayout(panel7, BoxLayout.X_AXIS));
-            panel7.setBounds(panel4.getX() + panel4.getWidth() + 2, y, 230, height);
+            panel7.setBounds(panel4.getX() + panel4.getWidth() + 15, y, 230, height);
             panel7.add(label_10);
             panel7.add(exportModuleMeteinfo);
             jbxxp.add(panel7);
@@ -367,7 +367,7 @@ public class PatcherDialog extends DialogWrapper {
             panel4 = new JBPanel();
             //  panel7.setBorder(LineBorder.createGrayLineBorder());
             panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
-            panel4.setBounds(x, y = y + height + 5, 250, height);
+            panel4.setBounds(x, y = y + height + 10, 250, height);
             panel4.add(label_10);
             panel4.add(exportModuleMetadata);
             jbxxp.add(panel4);
@@ -377,7 +377,7 @@ public class PatcherDialog extends DialogWrapper {
             panel7 = new JBPanel();
             //  panel7.setBorder(LineBorder.createGrayLineBorder());
             panel7.setLayout(new BoxLayout(panel7, BoxLayout.X_AXIS));
-            panel7.setBounds(panel4.getX() + panel4.getWidth() + 2, y, 240, height);
+            panel7.setBounds(panel4.getX() + panel4.getWidth() + 15, y, 240, height);
             panel7.add(label_10);
             panel7.add(exportModuleResources);
             jbxxp.add(panel7);
@@ -387,7 +387,7 @@ public class PatcherDialog extends DialogWrapper {
             panel4 = new JBPanel();
             //  panel7.setBorder(LineBorder.createGrayLineBorder());
             panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
-            panel4.setBounds(panel7.getX() + panel7.getWidth() + 2, y, 220, height);
+            panel4.setBounds(panel7.getX() + panel7.getWidth() + 15, y, 220, height);
             panel4.add(label_10);
             panel4.add(exportModuleLib);
             jbxxp.add(panel4);
@@ -610,13 +610,13 @@ public class PatcherDialog extends DialogWrapper {
 
             button_reloadModules = new JButton("重新加载模块列表(如果空 点击这个");
             button_reloadModules.setToolTipText("如果下面模块列表表格是空的 就点击这个或者重启idea，否则导出补丁会空白");
-            button_reloadModules.setBounds(label_9.getX() + label_9.getWidth() + 10, label_9.getY(), 300, height);
+            button_reloadModules.setBounds(label_9.getX() + label_9.getWidth() + 15, label_9.getY(), 300, height);
             button_reloadModules.addActionListener(this::onButton_reloadModules);
             jgp.add(button_reloadModules);
 
             button_loadGitNotCommitFiles = new JButton("Git未提交");
             button_loadGitNotCommitFiles.setToolTipText("点击后会把版本未提交的文件加载到上面要导出的文件列表表格里面");
-            button_loadGitNotCommitFiles.setBounds(button_reloadModules.getX() + button_reloadModules.getWidth() + 10, label_9.getY(), 90, height);
+            button_loadGitNotCommitFiles.setBounds(button_reloadModules.getX() + button_reloadModules.getWidth() + 15, label_9.getY(), 90, height);
             button_loadGitNotCommitFiles.addActionListener(this::onButton_loadGitNotCommitFiles);
             jgp.add(button_loadGitNotCommitFiles);
 

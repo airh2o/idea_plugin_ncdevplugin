@@ -43,6 +43,9 @@ public class NCDataSourceVO {
     private String isBase;
     String ncHome;
 
+    public NCDataSourceVO() {
+    }
+
     public NCDataSourceVO(String ncHome, Element e, Element root) {
         this.element = e;
         this.ncHome = ncHome;

@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * 数据库 连接工具类 <br/>
@@ -75,19 +76,28 @@ public class ConnectionUtil {
     }
 
     public static void initDataSourceClass(NCDataSourceVO ds, Project project, Component c) {
-        if (StringUtils.isBlank(ds.getDriverClassName())) {
-            return;
-        }
+        initDataSourceClass(ds, project, c, null);
+    }
 
-        try {
-            Class.forName(ds.getDriverClassName());
-            return;
-        } catch (Throwable e) {
-            LogUtil.error("读取class失败：" + e.toString(), e);
+    public static void initDataSourceClass(NCDataSourceVO ds
+            , Project project
+            , Component c
+            , Consumer after) {
+        if (StringUtils.isNotBlank(ds.getDriverClassName())) {
             try {
-                loadDriverClass(ds, project, c);
-            } catch (Throwable ex) {
-                LogUtil.error("根据jar载入读取class失败：" + ex.toString(), ex);
+                Class.forName(ds.getDriverClassName());
+                return;
+            } catch (Throwable e) {
+                LogUtil.error("读取class失败：" + e.toString(), e);
+                try {
+                    loadDriverClass(ds, project, c);
+                } catch (Throwable ex) {
+                    LogUtil.error("根据jar载入读取class失败：" + ex.toString(), ex);
+                }
+
+                if (after != null) {
+                    after.accept(e);
+                }
             }
         }
 
@@ -105,9 +115,17 @@ public class ConnectionUtil {
                     LogUtil.error(ex.toString(), ex);
                 }
             }
+
+            if (after != null) {
+                after.accept(e);
+            }
             return;
         } finally {
             IoUtil.close(conn);
+        }
+
+        if (after != null) {
+            after.accept(true);
         }
     }
 

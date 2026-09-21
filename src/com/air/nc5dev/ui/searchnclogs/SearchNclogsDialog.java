@@ -572,15 +572,17 @@ public class SearchNclogsDialog extends DialogWrapper {
                                         }
 
                                         if (has) {
-                                            SwingUtilities.invokeLater(() -> {
-                                                Vector v = new Vector();
-                                                v.add(tableModel_result.getRowCount() + 1);
-                                                v.add("成功");
-                                                v.add("" + file.getPath());
-                                                v.add(line);
-                                                tableModel_result.addRow(v);
-                                                fitTableColumns(table_result);
-                                            });
+                                            if (tableModel_result.getRowCount() < 5000) {
+                                                SwingUtilities.invokeLater(() -> {
+                                                    Vector v = new Vector();
+                                                    v.add(tableModel_result.getRowCount() + 1);
+                                                    v.add("成功");
+                                                    v.add("" + file.getPath());
+                                                    v.add(line);
+                                                    tableModel_result.addRow(v);
+                                                    fitTableColumns(table_result);
+                                                });
+                                            }
 
                                             if (ok != null) {
                                                 FileUtil.appendString(line + '\n', ok, encode);

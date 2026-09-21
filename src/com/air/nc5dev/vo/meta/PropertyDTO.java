@@ -1,5 +1,6 @@
 package com.air.nc5dev.vo.meta;
 
+import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.util.meta.consts.DataTypeStyleConverter;
 import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
 import com.air.nc5dev.util.meta.consts.VisibilityConverter;
@@ -89,13 +90,19 @@ public class PropertyDTO implements Serializable, Cloneable {
     transient String dataTypeStyleName;
     transient String visibilityName;
 
-    public void fixDisplays() {
+    public void fixDisplays(boolean full) {
         DataTypeStyleConverter dataTypeStyleConverter = new DataTypeStyleConverter();
         VisibilityConverter visibilityConverter = new VisibilityConverter();
-        setDbtype(PropertyDataTypeEnum.ofTypeDefualt(getDataType()).getDbtype());
-        setTypeDisplayName(PropertyDataTypeEnum.ofTypeDefualt(getDataType()).getTypeDisplayName());
-        setTypeName(PropertyDataTypeEnum.ofTypeDefualt(getDataType()).getTypeName());
-        setFieldType(PropertyDataTypeEnum.ofTypeDefualt(getDataType()).getFieldType());
+
+        PropertyDataTypeEnum propertyDataTypeEnum = full ? PropertyDataTypeEnum.ofTypeDefualt(getDataType())
+                : PropertyDataTypeEnum.ofType(getDataType());
+        if (propertyDataTypeEnum != null) {
+            setDbtype(propertyDataTypeEnum.getDbtype());
+            setTypeDisplayName(propertyDataTypeEnum.getTypeDisplayName());
+            setTypeName(propertyDataTypeEnum.getTypeName());
+            setFieldType(propertyDataTypeEnum.getFieldType());
+        }
+
         setDataTypeStyleName(dataTypeStyleConverter.getConvertBefor(getDataTypeStyle()));
         setVisibilityName(visibilityConverter.getNameOfVisibility(getVisibility()));
         setFieldName(getName());
@@ -121,6 +128,10 @@ public class PropertyDTO implements Serializable, Cloneable {
         hided = false;
         nullable = true;
         readOnly = false;
+    }
+
+    public void fixDisplays() {
+        fixDisplays(true);
     }
 
     @Override
