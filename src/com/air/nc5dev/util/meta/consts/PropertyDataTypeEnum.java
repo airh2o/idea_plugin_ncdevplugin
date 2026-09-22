@@ -35,12 +35,14 @@ public enum PropertyDataTypeEnum {
     BS000010000100001056("自定义项", "CUSTOM", "BS000010000100001056", "varchar", "varchar"),
 
     /// BIP 旗舰版   专用
-    SWITCHTYPE("布尔", "switch", "switch ", "int", "int"),
+    SWITCHTYPE("布尔", "switch", "switch", "int", "int"),
     DATE("日期", "date", "date", "char", "char"),
+    DATE_MDD("日期", "date_MDD", "date_MDD", "char", "char"),
     DATETIME("日期时间", "dateTime", "dateTime", "char", "char"),
     TEXT("文本", "text", "text", "varchar", "varchar"),
     USERDEFINE("自定义特征", "UserDefine", "UserDefine", "varchar", "varchar"),
     INTTYPE("整数", "int", "int", "int", "int"),
+    LONGTYPE("长整数", "long", "long", "int", "int"),
     NUMBER("数值", "number", "number", "decimal", "decimal"),
     //singleOption  枚举 单选， multipleOption 枚举 多选，quote  单选引用
 

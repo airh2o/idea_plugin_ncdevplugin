@@ -1,5 +1,6 @@
 package com.air.nc5dev.vo.meta;
 
+import com.air.nc5dev.util.StringUtil;
 import lombok.Data;
 import nc.vo.pub.lang.UFDateTime;
 
@@ -53,14 +54,20 @@ public class ComponentDTO implements Serializable, Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof ComponentDTO)) {
+            return false;
+        }
+
         ComponentDTO that = (ComponentDTO) o;
-        return Objects.equals(id, that.id);
+        return StringUtil.equals(getId(), that.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 }

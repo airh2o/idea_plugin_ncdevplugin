@@ -175,7 +175,16 @@ public class BIPLoadDataDictionaryAggVOUtil {
             rs = st.executeQuery(compomentSql);
             md_componentList = new VOArrayListResultSetExtractor<SearchComponentVO2>(SearchComponentVO2.class)
                     .extractData(rs);
-            md_componentList = md_componentList.stream().distinct().collect(Collectors.toList());
+            md_componentList = md_componentList.stream()
+                    .filter(c -> c.getId() != null)
+                    .collect(Collectors.collectingAndThen(
+                                    Collectors.toMap(SearchComponentVO::getId
+                                            , c -> c
+                                            , (c1, c2) -> c1
+                                            , LinkedHashMap::new)
+                                    , m -> new ArrayList<>(m.values())
+                            )
+                    );
             IoUtil.close(rs);
 
             agg.getCompomentIdMap().clear();
@@ -183,8 +192,8 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 agg.getCompomentIdMap().put(c.getId(), c);
             }
 
-            sql = "select e.main_entity as id " +
-                    "     , e.main_entity as name " +
+            sql = "select mmc.uri as id " +
+                    "     , mmc.uri as name " +
                     "     , mmc.display_name       as displayname " +
                     "     , mmc.meta_component_uri            as componentid " +
                     "     , 201                    as classtype " +
@@ -193,8 +202,8 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     "     , mmc.name          as fullclassname " +
                     "     , {aggFullClassName}          as aggfullclassname  " +
                     "     , e.code as resid " +
-                    "from iuap_metadata_base.md_biz_obj e " +
-                    "   join iuap_metadata_base.md_meta_class mmc on mmc.uri = e.main_entity " +
+                    "from iuap_metadata_base.md_meta_class mmc " +
+                    "  left join iuap_metadata_base.md_biz_obj e on mmc.uri = e.main_entity " +
                     "            and e.ytenant_id = mmc.ytenant_id " +
                     "   {join2} " +
                     " where e.ytenant_id = '0' and mmc.meta_component_uri is not null  "
@@ -328,8 +337,8 @@ public class BIPLoadDataDictionaryAggVOUtil {
                         "from ( " +
                         "        select distinct emv.id " +
                         "                        ,em.uri as resid " +
-                        "                        ,emv.code as name " +
-                        "                        ,emv.name as description " +
+                        "                        ,emv.code as value " +
+                        "                        ,emv.name as name " +
                         "          from iuap_metadata_base.md_enumeration em " +
                         "          join iuap_apdoc_basedoc.bd_cust_enum emv on emv.enumdefcode=em.name " +
                         ") tt " +
@@ -470,8 +479,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
             }
             com.getClassDTOS().add(entity);
 
-            //模块 只支持 1层！！！ 直接 用 组件id 作为 模块id， 即 cxsunpaper2.sunpaper2 这种
-            //也就是 modules 里 存的是 实体 直属 的 上一层 组件模块， 不再 往 上 module 归属！！！
+            //模块 只支持 1层！！！ 直接 用 组件id 作为 模块id， 也就是 modules 里 存的是 实体 直属 的 上一层 组件模块， 不再 往 上 module 归属！！！
             DataDictionaryAggVO.Module m = agg.getId2ModuleMap().get(com.getId());
             if (m == null) {
                 m = new DataDictionaryAggVO.Module();
@@ -591,7 +599,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
 
                 //引用的其他元数据！！！
                 ClassDTO refc = agg.getClassMap().get(p.getRefModelName());
-
+                p.setRefModelName(StringUtil.get(p.getRefModelName(), ""));
                 if (refc == null) {//也许是枚举！
                     //枚举!
                     List<EnumValueDTO> vs = agg.getClassId2EnumValuesMap().get(p.getRefModelName());
