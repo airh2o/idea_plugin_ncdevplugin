@@ -38,9 +38,12 @@ public class DataDictionaryAggVO implements Serializable, Cloneable {
 
     Map<String, ClassDTO> classMap;
     Map<String, SearchComponentVO> compomentIdMap;
-    Map<String, List<EnumValueDTO>> classId2EnumValuesMap;
-    Map<String, DataDictionaryAggVO.Module> id2ModuleMap;
-    ArrayList<DataDictionaryAggVO.Module> allModules;
+
+    ///// 这些不会放到导出的数据字典上
+    transient Map<String, List<EnumValueDTO>> classId2EnumValuesMap;
+    transient Map<String, DataDictionaryAggVO.Module> id2ModuleMap;
+    transient ArrayList<DataDictionaryAggVO.Module> allModules;
+
 
     /**
      * select id, name ,displayname, parentmoduleid from md_module ;

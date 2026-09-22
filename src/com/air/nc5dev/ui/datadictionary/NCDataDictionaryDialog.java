@@ -18,22 +18,14 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBTabbedPane;
-import com.intellij.ui.components.JBTextArea;
+import com.intellij.ui.components.*;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import java.awt.Desktop;
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
@@ -110,12 +102,13 @@ public class NCDataDictionaryDialog extends DialogWrapper {
             textFieldSerach = new JBTextArea();
             textFieldSerach.setEditable(true);
             textFieldSerach.setLineWrap(true);
-            textFieldSerach.setBounds(x = 1, y += h + 5, 500, h = 150);
-            panel_main.add(textFieldSerach);
+            JBScrollPane jbScrollPane = new JBScrollPane(textFieldSerach);
+            jbScrollPane.setBounds(x = 1, y += h + 5, 500, h = 150);
+            panel_main.add(jbScrollPane);
 
             w = getWidth() - 10;
             buttonSearch = new JButton("搜索");
-            buttonSearch.setBounds(x += textFieldSerach.getWidth() + 5, y, w = 60, h = 40);
+            buttonSearch.setBounds(x += jbScrollPane.getWidth() + 5, y, w = 60, h = 40);
             panel_main.add(buttonSearch);
 
             buttonClose = new JButton("关闭窗口");

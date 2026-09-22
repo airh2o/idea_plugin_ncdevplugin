@@ -118,12 +118,13 @@ public class BIPDataDictionaryDialog extends DialogWrapper {
             textFieldSerach = new JBTextArea();
             textFieldSerach.setEditable(true);
             textFieldSerach.setLineWrap(true);
-            textFieldSerach.setBounds(x = 1, y = labelInfo.getY() + labelInfo.getHeight() + 5, 500, h = 150);
-            panel_main.add(textFieldSerach);
+            JBScrollPane jbScrollPane = new JBScrollPane(textFieldSerach);
+            jbScrollPane.setBounds(x = 1, y = labelInfo.getY() + labelInfo.getHeight() + 5, 500, h = 250);
+            panel_main.add(jbScrollPane);
 
             w = getWidth() - 10;
             buttonSearch = new JButton("搜索");
-            buttonSearch.setBounds(x += textFieldSerach.getWidth() + 5, y, w = 60, h = 40);
+            buttonSearch.setBounds(x += jbScrollPane.getWidth() + 5, y, w = 60, h = 40);
             panel_main.add(buttonSearch);
 
             buttonTestDb = new JButton("测试数据库");
@@ -323,6 +324,7 @@ public class BIPDataDictionaryDialog extends DialogWrapper {
                     ss = StringUtil.replace(ss, "节点编码", "页面名称");
                     ss = StringUtil.replace(ss, "Agg类", "Schema"); // aggFullClassName
                     ss = StringUtil.replace(ss, "VO类", "页面名称");  // fullClassName
+                    ss = StringUtil.replace(ss, "重量端XML配置", "其他信息");  // paramvalue
                     FileUtil.writeUtf8String(ss, new File(f, s));
                     continue;
                 }
@@ -444,6 +446,7 @@ public class BIPDataDictionaryDialog extends DialogWrapper {
                     "     ,c.description \n " +
                     //   "     ,c.create_time as createTime \n " +
                     "     ,c.version \n " +
+                    "     ,c.micro_service_code as filePath \n " +
                     "from iuap_metadata_base.md_meta_component c \n " +
                     "where c.ytenant_id='0' \n " +
                     "order by c.pubts desc \n ");

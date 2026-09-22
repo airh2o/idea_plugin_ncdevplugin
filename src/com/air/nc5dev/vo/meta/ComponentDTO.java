@@ -5,6 +5,7 @@ import nc.vo.pub.lang.UFDateTime;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 组件vo
@@ -49,4 +50,17 @@ public class ComponentDTO implements Serializable, Cloneable {
     Boolean isSource;
 
     transient List<ClassDTO> classDTOS;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ComponentDTO that = (ComponentDTO) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
