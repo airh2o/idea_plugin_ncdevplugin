@@ -466,12 +466,12 @@ public class BIPLoadDataDictionaryAggVOUtil {
 
             entity.setComponentID(comp.getId());
             entity.setParamvalue(StrUtil.format(
-                    "领域:{},微服务:{},{},完整URI:{}"
+                    "领域:{},微服务:{},{}"
                     , StringUtil.get(comp.getNamespace())
                     , StringUtil.get(comp.getDisplayName())
                     , StringUtil.get(comp.getFilePath())
-                    , entity.getId()
             ));
+            entity.setFun_name(entity.getId());
 
             ResultSet rs = null;
             SearchComponentVO2 com = comp;

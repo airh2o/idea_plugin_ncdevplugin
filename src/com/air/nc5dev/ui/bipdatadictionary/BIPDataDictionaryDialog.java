@@ -326,6 +326,7 @@ public class BIPDataDictionaryDialog extends DialogWrapper {
                     ss = StringUtil.replaceAll(ss, "Agg类", "Schema"); // aggFullClassName
                     ss = StringUtil.replaceAll(ss, "VO类", "页面名称");  // fullClassName
                     ss = StringUtil.replaceAll(ss, "重量端XML配置", "其他信息");  // paramvalue
+                    ss = StringUtil.replaceAll(ss, "重量端节点名", "完整URI");  // fun_name
                     FileUtil.writeUtf8String(ss, new File(f, s));
                     continue;
                 }

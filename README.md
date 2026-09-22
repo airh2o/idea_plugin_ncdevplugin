@@ -1,46 +1,54 @@
 # 简介
 
 用友 Yonyou NC5系列 、 U8Cloud、 NC6系列 、 NCCloud 、 YonBIP Idea devtool Plugin   
-实现了 Idea Yonyou NC5x 、 U8Cloud 、 NC6x 、 NCCloud(新版改名叫YonBip) 、 YonBIP 开发插件。            
+实现了 Idea Yonyou NC5x 、 U8Cloud 、 NC6x 、 NCCloud(NCC新版改名叫YONBIP高级版) 、 YonBIP 开发插件。
 
 ## 注意，最新的插件安装包是 项目根目录的 idea_plugin_ncdevplugin文件名开头的 7z文件！ 安装需要 下载这个7z文件后解压，里面是个zip，直接安装这个zip即可！
-  如果有多个 就都下载下来，加压，因为git限制文件大小，所以我可能会压缩zip成为 多个拆分大小的7z文件。                  
-  如果没有7z 那就是 项目根目录的 几十MB大小的那个 zip 文件 。                             
-  BIP以上版本 服务端运行选项的jvm参数会增加 
+
+如果有多个 就都下载下来，加压，因为git限制文件大小，所以我可能会压缩zip成为 多个拆分大小的7z文件。                  
+如果没有7z 那就是 项目根目录的 几十MB大小的那个 zip 文件 。                             
+BIP以上版本 服务端运行选项的jvm参数会增加
+
 ```text
     --add-opens java.base/java.lang=ALL-UNNAMED 
     --add-opens java.base/java.lang.reflect=ALL-UNNAMED 
 ```
-如果导致启动失败 可以删除这3个jvm参数！            
+
+如果导致启动失败 可以删除这3个jvm参数！
+
 # 插件使用视频教程
+
 <a href="https://www.bilibili.com/video/BV1mg4y1f7cQ/?vd_source=6b1c74e795e65a8b04ffe9fe91867a10">
 使用教程:  https://www.bilibili.com/video/BV1mg4y1f7cQ/?vd_source=6b1c74e795e65a8b04ffe9fe91867a10 </a>
 
-# 专业独立顾问，接开发项目，有私单才能继续参与NC 继续更新插件，可做 NC5系列 NC6系列 NCCloud系列 BIP高级版系列，BIP旗舰版系列，金蝶云苍穹 eas，java，go，python，前后端，微信 钉钉等等。。。。
-## 专业承接 U8C NC5 NC6 NCC BIP，java微服务 springcloud，前后端分离，小程序 H5APP 等等私活，用友高级以上认证，项目都是120家以上经验！每年至少会做10家以上私单项目！                    
-## 业务联系方式: QQ 209308343   微信： yongyourj                  
+# 专业独立顾问，接开发项目，有私单才能继续参与NC 继续更新插件，可做 U8C NC5系列 NC6系列 NCCloud系列 BIP高级版系列，BIP旗舰版系列 YS系列，金蝶云苍穹 EAS，java，go，python，前后端，微信 钉钉等等。。。。
+
+## 专业承接 U8C NC5 NC6 NCC BIP，java微服务 springcloud，前后端分离，小程序 H5APP 等等私活，用友高级以上认证，NC BIP高级版 NCC 150家以上经验，旗舰版等20家以上经验！每年至少会做10家以上项目！
+
+## 业务联系方式: QQ 209308343 微信： yongyourj
 
 # 交个朋友，支持一杯咖啡:
+
 <img width="200px" height="200px" src="https://s1.ax1x.com/2020/03/30/GeyNdI.md.png"  alt="buy me a coffee"  />     
 
 # 版本兼容性
+
 V2以及以下版本 兼容 IDEA 2017-2023 (IDEA 本身支持JDK5及以后)            
 V3以及以上版本 兼容 IDEA 2021.2.1 和更新版本 (IDEA 本身支持JDK7及以后)                       
 老版本的下载，见根目录 idea_plugin_ncdevplugin.zip 里的提交历史 下载历史文件即可！          
 因为仓库过大， V4.0.3以前版本 请访问备份的老仓库:                
 <a href="https://gitee.com/ubisofts/idea_plugin_nc5devplugin">https://gitee.com/ubisofts/idea_plugin_nc5devplugin </a>                  
 或者                
-<a href="https://github.com/Air211111/idea_plugin_ncdevplugin">https://github.com/Air211111/idea_plugin_ncdevplugin </a>         
+<a href="https://github.com/Air211111/idea_plugin_ncdevplugin">https://github.com/Air211111/idea_plugin_ncdevplugin </a>
 
 如果你用的是BIP，启动服务有问题 可以试试增加NC服务器运行的JVM参数：
+
 ````text        
 -Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl           
 -Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl       
 ````
 
 检查NC代码规范因为需要全局扫描会比较慢，没反应就多点几次检查就好了。
-
-
 
 # 插件截图
 
@@ -90,6 +98,7 @@ add-idea连接数据库导出sql脚本增加xml支持变量填充!! 参考文件
 ![注意简单使用方式,数据库配置不管他 没用处的,就是个显示功能](https://s1.ax1x.com/2020/11/09/B7FcOH.jpg "注意简单使用方式,数据库配置不管他 没用处的,就是个显示功能")
 
 导出补丁支持 模块写一个配置文件 自定义相对路径：
+
 ```properties
 #本文件必须放入模块的根目录 文件名： patcherconfig.properties   
 #文件用法(可参考示例文件 patcherconfig.properties 所有参数都可以配或不配置 插件有默认值的哈)：   
@@ -158,6 +167,7 @@ onleyFullSql=true
 ```
 
 IDEA连接数据库导出SQL的xml配置文件:
+
 ```text
 参考 参考配置文件中的 xml，
 新增变量功能：
@@ -191,7 +201,12 @@ IDEA连接数据库导出SQL的xml配置文件:
 # 版本更新
 
 ``` 
-<em>4.0.6 版本 更新:</em> <br>
+<em>4.3.0 版本 更新:</em> <br>
+      <ul>
+              <li>1. 新增 生成BIP旗舰版离线数据字典功能！</li>
+      </ul>
+      
+      <em>4.0.6 版本 更新:</em> <br>
       <ul>
               <li>1. 优化bug和操作便利性！</li>
               <li>2. 新增根据在类名或者接口名等点击右键 打开upm文件功能！</li>
