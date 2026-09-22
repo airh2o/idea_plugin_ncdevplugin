@@ -58,6 +58,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
             "from iuap_metadata_base.md_meta_component c " +
             "where c.ytenant_id='0' ";
     static Cache<Object, Object> cache;
+    SearchComponentVO2 unknowModel;
 
     static {
         //    cache = CacheBuilder.newBuilder().expireAfterWrite(20, TimeUnit.MINUTES).build();
@@ -69,6 +70,13 @@ public class BIPLoadDataDictionaryAggVOUtil {
     }
 
     public DataDictionaryAggVO read() throws SQLException, ClassNotFoundException {
+        unknowModel = new SearchComponentVO2();
+        unknowModel.setId("unknowModel");
+        unknowModel.setName("unknowModel");
+        unknowModel.setDisplayName("未知模块");
+        unknowModel.setNamespace("");
+        unknowModel.setFilePath("");
+
         agg = new DataDictionaryAggVO();
         agg.setClassId2EnumValuesMap(new HashMap<>());
         agg.setCompomentIdMap(new HashMap<>());
@@ -277,10 +285,10 @@ public class BIPLoadDataDictionaryAggVOUtil {
 
             billTypes = new ArrayList<>();
             try {
-                sql = "select code as pk_billtypecode\n" +
-                        "     ,name as billtypename\n" +
-                        "     ,busiobj_code as component\n" +
-                        "from iuap_apdoc_basedoc.bd_billtype\n" +
+                sql = "select code as pk_billtypecode " +
+                        "     ,name as billtypename " +
+                        "     ,busiobj_code as component " +
+                        "from iuap_apdoc_basedoc.bd_billtype " +
                         "where dr=0 and busiobj_code in(select ccc.resid from (" + entitySql + ") ccc) "
                 ;
                 indicatorShow("正在一次性查询单据类型列表(4/11)..." + sql);
@@ -316,10 +324,16 @@ public class BIPLoadDataDictionaryAggVOUtil {
             }
 
             try {
-                sql = "select code as value" +
-                        " , coalesce(display_name, name) as name " +
-                        " , enumeration_uri as id " +
-                        "  from iuap_metadata_base.md_enumeration_literal ";
+                sql = "select tt.* " +
+                        "from ( " +
+                        "        select distinct emv.id " +
+                        "                        ,em.uri as resid " +
+                        "                        ,emv.code as name " +
+                        "                        ,emv.name as description " +
+                        "          from iuap_metadata_base.md_enumeration em " +
+                        "          join iuap_apdoc_basedoc.bd_cust_enum emv on emv.enumdefcode=em.name " +
+                        ") tt " +
+                        "order by tt.resid,tt.name ";
                 indicatorShow("正在一次性查询元数据枚举列表(7/11)..." + sql);
                 rs = st.executeQuery(sql);
                 enumValueDTOList = new VOArrayListResultSetExtractor<EnumValueDTO>(EnumValueDTO.class).extractData(rs);
@@ -436,13 +450,8 @@ public class BIPLoadDataDictionaryAggVOUtil {
             }
 
             if (comp == null) {
-                comp = new SearchComponentVO2();
-                comp.setId(entity.getComponentID());
-                comp.setName(comp.getId());
-                comp.setDisplayName("未知模块");
-                comp.setNamespace("");
-                comp.setFilePath("");
-                agg.getCompomentIdMap().put(entity.getComponentID(), comp);
+                comp = unknowModel;
+                agg.getCompomentIdMap().put(unknowModel.getId(), comp);
             }
 
             entity.setComponentID(comp.getId());
@@ -581,16 +590,16 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 }
 
                 //引用的其他元数据！！！
-                ClassDTO refc = agg.getClassMap().get(p.getDataType());
+                ClassDTO refc = agg.getClassMap().get(p.getRefModelName());
 
                 if (refc == null) {//也许是枚举！
                     //枚举!
-                    List<EnumValueDTO> vs = agg.getClassId2EnumValuesMap().get(p.getDataType());
+                    List<EnumValueDTO> vs = agg.getClassId2EnumValuesMap().get(p.getRefModelName());
                     if (vs == null) {
                         vs = enumValueDTOList.stream()
-                                .filter(e -> p.getDataType().equals(e.getId()))
+                                .filter(e -> p.getRefModelName().equals(e.getResid()))
                                 .collect(Collectors.toList());
-                        agg.getClassId2EnumValuesMap().put(p.getDataType(), vs);
+                        agg.getClassId2EnumValuesMap().put(p.getRefModelName(), vs);
                     }
 
                     if (CollUtil.isNotEmpty(vs)) {
@@ -606,17 +615,17 @@ public class BIPLoadDataDictionaryAggVOUtil {
 
                 if (refc == null) {
                     SearchComponentVO2 cmt = md_componentList.stream()
-                            .filter(e -> p.getDataType().equals(e.getId()))
+                            .filter(e -> e.getId().equals(p.getRefModelName()))
                             .findAny()
                             .orElse(null);
                     if (cmt != null) {
                         // loadSearchComponentVO(agg, refc, st);
                     }
                 }
-                refc = agg.getClassMap().get(p.getDataType());
+                refc = agg.getClassMap().get(p.getRefModelName());
 
                 if (refc == null) {
-                    p.setRefModelDesc(p.getRefModelDesc() + " (引用的其他实体 但是找不到此实体信息!) " + p.getDataType());
+                    p.setRefModelDesc(p.getRefModelName() + " (引用的其他实体 但是找不到此实体信息!) " + p.getDataType());
                     p.setRefModelName(null);
                     continue;
                 }
