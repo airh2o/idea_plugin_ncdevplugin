@@ -1,14 +1,15 @@
 package com.air.nc5dev.ui.bipdatadictionary;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.StrUtil;
-import com.air.nc5dev.util.*;
+import com.air.nc5dev.util.CollUtil;
+import com.air.nc5dev.util.ExceptionUtil;
+import com.air.nc5dev.util.NCPropXmlUtil;
+import com.air.nc5dev.util.StringUtil;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.idea.ProjectUtil;
 import com.air.nc5dev.util.jdbc.ConnectionUtil;
 import com.air.nc5dev.vo.DataDictionaryAggVO;
-import com.air.nc5dev.vo.ExportContentVO;
 import com.air.nc5dev.vo.NCDataSourceVO;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -16,7 +17,6 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.components.*;
@@ -30,8 +30,6 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Vector;
-import java.util.stream.Collectors;
 
 /***
  *     弹框UI        <br>
@@ -316,6 +314,19 @@ public class BIPDataDictionaryDialog extends DialogWrapper {
                     , "fee66e712a8a08eef5805a46892932ad.woff"
             );
             for (String s : fs) {
+                if (s.equals("index.js")) {
+                    // 采购订单(po_order) (实体*) | 表: po_order | VO类: nc.vo.pu.m21.entity.OrderHeaderVO
+                    // | Agg类: nc.vo.pu.m21.entity.OrderVO | 单据编码: 21 | 单据名称: 采购订单 | 节点编码: 40040400
+                    // | 轻量端页码编码: 400400800_card | 轻量端页码地址: /nccloud/resources/pu/pu/poorder/main/index.html#/card
+                    String ss = ProjectUtil.getResourceTemplatesUtf8Txt("nc_data_dictionary/" + s);
+                    ss = StringUtil.replace(ss, "轻量端页码地址", "页面类型");
+                    ss = StringUtil.replace(ss, "节点编码", "页面名称");
+                    ss = StringUtil.replace(ss, "Agg类", "Schema"); // aggFullClassName
+                    ss = StringUtil.replace(ss, "VO类", "页面名称");  // fullClassName
+                    FileUtil.writeUtf8String(ss, new File(f, s));
+                    continue;
+                }
+
                 byte[] bts = ProjectUtil.getResourceByte("nc_data_dictionary/" + s);
                 if (bts == null) {
                     File strf = ProjectUtil.getResourceTemplates("nc_data_dictionary/" + s);
@@ -423,11 +434,19 @@ public class BIPDataDictionaryDialog extends DialogWrapper {
 
     public void initDefualtValues() {
         try {
-            textFieldSerach.setText("select \n " +
-                    " id,name,micro_service_code as namespace,display_name as displayName \n " +
-                    " ,own_module as ownModule,version \n" +
-                    "from iuap_metadata_base.md_meta_component where 1=1 \n" +
-                    "order by pubts desc ");
+            textFieldSerach.setText("select c.uri as id \n " +
+                    "     ,c.legacy_id \n " +
+                    "     ,c.domain as namespace \n " +
+                    "     ,c.uri \n " +
+                    "     ,c.display_name as displayName \n " +
+                    "     ,c.own_module as ownModule \n " +
+                    "     ,c.name \n " +
+                    "     ,c.description \n " +
+                    //   "     ,c.create_time as createTime \n " +
+                    "     ,c.version \n " +
+                    "from iuap_metadata_base.md_meta_component c \n " +
+                    "where c.ytenant_id='0' \n " +
+                    "order by c.pubts desc \n ");
             labelInfo.setText("保存文件弹框 直接点击取消 不选择文件 就是关闭窗口！");
         } catch (Throwable e) {
             e.printStackTrace();

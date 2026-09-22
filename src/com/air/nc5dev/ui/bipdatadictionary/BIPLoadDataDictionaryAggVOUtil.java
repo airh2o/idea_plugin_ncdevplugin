@@ -37,7 +37,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
     DataDictionaryAggVO agg;
     ProgressIndicator indicator;
     List<SearchComponentVO2> md_componentList;
-    List<ClassExtInfoDTO> fieldList;
+    List<ClassExtInfoDTO> entityList;
     ArrayListMapLowerResultSetExtractor arrayListMapLowerResultSetExtractor = new ArrayListMapLowerResultSetExtractor();
     List<Map<String, Object>> billTypes;
     List<Map<String, Object>> webinfos;
@@ -45,17 +45,17 @@ public class BIPLoadDataDictionaryAggVOUtil {
     List<Map<String, Object>> pks;
     List<PropertyDTO> propertyDTOList;
     List<EnumValueDTO> enumValueDTOList;
-    String compomentSql = "select c.id\n" +
-            "     ,c.legacy_id\n" +
-            "     ,c.domain as namespace\n" +
-            "     ,c.uri\n" +
-            "     ,c.display_name as displayName\n" +
-            "     ,c.own_module as ownModule\n" +
-            "     ,c.name\n" +
-            "     ,c.description\n" +
-            "     ,c.create_time as createTime\n" +
-            "     ,c.version\n" +
-            "from iuap_metadata_base.md_meta_component c\n" +
+    String compomentSql = "select c.uri as id " +
+            "     ,c.legacy_id " +
+            "     ,c.domain as namespace " +
+            "     ,c.uri " +
+            "     ,c.display_name as displayName " +
+            "     ,c.own_module as ownModule " +
+            "     ,c.name " +
+            "     ,c.description " +
+            //   "     ,c.create_time as createTime " +
+            "     ,c.version " +
+            "from iuap_metadata_base.md_meta_component c " +
             "where c.ytenant_id='0' ";
     static Cache<Object, Object> cache;
 
@@ -88,10 +88,10 @@ public class BIPLoadDataDictionaryAggVOUtil {
             st = conn.createStatement();
             ResultSet rs = null;
             try {
-                rs = st.executeQuery("select show_version,evn from iuap_installer.product_version" +
-                        " where product_code!='aPaaS' and show_version is not null");
+                rs = st.executeQuery("select show_version from iuap_installer.product_version " +
+                        " where app_code like 'yonbip-%' and product_code!='aPaaS' and show_version is not null ");
                 if (rs.next()) {
-                    agg.setNcVersion(rs.getString(1) + ":" + rs.getString(2));
+                    agg.setNcVersion("BIP旗舰版:" + rs.getString(1));
                 }
                 IoUtil.close(rs);
             } catch (SQLException e) {
@@ -106,12 +106,12 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 }
                 IoUtil.close(rs);
             } catch (Throwable e) {
-                agg.setGroupName("");
+                agg.setGroupName("未知集团");
             }
 
             String sql = compomentSql
                     .toLowerCase()
-                    .replace("\n", " ")
+                    .replace(" ", " ")
                     .replace("\r", " ")
                     .replace("\t", " ");
             String[] ss = StringUtil.split(sql, " ");
@@ -161,117 +161,102 @@ public class BIPLoadDataDictionaryAggVOUtil {
             //读取元数据了
             indicatorShow(String.format("正在一次性查询元数据组件列表(2/11)...%s", compomentSql));
             rs = st.executeQuery(compomentSql);
-            md_componentList =
-                    new VOArrayListResultSetExtractor<SearchComponentVO2>(SearchComponentVO2.class).extractData(rs);
+            md_componentList = new VOArrayListResultSetExtractor<SearchComponentVO2>(SearchComponentVO2.class)
+                    .extractData(rs);
             IoUtil.close(rs);
 
-            sql = "select mmc.meta_component_uri as id " +
-                    ",mmc.name " +
-                    ",mmc.display_name as displayname" +
-                    ",cp.id as componentid" +
-                    ",201 as classtype" +
-                    ",null as parentclassid" +
-                    ",mmc.table_name as defaulttablename" +
-                    ",lower(aoj.owner)||'.'||lower(aoj.object_name) as fullclassname" +
-                    " from iuap_metadata_base.md_meta_class mmc " +
-                    "join iuap_metadata_base.md_meta_component cp on mmc.meta_component_uri=cp.uri " +
-                    "left join all_objects aoj on aoj.object_type='TABLE' and lower(aoj.object_name)=lower(mmc" +
-                    ".table_name) ";
+            sql = "select e.main_entity as id " +
+                    "     , e.main_entity as name " +
+                    "     , mmc.display_name       as displayname " +
+                    "     , mmc.meta_component_uri            as componentid " +
+                    "     , 201                    as classtype " +
+                    "     , null                   as parentclassid " +
+                    "     , mmc.table_name         as defaulttablename " +
+                    "     , mmc.name          as fullclassname " +
+                    "     , {aggFullClassName}          as aggfullclassname  " +
+                    "from iuap_metadata_base.md_biz_obj e " +
+                    "   join iuap_metadata_base.md_meta_class mmc on mmc.uri = e.main_entity " +
+                    "            and e.ytenant_id = mmc.ytenant_id " +
+                    " {join2} where e.ytenant_id = '0' "
+            ;
+
             if (productName.contains("mysql")
                     || productName.contains("tidb")
                     || productName.contains("mariadb")) {
                 // MySQL
-                sql = "select mmc.meta_component_uri as id " +
-                        ",mmc.name " +
-                        ",mmc.display_name as displayname" +
-                        ",cp.id as componentid" +
-                        ",201 as classtype" +
-                        ",null as parentclassid" +
-                        ",mmc.table_name as defaulttablename" +
-                        ",LOWER(CONCAT(aoj.table_schema, '.', mmc.table_name)) as fullclassname" +
-                        " from iuap_metadata_base.md_meta_class mmc " +
-                        "join iuap_metadata_base.md_meta_component cp on mmc.meta_component_uri=cp.uri " +
-                        "left join information_schema.tables aoj on aoj.TABLE_TYPE ='BASE TABLE' " +
-                        "  and lower(aoj.table_name )=lower(mmc.table_name) ";
+                sql = StringUtil.replace(sql, "{aggFullClassName}"
+                        , "lower(concat(aoj.table_schema, '.', mmc.table_name))");
+
+                sql = StringUtil.replace(sql, "{join2}"
+                        , "left join information_schema.tables aoj on aoj.table_type ='BASE TABLE' " +
+                                "  and lower(aoj.table_name )=lower(mmc.table_name) ");
             } else if (productName.contains("oracle")) {
                 // Oracle
+                sql = StringUtil.replace(sql, "{aggFullClassName}"
+                        , "lower(aoj.owner)||'.'||lower(aoj.object_name)");
+
+                sql = StringUtil.replace(sql, "{join2}"
+                        , "left join all_objects aoj on aoj.object_type='TABLE' " +
+                                " and lower(aoj.object_name)=lower(mmc.table_name) ");
             } else if (productName.contains("postgresql")
                     || productName.contains("kingbase")
                     || productName.contains("kdbms")
                     || productName.contains("gaussdb")) {
                 // PostgreSQL (PG)   人大金仓 (Kingbase)   华为GaussDB
-                sql = "select mmc.meta_component_uri as id " +
-                        ",mmc.name " +
-                        ",mmc.display_name as displayname" +
-                        ",cp.id as componentid" +
-                        ",201 as classtype" +
-                        ",null as parentclassid" +
-                        ",mmc.table_name as defaulttablename" +
-                        ",LOWER(CONCAT(aoj.schemaname , '.', mmc.table_name)) as fullclassname" +
-                        " from iuap_metadata_base.md_meta_class mmc " +
-                        "join iuap_metadata_base.md_meta_component cp on mmc.meta_component_uri=cp.uri " +
-                        "left join pg_tables aoj on 1=1 " +
-                        "  and lower(aoj.tablename  )=lower(mmc.table_name) ";
+                sql = StringUtil.replace(sql, "{aggFullClassName}"
+                        , "lower(concat(aoj.schemaname , '.', mmc.table_name))");
+
+                sql = StringUtil.replace(sql, "{join2}"
+                        , "left join pg_tables aoj on lower(aoj.tablename)=lower(mmc.table_name) ");
             } else if (productName.contains("microsoft sql server")) {
                 // SQL Server
-                sql = "select mmc.meta_component_uri as id " +
-                        ",mmc.name " +
-                        ",mmc.display_name as displayname" +
-                        ",cp.id as componentid" +
-                        ",201 as classtype" +
-                        ",null as parentclassid" +
-                        ",mmc.table_name as defaulttablename" +
-                        ",LOWER(CONCAT(SCHEMA_NAME(aoj.schema_id) , '.', mmc.table_name)) as fullclassname" +
-                        " from iuap_metadata_base.md_meta_class mmc " +
-                        "join iuap_metadata_base.md_meta_component cp on mmc.meta_component_uri=cp.uri " +
-                        "left join sys.objects aoj on aoj.type = 'U' " +
-                        "  and lower(aoj.name   )=lower(mmc.table_name) ";
+                sql = StringUtil.replace(sql, "{aggFullClassName}"
+                        , "lower(concat(schema_name(aoj.schema_id) , '.', mmc.table_name))");
+
+                sql = StringUtil.replace(sql, "{join2}"
+                        , "left join sys.objects aoj on aoj.type = 'U' " +
+                                "  and lower(aoj.name   )=lower(mmc.table_name) ");
             } else if (productName.contains("dm dbms") || productName.contains("dameng")) {
                 // 达梦 (DM)
-                sql = "select mmc.meta_component_uri as id " +
-                        ",mmc.name " +
-                        ",mmc.display_name as displayname" +
-                        ",cp.id as componentid" +
-                        ",201 as classtype" +
-                        ",null as parentclassid" +
-                        ",mmc.table_name as defaulttablename" +
-                        ",LOWER(CONCAT(aoj.owner , '.', mmc.table_name)) as fullclassname" +
-                        " from iuap_metadata_base.md_meta_class mmc " +
-                        "join iuap_metadata_base.md_meta_component cp on mmc.meta_component_uri=cp.uri " +
-                        "left join all_tables aoj on aoj.TABLE_TYPE ='BASE TABLE' " +
-                        "  and lower(aoj.table_name  )=lower(mmc.table_name) ";
+                sql = StringUtil.replace(sql, "{aggFullClassName}"
+                        , "lower(concat(aoj.owner , '.', mmc.table_name))");
+
+                sql = StringUtil.replace(sql, "{join2}"
+                        , "left join all_tables aoj on aoj.TABLE_TYPE ='BASE TABLE' " +
+                                "  and lower(aoj.table_name  )=lower(mmc.table_name) ");
             }
 
-            indicatorShow("正在一次性查询元数据字段列表(3/11)..." + sql);
+            indicatorShow("正在一次性查询实体列表(3/11)..." + sql);
             rs = st.executeQuery(sql);
-            fieldList = new VOArrayListResultSetExtractor<ClassExtInfoDTO>(ClassExtInfoDTO.class).extractData(rs);
+            entityList = new VOArrayListResultSetExtractor<ClassExtInfoDTO>(ClassExtInfoDTO.class).extractData(rs);
             IoUtil.close(rs);
 
             billTypes = new ArrayList<>();
-//            try {
-//                sql = "select pk_billtypecode,billtypename,nodecode, component from " +
-//                        "bd_billtype" +
-//                        " where istransaction='N'  " +
-//                        " union all\n" +
-//                        " select pk_billtypecode,billtypename,nodecode,component from bd_billtype  ";
-//                indicatorShow("正在一次性查询单据类型列表(4/11)..." + sql);
-//                rs = st.executeQuery(sql);
-//                billTypes = arrayListMapLowerResultSetExtractor.extractData(rs);
-//                IoUtil.close(rs);
-//            } catch (Exception e) {
-//                if (billTypes == null) {
-//                    billTypes = new ArrayList<>();
-//                }
-//            }
+            try {
+                sql = "select code as pk_billtypecode\n" +
+                        "     ,name as billtypename\n" +
+                        "     ,busiobj_code as component\n" +
+                        "from iuap_apdoc_basedoc.bd_billtype\n" +
+                        "where dr=0 ";
+                indicatorShow("正在一次性查询单据类型列表(4/11)..." + sql);
+                rs = st.executeQuery(sql);
+                billTypes = arrayListMapLowerResultSetExtractor.extractData(rs);
+                IoUtil.close(rs);
+            } catch (Exception e) {
+                if (billTypes == null) {
+                    billTypes = new ArrayList<>();
+                }
+            }
 
             try {
-                sql = "select b.bill_no as pagecode,b.bill_name as pageurl,mmc.id\n" +
-                        "from  iuap_apcom_benchservice.wb_service s\n" +
-                        "join iuap_metadata_service.uimeta_bill b on s.bu_code=b.biz_object\n" +
-                        "join iuap_metadata_service.uimeta_bill_entity be on b.serial_code=be.bill_serial_code and be" +
-                        ".ytenant_id=b.ytenant_id\n" +
-                        "join iuap_metadata_base.md_meta_class mmc on mmc.uri=be.datasource_name\n" +
-                        "where 1=1 and b.bill_type in('Voucher','VoucherList') ";
+                sql = "select distinct ub.bill_no as pagecode " +
+                        "    , ub.bill_type as pageurl " +
+                        "     , im.entity_uri as id " +
+                        "    ,  im.name as nodecode " +
+                        "from iuap_yonbuilder_service.ide_module im " +
+                        " join iuap_metadata_service.uimeta_bill ub on im.business_json like '%\"tplId\":\"' || ub" +
+                        ".def_tpl_serial_code || '\"%' " +
+                        "where 1=1 ";
                 indicatorShow("正在一次性查询节点信息(5/11)..." + sql);
                 rs = st.executeQuery(sql);
                 webinfos = arrayListMapLowerResultSetExtractor.extractData(rs);
@@ -303,7 +288,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                                 " where 1=1   " +
                                 " order by   "
                 ;
-                indicatorShow("正在一次性查询元数据属性列表,此步骤耗时很长(6/11)..." + sql);
+                indicatorShow("正在一次性查询实体字段列表,此步骤耗时很长(6/11)..." + sql);
                 rs = st.executeQuery(sql);
                 propertyDTOList = new VOArrayListResultSetExtractor<PropertyDTO>(PropertyDTO.class).extractData(rs);
                 IoUtil.close(rs);
@@ -314,7 +299,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
             }
 
             try {
-                sql = "select  code as value, coalesce(display_name, name) as name, enumeration_uri as id" +
+                sql = "select code as value, coalesce(display_name, name) as name, enumeration_uri as id" +
                         "  from iuap_metadata_base.md_enumeration_literal ";
                 indicatorShow("正在一次性查询元数据枚举列表(7/11)..." + sql);
                 rs = st.executeQuery(sql);
@@ -417,7 +402,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
 
             agg.getCompomentIdMap().put(com.getId(), com);
 
-            List cs = fieldList.stream()
+            List cs = entityList.stream()
                     .filter(f -> f.getComponentID().equals(com.getId()))
                     .collect(Collectors.toList());
             com.setClassDTOS(cs);

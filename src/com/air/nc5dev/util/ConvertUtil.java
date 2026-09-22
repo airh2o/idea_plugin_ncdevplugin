@@ -902,7 +902,7 @@ public class ConvertUtil extends Convert {
                 v = convert(type, value);
             } else {
                 if (type.equals(Date.class)) {
-                    v = (T) new SimpleDateFormat(V.getPatternDateForMartStr(valueStr)).parse(valueStr);
+                    v = (T) new SimpleDateFormat(V.getPatternDateForMartStr(StringUtil.sub(valueStr, 0, 19))).parse(StringUtil.sub(valueStr, 0, 19));
                 } else if (type.equals(java.sql.Date.class)) {
                     if (value.getClass() == Date.class) {
                         v = (T) new java.sql.Date(((Date) value).getTime());
@@ -922,9 +922,9 @@ public class ConvertUtil extends Convert {
                     v = (T) ("Y".equalsIgnoreCase(valueStr) || "true".equalsIgnoreCase(valueStr) ? Boolean.TRUE :
                             Boolean.FALSE);
                 } else if (type.equals(UFDateTime.class)) {
-                    v = (T) new UFDateTime(valueStr);
+                    v = (T) new UFDateTime(StringUtil.sub(valueStr, 0, 19));
                 } else if (type.equals(UFDate.class)) {
-                    v = (T) new UFDate(valueStr);
+                    v = (T) new UFDate(StringUtil.sub(valueStr, 0, 19));
                 }
             }
 
