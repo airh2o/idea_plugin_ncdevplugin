@@ -41,7 +41,9 @@ public enum PropertyDataTypeEnum {
     DATETIME("日期时间", "dateTime", "dateTime", "char", "char"),
     TEXT("文本", "text", "text", "varchar", "varchar"),
     USERDEFINE("自定义特征", "UserDefine", "UserDefine", "varchar", "varchar"),
+    ATTACHMENT("附件", "attachment", "attachment", "varchar", "varchar"),
     INTTYPE("整数", "int", "int", "int", "int"),
+    SHORTTYPE("短整数", "short", "short", "int", "int"),
     LONGTYPE("长整数", "long", "long", "int", "int"),
     NUMBER("数值", "number", "number", "decimal", "decimal"),
     //singleOption  枚举 单选， multipleOption 枚举 多选，quote  单选引用

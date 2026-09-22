@@ -206,7 +206,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     "  left join iuap_metadata_base.md_biz_obj e on mmc.uri = e.main_entity " +
                     "            and e.ytenant_id = mmc.ytenant_id " +
                     "   {join2} " +
-                    " where e.ytenant_id = '0' and mmc.meta_component_uri is not null  "
+                    " where mmc.ytenant_id = '0' and mmc.meta_component_uri is not null  "
             ;
 
             if (productName.contains("mysql")
@@ -278,6 +278,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                                 ",length as attrlength " +
                                 ",precise as precise " +
                                 ",object_uri as classid " +
+                                ", field_name as fieldName " +
                                 " from iuap_metadata_base.md_attribute" +
                                 " where 1=1 and object_uri in(select ccc.id from (" + entitySql + ") ccc) "
                 ;
@@ -466,9 +467,9 @@ public class BIPLoadDataDictionaryAggVOUtil {
             entity.setComponentID(comp.getId());
             entity.setParamvalue(StrUtil.format(
                     "领域:{},微服务:{},{},完整URI:{}"
-                    , comp.getNamespace()
-                    , comp.getDisplayName()
-                    , comp.getFilePath()
+                    , StringUtil.get(comp.getNamespace())
+                    , StringUtil.get(comp.getDisplayName())
+                    , StringUtil.get(comp.getFilePath())
                     , entity.getId()
             ));
 
@@ -636,6 +637,8 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     p.setRefModelDesc(p.getRefModelName() + " (引用的其他实体 但是找不到此实体信息!) " + p.getDataType());
                     p.setRefModelName(null);
                     continue;
+                } else {
+                    p.setDataType(refc.getId());
                 }
 
                 p.setRefModelDesc(String.format(
