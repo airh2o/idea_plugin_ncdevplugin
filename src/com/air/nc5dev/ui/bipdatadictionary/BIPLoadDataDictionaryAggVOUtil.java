@@ -243,42 +243,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
             entityList = new VOArrayListResultSetExtractor<ClassExtInfoDTO>(ClassExtInfoDTO.class).extractData(rs);
             IoUtil.close(rs);
 
-            billTypes = new ArrayList<>();
-            try {
-                sql = "select code as pk_billtypecode\n" +
-                        "     ,name as billtypename\n" +
-                        "     ,busiobj_code as component\n" +
-                        "from iuap_apdoc_basedoc.bd_billtype\n" +
-                        "where dr=0 ";
-                indicatorShow("正在一次性查询单据类型列表(4/11)..." + sql);
-                rs = st.executeQuery(sql);
-                billTypes = arrayListMapLowerResultSetExtractor.extractData(rs);
-                IoUtil.close(rs);
-            } catch (Exception e) {
-                if (billTypes == null) {
-                    billTypes = new ArrayList<>();
-                }
-            }
-
-            try {
-                sql = "select distinct ub.bill_no as pagecode " +
-                        "    , ub.bill_type as pageurl " +
-                        "     , im.entity_uri as id " +
-                        "    ,  im.name as nodecode " +
-                        "from iuap_yonbuilder_service.ide_module im " +
-                        " join iuap_metadata_service.uimeta_bill ub on im.business_json like '%\"tplId\":\"' || ub" +
-                        ".def_tpl_serial_code || '\"%' " +
-                        "where 1=1 ";
-                indicatorShow("正在一次性查询节点信息(5/11)..." + sql);
-                rs = st.executeQuery(sql);
-                webinfos = arrayListMapLowerResultSetExtractor.extractData(rs);
-                IoUtil.close(rs);
-            } catch (Exception e) {
-                if (webinfos == null) {
-                    webinfos = new ArrayList<>();
-                }
-            }
-
+            String entitySql = sql;
             try {
                 sql =
                         "select name" +
@@ -292,12 +257,12 @@ public class BIPLoadDataDictionaryAggVOUtil {
                                 ",biz_type as typeDisplayName" +
                                 ",biz_type as fieldType" +
                                 ",is_calculated as calculation" +
-                                ",false dynamic" +
+                                // ",false dynamic" +
                                 ",length as attrlength " +
                                 ",precise as precise " +
                                 ",object_uri as classid " +
                                 " from iuap_metadata_base.md_attribute" +
-                                " where 1=1   "
+                                " where 1=1 and object_uri in(select ccc.id from (" + entitySql + ") ccc) "
                 ;
                 indicatorShow("正在一次性查询实体字段列表,此步骤耗时很长(6/11)..." + sql);
                 rs = st.executeQuery(sql);
@@ -307,10 +272,53 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 if (propertyDTOList == null) {
                     propertyDTOList = new ArrayList<>();
                 }
+                e.printStackTrace();
+            }
+
+            billTypes = new ArrayList<>();
+            try {
+                sql = "select code as pk_billtypecode\n" +
+                        "     ,name as billtypename\n" +
+                        "     ,busiobj_code as component\n" +
+                        "from iuap_apdoc_basedoc.bd_billtype\n" +
+                        "where dr=0 and busiobj_code in(select ccc.resid from (" + entitySql + ") ccc) "
+                ;
+                indicatorShow("正在一次性查询单据类型列表(4/11)..." + sql);
+                rs = st.executeQuery(sql);
+                billTypes = arrayListMapLowerResultSetExtractor.extractData(rs);
+                IoUtil.close(rs);
+            } catch (Exception e) {
+                if (billTypes == null) {
+                    billTypes = new ArrayList<>();
+                }
+                e.printStackTrace();
             }
 
             try {
-                sql = "select code as value, coalesce(display_name, name) as name, enumeration_uri as id" +
+                sql = "select distinct ub.bill_no as pagecode " +
+                        "    , ub.bill_type as pageurl " +
+                        "     , im.entity_uri as id " +
+                        "    ,  im.name as nodecode " +
+                        "from iuap_yonbuilder_service.ide_module im " +
+                        " join iuap_metadata_service.uimeta_bill ub on im.business_json like '%\"tplId\":\"' || ub" +
+                        ".def_tpl_serial_code || '\"%' " +
+                        "where 1=1 and im.entity_uri in(select ccc.id from (" + entitySql + ") ccc) "
+                ;
+                indicatorShow("正在一次性查询节点信息(5/11)..." + sql);
+                rs = st.executeQuery(sql);
+                webinfos = arrayListMapLowerResultSetExtractor.extractData(rs);
+                IoUtil.close(rs);
+            } catch (Exception e) {
+                if (webinfos == null) {
+                    webinfos = new ArrayList<>();
+                }
+                e.printStackTrace();
+            }
+
+            try {
+                sql = "select code as value" +
+                        " , coalesce(display_name, name) as name " +
+                        " , enumeration_uri as id " +
                         "  from iuap_metadata_base.md_enumeration_literal ";
                 indicatorShow("正在一次性查询元数据枚举列表(7/11)..." + sql);
                 rs = st.executeQuery(sql);
@@ -320,33 +328,11 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 if (enumValueDTOList == null) {
                     enumValueDTOList = new ArrayList<>();
                 }
+                e.printStackTrace();
             }
 
             pks = new ArrayList<>();
-//            try {
-//                sql = "select name,tableid from md_column where  pkey='Y'";
-//                indicatorShow("正在一次性查询元数据主键列表(8/11)..." + sql);
-//                rs = st.executeQuery(sql);
-//                pks = arrayListMapLowerResultSetExtractor.extractData(rs);
-//                IoUtil.close(rs);
-//            } catch (Exception e) {
-//                if (pks == null) {
-//                    pks = new ArrayList<>();
-//                }
-//            }
-
             aggFullClasss = new ArrayList<>();
-//            try {
-//                sql = "select paravalue,id from md_accessorpara ";
-//                indicatorShow("正在一次性查询元数据java类列表(9/11)..." + sql);
-//                rs = st.executeQuery(sql);
-//                aggFullClasss = arrayListMapLowerResultSetExtractor.extractData(rs);
-//                IoUtil.close(rs);
-//            } catch (Exception e) {
-//                if (aggFullClasss == null) {
-//                    aggFullClasss = new ArrayList<>();
-//                }
-//            }
 
             //读取他们的实体列表和字段列表
             for (ClassExtInfoDTO e : entityList) {
@@ -362,7 +348,9 @@ public class BIPLoadDataDictionaryAggVOUtil {
             agg.setProjectName(getProject().getName());
             agg.setNcHome(ProjectNCConfigUtil.getNCHomePath(getProject()));
 
-            Collection<SearchComponentVO> comps = agg.getCompomentIdMap().values();
+            //注意！！！ 这里 必须 拷贝一份！！！ 因为 下面 会 clear() 掉 compomentIdMap，
+            //comps 如果 直接拿 map.values() 是个视图， clear 后 也 就 空了， 会导致 后面 模块树 为 空！
+            List<SearchComponentVO> comps = new ArrayList<>(agg.getCompomentIdMap().values());
             Iterator<SearchComponentVO> componentVOIterator = comps.iterator();
             while (componentVOIterator.hasNext()) {
                 SearchComponentVO c = componentVOIterator.next();
@@ -393,7 +381,10 @@ public class BIPLoadDataDictionaryAggVOUtil {
             agg.getAllModules().clear();
             for (SearchComponentVO c : comps) {
                 agg.getCompomentIdMap().put(c.getId(), c);
-                agg.getAllModules().add(agg.getId2ModuleMap().get(c.getOwnModule()));
+                DataDictionaryAggVO.Module module = agg.getId2ModuleMap().get(c.getOwnModule());
+                if (module != null) {
+                    agg.getAllModules().add(module);
+                }
             }
             List<DataDictionaryAggVO.Module> modules = V.toTree(agg.getAllModules(), "id", "parentmoduleid", "childs");
             agg.setModules(modules);
@@ -456,22 +447,22 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 agg.getId2ModuleMap().put(m.getId(), m);
             }
 
-            Map<String, Object> billType = billTypes.stream()
+            //单据类型 一个实体 可能对应 多个， 所以 这里 要全部过滤出来 然后 同名字段 英文逗号拼接！
+            List<Map<String, Object>> billTypeList = billTypes.stream()
                     .filter(pk -> entity.getResid().equals(pk.get("component")))
-                    .findAny()
-                    .orElse(null);
+                    .collect(Collectors.toList());
 
             // m.getMetas().add(com);
-            if (CollUtil.isNotEmpty(billType)) {
-                ReflectUtil.copy2VO(billType, entity);
+            if (CollUtil.isNotEmpty(billTypeList)) {
+                copy2VOWithJoin(billTypeList, entity);
             }
 
-            Map<String, Object> webinfo = webinfos.stream()
+            //节点信息 一个实体 可能对应 多个， 所以 这里 要全部过滤出来 然后 同名字段 英文逗号拼接！
+            List<Map<String, Object>> webinfoList = webinfos.stream()
                     .filter(pk -> entity.getId().equals(pk.get("id")))
-                    .findAny()
-                    .orElse(null);
-            if (CollUtil.isNotEmpty(webinfo)) {
-                ReflectUtil.copy2VO(webinfo, entity);
+                    .collect(Collectors.toList());
+            if (CollUtil.isNotEmpty(webinfoList)) {
+                copy2VOWithJoin(webinfoList, entity);
             }
 
             if (indicator.isCanceled()) {
@@ -609,6 +600,57 @@ public class BIPLoadDataDictionaryAggVOUtil {
             }
 
         } finally {
+        }
+    }
+
+    /**
+     * 把 多个 map 里的 同名字段 的值 全部取出来， 去重后 用 英文逗号 拼接， 再设置到 vo 里！ <br>
+     * 比如 一个实体 对应 多个单据类型、多个节点 的时候！ <br>
+     * <br>
+     *
+     * @param maps 符合条件的所有 map
+     * @param tovo 目标 vo， 字段名 忽略大小写 且忽略下划线
+     */
+    public static void copy2VOWithJoin(List<Map<String, Object>> maps, Object tovo) {
+        if (CollUtil.isEmpty(maps) || tovo == null) {
+            return;
+        }
+
+        //字段名(小写) -> 该字段所有不重复的值， 按出现顺序
+        Map<String, LinkedHashSet<String>> field2Values = new LinkedHashMap<>();
+
+        for (Map<String, Object> map : maps) {
+            if (CollUtil.isEmpty(map)) {
+                continue;
+            }
+
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                if (entry.getKey() == null || entry.getValue() == null) {
+                    continue;
+                }
+
+                String value = String.valueOf(entry.getValue()).trim();
+                if (value.isEmpty()) {
+                    continue;
+                }
+
+                field2Values.computeIfAbsent(entry.getKey().toLowerCase(), k -> new LinkedHashSet<>())
+                        .add(value);
+            }
+        }
+
+        for (Map.Entry<String, LinkedHashSet<String>> entry : field2Values.entrySet()) {
+            LinkedHashSet<String> values = entry.getValue();
+            if (CollUtil.isEmpty(values)) {
+                continue;
+            }
+
+            try {
+                ReflectUtil.setFieldValueAutoConvertIgnoreNotHasField(tovo, entry.getKey()
+                        , String.join(",", values));
+            } catch (Throwable e) {
+                //字段不存在 或者 类型不匹配 就忽略他！
+            }
         }
     }
 
