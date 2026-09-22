@@ -447,10 +447,11 @@ public class BIPLoadDataDictionaryAggVOUtil {
 
             entity.setComponentID(comp.getId());
             entity.setParamvalue(StrUtil.format(
-                    "领域:{},微服务:{},{}"
+                    "领域:{},微服务:{},{},完整URI:{}"
                     , comp.getNamespace()
                     , comp.getDisplayName()
                     , comp.getFilePath()
+                    , entity.getId()
             ));
 
             ResultSet rs = null;

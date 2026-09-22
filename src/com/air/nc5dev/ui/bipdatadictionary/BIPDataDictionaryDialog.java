@@ -320,8 +320,9 @@ public class BIPDataDictionaryDialog extends DialogWrapper {
                     // | Agg类: nc.vo.pu.m21.entity.OrderVO | 单据编码: 21 | 单据名称: 采购订单 | 节点编码: 40040400
                     // | 轻量端页码编码: 400400800_card | 轻量端页码地址: /nccloud/resources/pu/pu/poorder/main/index.html#/card
                     String ss = ProjectUtil.getResourceTemplatesUtf8Txt("nc_data_dictionary/" + s);
-                    ss = StringUtil.replace(ss, "轻量端页码地址", "页面类型");
-                    ss = StringUtil.replace(ss, "节点编码", "页面名称");
+                    ss = StringUtil.replace(ss, "轻量端页码编码", "页面编码cbillno");
+                    ss = StringUtil.replace(ss, "轻量端页码地址", "页面类型");  // pageurl
+                    ss = StringUtil.replace(ss, "节点编码", "页面名称");  // nodecode
                     ss = StringUtil.replace(ss, "Agg类", "Schema"); // aggFullClassName
                     ss = StringUtil.replace(ss, "VO类", "页面名称");  // fullClassName
                     ss = StringUtil.replace(ss, "重量端XML配置", "其他信息");  // paramvalue
