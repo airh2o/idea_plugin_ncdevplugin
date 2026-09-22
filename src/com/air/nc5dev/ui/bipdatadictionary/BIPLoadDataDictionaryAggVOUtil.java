@@ -189,7 +189,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     "   join iuap_metadata_base.md_meta_class mmc on mmc.uri = e.main_entity " +
                     "            and e.ytenant_id = mmc.ytenant_id " +
                     "   {join2} " +
-                    " where e.ytenant_id = '0' and mmc.meta_component_uri is not null and e.code = 'Y66578_lcm_apply' "
+                    " where e.ytenant_id = '0' and mmc.meta_component_uri is not null  "
             ;
 
             if (productName.contains("mysql")
@@ -378,16 +378,38 @@ public class BIPLoadDataDictionaryAggVOUtil {
             }
 
             agg.getCompomentIdMap().clear();
-            agg.getAllModules().clear();
             for (SearchComponentVO c : comps) {
                 agg.getCompomentIdMap().put(c.getId(), c);
-                DataDictionaryAggVO.Module module = agg.getId2ModuleMap().get(c.getOwnModule());
-                if (module != null) {
-                    agg.getAllModules().add(module);
-                }
             }
-            List<DataDictionaryAggVO.Module> modules = V.toTree(agg.getAllModules(), "id", "parentmoduleid", "childs");
-            agg.setModules(modules);
+
+            //modules 只支持 1层！！！ 完全 来自 实际 选中 的 实体 所 直属 的 组件模块，
+            //与 comps 数量 无关， 且 每个 模块 只 出现 一次！！！
+            agg.getAllModules().clear();
+            Map<String, DataDictionaryAggVO.Module> id2Module = new LinkedHashMap<>();
+            for (ClassDTO ca : agg.getClassMap().values()) {
+                String componentId = ca.getComponentID();
+                if (StrUtil.isBlank(componentId) || id2Module.containsKey(componentId)) {
+                    continue;
+                }
+
+                DataDictionaryAggVO.Module module = agg.getId2ModuleMap().get(componentId);
+                if (module == null) {
+                    //兜底： 理论上 loadSearchComponentVO 里 已经建过了
+                    SearchComponentVO c = agg.getCompomentIdMap().get(componentId);
+                    module = new DataDictionaryAggVO.Module();
+                    module.setId(componentId);
+                    module.setName(componentId);
+                    module.setDisplayname(c == null || StrUtil.isBlank(c.getDisplayName())
+                            ? componentId : c.getDisplayName());
+                    agg.getId2ModuleMap().put(module.getId(), module);
+                }
+
+                //只支持 1层， 所以 他 必须 是 根节点！！！
+                module.setParentmoduleid(null);
+                id2Module.put(componentId, module);
+                agg.getAllModules().add(module);
+            }
+            agg.setModules(new ArrayList<>(id2Module.values()));
 
             return agg;
         } finally {
@@ -425,8 +447,9 @@ public class BIPLoadDataDictionaryAggVOUtil {
 
             entity.setComponentID(comp.getId());
             entity.setParamvalue(StrUtil.format(
-                    "领域:{},微服务:{}"
+                    "领域:{},微服务:{},{}"
                     , comp.getNamespace()
+                    , comp.getDisplayName()
                     , comp.getFilePath()
             ));
 
@@ -437,15 +460,21 @@ public class BIPLoadDataDictionaryAggVOUtil {
             }
             com.getClassDTOS().add(entity);
 
-            DataDictionaryAggVO.Module m = agg.getId2ModuleMap().get(com.getOwnModule());
+            //模块 只支持 1层！！！ 直接 用 组件id 作为 模块id， 即 cxsunpaper2.sunpaper2 这种
+            //也就是 modules 里 存的是 实体 直属 的 上一层 组件模块， 不再 往 上 module 归属！！！
+            DataDictionaryAggVO.Module m = agg.getId2ModuleMap().get(com.getId());
             if (m == null) {
                 m = new DataDictionaryAggVO.Module();
-                m.setId(com.getOwnModule());
-                m.setName(com.getOwnModule());
-                m.setDisplayname(com.getOwnModule());
+                m.setId(com.getId());
+                m.setName(com.getId());
+                m.setDisplayname(StrUtil.blankToDefault(com.getDisplayName(), com.getId()));
                 // m.setMetas(new ArrayList<>());
                 agg.getId2ModuleMap().put(m.getId(), m);
             }
+
+            //只支持 1层， 所以 他 必须 是 根节点！！！ 否则 toTree 会 把他 当 某模块 的 子节点，
+            //导致 modules 里 拿不到 他！
+            m.setParentmoduleid(null);
 
             //单据类型 一个实体 可能对应 多个， 所以 这里 要全部过滤出来 然后 同名字段 英文逗号拼接！
             List<Map<String, Object>> billTypeList = billTypes.stream()
