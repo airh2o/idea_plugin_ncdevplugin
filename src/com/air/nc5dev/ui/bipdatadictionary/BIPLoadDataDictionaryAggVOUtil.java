@@ -478,7 +478,9 @@ public class BIPLoadDataDictionaryAggVOUtil {
             if (com.getClassDTOS() == null) {
                 com.setClassDTOS(new LinkedList<>());
             }
-            com.getClassDTOS().add(entity);
+            if (!com.getClassDTOS().contains(entity)) {
+                com.getClassDTOS().add(entity);
+            }
 
             //模块 只支持 1层！！！ 直接 用 组件id 作为 模块id， 也就是 modules 里 存的是 实体 直属 的 上一层 组件模块， 不再 往 上 module 归属！！！
             DataDictionaryAggVO.Module m = agg.getId2ModuleMap().get(com.getId());
@@ -494,7 +496,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
             //只支持 1层， 所以 他 必须 是 根节点！！！ 否则 toTree 会 把他 当 某模块 的 子节点，
             //导致 modules 里 拿不到 他！
             m.setParentmoduleid(null);
-
+            entity.setResid(StringUtil.get(entity.getResid()));
             //单据类型 一个实体 可能对应 多个， 所以 这里 要全部过滤出来 然后 同名字段 英文逗号拼接！
             List<Map<String, Object>> billTypeList = billTypes.stream()
                     .filter(pk -> entity.getResid().equals(pk.get("component")))

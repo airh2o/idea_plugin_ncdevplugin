@@ -6,6 +6,7 @@ import nc.vo.pub.lang.UFDateTime;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 实体vo
@@ -71,8 +72,8 @@ public class ClassDTO implements Serializable, Cloneable {
 
     public transient List<PropertyDTO> perperties;
     public transient List<EnumValueDTO> enumValues;
-    public transient  List<BizItfMapDTO> bizItfMaps;
-    public transient  List<AccessorParameterDTO> accessorParameters;
+    public transient List<BizItfMapDTO> bizItfMaps;
+    public transient List<AccessorParameterDTO> accessorParameters;
 
     public void setIndustry(String industry) {
         if (StringUtil.isBlank(industry)) {
@@ -80,5 +81,24 @@ public class ClassDTO implements Serializable, Cloneable {
         }
 
         this.industry = industry;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof ClassDTO)) {
+            return false;
+        }
+
+        ClassDTO that = (ClassDTO) o;
+        return StringUtil.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

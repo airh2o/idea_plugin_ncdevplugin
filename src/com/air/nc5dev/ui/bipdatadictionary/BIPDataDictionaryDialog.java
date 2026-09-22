@@ -277,6 +277,7 @@ public class BIPDataDictionaryDialog extends DialogWrapper {
             String html = ProjectUtil.getResourceTemplatesUtf8Txt("nc_data_dictionary/index.html");
             html = html.replace("{{DataDictionaryAggVOJsonString}}", str);
             html = html.replace("{{version}}", agg.getNcVersion());
+            html = html.replace("<title>NC 数据字典", "<title>" + agg.getNcVersion() + " 数据字典");
 
             String name = StringUtil.replaceAll(agg.getNcVersion(), ":", ".");
             name = StringUtil.replaceAll(name, "&", ".");

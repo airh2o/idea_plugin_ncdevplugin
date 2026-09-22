@@ -1,6 +1,7 @@
 package com.air.nc5dev.vo.meta;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -14,7 +15,8 @@ import java.util.List;
  * @project
  * @Version
  */
-@Data
+@Getter
+@Setter
 public class ClassExtInfoDTO extends ClassDTO {
     List<PropertyDTO> perperties;
     //单据信息
