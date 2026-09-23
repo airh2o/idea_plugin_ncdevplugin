@@ -1,15 +1,16 @@
 package com.air.nc5dev.vo.meta;
 
-import cn.hutool.core.util.StrUtil;
 import com.air.nc5dev.util.meta.consts.DataTypeStyleConverter;
 import com.air.nc5dev.util.meta.consts.PropertyDataTypeEnum;
 import com.air.nc5dev.util.meta.consts.VisibilityConverter;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import nc.vo.pub.VOStatus;
 import nc.vo.pub.lang.UFDateTime;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * 实体属性vo
@@ -19,7 +20,8 @@ import java.io.Serializable;
  * @Date 2024/4/10 0010 9:53
  **/
 //com.yonyou.studio.mdp.database.model.PropertyVO
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 public class PropertyDTO implements Serializable, Cloneable {
     private String id;
@@ -82,6 +84,7 @@ public class PropertyDTO implements Serializable, Cloneable {
     String refModelDesc;
     //字段类型描述
     String fileTypeDesc;
+    int ordernum = 10000;
 
     /**
      * @see VOStatus
@@ -142,5 +145,18 @@ public class PropertyDTO implements Serializable, Cloneable {
     @Override
     public PropertyDTO clone() throws CloneNotSupportedException {
         return (PropertyDTO) super.clone();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PropertyDTO that = (PropertyDTO) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

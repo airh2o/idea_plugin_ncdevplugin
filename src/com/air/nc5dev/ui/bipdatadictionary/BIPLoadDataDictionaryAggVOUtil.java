@@ -265,29 +265,60 @@ public class BIPLoadDataDictionaryAggVOUtil {
 
             try {
                 sql =
-                        "select name" +
-                                ",display_name as displayname" +
-                                ",is_nullable asnullable" +
-                                ",COALESCE(ref_meta_class_uri, ref_enum_uri) as refmodelname" +
-                                ",default_value as defaultvalue" +
-                                ",display_name as description " +
-                                ",biz_type as datatype" +
-                                ",biz_type as dbtype" +
-                                ",biz_type as typeDisplayName" +
-                                ",biz_type as fieldType" +
-                                ",is_calculated as calculation" +
-                                // ",false dynamic" +
-                                ",length as attrlength " +
-                                ",precise as precise " +
-                                ",object_uri as classid " +
-                                ", field_name as fieldName " +
-                                " from iuap_metadata_base.md_attribute" +
-                                " where 1=1 and object_uri in(select ccc.id from (" + entitySql + ") ccc) "
+                        "select concat(concat(object_uri,'.'), name) as id ,name " +
+                                "     , display_name                               as displayname " +
+                                "     , is_nullable                                   asnullable " +
+                                "     , COALESCE(ref_meta_class_uri, ref_enum_uri) as refmodelname " +
+                                "     , default_value                              as defaultvalue " +
+                                "     , display_name                               as description " +
+                                "     , biz_type                                   as datatype " +
+                                "     , biz_type                                   as dbtype " +
+                                "     , biz_type                                   as typeDisplayName " +
+                                "     , biz_type                                   as fieldType " +
+                                "     , is_calculated                              as calculation " +
+                                "     , length                                     as attrlength " +
+                                "     , precise                                    as precise " +
+                                "     , object_uri                                 as classid " +
+                                "     , field_name as field_name " +
+                                "     , 1 as ordernum " +
+                                "from iuap_metadata_base.md_attribute " +
+                                " where 1=1 and object_uri in(select ccc.id from (" + entitySql + ") ccc) " +
+                                "union all " +
+                                "select uri as id, name " +
+                                "     , display_name                               as displayname " +
+                                "     , null                                   asnullable " +
+                                "     , ref_type as refmodelname " +
+                                "     , default_value                              as defaultvalue " +
+                                "     , display_name                               as description " +
+                                "     , 'text'                                   as datatype " +
+                                "     , 'text'                                   as dbtype " +
+                                "     , 'text'                                   as typeDisplayName " +
+                                "     , 'text'                                   as fieldType " +
+                                "     , null                              as calculation " +
+                                "     , 100                                     as attrlength " +
+                                "     , 28                                    as precise " +
+                                "     , meta_class_uri                                 as classid " +
+                                "     , name as field_name " +
+                                "     , attribute_order as ordernum " +
+                                "from iuap_metadata_base.md_biz_attribute " +
+                                "where 1 = 1 "
                 ;
+
                 indicatorShow("正在一次性查询实体字段列表,此步骤耗时很长(6/11)..." + sql);
                 rs = st.executeQuery(sql);
                 propertyDTOList = new VOArrayListResultSetExtractor<PropertyDTO>(PropertyDTO.class).extractData(rs);
                 IoUtil.close(rs);
+
+                propertyDTOList = propertyDTOList.stream()
+                        .filter(c -> c.getId() != null)
+                        .collect(Collectors.collectingAndThen(
+                                Collectors.toMap(PropertyDTO::getId
+                                        , c -> c
+                                        , (c1, c2) -> c1
+                                        , LinkedHashMap::new)
+                                ,
+                                m -> new ArrayList<>(m.values()))
+                        );
             } catch (Exception e) {
                 if (propertyDTOList == null) {
                     propertyDTOList = new ArrayList<>();
@@ -650,8 +681,8 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     if (CollUtil.notEmpty(nclss)) {
                         refc = nclss.get(0);
                         agg.getClassMap().put(p.getRefModelName(), refc);
+                        loadSearchComponentVO(agg, nclss.get(0), st);
                     }
-                    loadSearchComponentVO(agg, nclss.get(0), st);
                 }
 
                 if (refc == null) {
@@ -670,6 +701,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 ));
             }
 
+            entity.getPerperties().sort((a, b) -> a.getOrdernum() - b.getOrdernum());
         } finally {
         }
     }

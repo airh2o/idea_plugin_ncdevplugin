@@ -43,11 +43,12 @@ public enum PropertyDataTypeEnum {
     TEXT("文本", "text", "text", "varchar", "varchar"),
     USERDEFINE("自定义特征", "UserDefine", "UserDefine", "varchar", "varchar"),
     ATTACHMENT("附件", "attachment", "attachment", "varchar", "varchar"),
+    MULTILANGUAGE("多语字段", "multiLanguage", "multiLanguage", "varchar", "varchar"),
     INTTYPE("整数", "int", "int", "int", "int"),
     SHORTTYPE("短整数", "short", "short", "int", "int"),
     LONGTYPE("长整数", "long", "long", "int", "int"),
     NUMBER("数值", "number", "number", "decimal", "decimal"),
-    //singleOption  枚举 单选， multipleOption 枚举 多选，quote  单选引用
+    //singleOption  枚举 单选， multipleOption 枚举 多选，quote  单选引用 , FreeCT 物料自由项特征组
 
     ;
 
