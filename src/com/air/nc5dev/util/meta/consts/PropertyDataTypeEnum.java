@@ -40,9 +40,10 @@ public enum PropertyDataTypeEnum {
     DATE_MDD("日期", "date_MDD", "date_MDD", "char", "char"),
     DATETIME("日期时间", "dateTime", "dateTime", "char", "char"),
     TIMESTAMP("日期时间", "timestamp", "timestamp", "char", "char"),
+    DATETIME_TIMESTAMP("日期时间", "dateTime_Timestamp", "dateTime_Timestamp", "char", "char"),
     TEXT("文本", "text", "text", "varchar", "varchar"),
     TEXT_MDD("文本", "text_MDD", "text_MDD", "varchar", "varchar"),
-    USERDEFINE("自定义特征", "UserDefine", "UserDefine", "varchar", "varchar"),
+    BIGTEXT("大文本", "bigText", "bigText", "varchar", "varchar"),
     ATTACHMENT("附件", "attachment", "attachment", "varchar", "varchar"),
     MULTILANGUAGE("多语字段", "multiLanguage", "multiLanguage", "varchar", "varchar"),
     INTTYPE("整数", "int", "int", "int", "int"),
@@ -51,6 +52,7 @@ public enum PropertyDataTypeEnum {
     MULTIPLEOPTION_INT("整数多选", "multipleOption_int", "multipleOption_int", "int", "int"),
     LONGTYPE("长整数", "long", "long", "int", "int"),
     NUMBER("数值", "number", "number", "decimal", "decimal"),
+    // USERDEFINE("自定义特征", "UserDefine", "UserDefine", "varchar", "varchar"),
     //singleOption  枚举 单选， multipleOption 枚举 多选，quote  单选引用 , FreeCT 物料自由项特征组
 
     ;

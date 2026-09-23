@@ -449,7 +449,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
             //读取他们的实体列表和字段列表
             for (int i = 0; i < entityList.size(); i++) {
                 ClassExtInfoDTO e = entityList.get(i);
-                indicatorShow(String.format("正在渲染实体(第%s个/共计%s个/剩余%s个):%s %s "
+                indicatorShow(String.format("正在吃奶玩命的渲染实体(第%s个/共计%s个/剩余%s个):%s %s "
                         , i + 1
                         , entityList.size()
                         , entityList.size() - i - 1
@@ -716,9 +716,11 @@ public class BIPLoadDataDictionaryAggVOUtil {
                         for (EnumValueDTO v : vs) {
                             v.setIndustry(null);
                         }
+                        vs.sort((a, b) -> StringUtil.get(a.getValue()).compareTo(StringUtil.get(b.getValue())));
 
                         p.setDescription(JSON.toJSONString(vs));
                         p.setRefModelDesc("枚举");
+                        p.setRefModelName(null);
                         continue;
                     }
                 }

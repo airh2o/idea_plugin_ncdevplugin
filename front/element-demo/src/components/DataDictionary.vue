@@ -549,7 +549,9 @@ export default {
       console.log("要显示实体啦: ", c, this.nowCompoment);
 
       if (!c.perperties || c.perperties.length < 1) {
-        return;
+       this.$message.error(    "这个实体目前没有任何字段哦! " +  id);
+              c.perperties=[];
+        // return;
       }
 
       this.nameFilters = [];

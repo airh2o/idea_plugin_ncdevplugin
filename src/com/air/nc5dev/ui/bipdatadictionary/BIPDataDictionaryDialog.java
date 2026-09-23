@@ -156,7 +156,8 @@ public class BIPDataDictionaryDialog extends DialogWrapper {
         try {
             ConnectionUtil.initDataSourceClass(getDataSource(), project, contentPane);
             start = System.currentTimeMillis();
-            Task.Backgroundable backgroundable = new Task.Backgroundable(project, "正在生成...耗时会比较长...完成后会自动打开...请耐心等待") {
+            Task.Backgroundable backgroundable = new Task.Backgroundable(project
+                    , "正在生成...耗时会比较长(甚至一小时,数据库查询会自动缓存到内存,关闭idea前再导出会非常快)...完成后会自动打开...请耐心等待") {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     try {
@@ -221,7 +222,8 @@ public class BIPDataDictionaryDialog extends DialogWrapper {
 
         try {
             File f = new File(outDir, "bip_data_dictionary");
-            Task.Backgroundable backgroundable = new Task.Backgroundable(project, "正在生成...耗时会比较长...完成后会自动打开...请耐心等待") {
+            Task.Backgroundable backgroundable = new Task.Backgroundable(project
+                    , "正在生成...耗时会比较长(甚至一小时,数据库查询会自动缓存到内存,关闭idea前再导出会非常快)...完成后会自动打开...请耐心等待") {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     try {
