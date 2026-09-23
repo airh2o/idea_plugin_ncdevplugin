@@ -8,12 +8,10 @@ import com.intellij.ide.projectView.ProjectViewNodeDecorator;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packageDependencies.ui.PackageDependenciesNode;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiJavaFile;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
-import com.intellij.psi.PsiJavaFile;
-import com.intellij.openapi.util.IconLoader;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.util.Map;
@@ -66,9 +64,11 @@ public class ProjectNodeDecorator implements ProjectViewNodeDecorator {
                     , null
                     , modelName);
 
-            String path = StrUtil.replaceChars(virtualFile.getPath(), new char[]{'\\', '/', File.separatorChar}, File.separator);
-            Map<String, ExportChangeCodeFilesAction.FileInfoDTO> m = ExportChangeCodeFilesAction.infoMap.get(node.getProject().getBasePath());
-            ExportChangeCodeFilesAction.FileInfoDTO v = m.get(path);
+            String path = StrUtil.replaceChars(virtualFile.getPath(), new char[]{'\\', '/', File.separatorChar},
+                    File.separator);
+            Map<String, ExportChangeCodeFilesAction.FileInfoDTO> m =
+                    ExportChangeCodeFilesAction.infoMap.get(node.getProject().getBasePath());
+            ExportChangeCodeFilesAction.FileInfoDTO v = m == null ? null : m.get(path);
             // 3. 这里编写你的自定义逻辑：决定显示什么文本
             // 例如：如果是接口，显示 "Interface"
             if (v != null) {
@@ -85,7 +85,7 @@ public class ProjectNodeDecorator implements ProjectViewNodeDecorator {
                 data.addText(" *标品类", tagStyle);
                 data.setTooltip(
                         StrUtil.blankToDefault(data.getTooltip(), "")
-                        + v.getOrgins().stream()
+                                + v.getOrgins().stream()
                                 .map(VirtualFile::getPath)
                                 .collect(Collectors.joining("\n"))
                 );

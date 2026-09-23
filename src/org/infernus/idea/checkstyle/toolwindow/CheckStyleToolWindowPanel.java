@@ -9,7 +9,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
-import com.intellij.openapi.editor.VisualPosition;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.TextEditor;
@@ -67,13 +66,12 @@ public class CheckStyleToolWindowPanel extends JPanel implements ConfigurationLi
     private static final String TREE_ACTION_GROUP = "CheckStylePluginTreeActions";
     private static final String DEFAULT_OVERRIDE = message("plugin.toolwindow.default-file");
 
-    private static final Map<Pattern, String> CHECKSTYLE_ERROR_PATTERNS
-            = new HashMap<>();
+    private static final Map<Pattern, String> CHECKSTYLE_ERROR_PATTERNS = new HashMap<>();
 
     private final Project project;
     private final ToolWindow toolWindow;
-    private final ComboBox configurationOverrideCombo = new ComboBox();
-    private final DefaultComboBoxModel configurationOverrideModel = new DefaultComboBoxModel();
+    private final ComboBox configurationOverrideCombo;
+    private final DefaultComboBoxModel configurationOverrideModel;
 
     private boolean displayingErrors = true;
     private boolean displayingWarnings = true;
@@ -110,6 +108,8 @@ public class CheckStyleToolWindowPanel extends JPanel implements ConfigurationLi
 
         this.toolWindow = toolWindow;
         this.project = project;
+        configurationOverrideCombo = new ComboBox();
+        configurationOverrideModel = new DefaultComboBoxModel();
 
         configurationChanged();
         configurationManager().addConfigurationListener(this);
