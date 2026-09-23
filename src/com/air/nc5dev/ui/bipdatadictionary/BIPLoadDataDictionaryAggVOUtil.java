@@ -777,19 +777,36 @@ public class BIPLoadDataDictionaryAggVOUtil {
             }
 
             entity.getPerperties().sort((a, b) -> {
-                if (a.getOrdernum() == 1000086 && b.getOrdernum() == 1000086) {
-                    return a.getName().compareTo(b.getName());
+                //注意！！！ 比较器 必须 满足 自反/反对称/传递 三个 契约！！！
+                //原来 的 写法 在 a 是默认排序号 而 b 不是时 返回 1， 但反向 比较 却 返回 0，
+                //违反 反对称性， TimSort 会 抛 Comparison method violates its general contract!
+                boolean aDefaultOrdnum = a.getOrdernum() == 1000086;
+                boolean bDefaultOrdnum = b.getOrdernum() == 1000086;
+
+                //非 默认排序号 的 排 前面
+                if (aDefaultOrdnum != bDefaultOrdnum) {
+                    return aDefaultOrdnum ? 1 : -1;
                 }
 
-                if (a.getOrdernum() != 1000086 && b.getOrdernum() != 1000086) {
-                    return a.getOrdernum() - b.getOrdernum();
+                //都 不是 默认排序号， 按 排序号 升序
+                if (!aDefaultOrdnum) {
+                    return Integer.compare(a.getOrdernum(), b.getOrdernum());
                 }
 
-                if (b.getOrdernum() != 1000086) {
+                //都 是 默认排序号， 按 字段名 升序（做 null 保护， 保证 一致性）
+                String nameA = a.getName();
+                String nameB = b.getName();
+                if (nameA == null && nameB == null) {
+                    return 0;
+                }
+                if (nameA == null) {
                     return 1;
                 }
+                if (nameB == null) {
+                    return -1;
+                }
 
-                return 0;
+                return nameA.compareTo(nameB);
             });
         } finally {
         }
