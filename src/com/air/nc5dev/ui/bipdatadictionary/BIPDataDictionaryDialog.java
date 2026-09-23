@@ -56,6 +56,7 @@ public class BIPDataDictionaryDialog extends DialogWrapper {
     Project project;
     long start;
     JButton buttonClose;
+    JButton buttonCacheClear;
     JButton buttonTestDb;
 
     public BIPDataDictionaryDialog(Project project) {
@@ -136,6 +137,11 @@ public class BIPDataDictionaryDialog extends DialogWrapper {
             buttonClose.setBounds(x += w + 5, y, w = 100, h = 40);
             panel_main.add(buttonClose);
             buttonClose.addActionListener(e -> close(0));
+
+            buttonCacheClear = new JButton("清空缓存(默认会增加1小时缓存)");
+            buttonCacheClear.setBounds(x += w + 5, y, w = 200, h = 40);
+            panel_main.add(buttonCacheClear);
+            buttonCacheClear.addActionListener(e -> BIPLoadDataDictionaryAggVOUtil.cache.cleanUp());
         }
 
         //设置点默认值

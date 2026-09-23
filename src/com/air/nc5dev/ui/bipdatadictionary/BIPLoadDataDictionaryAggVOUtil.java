@@ -12,12 +12,14 @@ import com.air.nc5dev.vo.NCDataSourceVO;
 import com.air.nc5dev.vo.meta.*;
 import com.alibaba.fastjson.JSON;
 import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import lombok.Data;
 
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -57,12 +59,12 @@ public class BIPLoadDataDictionaryAggVOUtil {
             "     ,c.version " +
             "from iuap_metadata_base.md_meta_component c " +
             "where c.ytenant_id='0' ";
-    static Cache<Object, Object> cache;
+    public static Cache<Object, Object> cache;
     SearchComponentVO2 unknowModel;
     String entitySql;
 
     static {
-        //    cache = CacheBuilder.newBuilder().expireAfterWrite(20, TimeUnit.MINUTES).build();
+        cache = CacheBuilder.newBuilder().expireAfterWrite(60, TimeUnit.DAYS).build();
     }
 
     public BIPLoadDataDictionaryAggVOUtil(Project project, NCDataSourceVO ncDataSourceVO) {
@@ -146,11 +148,16 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     + " )  "
             ;
             indicatorShow(String.format("正在查询模块列表(1/11)...%s", sql));
-            rs = st.executeQuery(sql);
             ArrayList<DataDictionaryAggVO.Module> allModules =
-                    new VOArrayListResultSetExtractor<DataDictionaryAggVO.Module>(DataDictionaryAggVO.Module.class)
-                            .extractData(rs);
-            IoUtil.close(rs);
+                    (ArrayList<DataDictionaryAggVO.Module>) cache.getIfPresent(sql);
+            if (allModules == null) {
+                rs = st.executeQuery(sql);
+                allModules =
+                        new VOArrayListResultSetExtractor<DataDictionaryAggVO.Module>(DataDictionaryAggVO.Module.class)
+                                .extractData(rs);
+                IoUtil.close(rs);
+                cache.put(sql, allModules);
+            }
 
             sql = "select label_code as id" +
                     ", label_code as name " +
@@ -158,11 +165,16 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     ", label_type as parentmoduleid" +
                     " from iuap_apcom_benchservice.wb_label" +
                     " where label_code in(select parentmoduleid from (" + sql + ") ) ";
-            rs = st.executeQuery(sql);
             ArrayList<DataDictionaryAggVO.Module> allModules2 =
-                    new VOArrayListResultSetExtractor<DataDictionaryAggVO.Module>
-                            (DataDictionaryAggVO.Module.class).extractData(rs);
-            IoUtil.close(rs);
+                    (ArrayList<DataDictionaryAggVO.Module>) cache.getIfPresent(sql);
+
+            if (allModules2 == null) {
+                rs = st.executeQuery(sql);
+                allModules2 = new VOArrayListResultSetExtractor<DataDictionaryAggVO.Module>
+                        (DataDictionaryAggVO.Module.class).extractData(rs);
+                IoUtil.close(rs);
+                cache.put(sql, allModules2);
+            }
 
             allModules.addAll(allModules2);
 
@@ -173,20 +185,24 @@ public class BIPLoadDataDictionaryAggVOUtil {
 
             //读取元数据了
             indicatorShow(String.format("正在一次性查询元数据组件列表(2/11)...%s", compomentSql));
-            rs = st.executeQuery(compomentSql);
-            md_componentList = new VOArrayListResultSetExtractor<SearchComponentVO2>(SearchComponentVO2.class)
-                    .extractData(rs);
-            md_componentList = md_componentList.stream()
-                    .filter(c -> c.getId() != null)
-                    .collect(Collectors.collectingAndThen(
-                                    Collectors.toMap(SearchComponentVO::getId
-                                            , c -> c
-                                            , (c1, c2) -> c1
-                                            , LinkedHashMap::new)
-                                    , m -> new ArrayList<>(m.values())
-                            )
-                    );
-            IoUtil.close(rs);
+            md_componentList = (List<SearchComponentVO2>) cache.getIfPresent(compomentSql);
+            if (md_componentList == null) {
+                rs = st.executeQuery(compomentSql);
+                md_componentList = new VOArrayListResultSetExtractor<SearchComponentVO2>(SearchComponentVO2.class)
+                        .extractData(rs);
+                md_componentList = md_componentList.stream()
+                        .filter(c -> c.getId() != null)
+                        .collect(Collectors.collectingAndThen(
+                                        Collectors.toMap(SearchComponentVO::getId
+                                                , c -> c
+                                                , (c1, c2) -> c1
+                                                , LinkedHashMap::new)
+                                        , m -> new ArrayList<>(m.values())
+                                )
+                        );
+                IoUtil.close(rs);
+                cache.put(compomentSql, md_componentList);
+            }
 
             agg.getCompomentIdMap().clear();
             for (SearchComponentVO c : md_componentList) {
@@ -258,9 +274,13 @@ public class BIPLoadDataDictionaryAggVOUtil {
 
             entitySql = sql + " and mmc.ytenant_id = '0' and mmc.meta_component_uri is not null ";
             indicatorShow("正在一次性查询实体列表(3/11)..." + entitySql);
-            rs = st.executeQuery(entitySql);
-            entityList = new VOArrayListResultSetExtractor<ClassExtInfoDTO>(ClassExtInfoDTO.class).extractData(rs);
-            IoUtil.close(rs);
+            entityList = (List<ClassExtInfoDTO>) cache.getIfPresent(entitySql);
+            if (entityList == null) {
+                rs = st.executeQuery(entitySql);
+                entityList = new VOArrayListResultSetExtractor<ClassExtInfoDTO>(ClassExtInfoDTO.class).extractData(rs);
+                IoUtil.close(rs);
+                cache.put(entitySql, entityList);
+            }
             entitySql = sql;
 
             try {
@@ -305,20 +325,25 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 ;
 
                 indicatorShow("正在一次性查询实体字段列表,此步骤耗时很长(6/11)..." + sql);
-                rs = st.executeQuery(sql);
-                propertyDTOList = new VOArrayListResultSetExtractor<PropertyDTO>(PropertyDTO.class).extractData(rs);
-                IoUtil.close(rs);
+                propertyDTOList = (List<PropertyDTO>) cache.getIfPresent(sql);
+                if (propertyDTOList == null) {
+                    rs = st.executeQuery(sql);
+                    propertyDTOList = new VOArrayListResultSetExtractor<PropertyDTO>(PropertyDTO.class).extractData(rs);
+                    IoUtil.close(rs);
 
-                propertyDTOList = propertyDTOList.stream()
-                        .filter(c -> c.getId() != null)
-                        .collect(Collectors.collectingAndThen(
-                                Collectors.toMap(PropertyDTO::getId
-                                        , c -> c
-                                        , (c1, c2) -> c1
-                                        , LinkedHashMap::new)
-                                ,
-                                m -> new ArrayList<>(m.values()))
-                        );
+                    propertyDTOList = propertyDTOList.stream()
+                            .filter(c -> c.getId() != null)
+                            .collect(Collectors.collectingAndThen(
+                                    Collectors.toMap(PropertyDTO::getId
+                                            , c -> c
+                                            , (c1, c2) -> c1
+                                            , LinkedHashMap::new)
+                                    ,
+                                    m -> new ArrayList<>(m.values()))
+                            );
+
+                    cache.put(sql, propertyDTOList);
+                }
             } catch (Exception e) {
                 if (propertyDTOList == null) {
                     propertyDTOList = new ArrayList<>();
@@ -335,9 +360,13 @@ public class BIPLoadDataDictionaryAggVOUtil {
                         "where dr=0 and busiobj_code in(select ccc.resid from (" + entitySql + ") ccc) "
                 ;
                 indicatorShow("正在一次性查询单据类型列表(4/11)..." + sql);
-                rs = st.executeQuery(sql);
-                billTypes = arrayListMapLowerResultSetExtractor.extractData(rs);
-                IoUtil.close(rs);
+                billTypes = (List<Map<String, Object>>) cache.getIfPresent(sql);
+                if (billTypes == null) {
+                    rs = st.executeQuery(sql);
+                    billTypes = arrayListMapLowerResultSetExtractor.extractData(rs);
+                    IoUtil.close(rs);
+                    cache.put(sql, billTypes);
+                }
             } catch (Exception e) {
                 if (billTypes == null) {
                     billTypes = new ArrayList<>();
@@ -356,9 +385,13 @@ public class BIPLoadDataDictionaryAggVOUtil {
                         "where 1=1 and im.entity_uri in(select ccc.id from (" + entitySql + ") ccc) "
                 ;
                 indicatorShow("正在一次性查询节点信息(5/11)..." + sql);
-                rs = st.executeQuery(sql);
-                webinfos = arrayListMapLowerResultSetExtractor.extractData(rs);
-                IoUtil.close(rs);
+                webinfos = (List<Map<String, Object>>) cache.getIfPresent(sql);
+                if (webinfos == null) {
+                    rs = st.executeQuery(sql);
+                    webinfos = arrayListMapLowerResultSetExtractor.extractData(rs);
+                    IoUtil.close(rs);
+                    cache.put(sql, webinfos);
+                }
             } catch (Exception e) {
                 if (webinfos == null) {
                     webinfos = new ArrayList<>();
@@ -378,8 +411,13 @@ public class BIPLoadDataDictionaryAggVOUtil {
                         ") tt " +
                         "order by tt.resid,tt.name ";
                 indicatorShow("正在一次性查询元数据枚举列表(7/11)..." + sql);
-                rs = st.executeQuery(sql);
-                enumValueDTOList = new VOArrayListResultSetExtractor<EnumValueDTO>(EnumValueDTO.class).extractData(rs);
+                enumValueDTOList = (List<EnumValueDTO>) cache.getIfPresent(sql);
+                if (enumValueDTOList == null) {
+                    rs = st.executeQuery(sql);
+                    enumValueDTOList =
+                            new VOArrayListResultSetExtractor<EnumValueDTO>(EnumValueDTO.class).extractData(rs);
+                    cache.put(sql, enumValueDTOList);
+                }
                 IoUtil.close(rs);
             } catch (Exception e) {
                 if (enumValueDTOList == null) {
@@ -670,18 +708,29 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 }
 
                 refc = agg.getClassMap().get(p.getRefModelName());
-                if (refc == null) {
-                    //查一次数据库看看情况
-                    String sql = entitySql + " and mmc.uri = '" + p.getRefModelName() + "' ";
-                    indicatorShow("正在补充查询实体..." + sql);
-                    rs = st.executeQuery(sql);
-                    ArrayList<ClassExtInfoDTO> nclss =
-                            new VOArrayListResultSetExtractor<ClassExtInfoDTO>(ClassExtInfoDTO.class).extractData(rs);
-                    IoUtil.close(rs);
-                    if (CollUtil.notEmpty(nclss)) {
-                        refc = nclss.get(0);
+                if (refc == null && StringUtil.isNotBlank(p.getRefModelName())) {
+                    String key = "补充查询实体:BIPQJB:" + ncDataSourceVO.getDatabaseUrl() + ":" + p.getRefModelName();
+                    Optional d = (Optional) cache.getIfPresent(key);
+                    if (d == null) {
+                        //查一次数据库看看情况
+                        String sql = entitySql + " and mmc.uri = '" + p.getRefModelName() + "' ";
+                        indicatorShow("正在补充查询实体..." + sql);
+                        rs = st.executeQuery(sql);
+                        ArrayList<ClassExtInfoDTO> nclss =
+                                new VOArrayListResultSetExtractor<ClassExtInfoDTO>(ClassExtInfoDTO.class).extractData(rs);
+                        IoUtil.close(rs);
+                        if (CollUtil.notEmpty(nclss)) {
+                            refc = nclss.get(0);
+                        }
+
+                        cache.put(key, Optional.ofNullable(refc));
+                    } else {
+                        refc = (ClassDTO) d.orElse(null);
+                    }
+
+                    if (refc != null) {
                         agg.getClassMap().put(p.getRefModelName(), refc);
-                        loadSearchComponentVO(agg, nclss.get(0), st);
+                        loadSearchComponentVO(agg, (ClassExtInfoDTO) refc, st);
                     }
                 }
 
