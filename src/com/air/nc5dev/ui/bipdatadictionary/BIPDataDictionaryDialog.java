@@ -138,7 +138,7 @@ public class BIPDataDictionaryDialog extends DialogWrapper {
             panel_main.add(buttonClose);
             buttonClose.addActionListener(e -> close(0));
 
-            buttonCacheClear = new JButton("清空缓存(默认会增加1小时缓存)");
+            buttonCacheClear = new JButton("清空缓存(不清空就会缓存到关闭idea为止)");
             buttonCacheClear.setBounds(x += w + 5, y, w = 200, h = 40);
             panel_main.add(buttonCacheClear);
             buttonCacheClear.addActionListener(e -> BIPLoadDataDictionaryAggVOUtil.cache.cleanUp());
