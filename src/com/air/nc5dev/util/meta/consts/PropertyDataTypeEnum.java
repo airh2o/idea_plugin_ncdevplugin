@@ -39,6 +39,7 @@ public enum PropertyDataTypeEnum {
     DATE("日期", "date", "date", "char", "char"),
     DATE_MDD("日期", "date_MDD", "date_MDD", "char", "char"),
     DATETIME("日期时间", "dateTime", "dateTime", "char", "char"),
+    TIMESTAMP("日期时间", "timestamp", "timestamp", "char", "char"),
     TEXT("文本", "text", "text", "varchar", "varchar"),
     USERDEFINE("自定义特征", "UserDefine", "UserDefine", "varchar", "varchar"),
     ATTACHMENT("附件", "attachment", "attachment", "varchar", "varchar"),

@@ -59,6 +59,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
             "where c.ytenant_id='0' ";
     static Cache<Object, Object> cache;
     SearchComponentVO2 unknowModel;
+    String entitySql;
 
     static {
         //    cache = CacheBuilder.newBuilder().expireAfterWrite(20, TimeUnit.MINUTES).build();
@@ -206,7 +207,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     "  left join iuap_metadata_base.md_biz_obj e on mmc.uri = e.main_entity " +
                     "            and e.ytenant_id = mmc.ytenant_id " +
                     "   {join2} " +
-                    " where mmc.ytenant_id = '0' and mmc.meta_component_uri is not null  "
+                    " where 1=1  "
             ;
 
             if (productName.contains("mysql")
@@ -255,12 +256,13 @@ public class BIPLoadDataDictionaryAggVOUtil {
                                 "  and lower(aoj.table_name  )=lower(mmc.table_name) ");
             }
 
-            indicatorShow("正在一次性查询实体列表(3/11)..." + sql);
-            rs = st.executeQuery(sql);
+            entitySql = sql + " and mmc.ytenant_id = '0' and mmc.meta_component_uri is not null ";
+            indicatorShow("正在一次性查询实体列表(3/11)..." + entitySql);
+            rs = st.executeQuery(entitySql);
             entityList = new VOArrayListResultSetExtractor<ClassExtInfoDTO>(ClassExtInfoDTO.class).extractData(rs);
             IoUtil.close(rs);
+            entitySql = sql;
 
-            String entitySql = sql;
             try {
                 sql =
                         "select name" +
@@ -336,7 +338,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
             try {
                 sql = "select tt.* " +
                         "from ( " +
-                        "        select distinct emv.id " +
+                        "        select distinct CONCAT(COALESCE(em.uri,''), COALESCE(emv.code,'')) as id " +
                         "                        ,em.uri as resid " +
                         "                        ,emv.code as value " +
                         "                        ,emv.name as name " +
@@ -532,12 +534,12 @@ public class BIPLoadDataDictionaryAggVOUtil {
                         .collect(Collectors.toList());
                 entity.setPerperties(ps);
 
-                entity.setAggFullClassName((String) aggFullClasss.stream()
-                        .filter(fc -> entity.getId().equals(fc.get("id")))
-                        .findAny()
-                        .orElse(new HashMap<>())
-                        .get("paravalue")
-                );
+                //entity.setAggFullClassName((String) aggFullClasss.stream()
+                //        .filter(fc -> entity.getId().equals(fc.get("id")))
+                //        .findAny()
+                //        .orElse(new HashMap<>())
+                //        .get("paravalue")
+                //);
 
                 if (m.getChilds() == null) {
                     m.setChilds(new ArrayList<>());
@@ -570,6 +572,8 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     .orElse(null);
             if (pkMap != null) {
                 idFields.add((String) pkMap.get("name"));
+            } else {
+                idFields.add("id");
             }
 
             for (PropertyDTO p : entity.getPerperties()) {
@@ -582,7 +586,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 p.setFileTypeDesc(p.getTypeName());
                 p.setTypeDisplayName(PropertyDataTypeEnum.ofTypeDefualt(p.getDataType()).getTypeDisplayName());
                 p.setRefModelDesc(p.getTypeDisplayName() + " (" + p.getFieldType() + ')');
-                p.setFieldName(p.getName());
+                // p.setFieldName(p.getName());
 
                 if (idFields.contains(p.getName())) {
                     p.setRefModelDesc("当前表主键:字符串 (String)");
@@ -624,7 +628,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     }
                 }
 
-                if (refc == null) {
+                if (false && refc == null) {
                     SearchComponentVO2 cmt = md_componentList.stream()
                             .filter(e -> e.getId().equals(p.getRefModelName()))
                             .findAny()
@@ -633,7 +637,22 @@ public class BIPLoadDataDictionaryAggVOUtil {
                         // loadSearchComponentVO(agg, refc, st);
                     }
                 }
+
                 refc = agg.getClassMap().get(p.getRefModelName());
+                if (refc == null) {
+                    //查一次数据库看看情况
+                    String sql = entitySql + " and mmc.uri = '" + p.getRefModelName() + "' ";
+                    indicatorShow("正在补充查询实体..." + sql);
+                    rs = st.executeQuery(sql);
+                    ArrayList<ClassExtInfoDTO> nclss =
+                            new VOArrayListResultSetExtractor<ClassExtInfoDTO>(ClassExtInfoDTO.class).extractData(rs);
+                    IoUtil.close(rs);
+                    if (CollUtil.notEmpty(nclss)) {
+                        refc = nclss.get(0);
+                        agg.getClassMap().put(p.getRefModelName(), refc);
+                    }
+                    loadSearchComponentVO(agg, nclss.get(0), st);
+                }
 
                 if (refc == null) {
                     p.setRefModelDesc(p.getRefModelName() + " (引用的其他实体 但是找不到此实体信息!) " + p.getDataType());
