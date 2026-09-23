@@ -272,16 +272,33 @@ public class BIPLoadDataDictionaryAggVOUtil {
                                 "  and lower(aoj.table_name  )=lower(mmc.table_name) ");
             }
 
-            entitySql = sql + " and mmc.ytenant_id = '0' and mmc.meta_component_uri is not null ";
+            entitySql = sql + " and mmc.ytenant_id='0' and mmc.meta_component_uri is not null  union all "
+                    + sql + " and mmc.ytenant_id!='0' and mmc.meta_component_uri is not null ";  // mmc
+            // .ytenant_id = '0'
             indicatorShow("正在一次性查询实体列表(3/11)..." + entitySql);
             entityList = (List<ClassExtInfoDTO>) cache.getIfPresent(entitySql);
             if (entityList == null) {
                 rs = st.executeQuery(entitySql);
                 entityList = new VOArrayListResultSetExtractor<ClassExtInfoDTO>(ClassExtInfoDTO.class).extractData(rs);
                 IoUtil.close(rs);
+                entityList = entityList.stream()
+                        .filter(c -> c.getId() != null)
+                        .collect(Collectors.collectingAndThen(
+                                Collectors.toMap(ClassExtInfoDTO::getId
+                                        , c -> c
+                                        , (c1, c2) -> c1
+                                        , LinkedHashMap::new)
+                                ,
+                                m -> new ArrayList<>(m.values()))
+                        );
+
                 cache.put(entitySql, entityList);
             }
             entitySql = sql;
+
+            for (ClassExtInfoDTO entity : entityList) {
+                agg.getClassMap().put(entity.getId(), entity);
+            }
 
             try {
                 sql =
@@ -300,7 +317,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                                 "     , precise                                    as precise " +
                                 "     , object_uri                                 as classid " +
                                 "     , field_name as field_name " +
-                                "     , 1 as ordernum " +
+                                "     , 1000086 as ordernum " +
                                 "from iuap_metadata_base.md_attribute " +
                                 " where 1=1 and object_uri in(select ccc.id from (" + entitySql + ") ccc) " +
                                 "union all " +
@@ -380,8 +397,8 @@ public class BIPLoadDataDictionaryAggVOUtil {
                         "     , im.entity_uri as id " +
                         "    ,  im.name as nodecode " +
                         "from iuap_yonbuilder_service.ide_module im " +
-                        " join iuap_metadata_service.uimeta_bill ub on im.business_json like '%\"tplId\":\"' || ub" +
-                        ".def_tpl_serial_code || '\"%' " +
+                        " join iuap_metadata_service.uimeta_bill ub   " +
+                        "   on im.business_json like '%\"' || ub.def_tpl_serial_code || '\"%' " +
                         "where 1=1 and im.entity_uri in(select ccc.id from (" + entitySql + ") ccc) "
                 ;
                 indicatorShow("正在一次性查询节点信息(5/11)..." + sql);
@@ -430,12 +447,19 @@ public class BIPLoadDataDictionaryAggVOUtil {
             aggFullClasss = new ArrayList<>();
 
             //读取他们的实体列表和字段列表
-            for (ClassExtInfoDTO e : entityList) {
+            for (int i = 0; i < entityList.size(); i++) {
+                ClassExtInfoDTO e = entityList.get(i);
+                indicatorShow(String.format("正在渲染实体(第%s个/共计%s个/剩余%s个):%s %s "
+                        , i + 1
+                        , entityList.size()
+                        , entityList.size() - i - 1
+                        , e.getId()
+                        , e.getDisplayName()));
                 if (indicator.isCanceled()) {
                     return agg;
                 }
 
-                indicatorShow(String.format("正在加载元数据组件(10/11)...%s - %s", e.getName(), e.getDisplayName()));
+                //indicatorShow(String.format("正在加载元数据组件(10/11)...%s - %s", e.getName(), e.getDisplayName()));
 
                 loadSearchComponentVO(agg, e, st);
             }
@@ -515,12 +539,14 @@ public class BIPLoadDataDictionaryAggVOUtil {
 
     public void loadSearchComponentVO(DataDictionaryAggVO agg, ClassExtInfoDTO entity, Statement st) throws SQLException {
         try {
+            if (CollUtil.isNotEmpty(entity.getPerperties())) {
+                // 已经加载过
+                return;
+            }
+
             if (indicator == null) {
                 indicator = new EmptyProgressIndicatorImpl();
             }
-
-            //立即放入map中，防止下个元数据 又依赖他的实体！
-            agg.getClassMap().put(entity.getId(), entity);
 
             SearchComponentVO2 comp = (SearchComponentVO2) agg.getCompomentIdMap().get(entity.getComponentID());
             if (comp == null) {
@@ -590,12 +616,12 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 return;
             }
 
-            indicatorShow(String.format("正在填充元数据组件实体的属性等信息(11/11)...%s - %s - %s - %s "
-                    , com.getName()
-                    , com.getDisplayName()
-                    , entity.getName()
-                    , entity.getDisplayName()
-            ));
+            //indicatorShow(String.format("正在填充元数据组件实体的属性等信息(11/11)...%s - %s - %s - %s "
+            //        , com.getName()
+            //        , com.getDisplayName()
+            //        , entity.getName()
+            //        , entity.getDisplayName()
+            //));
 
             if (ClassDTO.CLASSTYPE_ENTITY.equals(entity.getClassType())) {
                 List<PropertyDTO> ps = propertyDTOList.stream()
@@ -708,7 +734,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 }
 
                 refc = agg.getClassMap().get(p.getRefModelName());
-                if (refc == null && StringUtil.isNotBlank(p.getRefModelName())) {
+                if (false && refc == null && StringUtil.isNotBlank(p.getRefModelName())) {
                     String key = "补充查询实体:BIPQJB:" + ncDataSourceVO.getDatabaseUrl() + ":" + p.getRefModelName();
                     Optional d = (Optional) cache.getIfPresent(key);
                     if (d == null) {
@@ -750,7 +776,21 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 ));
             }
 
-            entity.getPerperties().sort((a, b) -> a.getOrdernum() - b.getOrdernum());
+            entity.getPerperties().sort((a, b) -> {
+                if (a.getOrdernum() == 1000086 && b.getOrdernum() == 1000086) {
+                    return a.getName().compareTo(b.getName());
+                }
+
+                if (a.getOrdernum() != 1000086 && b.getOrdernum() != 1000086) {
+                    return a.getOrdernum() - b.getOrdernum();
+                }
+
+                if (b.getOrdernum() != 1000086) {
+                    return 1;
+                }
+
+                return 0;
+            });
         } finally {
         }
     }
@@ -786,8 +826,9 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     continue;
                 }
 
-                field2Values.computeIfAbsent(entry.getKey().toLowerCase(), k -> new LinkedHashSet<>())
-                        .add(value);
+                field2Values.computeIfAbsent(entry.getKey().toLowerCase()
+                        , k -> new LinkedHashSet<>()
+                ).add(value);
             }
         }
 
@@ -798,8 +839,10 @@ public class BIPLoadDataDictionaryAggVOUtil {
             }
 
             try {
-                ReflectUtil.setFieldValueAutoConvertIgnoreNotHasField(tovo, entry.getKey()
-                        , String.join(",", values));
+                ReflectUtil.setFieldValueAutoConvertIgnoreNotHasField(tovo
+                        , entry.getKey()
+                        , String.join(",", values)
+                );
             } catch (Throwable e) {
                 //字段不存在 或者 类型不匹配 就忽略他！
             }

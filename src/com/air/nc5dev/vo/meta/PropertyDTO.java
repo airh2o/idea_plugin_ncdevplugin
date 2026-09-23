@@ -84,7 +84,7 @@ public class PropertyDTO implements Serializable, Cloneable {
     String refModelDesc;
     //字段类型描述
     String fileTypeDesc;
-    int ordernum = 10000;
+    int ordernum = 1000086;
 
     /**
      * @see VOStatus
