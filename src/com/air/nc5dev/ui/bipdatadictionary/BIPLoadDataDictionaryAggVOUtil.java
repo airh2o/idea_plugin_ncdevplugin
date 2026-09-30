@@ -148,15 +148,14 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     + " )  "
             ;
             indicatorShow(String.format("正在查询模块列表(1/11)...%s", sql));
-            ArrayList<DataDictionaryAggVO.Module> allModules =
-                    (ArrayList<DataDictionaryAggVO.Module>) cache.getIfPresent(sql);
+            ArrayList<DataDictionaryAggVO.Module> allModules = getFromCache(sql);
             if (allModules == null) {
                 rs = st.executeQuery(sql);
                 allModules =
                         new VOArrayListResultSetExtractor<DataDictionaryAggVO.Module>(DataDictionaryAggVO.Module.class)
                                 .extractData(rs);
                 IoUtil.close(rs);
-                cache.put(sql, allModules);
+                setFromCache(sql, allModules);
             }
 
             sql = "select label_code as id" +
@@ -165,15 +164,14 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     ", label_type as parentmoduleid" +
                     " from iuap_apcom_benchservice.wb_label" +
                     " where label_code in(select tt1.parentmoduleid from (" + sql + ") tt1 ) ";
-            ArrayList<DataDictionaryAggVO.Module> allModules2 =
-                    (ArrayList<DataDictionaryAggVO.Module>) cache.getIfPresent(sql);
+            ArrayList<DataDictionaryAggVO.Module> allModules2 = getFromCache(sql);
 
             if (allModules2 == null) {
                 rs = st.executeQuery(sql);
                 allModules2 = new VOArrayListResultSetExtractor<DataDictionaryAggVO.Module>
                         (DataDictionaryAggVO.Module.class).extractData(rs);
                 IoUtil.close(rs);
-                cache.put(sql, allModules2);
+                setFromCache(sql, allModules2);
             }
 
             allModules.addAll(allModules2);
@@ -185,7 +183,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
 
             //读取元数据了
             indicatorShow(String.format("正在一次性查询元数据组件列表(2/11)...%s", compomentSql));
-            md_componentList = (List<SearchComponentVO2>) cache.getIfPresent(compomentSql);
+            md_componentList = getFromCache(compomentSql);
             if (md_componentList == null) {
                 rs = st.executeQuery(compomentSql);
                 md_componentList = new VOArrayListResultSetExtractor<SearchComponentVO2>(SearchComponentVO2.class)
@@ -201,7 +199,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                                 )
                         );
                 IoUtil.close(rs);
-                cache.put(compomentSql, md_componentList);
+                setFromCache(compomentSql, md_componentList);
             }
 
             agg.getCompomentIdMap().clear();
@@ -276,7 +274,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     + sql + " and mmc.ytenant_id!='0' and mmc.meta_component_uri is not null ";  // mmc
             // .ytenant_id = '0'
             indicatorShow("正在一次性查询实体列表(3/11)..." + entitySql);
-            entityList = (List<ClassExtInfoDTO>) cache.getIfPresent(entitySql);
+            entityList = getFromCache(entitySql);
             if (entityList == null) {
                 rs = st.executeQuery(entitySql);
                 entityList = new VOArrayListResultSetExtractor<ClassExtInfoDTO>(ClassExtInfoDTO.class).extractData(rs);
@@ -292,7 +290,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                                 m -> new ArrayList<>(m.values()))
                         );
 
-                cache.put(entitySql, entityList);
+                setFromCache(entitySql, entityList);
             }
             entitySql = sql;
 
@@ -342,7 +340,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 ;
 
                 indicatorShow("正在一次性查询实体字段列表,此步骤耗时很长(6/11)..." + sql);
-                propertyDTOList = (List<PropertyDTO>) cache.getIfPresent(sql);
+                propertyDTOList = getFromCache(sql);
                 if (propertyDTOList == null) {
                     rs = st.executeQuery(sql);
                     propertyDTOList = new VOArrayListResultSetExtractor<PropertyDTO>(PropertyDTO.class).extractData(rs);
@@ -359,7 +357,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                                     m -> new ArrayList<>(m.values()))
                             );
 
-                    cache.put(sql, propertyDTOList);
+                    setFromCache(sql, propertyDTOList);
                 }
             } catch (Exception e) {
                 if (propertyDTOList == null) {
@@ -377,12 +375,12 @@ public class BIPLoadDataDictionaryAggVOUtil {
                         "where dr=0 and busiobj_code in(select ccc.resid from (" + entitySql + ") ccc) "
                 ;
                 indicatorShow("正在一次性查询单据类型列表(4/11)..." + sql);
-                billTypes = (List<Map<String, Object>>) cache.getIfPresent(sql);
+                billTypes = getFromCache(sql);
                 if (billTypes == null) {
                     rs = st.executeQuery(sql);
                     billTypes = arrayListMapLowerResultSetExtractor.extractData(rs);
                     IoUtil.close(rs);
-                    cache.put(sql, billTypes);
+                    setFromCache(sql, billTypes);
                 }
             } catch (Exception e) {
                 if (billTypes == null) {
@@ -402,12 +400,12 @@ public class BIPLoadDataDictionaryAggVOUtil {
                         "where 1=1 and im.entity_uri in(select ccc.id from (" + entitySql + ") ccc) "
                 ;
                 indicatorShow("正在一次性查询节点信息(5/11)..." + sql);
-                webinfos = (List<Map<String, Object>>) cache.getIfPresent(sql);
+                webinfos = getFromCache(sql);
                 if (webinfos == null) {
                     rs = st.executeQuery(sql);
                     webinfos = arrayListMapLowerResultSetExtractor.extractData(rs);
                     IoUtil.close(rs);
-                    cache.put(sql, webinfos);
+                    setFromCache(sql, webinfos);
                 }
             } catch (Exception e) {
                 if (webinfos == null) {
@@ -428,12 +426,12 @@ public class BIPLoadDataDictionaryAggVOUtil {
                         ") tt " +
                         "order by tt.resid,tt.name ";
                 indicatorShow("正在一次性查询元数据枚举列表(7/11)..." + sql);
-                enumValueDTOList = (List<EnumValueDTO>) cache.getIfPresent(sql);
+                enumValueDTOList = getFromCache(sql);
                 if (enumValueDTOList == null) {
                     rs = st.executeQuery(sql);
                     enumValueDTOList =
                             new VOArrayListResultSetExtractor<EnumValueDTO>(EnumValueDTO.class).extractData(rs);
-                    cache.put(sql, enumValueDTOList);
+                    setFromCache(sql, enumValueDTOList);
                 }
                 IoUtil.close(rs);
             } catch (Exception e) {
@@ -738,7 +736,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 refc = agg.getClassMap().get(p.getRefModelName());
                 if (false && refc == null && StringUtil.isNotBlank(p.getRefModelName())) {
                     String key = "补充查询实体:BIPQJB:" + ncDataSourceVO.getDatabaseUrl() + ":" + p.getRefModelName();
-                    Optional d = (Optional) cache.getIfPresent(key);
+                    Optional d = getFromCache(key);
                     if (d == null) {
                         //查一次数据库看看情况
                         String sql = entitySql + " and mmc.uri = '" + p.getRefModelName() + "' ";
@@ -751,7 +749,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                             refc = nclss.get(0);
                         }
 
-                        cache.put(key, Optional.ofNullable(refc));
+                        setFromCache(key, Optional.ofNullable(refc));
                     } else {
                         refc = (ClassDTO) d.orElse(null);
                     }
@@ -866,6 +864,14 @@ public class BIPLoadDataDictionaryAggVOUtil {
                 //字段不存在 或者 类型不匹配 就忽略他！
             }
         }
+    }
+
+    public <T> T getFromCache(String key) {
+        return (T) cache.getIfPresent(ncDataSourceVO.getDatabaseUrl() + ncDataSourceVO.getUser() + key);
+    }
+
+    public void setFromCache(String key, Object v) {
+        cache.put(ncDataSourceVO.getDatabaseUrl() + ncDataSourceVO.getUser() + key, v);
     }
 
     public void indicatorShow(String msg) {
