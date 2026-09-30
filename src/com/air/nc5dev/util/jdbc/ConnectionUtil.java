@@ -1,12 +1,7 @@
 package com.air.nc5dev.util.jdbc;
 
-import com.air.nc5dev.util.CollUtil;
-import com.air.nc5dev.util.ExceptionUtil;
-import com.air.nc5dev.util.IoUtil;
-import com.air.nc5dev.util.ProjectNCConfigUtil;
-import com.air.nc5dev.util.ReflectUtil;
-import com.air.nc5dev.util.StringUtil;
-import com.air.nc5dev.util.V;
+import cn.hutool.core.util.StrUtil;
+import com.air.nc5dev.util.*;
 import com.air.nc5dev.util.idea.LogUtil;
 import com.air.nc5dev.util.ncutils.AESEncode;
 import com.air.nc5dev.vo.ExportContentVO;
@@ -22,20 +17,17 @@ import nc.uap.studio.pub.db.query.SqlQueryResultSet;
 import nc.uap.studio.pub.db.script.export.SqlQueryInserts;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.swing.JFileChooser;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import java.awt.Component;
+import java.awt.*;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -83,6 +75,50 @@ public class ConnectionUtil {
             , Project project
             , Component c
             , Consumer after) {
+        if (StrUtil.isBlank(ds.getDriverClassName())) {
+            // 根据url自动匹配驱动类名
+            if (StrUtil.startWith(ds.getDatabaseUrl(), "jdbc:mysql:")) {
+                ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
+            } else if (StrUtil.startWith(ds.getDatabaseUrl(), "jdbc:kingbase8")) {
+                ds.setDriverClassName("com.kingbase8.Driver");
+            } else if (StrUtil.startWith(ds.getDatabaseUrl(), "jdbc:kingbase9")) {
+                ds.setDriverClassName("com.kingbase8.Driver");
+            } else if (StrUtil.startWith(ds.getDatabaseUrl(), "jdbc:dm:")) {
+                //达梦 DM8
+                ds.setDriverClassName("dm.jdbc.driver.DmDriver");
+            } else if (StrUtil.startWith(ds.getDatabaseUrl(), "jdbc:postgresql:")) {
+                //PostgreSQL
+                ds.setDriverClassName("org.postgresql.Driver");
+            } else if (StrUtil.startWith(ds.getDatabaseUrl(), "jdbc:oracle:thin:")) {
+                //Oracle ojdbc8
+                ds.setDriverClassName("oracle.jdbc.OracleDriver");
+            } else if (StrUtil.startWith(ds.getDatabaseUrl(), "jdbc:gbase://")) {
+                //GBase8s
+                ds.setDriverClassName("com.gbase.jdbc.Driver");
+            } else if (StrUtil.startWith(ds.getDatabaseUrl(), "jdbc:gbase8a://")) {
+                //GBase8a
+                ds.setDriverClassName("com.gbase.jdbc.Driver");
+            } else if (StrUtil.startWith(ds.getDatabaseUrl(), "jdbc:oscar:")) {
+                //神通 OSCAR
+                ds.setDriverClassName("com.oscar.jdbc.OscarDriver");
+            } else if (StrUtil.startWith(ds.getDatabaseUrl(), "jdbc:highgo:")) {
+                //瀚高 HighGo
+                ds.setDriverClassName("com.highgo.jdbc.Driver");
+            } else if (StrUtil.startWith(ds.getDatabaseUrl(), "jdbc:sqlserver:")) {
+                //SqlServer
+                ds.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            } else if (StrUtil.startWith(ds.getDatabaseUrl(), "jdbc:h2:")) {
+                //H2内存库
+                ds.setDriverClassName("org.h2.Driver");
+            } else if (StrUtil.startWith(ds.getDatabaseUrl(), "jdbc:sqlite:")) {
+                //SQLite
+                ds.setDriverClassName("org.sqlite.JDBC");
+            } else {
+                //无匹配，可抛出异常或者不处理，外部自行配置driver
+                //  throw new RuntimeException("不支持的数据库url:" + ds.getDatabaseUrl());
+            }
+        }
+
         if (StringUtils.isNotBlank(ds.getDriverClassName())) {
             try {
                 Class.forName(ds.getDriverClassName());

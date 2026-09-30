@@ -164,7 +164,7 @@ public class BIPLoadDataDictionaryAggVOUtil {
                     ",label_name as displayname" +
                     ", label_type as parentmoduleid" +
                     " from iuap_apcom_benchservice.wb_label" +
-                    " where label_code in(select parentmoduleid from (" + sql + ") ) ";
+                    " where label_code in(select tt1.parentmoduleid from (" + sql + ") tt1 ) ";
             ArrayList<DataDictionaryAggVO.Module> allModules2 =
                     (ArrayList<DataDictionaryAggVO.Module>) cache.getIfPresent(sql);
 
